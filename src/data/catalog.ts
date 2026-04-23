@@ -157,3 +157,119 @@ export function findQuestionBySlug(slug: string | undefined) {
 export function questionsForExam(examSlug: string) {
   return questionCatalog.filter((question) => question.examSlug === examSlug)
 }
+
+export type MockCatalogItem = {
+  slug: string
+  examSlug: string
+  examName: string
+  title: string
+  description: string
+  questions: number
+  durationMinutes: number
+  difficulty: 'Beginner' | 'Moderate' | 'Advanced'
+  isFree: boolean
+  subjects: string[]
+}
+
+export type PaperCatalogItem = {
+  slug: string
+  examSlug: string
+  examName: string
+  title: string
+  year: string
+  shift: string
+  description: string
+  questions: number
+  subjects: string[]
+}
+
+export const mockCatalog: MockCatalogItem[] = [
+  {
+    slug: 'upsc-prelims-gs-mini-mock-2026',
+    examSlug: 'upsc-cse',
+    examName: 'UPSC CSE',
+    title: 'UPSC Prelims GS Mini Mock 2026',
+    description: 'A focused UPSC Prelims mini mock covering polity, geography, history, economy, and environment with instant review.',
+    questions: 25,
+    durationMinutes: 30,
+    difficulty: 'Moderate',
+    isFree: true,
+    subjects: ['Polity', 'Geography', 'History', 'Environment'],
+  },
+  {
+    slug: 'ssc-cgl-tier-1-reasoning-sprint',
+    examSlug: 'ssc-cgl',
+    examName: 'SSC CGL',
+    title: 'SSC CGL Tier 1 Reasoning Sprint',
+    description: 'Timed reasoning practice for SSC CGL Tier 1 with previous-year style questions and score analysis.',
+    questions: 30,
+    durationMinutes: 20,
+    difficulty: 'Beginner',
+    isFree: true,
+    subjects: ['Reasoning', 'Quant', 'General Awareness'],
+  },
+  {
+    slug: 'jkssb-finance-accounts-full-mock',
+    examSlug: 'jkssb',
+    examName: 'JKSSB',
+    title: 'JKSSB Finance Accounts Full Mock',
+    description: 'Full-length JKSSB finance and accounts mock with public finance, accounting, reasoning, and JK GK coverage.',
+    questions: 100,
+    durationMinutes: 120,
+    difficulty: 'Advanced',
+    isFree: false,
+    subjects: ['Finance', 'Accounts', 'Reasoning', 'JK GK'],
+  },
+]
+
+export const paperCatalog: PaperCatalogItem[] = [
+  {
+    slug: 'upsc-prelims-2023-gs-paper-1',
+    examSlug: 'upsc-cse',
+    examName: 'UPSC CSE',
+    title: 'UPSC Prelims 2023 GS Paper 1 Solved',
+    year: '2023',
+    shift: 'General Studies Paper 1',
+    description: 'UPSC Prelims 2023 GS Paper 1 with solved answers, topic tags, explanations, and free question-wise practice.',
+    questions: 100,
+    subjects: ['Polity', 'Geography', 'Economy', 'Environment', 'History'],
+  },
+  {
+    slug: 'ssc-cgl-2023-tier-1-all-shifts',
+    examSlug: 'ssc-cgl',
+    examName: 'SSC CGL',
+    title: 'SSC CGL 2023 Tier 1 All Shifts Solved',
+    year: '2023',
+    shift: 'Tier 1 All Shifts',
+    description: 'SSC CGL 2023 Tier 1 solved previous year papers with shift-wise questions and explanations.',
+    questions: 900,
+    subjects: ['Quant', 'Reasoning', 'English', 'General Awareness'],
+  },
+  {
+    slug: 'jkssb-finance-accounts-2024-paper',
+    examSlug: 'jkssb',
+    examName: 'JKSSB',
+    title: 'JKSSB Finance Accounts 2024 Solved Paper',
+    year: '2024',
+    shift: 'Finance Accounts Paper',
+    description: 'JKSSB Finance Accounts 2024 paper with solved answers, explanations, and exam-wise practice links.',
+    questions: 150,
+    subjects: ['Finance', 'Accounts', 'Budget', 'Reasoning'],
+  },
+]
+
+export function findMockBySlug(slug: string | undefined) {
+  return mockCatalog.find((mock) => mock.slug === slug)
+}
+
+export function findPaperBySlug(slug: string | undefined) {
+  return paperCatalog.find((paper) => paper.slug === slug)
+}
+
+export function mocksForExam(examSlug: string) {
+  return mockCatalog.filter((mock) => mock.examSlug === examSlug)
+}
+
+export function papersForExam(examSlug: string) {
+  return paperCatalog.filter((paper) => paper.examSlug === examSlug)
+}

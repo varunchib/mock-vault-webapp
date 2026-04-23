@@ -7,15 +7,15 @@ import { AppRoutes } from './routes/AppRoutes'
 
 function AppChrome() {
   const location = useLocation()
-  const isDashboard = location.pathname.startsWith('/dashboard')
+  const isPrivateApp = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')
 
   return (
     <>
-      {!isDashboard ? <Navbar /> : null}
+      {!isPrivateApp ? <Navbar /> : null}
       <main>
         <AppRoutes />
       </main>
-      {!isDashboard ? <Footer /> : null}
+      {!isPrivateApp ? <Footer /> : null}
     </>
   )
 }
