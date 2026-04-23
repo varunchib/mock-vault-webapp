@@ -1,4 +1,5 @@
-﻿import { seoLinks } from '../../data/landing'
+﻿import { Link } from 'react-router-dom'
+import { questionCatalog } from '../../data/catalog'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
 
@@ -11,11 +12,11 @@ export function SeoLinks() {
         subtitle="Every link below is a fully solved, Google-indexed page. This is what gets us to rank #1."
       />
       <div className="seo-grid">
-        {seoLinks.map((link) => (
-          <a className="seo-card" href="#top" key={link.title}>
-            <span className="seo-text">📄 {link.title}</span>
-            <span className="seo-count">{link.count}</span>
-          </a>
+        {questionCatalog.map((question) => (
+          <Link className="seo-card" to={`/question/${question.slug}`} key={question.slug}>
+            <span className="seo-text">📄 {question.examName} {question.year} {question.subject} Q{question.questionNo}</span>
+            <span className="seo-count">Solved</span>
+          </Link>
         ))}
       </div>
     </Reveal>
