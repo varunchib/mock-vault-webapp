@@ -5,7 +5,7 @@ import { AdminDashboardPage } from '../pages/AdminDashboardPage'
 import { AllExamsPage, ExamPage } from '../pages/ExamPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { LandingPage } from '../pages/LandingPage'
-import { MockDetailPage, MockTestsPage } from '../pages/MockSeoPage'
+import { PreviousYearPapersPage } from '../pages/PreviousYearPapersPage'
 import { PyqPaperPage } from '../pages/PyqPaperPage'
 import { QuestionPage } from '../pages/QuestionPage'
 
@@ -28,9 +28,8 @@ export function AppRoutes() {
       <Route path="/admin" element={<ProtectedAdmin />} />
       <Route path="/exam" element={<AllExamsPage />} />
       <Route path="/exam/:slug" element={<ExamPage />} />
+      <Route path="/:examPath/previous-year-papers" element={<PreviousYearPapersPage />} />
       <Route path="/question/:slug" element={<QuestionPage />} />
-      <Route path="/mock-test" element={<MockTestsPage />} />
-      <Route path="/mock-test/:slug" element={<MockDetailPage />} />
       <Route path="/pyq/:slug" element={<PyqPaperPage />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
