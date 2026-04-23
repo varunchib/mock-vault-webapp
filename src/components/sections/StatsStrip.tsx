@@ -1,24 +1,41 @@
-import { useCountUp } from '../../hooks/useCountUp'
-import { STATS } from '../../data'
+﻿import { useEffect, useRef, useState } from 'react'
+import { useInView } from 'framer-motion'
+import { stats } from '../../data/landing'
 
-function StatCell({ value, suffix, label }) {
-  const { count, ref } = useCountUp(value)
+function CountStat({ target, suffix, label }: { target: number; suffix: string; label: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once: true, amount: 0.5 })
+  const [count, setCount] = useState(0)
+
+  useEffect(() => {
+    if (!isInView) return
+
+    let frame = 0
+    const totalFrames = 55
+    const timer = window.setInterval(() => {
+      frame += 1
+      const progress = Math.min(frame / totalFrames, 1)
+      setCount(Math.round(target * progress))
+      if (progress === 1) window.clearInterval(timer)
+    }, 25)
+
+    return () => window.clearInterval(timer)
+  }, [isInView, target])
+
   return (
-    <div ref={ref} className="flex-1 min-w-[140px] text-center px-5 py-7 border-r border-line last:border-r-0">
-      <div className="font-display text-[34px] font-bold text-ink leading-none">
-        {count}<em className="not-italic text-hl-dark">{suffix}</em>
-      </div>
-      <div className="text-[13px] text-ink-3 font-medium mt-1.5">{label}</div>
+    <div className="stat-cell" ref={ref}>
+      <div className="stat-n">{count}<em>{suffix}</em></div>
+      <div className="stat-l">{label}</div>
     </div>
   )
 }
 
 export function StatsStrip() {
   return (
-    <div className="bg-white border-t border-b border-line flex flex-wrap px-[5%]">
-      {STATS.map((s) => (
-        <StatCell key={s.label} {...s} />
+    <section className="stats-strip" aria-label="PYQVault platform stats">
+      {stats.map((stat) => (
+        <CountStat key={stat.label} {...stat} />
       ))}
-    </div>
+    </section>
   )
 }

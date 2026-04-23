@@ -1,78 +1,77 @@
-import { Check, X } from 'lucide-react'
-import { FadeIn } from '../ui/FadeIn'
+﻿import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
-import { PRICING_PLANS } from '../../data'
 
-function PriceCard({ plan }) {
-  const { name, price, period, popular, features, cta, ctaStyle } = plan
-
-  return (
-    <div className={`relative rounded-2xl p-8 border-[1.5px] ${popular ? 'bg-ink border-ink' : 'bg-paper border-line'}`}>
-      {popular && (
-        <div className="absolute -top-[13px] left-1/2 -translate-x-1/2 bg-hl text-ink text-[11px] font-bold px-4 py-[3px] rounded-full tracking-wide">
-          MOST POPULAR
-        </div>
-      )}
-
-      <p className={`text-xs font-semibold tracking-[1.5px] uppercase mb-2.5 ${popular ? 'text-hl mt-2' : 'text-ink-4'}`}>
-        {name}
-      </p>
-
-      <div className={`font-display text-[40px] font-bold leading-none mb-0.5 ${popular ? 'text-white' : 'text-ink'}`}>
-        <sup className="text-xl">₹</sup>{price}
-      </div>
-
-      <p className={`text-[13px] mb-6 ${popular ? 'text-zinc-500' : 'text-ink-4'}`}>{period}</p>
-
-      <ul className="flex flex-col gap-2.5 mb-7">
-        {features.map(({ text, included }) => (
-          <li key={text} className={`flex items-center gap-2 text-sm ${
-            included
-              ? popular ? 'text-zinc-300' : 'text-ink-2'
-              : popular ? 'text-zinc-600' : 'text-ink-4'
-          }`}>
-            {included
-              ? <Check size={14} className="text-brand-green shrink-0" />
-              : <X size={14} className="shrink-0 opacity-50" />
-            }
-            {text}
-          </li>
-        ))}
-      </ul>
-
-      <button
-        className={`w-full py-3 rounded-[10px] text-sm font-semibold font-body transition-all duration-150 border-[1.5px] ${
-          ctaStyle === 'primary'
-            ? 'bg-hl text-ink border-transparent hover:bg-yellow-300'
-            : popular
-              ? 'bg-transparent text-zinc-400 border-zinc-700 hover:border-zinc-500 hover:text-white'
-              : 'bg-white text-ink border-line hover:border-ink-2'
-        }`}
-      >
-        {cta}
-      </button>
-    </div>
-  )
-}
+const plans = [
+  {
+    name: 'Explorer',
+    amount: '0',
+    period: 'Free forever · No card',
+    cta: 'Get started free',
+    popular: false,
+    features: [
+      { text: 'All PYQs with full solutions', included: true },
+      { text: '5 full mocks per month', included: true },
+      { text: 'Basic score & review', included: true },
+      { text: 'Unlimited mocks', included: false },
+      { text: 'Analytics & tracking', included: false },
+      { text: 'PDF downloads', included: false },
+    ],
+  },
+  {
+    name: 'Aspirant',
+    amount: '149',
+    period: 'per month · cancel anytime',
+    cta: 'Get Aspirant',
+    popular: true,
+    features: [
+      { text: 'Everything in Explorer', included: true },
+      { text: 'Unlimited mock tests', included: true },
+      { text: 'AI weak area analysis', included: true },
+      { text: 'PDF downloads', included: true },
+      { text: 'State leaderboard', included: true },
+      { text: 'No ads', included: true },
+    ],
+  },
+  {
+    name: 'Pro Scholar',
+    amount: '299',
+    period: 'per month · best for mains',
+    cta: 'Get Pro Scholar',
+    popular: false,
+    features: [
+      { text: 'Everything in Aspirant', included: true },
+      { text: 'AI Doubt Solver', included: true },
+      { text: 'Group mock challenges', included: true },
+      { text: '30/60/90 day planner', included: true },
+      { text: 'Early paper access', included: true },
+    ],
+  },
+] as const
 
 export function Pricing() {
   return (
-    <section className="bg-white border-t border-line px-[5%] py-[88px]" id="pricing">
-      <FadeIn>
-        <SectionHeader
-          eyebrow="Pricing"
-          title="Simple, honest pricing"
-          sub="Free is genuinely free. No 7-day trial tricks. No credit card to start."
-        />
-      </FadeIn>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-12 items-start">
-        {PRICING_PLANS.map((plan, i) => (
-          <FadeIn key={plan.id} delay={i * 0.08}>
-            <PriceCard plan={plan} />
-          </FadeIn>
+    <Reveal as="section" className="pricing-section" id="pricing">
+      <SectionHeader
+        eyebrow="Pricing"
+        title="Simple, honest pricing"
+        subtitle="Free is genuinely free. No 7-day trial tricks. No credit card to start."
+      />
+      <div className="price-grid">
+        {plans.map((plan) => (
+          <div className={`price-card ${plan.popular ? 'pop' : ''}`.trim()} key={plan.name}>
+            {plan.popular ? <div className="pop-tag">MOST POPULAR</div> : null}
+            <div className="p-name">{plan.name}</div>
+            <div className="p-amt"><sup>₹</sup>{plan.amount}</div>
+            <div className="p-per">{plan.period}</div>
+            <ul className="p-feats">
+              {plan.features.map((feature) => (
+                <li className={`p-feat ${feature.included ? '' : 'no'}`.trim()} key={feature.text}>{feature.text}</li>
+              ))}
+            </ul>
+            <button className={`p-btn ${plan.popular ? 'dark-btn' : 'ghost-btn'}`} type="button">{plan.cta}</button>
+          </div>
         ))}
       </div>
-    </section>
+    </Reveal>
   )
 }

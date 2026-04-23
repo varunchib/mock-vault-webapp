@@ -1,24 +1,37 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Navbar } from "./components/layout/Navbar";
-import { Footer } from "./components/layout/Footer";
-import { HomePage } from "./pages/HomePage";
-import ExamPage from "./pages/ExamPage";
-import MockPage from "./pages/MockPage";
-import QuestionPage from "./pages/QuestionPage";
+﻿import { Navbar } from './components/layout/Navbar'
+import { Footer } from './components/layout/Footer'
+import { AccessModel } from './components/sections/AccessModel'
+import { CTA } from './components/sections/CTA'
+import { Exams } from './components/sections/Exams'
+import { Hero } from './components/sections/Hero'
+import { HowItWorks } from './components/sections/HowItWorks'
+import { Pricing } from './components/sections/Pricing'
+import { QuestionDemo } from './components/sections/QuestionDemo'
+import { SeoLinks } from './components/sections/SeoLinks'
+import { StatsStrip } from './components/sections/StatsStrip'
+import { Testimonials } from './components/sections/Testimonials'
+import { Ticker } from './components/sections/Ticker'
+import { ValueProps } from './components/sections/ValueProps'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    <>
       <Navbar />
-      <main className="pt-[62px]">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/exam/:id" element={<ExamPage />} />
-          <Route path="/mock/:id" element={<MockPage />} />
-          <Route path="/question/:id" element={<QuestionPage />} />
-        </Routes>
+      <main>
+        <Hero />
+        <Ticker />
+        <StatsStrip />
+        <ValueProps />
+        <QuestionDemo />
+        <Exams />
+        <AccessModel />
+        <HowItWorks />
+        <Pricing />
+        <SeoLinks />
+        <Testimonials />
+        <CTA />
       </main>
       <Footer />
-    </BrowserRouter>
-  );
+    </>
+  )
 }
