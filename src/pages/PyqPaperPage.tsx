@@ -2,6 +2,7 @@
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
+import { examPreviousPapersPath } from '../lib/routes'
 import { findPaperBySlug, questionCatalog } from '../data/catalog'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -25,6 +26,7 @@ export function PyqPaperPage() {
       name: paper.title,
       description: paper.description,
       educationalLevel: 'Competitive exam preparation',
+      learningResourceType: 'Previous year question paper',
     } : undefined,
   })
 
@@ -32,7 +34,7 @@ export function PyqPaperPage() {
 
   const gatedAction = () => {
     if (isAuthenticated) {
-      window.alert('PDF/mock action will open after backend integration.')
+      window.alert('This will open the mock/PDF module after backend integration.')
       return
     }
     setLoginOpen(true)
@@ -41,48 +43,65 @@ export function PyqPaperPage() {
   const relatedQuestions = questionCatalog.filter((question) => question.examSlug === paper.examSlug)
 
   return (
-    <section className="public-page">
-      <div className="public-shell">
+    <section className="paper-simple-page">
+      <div className="paper-simple-shell">
         <nav className="crumbs" aria-label="Breadcrumb">
-          <Link to="/">Home</Link><span>/</span><Link to={`/exam/${paper.examSlug}`}>{paper.examName}</Link><span>/</span><span>{paper.year}</span>
+          <Link to="/">Home</Link>
+          <span>/</span>
+          <Link to={examPreviousPapersPath(paper.examSlug)}>{paper.examName} Papers</Link>
+          <span>/</span>
+          <span>{paper.year}</span>
         </nav>
-        <header className="public-hero compact">
-          <div>
-            <span className="public-kicker">PYQ Paper · {paper.year}</span>
-            <h1>{paper.title}</h1>
-            <p>{paper.description}</p>
-            <div className="public-actions">
-              <button className="dash-primary" type="button" onClick={gatedAction}><Play size={17} /> Attempt as mock</button>
-              <button className="dash-secondary" type="button" onClick={gatedAction}><Download size={17} /> Download PDF</button>
-            </div>
-          </div>
-          <div className="exam-score-card">
-            <div><strong>{paper.questions}</strong><span>Questions</span></div>
-            <div><strong>{paper.year}</strong><span>Year</span></div>
-            <div><strong>{paper.subjects.length}</strong><span>Subjects</span></div>
-          </div>
-        </header>
 
-        <section className="public-grid two-col">
-          <div className="public-card">
-            <div className="public-card-head"><h2>Question-wise solutions</h2><FileText size={18} /></div>
-            <div className="link-list">
-              {relatedQuestions.map((question) => (
-                <Link to={`/question/${question.slug}`} key={question.slug}>
-                  <span>Q{question.questionNo}. {question.subject}</span>
-                  <span>Solved</span>
-                </Link>
-              ))}
+        <div className="paper-simple-layout">
+          <main className="paper-simple-main">
+            <header className="paper-simple-header">
+              <span>{paper.examName} · {paper.year}</span>
+              <h1>{paper.title}</h1>
+              <p>{paper.description}</p>
+              <div className="paper-simple-meta">
+                <small>{paper.questions} Questions</small>
+                <small>{paper.shift}</small>
+                <small>{paper.subjects.length} Subjects</small>
+              </div>
+            </header>
+
+            <section className="paper-simple-card">
+              <div className="paper-simple-head">
+                <h2>Questions with solutions</h2>
+                <span>{relatedQuestions.length} solved</span>
+              </div>
+              <div className="paper-simple-list">
+                {relatedQuestions.map((question) => (
+                  <Link to={`/question/${question.slug}`} key={question.slug}>
+                    <span>Q{question.questionNo}</span>
+                    <div>
+                      <strong>{question.question}</strong>
+                      <small>{question.subject} · Answer: {question.answer}</small>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </section>
+          </main>
+
+          <aside className="paper-simple-side">
+            <div className="paper-action-box">
+              <h2>Attempt this paper</h2>
+              <p>Take this PYQ as a timed mock. Score and analysis are saved after login.</p>
+              <button className="primary" type="button" onClick={gatedAction}><Play size={16} /> Attempt Mock</button>
+              <button type="button" onClick={gatedAction}><Download size={16} /> Download PDF</button>
+              <div><Lock size={14} /> Login required for mock history and PDFs.</div>
             </div>
-          </div>
-          <div className="public-card">
-            <h2>Subjects covered</h2>
-            <div className="subject-cloud">
-              {paper.subjects.map((subject) => <span key={subject}>{subject}</span>)}
+
+            <div className="paper-detail-box">
+              <h3>Paper details</h3>
+              <p><FileText size={14} /> {paper.questions} questions</p>
+              <p>{paper.shift}</p>
+              <p>{paper.subjects.join(', ')}</p>
             </div>
-            <div className="locked-row"><Lock size={16} /> PDF download and attempt history require login.</div>
-          </div>
-        </section>
+          </aside>
+        </div>
       </div>
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </section>

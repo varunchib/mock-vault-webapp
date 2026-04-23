@@ -1,8 +1,9 @@
-﻿import { ArrowRight, BookOpen, Download, FileText, Lock, Play, Search } from 'lucide-react'
+﻿import { ArrowRight, BookOpen, FileText, Lock, Play, Search } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { LoginModal } from '../components/auth/LoginModal'
 import { useState } from 'react'
-import { examCatalog, findExamBySlug, questionsForExam } from '../data/catalog'
+import { examPreviousPapersPath } from '../lib/routes'
+import { examCatalog, findExamBySlug, papersForExam, questionsForExam } from '../data/catalog'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 
@@ -12,7 +13,7 @@ export function ExamPage() {
   const { isAuthenticated } = useAuth()
   const [loginOpen, setLoginOpen] = useState(false)
 
-  const title = exam ? `${exam.shortName} Previous Year Questions, Mock Tests & Solved Papers | PYQVault` : 'Exam PYQs and Mock Tests | PYQVault'
+  const title = exam ? `${exam.shortName} Previous Year Question Papers with Solutions | PYQVault` : 'Exam PYQs and Mock Tests | PYQVault'
   const description = exam?.description ?? 'Browse solved previous year questions, mock tests, answer keys, and explanations on PYQVault.'
 
   usePageMeta({
@@ -31,6 +32,7 @@ export function ExamPage() {
   if (!exam) return <Navigate to="/" replace />
 
   const questions = questionsForExam(exam.slug)
+  const papers = papersForExam(exam.slug)
 
   const requireLogin = () => {
     if (isAuthenticated) {
@@ -49,14 +51,14 @@ export function ExamPage() {
           <span>{exam.shortName}</span>
         </nav>
 
-        <header className="public-hero compact">
+        <header className="public-hero compact sober-hero">
           <div>
             <span className="public-kicker">{exam.icon} {exam.category} Exam</span>
-            <h1>{exam.name} PYQs, mocks and solved papers</h1>
+            <h1>{exam.name} previous year question papers</h1>
             <p>{exam.description}</p>
             <div className="public-actions">
-              <button className="dash-primary" type="button" onClick={requireLogin}><Play size={17} /> Attempt mock</button>
-              <button className="dash-secondary" type="button" onClick={requireLogin}><Download size={17} /> Download PDF</button>
+              <Link className="dash-primary link-button" to={examPreviousPapersPath(exam.slug)}><FileText size={17} /> View all papers</Link>
+              <button className="dash-secondary" type="button" onClick={requireLogin}><Play size={17} /> Attempt latest</button>
             </div>
           </div>
           <div className="exam-score-card">
@@ -69,17 +71,17 @@ export function ExamPage() {
         <section className="public-grid two-col">
           <div className="public-card">
             <div className="public-card-head">
-              <h2>Popular PYQ pages</h2>
+              <h2>Solved question papers</h2>
               <Search size={18} />
             </div>
             <div className="link-list">
-              {questions.map((question) => (
-                <Link to={`/question/${question.slug}`} key={question.slug}>
-                  <span><FileText size={16} /> {question.year} · {question.paper} · Q{question.questionNo}</span>
+              {papers.map((paper) => (
+                <Link to={`/pyq/${paper.slug}`} key={paper.slug}>
+                  <span><FileText size={16} /> {paper.title}</span>
                   <ArrowRight size={16} />
                 </Link>
               ))}
-              {questions.length === 0 ? <p className="muted-copy">Question pages for this exam are being added.</p> : null}
+              {papers.length === 0 ? <p className="muted-copy">Solved paper pages for this exam are being added.</p> : null}
             </div>
           </div>
 
@@ -98,10 +100,24 @@ export function ExamPage() {
         </section>
 
         <section className="public-card seo-copy-card">
-          <h2>Free to read. Login only when you take action.</h2>
-          <p>Every question explanation is public so students can find it from Google. Login is required only for mock attempts, saved progress, PDF downloads, analytics, and personalized plans.</p>
-          <div className="locked-row"><Lock size={16} /> Mock history, PDF downloads and analytics are saved after login.</div>
+          <h2>Question-wise explanations are public.</h2>
+          <p>Students from Google land on exact paper pages first. They can read solved questions freely. Attempt mode, saved score, PDF download, and analytics are available after login.</p>
+          <div className="locked-row"><Lock size={16} /> Mock history, PDFs, and analytics are saved after login.</div>
         </section>
+
+        {questions.length ? (
+          <section className="public-card seo-copy-card">
+            <h2>Recently solved questions</h2>
+            <div className="link-list">
+              {questions.slice(0, 3).map((question) => (
+                <Link to={`/question/${question.slug}`} key={question.slug}>
+                  <span>Q{question.questionNo}. {question.subject} · {question.year}</span>
+                  <span>Solved</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </section>
@@ -118,19 +134,19 @@ export function AllExamsPage() {
   return (
     <section className="public-page">
       <div className="public-shell">
-        <header className="public-hero compact">
+        <header className="public-hero compact sober-hero">
           <div>
             <span className="public-kicker">Browse exams</span>
-            <h1>Find solved PYQs for your target exam</h1>
-            <p>Start with a public exam page, read explanations freely, then login when you want to attempt mocks or save progress.</p>
+            <h1>Find solved PYQ papers for your target exam</h1>
+            <p>Start with a public paper page, read explanations freely, then login when you want to attempt the paper as a mock or download PDFs.</p>
           </div>
         </header>
         <div className="catalog-grid">
           {examCatalog.map((examItem) => (
-            <Link className="catalog-card" to={`/exam/${examItem.slug}`} key={examItem.slug}>
+            <Link className="catalog-card" to={examPreviousPapersPath(examItem.slug)} key={examItem.slug}>
               <span>{examItem.icon}</span>
               <strong>{examItem.shortName}</strong>
-              <small>{examItem.totalQuestions} questions</small>
+              <small>{examItem.papers} papers</small>
             </Link>
           ))}
         </div>
@@ -138,3 +154,4 @@ export function AllExamsPage() {
     </section>
   )
 }
+
