@@ -1,4 +1,5 @@
-﻿import { exams } from '../../data/landing'
+﻿import { Link } from 'react-router-dom'
+import { examCatalog } from '../../data/catalog'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
 
@@ -11,18 +12,13 @@ export function Exams() {
         subtitle="Central, state, banking, railway, teaching, medical — every competitive exam in India."
       />
       <div className="exam-grid">
-        {exams.map((exam) => (
-          <button
-            className="exam-card"
-            type="button"
-            key={exam.name}
-            onClick={() => window.alert(`${exam.name} papers loading...`)}
-          >
+        {examCatalog.map((exam) => (
+          <Link className="exam-card" to={`/exam/${exam.slug}`} key={exam.name}>
             <div className="ec-icon">{exam.icon}</div>
-            <h3 className="ec-name">{exam.name}</h3>
-            <div className="ec-sub">{exam.questions}</div>
-            <div className="ec-badge">{exam.badge}</div>
-          </button>
+            <h3 className="ec-name">{exam.shortName}</h3>
+            <div className="ec-sub">{exam.totalQuestions} questions</div>
+            <div className="ec-badge">{exam.category}</div>
+          </Link>
         ))}
       </div>
     </Reveal>
