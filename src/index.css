@@ -6107,3 +6107,466 @@ footer {
     width: 100%;
   }
 }
+
+/* Sober public PYQ reading experience */
+.pyq-reader-page,
+.pyq-paper-page,
+.pyp-sober-page {
+  padding: 28px 5% 80px;
+  background: #f7f8fa;
+  font-family: 'DM Sans', sans-serif;
+}
+
+.pyq-reader-shell,
+.pyq-paper-shell,
+.pyp-sober-shell {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+.pyq-reader-layout,
+.pyq-paper-layout,
+.pyp-sober-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
+  gap: 18px;
+  align-items: start;
+}
+
+.pyq-reader-main,
+.pyq-paper-main,
+.pyp-sober-main {
+  min-width: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.pyq-reader-header,
+.pyq-reader-card,
+.pyq-action-card,
+.pyq-paper-header,
+.pyq-paper-card,
+.pyq-paper-action-card,
+.pyq-paper-detail-card,
+.pyp-sober-hero,
+.pyp-sober-card,
+.pyp-sober-side-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .05);
+}
+
+.pyq-reader-header,
+.pyq-reader-card,
+.pyq-action-card,
+.pyq-paper-header,
+.pyq-paper-card,
+.pyq-paper-action-card,
+.pyq-paper-detail-card {
+  padding: 20px;
+}
+
+.pyq-reader-meta,
+.pyq-paper-meta,
+.pyp-sober-years,
+.pyq-tag-list,
+.pyp-sober-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pyq-reader-meta span,
+.pyq-paper-meta small,
+.pyp-sober-years button,
+.pyq-tag-list span,
+.pyp-sober-tags span,
+.pyp-sober-card-top span,
+.pyp-sober-card-top small {
+  border-radius: 999px;
+  background: #f3f4f6;
+  color: #6b7280;
+  padding: 5px 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pyq-reader-header h1,
+.pyq-paper-header h1,
+.pyp-sober-hero h1 {
+  margin: 10px 0;
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(26px, 3.2vw, 36px);
+  font-weight: 700;
+  line-height: 1.28;
+  letter-spacing: -.02em;
+}
+
+.pyq-reader-header p,
+.pyq-paper-header p,
+.pyp-sober-hero p,
+.pyq-action-card p,
+.pyq-paper-action-card p,
+.pyq-paper-detail-card p,
+.pyp-sober-card p,
+.pyp-sober-side-card p {
+  color: #5f6673;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.pyq-reader-card h2,
+.pyq-paper-card-head h2,
+.pyq-action-card h2,
+.pyq-paper-action-card h2,
+.pyq-paper-detail-card h3,
+.pyp-sober-card a,
+.pyp-sober-side-card h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.pyq-option-list,
+.pyq-paper-question-list,
+.pyp-sober-card-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.pyq-option-list button,
+.pyq-paper-question-list a,
+.pyp-sober-card {
+  border: 1px solid #eceff3;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.pyq-option-list button {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  text-align: left;
+}
+
+.pyq-option-list button span {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  background: #f3f4f6;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pyq-option-list button strong,
+.pyq-paper-question-list strong,
+.pyp-sober-card a {
+  color: #111827;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pyq-option-list button.correct {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.pyq-option-list button.incorrect {
+  border-color: #fecaca;
+  background: #fff1f1;
+}
+
+.explanation-card {
+  background: #fafaf7;
+}
+
+.answer-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  color: #166534;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.explanation-card p {
+  color: #374151;
+  font-size: 14px;
+}
+
+.pyq-reader-side,
+.pyq-paper-side,
+.pyp-sober-side {
+  position: sticky;
+  top: 86px;
+  display: grid;
+  gap: 12px;
+}
+
+.pyq-action-card,
+.pyq-paper-action-card,
+.pyp-sober-side-card.highlight {
+  background: #fff;
+}
+
+.pyq-action-card button,
+.pyq-paper-action-card button,
+.pyp-sober-actions button,
+.pyp-sober-side-card button {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #374151;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 700;
+  margin-top: 10px;
+}
+
+.pyq-action-card button.primary,
+.pyq-paper-action-card button.primary,
+.pyp-sober-actions button,
+.pyp-sober-side-card button {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--hl);
+}
+
+.pyq-login-note,
+.pyq-paper-login-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  margin-top: 12px;
+  border-radius: 10px;
+  background: var(--hl-bg);
+  color: var(--hl-dark);
+  padding: 9px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pyq-paper-question-list a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 14px;
+  text-decoration: none;
+}
+
+.pyq-paper-question-list a > span {
+  border-radius: 9px;
+  background: #f3f4f6;
+  color: #4b5563;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pyq-paper-question-list small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.pyp-sober-hero {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 16px;
+  padding: 22px;
+}
+
+.pyp-sober-hero > div > span {
+  color: var(--hl-dark);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.pyp-sober-hero aside {
+  min-width: 220px;
+  display: grid;
+  gap: 6px;
+  border-radius: 12px;
+  background: #fafaf7;
+  padding: 16px;
+}
+
+.pyp-sober-hero aside svg {
+  color: var(--hl-dark);
+}
+
+.pyp-sober-hero aside strong {
+  font-size: 14px;
+}
+
+.pyp-sober-hero aside small {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.pyp-sober-toolbar {
+  display: flex;
+  gap: 10px;
+}
+
+.pyp-sober-toolbar label,
+.pyp-sober-toolbar button {
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  padding: 0 12px;
+}
+
+.pyp-sober-toolbar label {
+  flex: 1;
+  color: #9ca3af;
+}
+
+.pyp-sober-toolbar input {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  font-size: 14px;
+}
+
+.pyp-sober-toolbar button {
+  color: #374151;
+  font-weight: 700;
+}
+
+.pyp-sober-years button.active {
+  background: var(--ink);
+  color: var(--hl);
+}
+
+.pyp-sober-card-grid {
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+}
+
+.pyp-sober-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.pyp-sober-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pyp-sober-card a {
+  text-decoration: none;
+}
+
+.pyp-sober-card p {
+  margin-top: -4px;
+}
+
+.pyp-sober-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.pyp-sober-actions a,
+.pyp-sober-actions button {
+  flex: 1 1 120px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  color: #374151;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pyp-sober-actions a {
+  color: #111827;
+}
+
+.pyp-sober-side-card {
+  padding: 18px;
+}
+
+.pyp-sober-side-card.highlight {
+  border-color: #e5e7eb;
+}
+
+@media (max-width: 980px) {
+  .pyq-reader-layout,
+  .pyq-paper-layout,
+  .pyp-sober-layout,
+  .pyp-sober-hero {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pyq-reader-side,
+  .pyq-paper-side,
+  .pyp-sober-side {
+    position: static;
+  }
+}
+
+@media (max-width: 700px) {
+  .pyq-reader-page,
+  .pyq-paper-page,
+  .pyp-sober-page {
+    padding-left: 4%;
+    padding-right: 4%;
+  }
+
+  .pyq-reader-header,
+  .pyq-reader-card,
+  .pyq-action-card,
+  .pyq-paper-header,
+  .pyq-paper-card,
+  .pyq-paper-action-card,
+  .pyq-paper-detail-card,
+  .pyp-sober-hero,
+  .pyp-sober-card,
+  .pyp-sober-side-card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .pyp-sober-toolbar,
+  .pyp-sober-actions {
+    flex-direction: column;
+  }
+
+  .pyp-sober-actions a,
+  .pyp-sober-actions button {
+    width: 100%;
+  }
+}
