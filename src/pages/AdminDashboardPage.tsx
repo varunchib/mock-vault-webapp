@@ -1,8 +1,8 @@
-﻿import { BarChart3, Bell, CheckCircle2, ClipboardList, Eye, FileText, Globe2, Home, Import, LayoutDashboard, Link2, ListChecks, LogOut, Plus, Save, Search, Settings, Trash2, UploadCloud } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { BarChart3, Bell, CheckCircle2, ClipboardList, Eye, Globe2, Home, Import, LayoutDashboard, Link2, ListChecks, LogOut, Plus, Save, Search, Settings, Trash2, UploadCloud } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
-import { examCatalog, mockCatalog, paperCatalog } from '../data/catalog'
+import { fetchAdminSummary, type AdminSummary } from '../lib/api'
 import { usePageMeta } from '../lib/usePageMeta'
 
 type AdminQuestionDraft = {
@@ -41,7 +41,7 @@ const storageKey = 'pyqvault.admin.mock.drafts.v2'
 const adminNav: AdminNavItem[] = [
   { icon: LayoutDashboard, label: 'Overview', href: '#overview', active: true },
   { icon: ClipboardList, label: 'Mock Builder', href: '#builder' },
-  { icon: FileText, label: 'Questions', href: '#questions' },
+  { icon: ListChecks, label: 'Questions', href: '#questions' },
   { icon: Globe2, label: 'SEO Tools', href: '#seo' },
   { icon: UploadCloud, label: 'Draft Queue', href: '#drafts' },
   { icon: Settings, label: 'Settings', href: '#settings' },
@@ -78,12 +78,12 @@ function readDrafts(): AdminMockDraft[] {
   }
 }
 
-function makeInitialDraft(): AdminMockDraft {
+function makeInitialDraft(examSlug = ''): AdminMockDraft {
   return {
     id: crypto.randomUUID(),
     title: '',
     slug: '',
-    examSlug: examCatalog[0].slug,
+    examSlug,
     durationMinutes: '30',
     difficulty: 'Moderate',
     description: '',
@@ -142,11 +142,14 @@ function AdminNav() {
 export function AdminDashboardPage() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
-  const [draft, setDraft] = useState<AdminMockDraft>(makeInitialDraft)
+  const [summary, setSummary] = useState<AdminSummary | null>(null)
+  const [draft, setDraft] = useState<AdminMockDraft>(makeInitialDraft())
   const [questionDraft, setQuestionDraft] = useState<AdminQuestionDraft>(emptyQuestion)
   const [bulkText, setBulkText] = useState('')
   const [drafts, setDrafts] = useState<AdminMockDraft[]>(readDrafts)
-  const selectedExam = examCatalog.find((exam) => exam.slug === draft.examSlug) ?? examCatalog[0]
+  const [loading, setLoading] = useState(true)
+  const exams = summary?.exams ?? []
+  const selectedExam = exams.find((exam) => exam.slug === draft.examSlug) ?? exams[0]
   const seoScore = useMemo(() => seoScoreFor(draft), [draft])
   const publicUrl = `/mock-test/${draft.slug || 'mock-slug'}`
 
@@ -156,8 +159,26 @@ export function AdminDashboardPage() {
     canonicalPath: '/admin',
   })
 
-  const handleLogout = () => {
-    logout()
+  useEffect(() => {
+    let cancelled = false
+
+    void fetchAdminSummary()
+      .then((data) => {
+        if (cancelled) return
+        setSummary(data)
+        setDraft((current) => current.examSlug ? current : makeInitialDraft(data.exams[0]?.slug ?? ''))
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const handleLogout = async () => {
+    await logout()
     navigate('/')
   }
 
@@ -184,7 +205,7 @@ export function AdminDashboardPage() {
   }
 
   const importBulk = () => {
-    const imported = parseBulkQuestions(bulkText, questionDraft.subject || (selectedExam.subjects[0] ?? ''))
+    const imported = parseBulkQuestions(bulkText, questionDraft.subject || (selectedExam?.subjects[0] ?? ''))
     if (!imported.length) return
     setDraft((current) => ({ ...current, questions: [...current.questions, ...imported] }))
     setBulkText('')
@@ -196,9 +217,13 @@ export function AdminDashboardPage() {
     const nextDrafts = [nextDraft, ...drafts.filter((item) => item.id !== nextDraft.id)]
     window.localStorage.setItem(storageKey, JSON.stringify(nextDrafts))
     setDrafts(nextDrafts)
-    setDraft(makeInitialDraft())
+    setDraft(makeInitialDraft(exams[0]?.slug ?? ''))
     setQuestionDraft(emptyQuestion())
     setBulkText('')
+  }
+
+  if (loading || !selectedExam) {
+    return <section className="vault-app"><div className="vault-workspace"><main className="vault-main"><p>Loading admin workspace...</p></main></div></section>
   }
 
   return (
@@ -228,15 +253,15 @@ export function AdminDashboardPage() {
             <div>
               <span>Admin workspace</span>
               <h1>Build mock tests, SEO pages, and question sets from one place.</h1>
-              <p>Same dashboard system as the user app. Drafts save locally for now; the shape is ready for backend publishing.</p>
+              <p>Publishing is still draft-based in the UI, but routing, auth, and catalog counts now come from the backend.</p>
             </div>
             <button type="button" onClick={saveDraft} disabled={!draft.title.trim()}><Save size={17} /> Save mock draft</button>
           </section>
 
           <section className="admin-lite-stats">
-            <article><ClipboardList size={19} /><strong>{mockCatalog.length + drafts.length}</strong><span>Mock pages</span></article>
-            <article><FileText size={19} /><strong>{draft.questions.length}</strong><span>Questions in draft</span></article>
-            <article><UploadCloud size={19} /><strong>{paperCatalog.length}</strong><span>PYQ papers</span></article>
+            <article><ClipboardList size={19} /><strong>{(summary?.mockCount ?? 0) + drafts.length}</strong><span>Mock pages</span></article>
+            <article><ListChecks size={19} /><strong>{draft.questions.length}</strong><span>Questions in draft</span></article>
+            <article><UploadCloud size={19} /><strong>{summary?.paperCount ?? 0}</strong><span>PYQ papers</span></article>
             <article><BarChart3 size={19} /><strong>{seoScore}%</strong><span>SEO readiness</span></article>
           </section>
 
@@ -252,7 +277,7 @@ export function AdminDashboardPage() {
               <div className="admin-form-grid clean">
                 <label>Mock title<input value={draft.title} onChange={(event) => updateDraft('title', event.target.value)} placeholder="UPSC Prelims GS Mini Mock 2026" /></label>
                 <label>SEO slug<input value={draft.slug} onChange={(event) => updateDraft('slug', slugify(event.target.value))} placeholder="upsc-prelims-gs-mini-mock-2026" /></label>
-                <label>Exam<select value={draft.examSlug} onChange={(event) => updateDraft('examSlug', event.target.value)}>{examCatalog.map((exam) => <option value={exam.slug} key={exam.slug}>{exam.shortName}</option>)}</select></label>
+                <label>Exam<select value={draft.examSlug} onChange={(event) => updateDraft('examSlug', event.target.value)}>{exams.map((exam) => <option value={exam.slug} key={exam.slug}>{exam.shortName}</option>)}</select></label>
                 <label>Difficulty<select value={draft.difficulty} onChange={(event) => updateDraft('difficulty', event.target.value)}><option>Beginner</option><option>Moderate</option><option>Advanced</option></select></label>
                 <label>Duration minutes<input value={draft.durationMinutes} onChange={(event) => updateDraft('durationMinutes', event.target.value)} inputMode="numeric" /></label>
                 <label>Question count<input value={String(draft.questions.length)} readOnly /></label>
@@ -358,4 +383,3 @@ export function AdminDashboardPage() {
     </section>
   )
 }
-

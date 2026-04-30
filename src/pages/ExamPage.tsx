@@ -1,4 +1,4 @@
-﻿import {
+import {
   ArrowRight,
   BookOpen,
   FileText,
@@ -6,8 +6,8 @@
   Play,
   Search,
 } from "lucide-react";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
 import { examPreviousPapersPath } from "../lib/routes";
 import {
@@ -23,6 +23,7 @@ import { useAuth } from "../context/useAuth";
 import { usePageMeta } from "../lib/usePageMeta";
 
 export function ExamPage() {
+  const navigate = useNavigate();
   const { slug } = useParams();
   const [exam, setExam] = useState<Exam | null>(null);
   const [papers, setPapers] = useState<Paper[]>([]);
@@ -93,20 +94,24 @@ export function ExamPage() {
   if (error || !exam) return <Navigate to="/" replace />;
 
   const recentQuestions = questions.slice(0, 3);
+  const latestPaper = papers[0];
+  const homeHref = isAuthenticated ? "/dashboard" : "/";
 
-  const requireLogin = () => {
-    if (isAuthenticated) {
-      window.alert("Opening your mock test dashboard...");
+  const continueAttempt = () => {
+    if (latestPaper) {
+      navigate(`/pyq/${latestPaper.slug}`);
       return;
     }
-    setLoginOpen(true);
+    if (!isAuthenticated) {
+      setLoginOpen(true);
+    }
   };
 
   return (
     <section className="public-page exam-public-page">
       <div className="public-shell">
         <nav className="crumbs" aria-label="Breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to={homeHref}>Home</Link>
           <span>/</span>
           <span>{exam.shortName}</span>
         </nav>
@@ -128,7 +133,7 @@ export function ExamPage() {
               <button
                 className="dash-secondary"
                 type="button"
-                onClick={requireLogin}
+                onClick={continueAttempt}
               >
                 <Play size={17} /> Attempt latest
               </button>
@@ -194,15 +199,14 @@ export function ExamPage() {
         </section>
 
         <section className="public-card seo-copy-card">
-          <h2>Question-wise explanations are public.</h2>
+          <h2>Public paper pages. Login only when you submit.</h2>
           <p>
-            Students from Google land on exact paper pages first. They can read
-            solved questions freely. Attempt mode, saved score, PDF download,
-            and analytics are available after login.
+            Students can open papers and read the question flow without an account.
+            Login is required when they submit answers, save progress, download PDFs,
+            or want analytics.
           </p>
           <div className="locked-row">
-            <Lock size={16} /> Mock history, PDFs, and analytics are saved after
-            login.
+            <Lock size={16} /> Submitting answers, saved history, PDFs, and analytics require login.
           </div>
         </section>
 
@@ -213,9 +217,9 @@ export function ExamPage() {
               {recentQuestions.map((question) => (
                 <Link to={`/question/${question.slug}`} key={question.slug}>
                   <span>
-                    Q{question.questionNo}. {question.subject} · {question.year}
+                    Q{question.questionNo}. {question.subject} - {question.year}
                   </span>
-                  <span>Solved</span>
+                  <span>Open</span>
                 </Link>
               ))}
             </div>
@@ -228,16 +232,18 @@ export function ExamPage() {
 }
 
 export function AllExamsPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const query = searchParams.get("q") ?? "";
+
   usePageMeta({
     title: "All Competitive Exam PYQs and Mock Tests | PYQVault",
     description:
       "Browse UPSC, SSC, JKSSB, NEET, banking, railway, state PSC and other exam PYQs with solved answers and explanations.",
     canonicalPath: "/exam",
   });
-
-  const [exams, setExams] = useState<Exam[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -250,6 +256,24 @@ export function AllExamsPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  const filteredExams = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return exams;
+
+    return exams.filter((examItem) =>
+      [
+        examItem.name,
+        examItem.shortName,
+        examItem.category,
+        examItem.description,
+        ...examItem.subjects,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(normalized),
+    );
+  }, [exams, query]);
+
   return (
     <section className="public-page">
       <div className="public-shell">
@@ -258,19 +282,36 @@ export function AllExamsPage() {
             <span className="public-kicker">Browse exams</span>
             <h1>Find solved PYQ papers for your target exam</h1>
             <p>
-              Start with a public paper page, read explanations freely, then
-              login when you want to attempt the paper as a mock or download
-              PDFs.
+              Open any exam page, browse public paper lists, and start attempting questions.
+              Login is needed only when you submit answers or want saved features.
             </p>
           </div>
         </header>
+
+        <section className="pyp-sober-toolbar" style={{ marginBottom: "1.5rem" }}>
+          <label>
+            <Search size={16} />
+            <input
+              value={query}
+              onChange={(event) => {
+                const next = event.target.value;
+                if (next.trim()) setSearchParams({ q: next });
+                else setSearchParams({});
+              }}
+              placeholder="Search your exam, subject, category..."
+            />
+          </label>
+        </section>
+
         <div className="catalog-grid">
           {loading ? (
             <p>Loading exams...</p>
           ) : error ? (
             <p>Unable to load exams. Please try again later.</p>
+          ) : filteredExams.length === 0 ? (
+            <p>No exams matched your search.</p>
           ) : (
-            exams.map((examItem) => (
+            filteredExams.map((examItem) => (
               <Link
                 className="catalog-card"
                 to={examPreviousPapersPath(examItem.slug)}

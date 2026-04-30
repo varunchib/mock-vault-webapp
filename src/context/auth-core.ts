@@ -1,17 +1,19 @@
-﻿import { createContext } from 'react'
+import { createContext } from 'react'
 
 export type AuthUser = {
   id: string
   email: string
   name: string
   avatarUrl?: string
+  role: 'user' | 'admin'
 }
 
 export type AuthContextValue = {
   user: AuthUser | null
   isAuthenticated: boolean
-  loginWithGoogleCredential: (credential: string) => void
-  logout: () => void
+  isLoading: boolean
+  loginWithGoogleCredential: (credential: string) => Promise<void>
+  logout: () => Promise<void>
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null)

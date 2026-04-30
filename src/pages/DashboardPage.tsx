@@ -1,75 +1,21 @@
-﻿import { BarChart3, Bell, BookOpenCheck, Bookmark, CalendarDays, ChevronDown, ChevronRight, CircleHelp, ClipboardList, Download, FileText, Home, LibraryBig, LogOut, Plus, Search, Settings, Target, UserRound } from 'lucide-react'
+import { Search } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
-import { useMemo, useState } from 'react'
-import { useAuth } from '../context/useAuth'
-import { examCatalog, questionCatalog } from '../data/catalog'
+import { useEffect, useMemo, useState } from 'react'
+import { fetchDashboardBootstrap, fetchExamPapers, fetchExamQuestions, type Exam, type MockItem, type Paper, type Question } from '../lib/api'
+import { examPreviousPapersPath } from '../lib/routes'
 import { usePageMeta } from '../lib/usePageMeta'
-
-type NavItem = {
-  icon: typeof Home
-  label: string
-  badge?: string
-  active?: boolean
-}
-
-const primaryNav: NavItem[] = [
-  { icon: Home, label: 'Home', active: true },
-  { icon: ClipboardList, label: 'Mock Tests' },
-  { icon: FileText, label: 'PYQ Papers' },
-  { icon: BookOpenCheck, label: 'Practice' },
-  { icon: BarChart3, label: 'Analytics', badge: 'Soon' },
-]
-
-const libraryNav: NavItem[] = [
-  { icon: LibraryBig, label: 'All Exams' },
-  { icon: Bookmark, label: 'Saved Questions' },
-  { icon: Download, label: 'PDF Library' },
-  { icon: CircleHelp, label: 'Doubts' },
-]
-
-const planner = [
-  { label: 'Solve 20 PYQs', meta: '10-15 min', done: true },
-  { label: 'Attempt 1 mini mock', meta: '20 min', done: false },
-  { label: 'Review mistakes', meta: '5 min', done: false },
-]
-
-const mockRows = [
-  { name: 'Daily PYQ Drill', meta: '20 questions · 18 min', tag: 'Free' },
-  { name: 'Diagnostic Mini Mock', meta: '50 questions · 45 min', tag: 'Recommended' },
-  { name: 'Previous Year Mixed Set', meta: '100 questions · 120 min', tag: 'PDF' },
-]
-
-function NavGroup({ title, items }: { title: string; items: NavItem[] }) {
-  return (
-    <div className="vault-nav-group">
-      <p>{title}</p>
-      {items.map((item) => (
-        <button className={`vault-nav-item ${item.active ? 'active' : ''}`} type="button" key={item.label}>
-          <item.icon size={18} />
-          <span>{item.label}</span>
-          {item.badge ? <em>{item.badge}</em> : null}
-        </button>
-      ))}
-    </div>
-  )
-}
 
 export function DashboardPage() {
   const navigate = useNavigate()
-  const { user, logout } = useAuth()
-  const [selectedExamSlugs, setSelectedExamSlugs] = useState(['upsc-cse', 'ssc-cgl'])
-  const [activeExamSlug, setActiveExamSlug] = useState('upsc-cse')
-  const [examToAdd, setExamToAdd] = useState('jkssb')
-  const firstName = user?.name.split(' ')[0] ?? 'Aspirant'
-
-  const selectedExams = useMemo(() => {
-    return selectedExamSlugs
-      .map((slug) => examCatalog.find((exam) => exam.slug === slug))
-      .filter((exam): exam is NonNullable<typeof exam> => Boolean(exam))
-  }, [selectedExamSlugs])
-
-  const activeExam = examCatalog.find((exam) => exam.slug === activeExamSlug) ?? selectedExams[0] ?? examCatalog[0]
-  const availableToAdd = examCatalog.filter((exam) => !selectedExamSlugs.includes(exam.slug))
+  const [exams, setExams] = useState<Exam[]>([])
+  const [mocks, setMocks] = useState<MockItem[]>([])
+  const [recentQuestions, setRecentQuestions] = useState<Question[]>([])
+  const [activeExamSlug, setActiveExamSlug] = useState('')
+  const [activeQuestions, setActiveQuestions] = useState<Question[]>([])
+  const [activePapers, setActivePapers] = useState<Paper[]>([])
+  const [query, setQuery] = useState('')
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   usePageMeta({
     title: 'Dashboard | PYQVault',
@@ -77,175 +23,250 @@ export function DashboardPage() {
     canonicalPath: '/dashboard',
   })
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
+  useEffect(() => {
+    let cancelled = false
+
+    const loadDashboard = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+        const data = await fetchDashboardBootstrap()
+        if (cancelled) return
+
+        setExams(data.exams)
+        setMocks(data.mocks)
+        setRecentQuestions(data.recentQuestions)
+        setActiveExamSlug(data.exams[0]?.slug ?? '')
+      } catch (loadError) {
+        if (!cancelled) {
+          setError(loadError instanceof Error ? loadError.message : 'Unable to load dashboard.')
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
+    }
+
+    void loadDashboard()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!activeExamSlug) return
+
+    let cancelled = false
+
+    void Promise.all([
+      fetchExamQuestions(activeExamSlug),
+      fetchExamPapers(activeExamSlug),
+    ])
+      .then(([questions, papers]) => {
+        if (cancelled) return
+        setActiveQuestions(questions)
+        setActivePapers(papers)
+      })
+      .catch(() => {
+        if (cancelled) return
+        setActiveQuestions([])
+        setActivePapers([])
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [activeExamSlug])
+
+  const activeExam = exams.find((exam) => exam.slug === activeExamSlug) ?? exams[0]
+  const visibleQuestions = activeQuestions.length ? activeQuestions.slice(0, 5) : recentQuestions
+  const recommendedMocks = mocks.filter((mock) => mock.examSlug === activeExam?.slug)
+  const popularPapers = activePapers.slice(0, 6)
+
+  const filteredExams = useMemo(() => {
+    const normalized = query.trim().toLowerCase()
+    if (!normalized) return exams
+
+    return exams.filter((exam) =>
+      [
+        exam.name,
+        exam.shortName,
+        exam.category,
+        exam.description,
+        ...exam.subjects,
+      ]
+        .join(' ')
+        .toLowerCase()
+        .includes(normalized),
+    )
+  }, [exams, query])
+
+  const handleSearch = () => {
+    const trimmed = query.trim()
+    navigate(trimmed ? `/exam?q=${encodeURIComponent(trimmed)}` : '/exam')
   }
 
-  const addExam = () => {
-    if (selectedExamSlugs.includes(examToAdd)) return
-    setSelectedExamSlugs((value) => [...value, examToAdd])
-    setActiveExamSlug(examToAdd)
-    const next = examCatalog.find((exam) => exam.slug !== examToAdd && !selectedExamSlugs.includes(exam.slug))
-    if (next) setExamToAdd(next.slug)
+  if (loading) {
+    return <p>Loading dashboard...</p>
+  }
+
+  if (error || !activeExam) {
+    return <p>{error ?? 'Dashboard is unavailable right now.'}</p>
   }
 
   return (
-    <section className="vault-app vault-app-simple">
-      <aside className="vault-sidebar vault-sidebar-simple">
-        <Link className="vault-logo" to="/">
-          <span>P</span>
-          <strong>PYQVault</strong>
-        </Link>
+    <>
+      <section className="dashboard-strip">
+        <div>
+          <small>Active exam</small>
+          <strong>{activeExam.shortName}</strong>
+        </div>
+        <div>
+          <small>Papers</small>
+          <strong>{activeExam.papers}</strong>
+        </div>
+        <div>
+          <small>Questions</small>
+          <strong>{activeExam.totalQuestions}</strong>
+        </div>
+        <div className="dashboard-strip-actions">
+          <button type="button" onClick={() => navigate('/mock-test')}>Mock Tests</button>
+          <button type="button" onClick={() => navigate(examPreviousPapersPath(activeExam.slug))}>PYQ Papers</button>
+          <button type="button" onClick={() => navigate(visibleQuestions[0] ? `/question/${visibleQuestions[0].slug}` : `/exam/${activeExam.slug}`)}>Practice</button>
+        </div>
+      </section>
 
-        <NavGroup title="Prepare" items={primaryNav} />
-        <NavGroup title="Library" items={libraryNav} />
-
-        <button className="vault-logout" type="button" onClick={handleLogout}>
-          <LogOut size={17} /> Logout
-        </button>
-      </aside>
-
-      <div className="vault-workspace">
-        <header className="vault-topbar vault-topbar-simple">
-          <label className="vault-search">
-            <Search size={18} />
-            <input placeholder="Search papers, questions, topics..." />
+      <section className="dashboard-panel">
+        <div className="dashboard-panel-head">
+          <div>
+            <small>Exams</small>
+            <h2>All exams</h2>
+          </div>
+          <Link to="/exam">Browse all</Link>
+        </div>
+        <section className="pyp-sober-toolbar dashboard-inline-search">
+          <label>
+            <Search size={16} />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter') handleSearch()
+              }}
+              placeholder="Search your exam..."
+            />
           </label>
-
-          <button className="vault-icon-button" type="button"><Bell size={18} /></button>
-          <button className="vault-profile" type="button">
-            {user?.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <UserRound size={18} />}
-            <span>{firstName}</span>
-          </button>
-        </header>
-
-        <main className="vault-main vault-main-simple">
-          <section className="simple-welcome">
-            <div>
-              <span>Dashboard</span>
-              <h1>Welcome back, {firstName}</h1>
-              <p>Select your exam and continue with PYQs, mocks, or revision. Keep the home screen focused.</p>
-            </div>
-            <Link to={`/exam/${activeExam.slug}`}>Open {activeExam.shortName} page <ChevronRight size={16} /></Link>
-          </section>
-
-          <section className="selected-exams-panel">
-            <div className="simple-panel-head">
-              <div>
-                <span><Target size={15} /> My exams</span>
-                <h2>Choose what you are preparing for</h2>
+        </section>
+        <div className="dashboard-exam-grid">
+          {filteredExams.map((exam) => (
+            <article
+              className={`dashboard-exam-card ${exam.slug === activeExam.slug ? 'active' : ''}`}
+              key={exam.slug}
+            >
+              <button type="button" onClick={() => setActiveExamSlug(exam.slug)}>
+                <span className="dashboard-exam-icon">{exam.icon}</span>
+                <strong>{exam.shortName}</strong>
+                <small>{exam.category}</small>
+                <p>{exam.totalQuestions} questions</p>
+              </button>
+              <div className="dashboard-card-actions">
+                <Link to={examPreviousPapersPath(exam.slug)}>Papers</Link>
+                <Link to={`/exam/${exam.slug}`}>Open</Link>
               </div>
-              {availableToAdd.length ? (
-                <div className="add-exam-control">
-                  <label>
-                    <select value={examToAdd} onChange={(event) => setExamToAdd(event.target.value)}>
-                      {availableToAdd.map((exam) => <option value={exam.slug} key={exam.slug}>{exam.shortName}</option>)}
-                    </select>
-                    <ChevronDown size={14} />
-                  </label>
-                  <button type="button" onClick={addExam}><Plus size={15} /> Add exam</button>
-                </div>
-              ) : null}
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="dashboard-content-grid">
+        <article className="dashboard-panel">
+          <div className="dashboard-panel-head">
+            <div>
+              <small>Popular papers</small>
+              <h2>{activeExam.shortName} papers</h2>
             </div>
+            <Link to={examPreviousPapersPath(activeExam.slug)}>View all</Link>
+          </div>
+          <div className="dashboard-list">
+            {popularPapers.map((paper) => (
+              <Link className="dashboard-list-row" to={`/pyq/${paper.slug}`} key={paper.slug}>
+                <div>
+                  <strong>{paper.title}</strong>
+                  <small>{paper.year} · {paper.shift}</small>
+                </div>
+                <span>{paper.questions} Qs</span>
+              </Link>
+            ))}
+            {popularPapers.length === 0 ? <p>No papers published yet.</p> : null}
+          </div>
+        </article>
 
-            <div className="selected-exam-grid">
-              {selectedExams.map((exam) => (
-                <button
-                  className={exam.slug === activeExam.slug ? 'active' : ''}
-                  type="button"
-                  key={exam.slug}
-                  onClick={() => setActiveExamSlug(exam.slug)}
-                >
-                  <span>{exam.icon}</span>
-                  <strong>{exam.shortName}</strong>
-                  <small>{exam.totalQuestions} questions · {exam.mocks} mocks</small>
-                </button>
-              ))}
+        <article className="dashboard-panel">
+          <div className="dashboard-panel-head">
+            <div>
+              <small>Mock tests</small>
+              <h2>Recommended mocks</h2>
             </div>
-          </section>
+            <Link to="/mock-test">View all</Link>
+          </div>
+          <div className="dashboard-card-grid">
+            {recommendedMocks.map((mock) => (
+              <Link className="dashboard-feature-card" to={`/mock-test/${mock.slug}`} key={mock.slug}>
+                <strong>{mock.title}</strong>
+                <small>{mock.questions} questions · {mock.durationMinutes} min</small>
+                <span>{mock.isFree ? 'Free' : 'Premium'}</span>
+              </Link>
+            ))}
+            {recommendedMocks.length === 0 ? <p>No mocks published for this exam yet.</p> : null}
+          </div>
+        </article>
 
-          <section className="simple-dashboard-grid">
-            <div className="simple-main-column">
-              <article className="simple-card">
-                <div className="simple-panel-head">
-                  <div>
-                    <span>Continue</span>
-                    <h2>Pick up from PYQs</h2>
-                  </div>
-                  <Link to="/exam">Browse all</Link>
-                </div>
-                <div className="simple-question-list">
-                  {questionCatalog.map((question) => (
-                    <Link to={`/question/${question.slug}`} key={question.slug}>
-                      <div>
-                        <strong>{question.examName} {question.year} · Q{question.questionNo}</strong>
-                        <small>{question.subject} · solved explanation</small>
-                      </div>
-                      <ChevronRight size={16} />
-                    </Link>
-                  ))}
-                </div>
-              </article>
-
-              <article className="simple-card">
-                <div className="simple-panel-head">
-                  <div>
-                    <span>Mocks</span>
-                    <h2>Recommended for {activeExam.shortName}</h2>
-                  </div>
-                </div>
-                <div className="simple-mock-list">
-                  {mockRows.map((mock) => (
-                    <div className="simple-mock-row" key={mock.name}>
-                      <ClipboardList size={18} />
-                      <div>
-                        <strong>{mock.name}</strong>
-                        <small>{mock.meta}</small>
-                      </div>
-                      <em>{mock.tag}</em>
-                      <button type="button">Start</button>
-                    </div>
-                  ))}
-                </div>
-              </article>
+        <article className="dashboard-panel">
+          <div className="dashboard-panel-head">
+            <div>
+              <small>Recently viewed</small>
+              <h2>Recent questions</h2>
             </div>
-
-            <aside className="simple-side-column">
-              <article className="simple-card today-card">
-                <div className="simple-panel-head compact">
-                  <div>
-                    <span><CalendarDays size={15} /> Today</span>
-                    <h2>3 tasks</h2>
-                  </div>
+          </div>
+          <div className="dashboard-list">
+            {visibleQuestions.map((question) => (
+              <Link className="dashboard-list-row" to={`/question/${question.slug}`} key={question.slug}>
+                <div>
+                  <strong>{question.examName} Q{question.questionNo}</strong>
+                  <small>{question.subject} · {question.year}</small>
                 </div>
-                <div className="today-task-list">
-                  {planner.map((task) => (
-                    <label key={task.label}>
-                      <input type="checkbox" defaultChecked={task.done} />
-                      <span><strong>{task.label}</strong><small>{task.meta}</small></span>
-                    </label>
-                  ))}
-                </div>
-              </article>
+                <span>Open</span>
+              </Link>
+            ))}
+          </div>
+        </article>
 
-              <article className="simple-card compact-action-card">
-                <Download size={20} />
-                <h2>PDF Library</h2>
-                <p>Download papers and answer keys for selected exams.</p>
-                <button type="button">Open library</button>
-              </article>
-
-              <article className="simple-card compact-action-card muted">
-                <Settings size={20} />
-                <h2>Preferences</h2>
-                <p>Change exams, language, daily goal, and notifications.</p>
-                <button type="button">Edit settings</button>
-              </article>
-            </aside>
-          </section>
-        </main>
-      </div>
-    </section>
+        <article className="dashboard-panel">
+          <div className="dashboard-panel-head">
+            <div>
+              <small>Quick access</small>
+              <h2>Tools</h2>
+            </div>
+          </div>
+          <div className="dashboard-card-grid">
+            <button className="dashboard-feature-card dashboard-feature-button" type="button" onClick={() => navigate('/mock-test')}>
+              <strong>Mock Tests</strong>
+              <small>Start timed practice sets</small>
+              <span>Open</span>
+            </button>
+            <button className="dashboard-feature-card dashboard-feature-button" type="button" onClick={() => navigate(examPreviousPapersPath(activeExam.slug))}>
+              <strong>PYQ Papers</strong>
+              <small>Browse year-wise public papers</small>
+              <span>Open</span>
+            </button>
+            <button className="dashboard-feature-card dashboard-feature-button" type="button" onClick={() => navigate(visibleQuestions[0] ? `/question/${visibleQuestions[0].slug}` : `/exam/${activeExam.slug}`)}>
+              <strong>Practice</strong>
+              <small>Open solved questions directly</small>
+              <span>Open</span>
+            </button>
+          </div>
+        </article>
+      </section>
+    </>
   )
 }

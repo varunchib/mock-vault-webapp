@@ -1,11 +1,11 @@
-﻿import { Download, FileText, Lock, Play } from "lucide-react";
-import { Link, Navigate, useParams } from "react-router-dom";
+import { Download, FileText, Lock, Play } from "lucide-react";
+import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
 import { examPreviousPapersPath } from "../lib/routes";
 import {
-  fetchExamQuestions,
   fetchPaperBySlug,
+  fetchPaperQuestions,
   type Paper,
   type Question,
 } from "../lib/api";
@@ -13,6 +13,7 @@ import { useAuth } from "../context/useAuth";
 import { usePageMeta } from "../lib/usePageMeta";
 
 export function PyqPaperPage() {
+  const navigate = useNavigate()
   const { slug } = useParams();
   const [paper, setPaper] = useState<Paper | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -32,7 +33,7 @@ export function PyqPaperPage() {
     fetchPaperBySlug(slug)
       .then((paperData) => {
         setPaper(paperData);
-        return fetchExamQuestions(paperData.examSlug);
+        return fetchPaperQuestions(paperData.slug);
       })
       .then(setQuestions)
       .catch(() => setError(true))
@@ -62,10 +63,7 @@ export function PyqPaperPage() {
       : undefined,
   });
 
-  const relatedQuestions = useMemo(() => {
-    if (!paper) return [];
-    return questions.filter((question) => question.examSlug === paper.examSlug);
-  }, [paper, questions]);
+  const relatedQuestions = useMemo(() => questions, [questions]);
 
   if (!slug) return <Navigate to="/exam" replace />;
 
@@ -80,10 +78,11 @@ export function PyqPaperPage() {
   }
 
   if (error || !paper) return <Navigate to="/exam" replace />;
+  const homeHref = isAuthenticated ? "/dashboard" : "/";
 
   const gatedAction = () => {
     if (isAuthenticated) {
-      window.alert("This will open the mock/PDF module after backend integration.");
+      navigate('/dashboard')
       return;
     }
     setLoginOpen(true);
@@ -93,7 +92,7 @@ export function PyqPaperPage() {
     <section className="pyq-paper-page">
       <div className="pyq-paper-shell">
         <nav className="crumbs" aria-label="Breadcrumb">
-          <Link to="/">Home</Link>
+          <Link to={homeHref}>Home</Link>
           <span>/</span>
           <Link to={examPreviousPapersPath(paper.examSlug)}>
             {paper.examName} Papers
@@ -105,7 +104,7 @@ export function PyqPaperPage() {
         <div className="pyq-paper-layout">
           <main className="pyq-paper-main">
             <header className="pyq-paper-header">
-              <span>{paper.examName} · {paper.year}</span>
+              <span>{paper.examName} - {paper.year}</span>
               <h1>{paper.title}</h1>
               <p>{paper.description}</p>
               <div className="pyq-paper-meta">
@@ -126,7 +125,7 @@ export function PyqPaperPage() {
                     <span>Q{question.questionNo}</span>
                     <div>
                       <strong>{question.question}</strong>
-                      <small>{question.subject} · Answer: {question.answer}</small>
+                      <small>{question.subject} - Open question</small>
                     </div>
                   </Link>
                 ))}
@@ -137,9 +136,9 @@ export function PyqPaperPage() {
           <aside className="pyq-paper-side">
             <div className="pyq-paper-action-card">
               <h2>Attempt this paper</h2>
-              <p>Use timer, review answers, and keep your score history after login.</p>
+              <p>Paper pages stay public. Login is required when you submit answers, save history, or download PDFs.</p>
               <button className="primary" type="button" onClick={gatedAction}>
-                <Play size={16} /> Attempt Mock
+                <Play size={16} /> Continue with account
               </button>
               <button type="button" onClick={gatedAction}>
                 <Download size={16} /> Download PDF
