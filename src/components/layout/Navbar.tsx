@@ -1,5 +1,5 @@
-﻿import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { LoginModal } from '../auth/LoginModal'
 import { Logo } from '../ui/Logo'
 import { useAuth } from '../../context/useAuth'
@@ -17,8 +17,8 @@ export function Navbar() {
     setLoginOpen(true)
   }
 
-  const handleLogout = () => {
-    logout()
+  const handleLogout = async () => {
+    await logout()
     navigate('/')
   }
 
@@ -27,7 +27,7 @@ export function Navbar() {
       <nav className="site-nav">
         <Logo />
         <ul className="nav-mid" aria-label="Primary navigation">
-          <li><a href="/exam">Exams</a></li>
+          <li><Link to="/exam">Exams</Link></li>
           <li><a href="/#how">How it works</a></li>
           <li><a href="/#pricing">Pricing</a></li>
         </ul>
@@ -39,7 +39,7 @@ export function Navbar() {
                 <strong>{user.name}</strong>
                 <small>{user.email}</small>
               </div>
-              <button className="n-login" type="button" onClick={handleLogout}>Log out</button>
+              <button className="n-login" type="button" onClick={() => void handleLogout()}>Log out</button>
             </div>
           ) : (
             <button className="n-login" type="button" onClick={() => setLoginOpen(true)}>Log in</button>

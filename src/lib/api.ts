@@ -20,6 +20,7 @@ export type QuestionOption = {
 export type Question = {
   slug: string;
   examSlug: string;
+  paperSlug?: string;
   examName: string;
   year: string;
   paper: string;
@@ -58,80 +59,146 @@ export type MockItem = {
   subjects: string[];
 };
 
-async function getJson<T>(path: string): Promise<T> {
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-  };
+export type AuthUser = {
+  id: string;
+  email: string;
+  name: string;
+  avatarUrl?: string;
+  role: "user" | "admin";
+};
 
-  // Add authorization header if token exists
-  const session = localStorage.getItem("pyqvault.google.session");
-  if (session) {
-    try {
-      const parsed = JSON.parse(session);
-      if (parsed.token && parsed.expiresAt > Date.now()) {
-        headers.Authorization = `Bearer ${parsed.token}`;
-      }
-    } catch {
-      // Ignore parsing errors
-    }
+export type DashboardBootstrap = {
+  user: AuthUser;
+  exams: Exam[];
+  mocks: MockItem[];
+  recentQuestions: Question[];
+};
+
+export type AdminSummary = {
+  exams: Exam[];
+  paperCount: number;
+  mockCount: number;
+  questionCount: number;
+};
+
+type AuthPayload = {
+  user: AuthUser;
+};
+
+export class APIError extends Error {
+  constructor(
+    message: string,
+    public status: number,
+  ) {
+    super(message);
+  }
+}
+
+function normalizeBaseUrl() {
+  const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+  if (!baseUrl) return "";
+
+  let normalized = baseUrl.replace(/\/+$/, "");
+
+  if (normalized.endsWith("/api/v1")) {
+    normalized = normalized.slice(0, -7);
+  } else if (normalized.endsWith("/api")) {
+    normalized = normalized.slice(0, -4);
   }
 
-  const response = await fetch(path, { headers });
-  if (!response.ok) {
-    throw new Error(
-      `Request failed: ${response.status} ${response.statusText}`,
-    );
-  }
-  return response.json();
+  return normalized;
 }
 
-export function fetchExamCatalog(): Promise<Exam[]> {
-  return getJson<Exam[]>("/api/exams");
+function buildUrl(path: string) {
+  return `${normalizeBaseUrl()}${path}`;
 }
 
-export function fetchExamBySlug(slug: string): Promise<Exam> {
-  return getJson<Exam>(`/api/exams/${encodeURIComponent(slug)}`);
-}
-
-export function fetchExamPapers(slug: string): Promise<Paper[]> {
-  return getJson<Paper[]>(`/api/exams/${encodeURIComponent(slug)}/papers`);
-}
-
-export function fetchExamQuestions(slug: string): Promise<Question[]> {
-  return getJson<Question[]>(
-    `/api/exams/${encodeURIComponent(slug)}/questions`,
-  );
-}
-
-export function fetchPaperBySlug(slug: string): Promise<Paper> {
-  return getJson<Paper>(`/api/papers/${encodeURIComponent(slug)}`);
-}
-
-export function fetchQuestionBySlug(slug: string): Promise<Question> {
-  return getJson<Question>(`/api/questions/${encodeURIComponent(slug)}`);
-}
-
-export function fetchMockCatalog(): Promise<MockItem[]> {
-  return getJson<MockItem[]>("/api/mocks");
-}
-
-export async function authenticateWithGoogle(
-  credential: string,
-): Promise<{ user: any; token: string }> {
-  const response = await fetch("/api/auth", {
-    method: "POST",
+async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(buildUrl(path), {
+    credentials: "include",
     headers: {
       "Content-Type": "application/json",
+      ...(init?.headers ?? {}),
     },
-    body: JSON.stringify({ credential }),
+    ...init,
   });
 
   if (!response.ok) {
-    const error = await response
+    const errorPayload = await response
       .json()
-      .catch(() => ({ message: "Authentication failed" }));
-    throw new Error(error.message || "Authentication failed");
+      .catch(() => ({ message: `Request failed with status ${response.status}` }));
+    throw new APIError(
+      errorPayload.message ?? `Request failed with status ${response.status}`,
+      response.status,
+    );
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
+}
+
+export function fetchExamCatalog(): Promise<Exam[]> {
+  return requestJson<Exam[]>("/api/v1/exams");
+}
+
+export function fetchExamBySlug(slug: string): Promise<Exam> {
+  return requestJson<Exam>(`/api/v1/exams/${encodeURIComponent(slug)}`);
+}
+
+export function fetchExamPapers(slug: string): Promise<Paper[]> {
+  return requestJson<Paper[]>(`/api/v1/exams/${encodeURIComponent(slug)}/papers`);
+}
+
+export function fetchExamQuestions(slug: string): Promise<Question[]> {
+  return requestJson<Question[]>(`/api/v1/exams/${encodeURIComponent(slug)}/questions`);
+}
+
+export function fetchPaperBySlug(slug: string): Promise<Paper> {
+  return requestJson<Paper>(`/api/v1/papers/${encodeURIComponent(slug)}`);
+}
+
+export function fetchPaperQuestions(slug: string): Promise<Question[]> {
+  return requestJson<Question[]>(`/api/v1/papers/${encodeURIComponent(slug)}/questions`);
+}
+
+export function fetchQuestionBySlug(slug: string): Promise<Question> {
+  return requestJson<Question>(`/api/v1/questions/${encodeURIComponent(slug)}`);
+}
+
+export function fetchMockCatalog(): Promise<MockItem[]> {
+  return requestJson<MockItem[]>("/api/v1/mocks");
+}
+
+export function fetchMockBySlug(slug: string): Promise<MockItem> {
+  return requestJson<MockItem>(`/api/v1/mocks/${encodeURIComponent(slug)}`);
+}
+
+export function fetchDashboardBootstrap(): Promise<DashboardBootstrap> {
+  return requestJson<DashboardBootstrap>("/api/v1/dashboard");
+}
+
+export function fetchAdminSummary(): Promise<AdminSummary> {
+  return requestJson<AdminSummary>("/api/v1/admin/summary");
+}
+
+export function fetchCurrentUser(): Promise<AuthPayload> {
+  return requestJson<AuthPayload>("/api/v1/auth/me");
+}
+
+export function refreshAuthSession(): Promise<AuthPayload> {
+  return requestJson<AuthPayload>("/api/v1/auth/refresh", {
+    method: "POST",
+  });
+}
+
+export function logoutAuthSession(): Promise<{ message: string }> {
+  return requestJson<{ message: string }>("/api/v1/auth/logout", {
+    method: "POST",
+  });
+}
+
+export function authenticateWithGoogle(credential: string): Promise<AuthPayload> {
+  return requestJson<AuthPayload>("/api/v1/auth/google", {
+    method: "POST",
+    body: JSON.stringify({ credential }),
+  });
 }

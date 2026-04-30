@@ -1,6 +1,7 @@
-﻿import { useState } from 'react'
+import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { motion, type Variants } from 'framer-motion'
+import { useNavigate } from 'react-router-dom'
 import { quickTags } from '../../data/landing'
 
 const stagger: Variants = {
@@ -18,13 +19,16 @@ const item: Variants = {
 }
 
 export function Hero() {
+  const navigate = useNavigate()
   const [query, setQuery] = useState('')
 
-  const runSearch = () => {
-    const trimmed = query.trim()
-    if (trimmed) {
-      window.alert(`Searching for: "${trimmed}"\n\n→ Takes you to results page`)
+  const runSearch = (value = query) => {
+    const trimmed = value.trim()
+    if (!trimmed) {
+      navigate('/exam')
+      return
     }
+    navigate(`/exam?q=${encodeURIComponent(trimmed)}`)
   }
 
   return (
@@ -33,7 +37,7 @@ export function Hero() {
       <motion.div variants={stagger} initial="hidden" animate="show" className="hero-inner">
         <motion.div variants={item} className="hero-chip">
           <span className="chip-dot" />
-          New — UPSC 2024 paper just added
+          New - UPSC 2024 paper just added
         </motion.div>
 
         <motion.h1 variants={item}>
@@ -42,7 +46,7 @@ export function Hero() {
         </motion.h1>
 
         <motion.p variants={item} className="hero-sub">
-          Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams — with complete answers and explanations.
+          Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams - with complete answers and explanations.
         </motion.p>
 
         <motion.div variants={item} className="search-outer">
@@ -54,15 +58,15 @@ export function Hero() {
             onKeyDown={(event) => {
               if (event.key === 'Enter') runSearch()
             }}
-            placeholder="Search — JKSSB 2024, SSC CGL 2023, UPSC Prelims..."
+            placeholder="Search - JKSSB 2024, SSC CGL 2023, UPSC Prelims..."
             aria-label="Search exam papers"
           />
-          <button className="s-btn" type="button" onClick={runSearch}>Search Papers</button>
+          <button className="s-btn" type="button" onClick={() => runSearch()}>Search Papers</button>
         </motion.div>
 
         <motion.div variants={item} className="tag-row" aria-label="Quick searches">
           {quickTags.map((tag) => (
-            <button className="s-tag" type="button" key={tag.label} onClick={() => setQuery(tag.query)}>
+            <button className="s-tag" type="button" key={tag.label} onClick={() => runSearch(tag.query)}>
               {tag.label}
             </button>
           ))}

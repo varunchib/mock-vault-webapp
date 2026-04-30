@@ -1,5 +1,6 @@
-﻿import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
+import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { X } from 'lucide-react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
 import { env } from '../../lib/env'
@@ -12,14 +13,26 @@ type LoginModalProps = {
 export function LoginModal({ open, onClose }: LoginModalProps) {
   const navigate = useNavigate()
   const { loginWithGoogleCredential } = useAuth()
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   if (!open) return null
 
-  const handleSuccess = (response: CredentialResponse) => {
+  const handleSuccess = async (response: CredentialResponse) => {
     if (!response.credential) return
-    loginWithGoogleCredential(response.credential)
-    onClose()
-    navigate('/dashboard')
+    setErrorMessage(null)
+    setIsSubmitting(true)
+
+    try {
+      await loginWithGoogleCredential(response.credential)
+      onClose()
+      navigate('/dashboard')
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Login failed. Please try again.'
+      setErrorMessage(message)
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -45,7 +58,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           <div className="auth-google-slot">
             <GoogleLogin
               onSuccess={handleSuccess}
-              onError={() => window.alert('Google login failed. Please try again.')}
+              onError={() => setErrorMessage('Google login failed. Please try again.')}
               useOneTap={false}
               text="continue_with"
               shape="pill"
@@ -59,8 +72,11 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           </div>
         )}
 
+        {isSubmitting ? <div className="auth-note">Signing you in...</div> : null}
+        {errorMessage ? <div className="auth-config-warning">{errorMessage}</div> : null}
+
         <div className="auth-note">
-          For production, verify the Google ID token on your backend before granting paid or private access.
+          Your session is verified on the backend before private access is granted.
         </div>
       </section>
     </div>

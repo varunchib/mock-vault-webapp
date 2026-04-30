@@ -1,5 +1,9 @@
-﻿import { Reveal } from '../ui/Reveal'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { LoginModal } from '../auth/LoginModal'
+import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
+import { useAuth } from '../../context/useAuth'
 
 const plans = [
   {
@@ -8,6 +12,7 @@ const plans = [
     period: 'Free forever · No card',
     cta: 'Get started free',
     popular: false,
+    premium: false,
     features: [
       { text: 'All PYQs with full solutions', included: true },
       { text: '5 full mocks per month', included: true },
@@ -23,6 +28,7 @@ const plans = [
     period: 'per month · cancel anytime',
     cta: 'Get Aspirant',
     popular: true,
+    premium: true,
     features: [
       { text: 'Everything in Explorer', included: true },
       { text: 'Unlimited mock tests', included: true },
@@ -38,6 +44,7 @@ const plans = [
     period: 'per month · best for mains',
     cta: 'Get Pro Scholar',
     popular: false,
+    premium: true,
     features: [
       { text: 'Everything in Aspirant', included: true },
       { text: 'AI Doubt Solver', included: true },
@@ -49,29 +56,50 @@ const plans = [
 ] as const
 
 export function Pricing() {
+  const navigate = useNavigate()
+  const { isAuthenticated } = useAuth()
+  const [loginOpen, setLoginOpen] = useState(false)
+
+  const handlePlanClick = (premium: boolean) => {
+    if (!premium) {
+      navigate('/exam')
+      return
+    }
+
+    if (isAuthenticated) {
+      navigate('/dashboard')
+      return
+    }
+
+    setLoginOpen(true)
+  }
+
   return (
-    <Reveal as="section" className="pricing-section" id="pricing">
-      <SectionHeader
-        eyebrow="Pricing"
-        title="Simple, honest pricing"
-        subtitle="Free is genuinely free. No 7-day trial tricks. No credit card to start."
-      />
-      <div className="price-grid">
-        {plans.map((plan) => (
-          <div className={`price-card ${plan.popular ? 'pop' : ''}`.trim()} key={plan.name}>
-            {plan.popular ? <div className="pop-tag">MOST POPULAR</div> : null}
-            <div className="p-name">{plan.name}</div>
-            <div className="p-amt"><sup>₹</sup>{plan.amount}</div>
-            <div className="p-per">{plan.period}</div>
-            <ul className="p-feats">
-              {plan.features.map((feature) => (
-                <li className={`p-feat ${feature.included ? '' : 'no'}`.trim()} key={feature.text}>{feature.text}</li>
-              ))}
-            </ul>
-            <button className={`p-btn ${plan.popular ? 'dark-btn' : 'ghost-btn'}`} type="button">{plan.cta}</button>
-          </div>
-        ))}
-      </div>
-    </Reveal>
+    <>
+      <Reveal as="section" className="pricing-section" id="pricing">
+        <SectionHeader
+          eyebrow="Pricing"
+          title="Simple, honest pricing"
+          subtitle="Free is genuinely free. No 7-day trial tricks. No credit card to start."
+        />
+        <div className="price-grid">
+          {plans.map((plan) => (
+            <div className={`price-card ${plan.popular ? 'pop' : ''}`.trim()} key={plan.name}>
+              {plan.popular ? <div className="pop-tag">MOST POPULAR</div> : null}
+              <div className="p-name">{plan.name}</div>
+              <div className="p-amt"><sup>₹</sup>{plan.amount}</div>
+              <div className="p-per">{plan.period}</div>
+              <ul className="p-feats">
+                {plan.features.map((feature) => (
+                  <li className={`p-feat ${feature.included ? '' : 'no'}`.trim()} key={feature.text}>{feature.text}</li>
+                ))}
+              </ul>
+              <button className={`p-btn ${plan.popular ? 'dark-btn' : 'ghost-btn'}`} type="button" onClick={() => handlePlanClick(plan.premium)}>{plan.cta}</button>
+            </div>
+          ))}
+        </div>
+      </Reveal>
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+    </>
   )
 }

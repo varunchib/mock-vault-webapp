@@ -1,95 +1,66 @@
-﻿import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
+import { AuthContext, type AuthContextValue } from "../../context/auth-core";
 import {
-  AuthContext,
-  type AuthUser,
-  type AuthContextValue,
-} from "../../context/auth-core";
-import { env } from "../../lib/env";
-import { authenticateWithGoogle } from "../../lib/api";
-
-type GoogleCredentialPayload = {
-  sub: string;
-  email: string;
-  name: string;
-  picture?: string;
-  exp: number;
-};
-
-type StoredSession = {
-  user: AuthUser;
-  token: string;
-  expiresAt: number;
-};
-
-const storageKey = "pyqvault.google.session";
-
-function readStoredSession(): StoredSession | null {
-  const raw = window.localStorage.getItem(storageKey);
-  if (!raw) return null;
-
-  try {
-    const parsed = JSON.parse(raw) as StoredSession;
-    if (!parsed.expiresAt || parsed.expiresAt <= Date.now()) {
-      window.localStorage.removeItem(storageKey);
-      return null;
-    }
-    return parsed;
-  } catch {
-    window.localStorage.removeItem(storageKey);
-    return null;
-  }
-}
-
-function getInitialUser() {
-  const raw = window.localStorage.getItem(storageKey);
-  if (!raw) return null;
-
-  try {
-    const parsed = JSON.parse(raw) as StoredSession;
-    if (!parsed.expiresAt || parsed.expiresAt <= Date.now()) {
-      window.localStorage.removeItem(storageKey);
-      return null;
-    }
-    return parsed.user;
-  } catch {
-    window.localStorage.removeItem(storageKey);
-    return null;
-  }
-}
+  APIError,
+  authenticateWithGoogle,
+  fetchCurrentUser,
+  logoutAuthSession,
+  refreshAuthSession,
+} from "../../lib/api";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(getInitialUser);
+  const [user, setUser] = useState<AuthContextValue["user"]>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const value = useMemo<AuthContextValue>(
-    () => ({
-      user,
-      isAuthenticated: Boolean(user),
-      loginWithGoogleCredential: async (credential: string) => {
-        try {
-          const authResponse = await authenticateWithGoogle(credential);
+  useEffect(() => {
+    let cancelled = false;
 
-          // Store the backend JWT token and user info
-          const session = {
-            user: authResponse.user,
-            token: authResponse.token,
-            expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
-          };
-
-          window.localStorage.setItem(storageKey, JSON.stringify(session));
-          setUser(authResponse.user);
-        } catch (error) {
-          console.error("Authentication error:", error);
-          throw error;
+    const bootstrap = async () => {
+      try {
+        const response = await fetchCurrentUser();
+        if (!cancelled) setUser(response.user);
+        return;
+      } catch (error) {
+        if (!(error instanceof APIError) || error.status !== 401) {
+          if (!cancelled) setUser(null);
+          return;
         }
-      },
-      logout: () => {
-        window.localStorage.removeItem(storageKey);
+      }
+
+      try {
+        const refreshed = await refreshAuthSession();
+        if (!cancelled) setUser(refreshed.user);
+      } catch {
+        if (!cancelled) setUser(null);
+      }
+    };
+
+    void bootstrap().finally(() => {
+      if (!cancelled) setIsLoading(false);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const value: AuthContextValue = {
+    user,
+    isAuthenticated: Boolean(user),
+    isLoading,
+    loginWithGoogleCredential: async (credential: string) => {
+      const response = await authenticateWithGoogle(credential);
+      setUser(response.user);
+    },
+    logout: async () => {
+      try {
+        await logoutAuthSession();
+      } finally {
         setUser(null);
-      },
-    }),
-    [user],
-  );
+      }
+    },
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

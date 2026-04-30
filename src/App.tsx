@@ -1,21 +1,37 @@
-﻿import { BrowserRouter, useLocation } from 'react-router-dom'
+import { BrowserRouter, useLocation } from 'react-router-dom'
 import { GoogleProvider } from './components/auth/GoogleProvider'
 import { AuthProvider } from './components/auth/AuthProvider'
-import { Navbar } from './components/layout/Navbar'
 import { Footer } from './components/layout/Footer'
+import { Navbar } from './components/layout/Navbar'
+import { AppShell } from './components/layout/AppShell'
+import { useAuth } from './context/useAuth'
 import { AppRoutes } from './routes/AppRoutes'
 
 function AppChrome() {
   const location = useLocation()
-  const isPrivateApp = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/admin')
+  const { isAuthenticated, isLoading } = useAuth()
+  const isAdminRoute = location.pathname.startsWith('/admin')
+  const useUserShell = isAuthenticated && !isAdminRoute
+
+  if (isLoading) {
+    return <main><section className="public-page"><div className="public-shell"><p>Loading session...</p></div></section></main>
+  }
+
+  if (useUserShell) {
+    return <AppShell><AppRoutes /></AppShell>
+  }
+
+  if (isAdminRoute) {
+    return <main><AppRoutes /></main>
+  }
 
   return (
     <>
-      {!isPrivateApp ? <Navbar /> : null}
+      <Navbar />
       <main>
         <AppRoutes />
       </main>
-      {!isPrivateApp ? <Footer /> : null}
+      <Footer />
     </>
   )
 }
