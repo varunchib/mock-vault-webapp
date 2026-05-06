@@ -4,6 +4,7 @@ import { AuthProvider } from './components/auth/AuthProvider'
 import { Footer } from './components/layout/Footer'
 import { Navbar } from './components/layout/Navbar'
 import { AppShell } from './components/layout/AppShell'
+import { HaloLoader } from './components/common/HaloLoader'
 import { useAuth } from './context/useAuth'
 import { AppRoutes } from './routes/AppRoutes'
 
@@ -11,10 +12,11 @@ function AppChrome() {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
   const isAdminRoute = location.pathname.startsWith('/admin')
+  const isLandingRoute = location.pathname === '/'
   const useUserShell = isAuthenticated && !isAdminRoute
 
   if (isLoading) {
-    return <main><section className="public-page"><div className="public-shell"><p>Loading session...</p></div></section></main>
+    return <main><section className="public-page"><div className="public-shell"><HaloLoader label="Loading session" /></div></section></main>
   }
 
   if (useUserShell) {
@@ -26,13 +28,13 @@ function AppChrome() {
   }
 
   return (
-    <>
+    <div className={isLandingRoute ? 'landing-layout' : 'subpage-layout'}>
       <Navbar />
       <main>
         <AppRoutes />
       </main>
       <Footer />
-    </>
+    </div>
   )
 }
 

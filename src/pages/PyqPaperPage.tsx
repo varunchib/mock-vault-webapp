@@ -2,6 +2,7 @@ import { Download, FileText, Lock, Play } from "lucide-react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
+import { HaloLoader } from "../components/common/HaloLoader";
 import { examPreviousPapersPath } from "../lib/routes";
 import {
   fetchPaperBySlug,
@@ -71,7 +72,7 @@ export function PyqPaperPage() {
     return (
       <section className="pyq-paper-page">
         <div className="pyq-paper-shell">
-          <p>Loading paper...</p>
+          <HaloLoader label="Loading paper" />
         </div>
       </section>
     );

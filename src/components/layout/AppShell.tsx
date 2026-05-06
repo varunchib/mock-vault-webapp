@@ -1,7 +1,20 @@
-import type { ReactNode } from 'react'
-import { BookOpenCheck, Bookmark, CircleHelp, ClipboardList, Download, FileText, Home, LibraryBig, LogOut, Search } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  BookOpenCheck,
+  Bookmark,
+  ChevronRight,
+  CircleHelp,
+  ClipboardList,
+  Download,
+  FileText,
+  Home,
+  LibraryBig,
+  LogOut,
+  Search,
+} from 'lucide-react'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../context/useAuth'
+import { fetchExamCatalog, type Exam } from '../../lib/api'
 
 type NavItem = {
   icon: typeof Home
@@ -46,10 +59,80 @@ function NavGroup({
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const location = useLocation()
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const firstName = user?.name.split(' ')[0] ?? 'Aspirant'
   const avatarInitial = firstName.charAt(0).toUpperCase()
+  const [searchQuery, setSearchQuery] = useState('')
+  const [allExams, setAllExams] = useState<Exam[]>([])
+  const [profileOpen, setProfileOpen] = useState(false)
+  const searchRef = useRef<HTMLDivElement | null>(null)
+  const profileRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    void fetchExamCatalog()
+      .then((catalog) => {
+        if (!cancelled) {
+          setAllExams(catalog)
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setAllExams([])
+        }
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  useEffect(() => {
+    setSearchQuery('')
+    setProfileOpen(false)
+  }, [location.pathname])
+
+  useEffect(() => {
+    const handlePointerDown = (event: MouseEvent) => {
+      const target = event.target as Node
+
+      if (searchRef.current && !searchRef.current.contains(target)) {
+        setSearchQuery('')
+      }
+
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setProfileOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+    }
+  }, [])
+
+  const searchResults = useMemo(() => {
+    const normalized = searchQuery.trim().toLowerCase()
+    if (!normalized) return []
+
+    return allExams
+      .filter((exam) =>
+        [
+          exam.name,
+          exam.shortName,
+          exam.category,
+          exam.description,
+          ...exam.subjects,
+        ]
+          .join(' ')
+          .toLowerCase()
+          .includes(normalized),
+      )
+      .slice(0, 6)
+  }, [allExams, searchQuery])
 
   const handleLogout = async () => {
     await logout()
@@ -66,31 +149,67 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <NavGroup title="Prepare" items={primaryNav} onNavigate={navigate} />
         <NavGroup title="Library" items={libraryNav} onNavigate={navigate} />
-
-        <button className="vault-logout" type="button" onClick={() => void handleLogout()}>
-          <LogOut size={17} /> Logout
-        </button>
       </aside>
 
       <div className="vault-workspace">
         <header className="vault-topbar vault-topbar-simple dashboard-topbar">
-          <label className="vault-search">
-            <Search size={18} />
-            <input
-              placeholder="Search exam, paper, subject..."
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  const value = (event.currentTarget.value ?? '').trim()
-                  navigate(value ? `/exam?q=${encodeURIComponent(value)}` : '/exam')
-                }
-              }}
-            />
-          </label>
+          <div className="vault-search-wrap" ref={searchRef}>
+            <label className="vault-search">
+              <Search size={18} />
+              <input
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder="Search exams..."
+              />
+            </label>
 
-          <button className="vault-profile dashboard-profile" type="button">
-            <span className="dashboard-avatar">{avatarInitial}</span>
-            <span>{firstName}</span>
-          </button>
+            {searchQuery.trim() ? (
+              <div className="vault-search-results">
+                {searchResults.length ? (
+                  searchResults.map((exam) => (
+                    <button
+                      className="vault-search-result"
+                      type="button"
+                      key={exam.slug}
+                      onClick={() => navigate(`/exam/${exam.slug}`)}
+                    >
+                      <span>{exam.icon}</span>
+                      <div>
+                        <strong>{exam.shortName}</strong>
+                        <small>{exam.category} exam</small>
+                      </div>
+                      <ChevronRight size={16} />
+                    </button>
+                  ))
+                ) : (
+                  <div className="vault-search-empty">
+                    <strong>No matching exams</strong>
+                    <small>Try exam name, category, or subject.</small>
+                  </div>
+                )}
+              </div>
+            ) : null}
+          </div>
+
+          <div className="vault-profile-wrap" ref={profileRef}>
+            <button
+              className="vault-profile dashboard-profile dashboard-profile-trigger"
+              type="button"
+              onClick={() => setProfileOpen((open) => !open)}
+            >
+              <span className="dashboard-avatar">{avatarInitial}</span>
+            </button>
+
+            {profileOpen ? (
+              <div className="vault-profile-menu">
+                <strong>{firstName}</strong>
+                <small>{user?.email}</small>
+                <button type="button" onClick={() => void handleLogout()}>
+                  <LogOut size={16} /> Logout
+                </button>
+              </div>
+            ) : null}
+          </div>
         </header>
 
         <main className="vault-main vault-main-simple dashboard-main">

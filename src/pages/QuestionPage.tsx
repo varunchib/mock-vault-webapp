@@ -2,6 +2,7 @@ import { CheckCircle2, Download, Lock, Play, Share2 } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
+import { HaloLoader } from "../components/common/HaloLoader";
 import { examPreviousPapersPath } from "../lib/routes";
 import { fetchQuestionBySlug, type Question } from "../lib/api";
 import { useAuth } from "../context/useAuth";
@@ -73,7 +74,7 @@ export function QuestionPage() {
     return (
       <section className="pyq-reader-page">
         <div className="pyq-reader-shell">
-          <p>Loading question...</p>
+          <HaloLoader label="Loading question" />
         </div>
       </section>
     );

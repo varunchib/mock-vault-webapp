@@ -2,6 +2,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { isAdminUser } from '../context/admin'
 import { useAuth } from '../context/useAuth'
 import { AdminDashboardPage } from '../pages/AdminDashboardPage'
+import { HaloLoader } from '../components/common/HaloLoader'
 import { AllExamsPage, ExamPage } from '../pages/ExamPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { LandingPage } from '../pages/LandingPage'
@@ -14,7 +15,7 @@ function RootRoute() {
   const { isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
-    return <section className="public-page"><div className="public-shell"><p>Loading session...</p></div></section>
+    return <section className="public-page"><div className="public-shell"><HaloLoader label="Loading session" /></div></section>
   }
 
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <LandingPage />
@@ -24,7 +25,7 @@ function ProtectedDashboard() {
   const { isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
-    return <section className="public-page"><div className="public-shell"><p>Loading session...</p></div></section>
+    return <section className="public-page"><div className="public-shell"><HaloLoader label="Loading session" /></div></section>
   }
 
   return isAuthenticated ? <DashboardPage /> : <Navigate to="/" replace />
@@ -34,7 +35,7 @@ function ProtectedAdmin() {
   const { user, isAuthenticated, isLoading } = useAuth()
 
   if (isLoading) {
-    return <section className="public-page"><div className="public-shell"><p>Loading session...</p></div></section>
+    return <section className="public-page"><div className="public-shell"><HaloLoader label="Loading session" /></div></section>
   }
 
   if (!isAuthenticated) return <Navigate to="/" replace />

@@ -2,6 +2,7 @@ import { BookOpen, Download, FileText, Lock, Play, Search } from "lucide-react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
+import { HaloLoader } from "../components/common/HaloLoader";
 import { examSlugFromPreviousPapersPath } from "../lib/routes";
 import {
   fetchExamBySlug,
@@ -90,7 +91,7 @@ export function PreviousYearPapersPage() {
     return (
       <section className="pyp-page">
         <div className="pyp-shell">
-          <p>Loading papers...</p>
+          <HaloLoader label="Loading papers" />
         </div>
       </section>
     );

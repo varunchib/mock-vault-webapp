@@ -44,7 +44,7 @@ export function Navbar() {
           ) : (
             <button className="n-login" type="button" onClick={() => setLoginOpen(true)}>Log in</button>
           )}
-          <button className="n-cta" type="button" onClick={goToDashboardOrLogin}>{isAuthenticated ? 'Dashboard' : 'Start Free →'}</button>
+          <button className="n-cta" type="button" onClick={goToDashboardOrLogin}>{isAuthenticated ? 'Dashboard' : 'Start Free'}</button>
         </div>
       </nav>
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
