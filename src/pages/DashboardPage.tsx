@@ -1,25 +1,108 @@
-import { Search } from 'lucide-react'
-import { Link, useNavigate } from 'react-router-dom'
+import { ClipboardList, FileText } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
-import { fetchDashboardBootstrap, fetchExamPapers, fetchExamQuestions, type Exam, type MockItem, type Paper, type Question } from '../lib/api'
+import {
+  fetchDashboardBootstrap,
+  type Exam,
+  type MockItem,
+  type Question,
+} from '../lib/api'
 import { examPreviousPapersPath } from '../lib/routes'
 import { usePageMeta } from '../lib/usePageMeta'
+import { HaloLoader } from '../components/common/HaloLoader'
+
+type ExamCategoryGroup = {
+  label: string
+  exams: Exam[]
+}
+
+const categoryOrder = [
+  'Central',
+  'Banking',
+  'State',
+  'Railways',
+  'Teaching',
+  'Medical',
+  'Engineering',
+]
+
+function normalizeExamCategory(category: string) {
+  const normalized = category.trim().toLowerCase()
+
+  if (normalized.includes('bank')) return 'Banking'
+  if (normalized.includes('state')) return 'State'
+  if (normalized.includes('rail')) return 'Railways'
+  if (normalized.includes('teach')) return 'Teaching'
+  if (normalized.includes('medical') || normalized.includes('neet')) return 'Medical'
+  if (normalized.includes('engineering') || normalized.includes('jee')) return 'Engineering'
+  if (
+    normalized.includes('central') ||
+    normalized.includes('ssc') ||
+    normalized.includes('upsc') ||
+    normalized.includes('defence') ||
+    normalized.includes('defense')
+  ) {
+    return 'Central'
+  }
+
+  return category
+}
+
+function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
+  const grouped = new Map<string, Exam[]>()
+
+  exams.forEach((exam) => {
+    const label = normalizeExamCategory(exam.category)
+    const current = grouped.get(label) ?? []
+    current.push(exam)
+    grouped.set(label, current)
+  })
+
+  return [...grouped.entries()]
+    .map(([label, items]) => ({
+      label,
+      exams: items.sort((left, right) => left.shortName.localeCompare(right.shortName)),
+    }))
+    .sort((left, right) => {
+      const leftRank = categoryOrder.indexOf(left.label)
+      const rightRank = categoryOrder.indexOf(right.label)
+
+      if (leftRank === -1 && rightRank === -1) return left.label.localeCompare(right.label)
+      if (leftRank === -1) return 1
+      if (rightRank === -1) return -1
+      return leftRank - rightRank
+    })
+}
+
+function getEnrolledExams(exams: Exam[], mocks: MockItem[], recentQuestions: Question[]) {
+  const examMap = new Map(exams.map((exam) => [exam.slug, exam]))
+  const seen = new Set<string>()
+  const orderedSlugs = [
+    ...recentQuestions.map((question) => question.examSlug),
+    ...mocks.map((mock) => mock.examSlug),
+    ...exams.map((exam) => exam.slug),
+  ]
+
+  return orderedSlugs
+    .map((slug) => {
+      if (seen.has(slug)) return null
+      seen.add(slug)
+      return examMap.get(slug) ?? null
+    })
+    .filter((exam): exam is Exam => Boolean(exam))
+    .slice(0, 6)
+}
 
 export function DashboardPage() {
-  const navigate = useNavigate()
   const [exams, setExams] = useState<Exam[]>([])
   const [mocks, setMocks] = useState<MockItem[]>([])
   const [recentQuestions, setRecentQuestions] = useState<Question[]>([])
-  const [activeExamSlug, setActiveExamSlug] = useState('')
-  const [activeQuestions, setActiveQuestions] = useState<Question[]>([])
-  const [activePapers, setActivePapers] = useState<Paper[]>([])
-  const [query, setQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   usePageMeta({
     title: 'Dashboard | PYQVault',
-    description: 'Your PYQVault dashboard for mock tests, PYQ practice, daily goals, and exam preparation progress.',
+    description: 'Your PYQVault dashboard for exam categories, mock tests, and recent preparation activity.',
     canonicalPath: '/dashboard',
   })
 
@@ -36,7 +119,6 @@ export function DashboardPage() {
         setExams(data.exams)
         setMocks(data.mocks)
         setRecentQuestions(data.recentQuestions)
-        setActiveExamSlug(data.exams[0]?.slug ?? '')
       } catch (loadError) {
         if (!cancelled) {
           setError(loadError instanceof Error ? loadError.message : 'Unable to load dashboard.')
@@ -53,220 +135,101 @@ export function DashboardPage() {
     }
   }, [])
 
-  useEffect(() => {
-    if (!activeExamSlug) return
-
-    let cancelled = false
-
-    void Promise.all([
-      fetchExamQuestions(activeExamSlug),
-      fetchExamPapers(activeExamSlug),
-    ])
-      .then(([questions, papers]) => {
-        if (cancelled) return
-        setActiveQuestions(questions)
-        setActivePapers(papers)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setActiveQuestions([])
-        setActivePapers([])
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [activeExamSlug])
-
-  const activeExam = exams.find((exam) => exam.slug === activeExamSlug) ?? exams[0]
-  const visibleQuestions = activeQuestions.length ? activeQuestions.slice(0, 5) : recentQuestions
-  const recommendedMocks = mocks.filter((mock) => mock.examSlug === activeExam?.slug)
-  const popularPapers = activePapers.slice(0, 6)
-
-  const filteredExams = useMemo(() => {
-    const normalized = query.trim().toLowerCase()
-    if (!normalized) return exams
-
-    return exams.filter((exam) =>
-      [
-        exam.name,
-        exam.shortName,
-        exam.category,
-        exam.description,
-        ...exam.subjects,
-      ]
-        .join(' ')
-        .toLowerCase()
-        .includes(normalized),
-    )
-  }, [exams, query])
-
-  const handleSearch = () => {
-    const trimmed = query.trim()
-    navigate(trimmed ? `/exam?q=${encodeURIComponent(trimmed)}` : '/exam')
-  }
+  const groupedExams = useMemo(() => groupExamsByCategory(exams), [exams])
+  const enrolledExams = useMemo(
+    () => getEnrolledExams(exams, mocks, recentQuestions),
+    [exams, mocks, recentQuestions],
+  )
+  const attemptedQuestions = recentQuestions.slice(0, 6)
 
   if (loading) {
-    return <p>Loading dashboard...</p>
+    return <HaloLoader label="Loading dashboard" />
   }
 
-  if (error || !activeExam) {
-    return <p>{error ?? 'Dashboard is unavailable right now.'}</p>
+  if (error) {
+    return <p>{error}</p>
   }
 
   return (
-    <>
-      <section className="dashboard-strip">
-        <div>
-          <small>Active exam</small>
-          <strong>{activeExam.shortName}</strong>
-        </div>
-        <div>
-          <small>Papers</small>
-          <strong>{activeExam.papers}</strong>
-        </div>
-        <div>
-          <small>Questions</small>
-          <strong>{activeExam.totalQuestions}</strong>
-        </div>
-        <div className="dashboard-strip-actions">
-          <button type="button" onClick={() => navigate('/mock-test')}>Mock Tests</button>
-          <button type="button" onClick={() => navigate(examPreviousPapersPath(activeExam.slug))}>PYQ Papers</button>
-          <button type="button" onClick={() => navigate(visibleQuestions[0] ? `/question/${visibleQuestions[0].slug}` : `/exam/${activeExam.slug}`)}>Practice</button>
-        </div>
-      </section>
-
-      <section className="dashboard-panel">
-        <div className="dashboard-panel-head">
-          <div>
-            <small>Exams</small>
-            <h2>All exams</h2>
-          </div>
-          <Link to="/exam">Browse all</Link>
-        </div>
-        <section className="pyp-sober-toolbar dashboard-inline-search">
-          <label>
-            <Search size={16} />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') handleSearch()
-              }}
-              placeholder="Search your exam..."
-            />
-          </label>
-        </section>
-        <div className="dashboard-exam-grid">
-          {filteredExams.map((exam) => (
-            <article
-              className={`dashboard-exam-card ${exam.slug === activeExam.slug ? 'active' : ''}`}
-              key={exam.slug}
-            >
-              <button type="button" onClick={() => setActiveExamSlug(exam.slug)}>
-                <span className="dashboard-exam-icon">{exam.icon}</span>
-                <strong>{exam.shortName}</strong>
-                <small>{exam.category}</small>
-                <p>{exam.totalQuestions} questions</p>
-              </button>
-              <div className="dashboard-card-actions">
-                <Link to={examPreviousPapersPath(exam.slug)}>Papers</Link>
-                <Link to={`/exam/${exam.slug}`}>Open</Link>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="dashboard-content-grid">
-        <article className="dashboard-panel">
+    <div className="dashboard-flow">
+      {groupedExams.map((group) => (
+        <section className="dashboard-panel dashboard-category-panel" key={group.label}>
           <div className="dashboard-panel-head">
             <div>
-              <small>Popular papers</small>
-              <h2>{activeExam.shortName} papers</h2>
+              <small>Category</small>
+              <h2>{group.label}</h2>
             </div>
-            <Link to={examPreviousPapersPath(activeExam.slug)}>View all</Link>
+            <Link to={`/exam?q=${encodeURIComponent(group.label)}`}>More</Link>
           </div>
-          <div className="dashboard-list">
-            {popularPapers.map((paper) => (
-              <Link className="dashboard-list-row" to={`/pyq/${paper.slug}`} key={paper.slug}>
-                <div>
-                  <strong>{paper.title}</strong>
-                  <small>{paper.year} · {paper.shift}</small>
+
+          <div className="dashboard-exam-grid">
+            {group.exams.slice(0, 4).map((exam) => (
+              <article className="dashboard-exam-card" key={exam.slug}>
+                <div className="dashboard-exam-body">
+                  <span className="dashboard-exam-icon">{exam.icon}</span>
+                  <strong>{exam.shortName}</strong>
+                  <small>{exam.name}</small>
+                  <p>{exam.papers} papers - {exam.mocks} mocks</p>
                 </div>
-                <span>{paper.questions} Qs</span>
-              </Link>
+                <div className="dashboard-card-actions">
+                  <Link to={examPreviousPapersPath(exam.slug)}>
+                    <FileText size={14} /> Papers
+                  </Link>
+                  <Link to={`/mock-test/${exam.slug}`}>
+                    <ClipboardList size={14} /> Mocks
+                  </Link>
+                </div>
+              </article>
             ))}
-            {popularPapers.length === 0 ? <p>No papers published yet.</p> : null}
           </div>
-        </article>
+        </section>
+      ))}
 
+      <section className="dashboard-summary-grid">
         <article className="dashboard-panel">
           <div className="dashboard-panel-head">
             <div>
-              <small>Mock tests</small>
-              <h2>Recommended mocks</h2>
+              <small>Enrolled</small>
+              <h2>Enrolled exams</h2>
             </div>
-            <Link to="/mock-test">View all</Link>
           </div>
-          <div className="dashboard-card-grid">
-            {recommendedMocks.map((mock) => (
-              <Link className="dashboard-feature-card" to={`/mock-test/${mock.slug}`} key={mock.slug}>
-                <strong>{mock.title}</strong>
-                <small>{mock.questions} questions · {mock.durationMinutes} min</small>
-                <span>{mock.isFree ? 'Free' : 'Premium'}</span>
-              </Link>
-            ))}
-            {recommendedMocks.length === 0 ? <p>No mocks published for this exam yet.</p> : null}
-          </div>
-        </article>
 
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-head">
-            <div>
-              <small>Recently viewed</small>
-              <h2>Recent questions</h2>
-            </div>
-          </div>
           <div className="dashboard-list">
-            {visibleQuestions.map((question) => (
+            {enrolledExams.map((exam) => (
+              <Link className="dashboard-list-row" to={`/mock-test/${exam.slug}`} key={exam.slug}>
+                <div>
+                  <strong>{exam.shortName}</strong>
+                  <small>{exam.category}</small>
+                </div>
+                <span>{exam.mocks} mocks</span>
+              </Link>
+            ))}
+            {enrolledExams.length === 0 ? <p>No enrolled exams yet.</p> : null}
+          </div>
+        </article>
+
+        <article className="dashboard-panel">
+          <div className="dashboard-panel-head">
+            <div>
+              <small>Attempted</small>
+              <h2>Attempted questions</h2>
+            </div>
+          </div>
+
+          <div className="dashboard-list">
+            {attemptedQuestions.map((question) => (
               <Link className="dashboard-list-row" to={`/question/${question.slug}`} key={question.slug}>
                 <div>
                   <strong>{question.examName} Q{question.questionNo}</strong>
-                  <small>{question.subject} · {question.year}</small>
+                  <small>{question.subject} - {question.year}</small>
                 </div>
                 <span>Open</span>
               </Link>
             ))}
-          </div>
-        </article>
-
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-head">
-            <div>
-              <small>Quick access</small>
-              <h2>Tools</h2>
-            </div>
-          </div>
-          <div className="dashboard-card-grid">
-            <button className="dashboard-feature-card dashboard-feature-button" type="button" onClick={() => navigate('/mock-test')}>
-              <strong>Mock Tests</strong>
-              <small>Start timed practice sets</small>
-              <span>Open</span>
-            </button>
-            <button className="dashboard-feature-card dashboard-feature-button" type="button" onClick={() => navigate(examPreviousPapersPath(activeExam.slug))}>
-              <strong>PYQ Papers</strong>
-              <small>Browse year-wise public papers</small>
-              <span>Open</span>
-            </button>
-            <button className="dashboard-feature-card dashboard-feature-button" type="button" onClick={() => navigate(visibleQuestions[0] ? `/question/${visibleQuestions[0].slug}` : `/exam/${activeExam.slug}`)}>
-              <strong>Practice</strong>
-              <small>Open solved questions directly</small>
-              <span>Open</span>
-            </button>
+            {attemptedQuestions.length === 0 ? <p>No attempted questions yet.</p> : null}
           </div>
         </article>
       </section>
-    </>
+    </div>
   )
 }

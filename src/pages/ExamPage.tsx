@@ -9,6 +9,7 @@ import {
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
+import { HaloLoader } from "../components/common/HaloLoader";
 import { examPreviousPapersPath } from "../lib/routes";
 import {
   fetchExamCatalog,
@@ -86,7 +87,7 @@ export function ExamPage() {
     return (
       <section className="public-page exam-public-page">
         <div className="public-shell">
-          <p>Loading exam...</p>
+          <HaloLoader label="Loading exam" />
         </div>
       </section>
     );
@@ -277,13 +278,12 @@ export function AllExamsPage() {
   return (
     <section className="public-page">
       <div className="public-shell">
-        <header className="public-hero compact sober-hero">
+        <header className="utility-page-hero">
           <div>
-            <span className="public-kicker">Browse exams</span>
-            <h1>Find solved PYQ papers for your target exam</h1>
+            <small>Browse Exams</small>
+            <h1>Exam library</h1>
             <p>
-              Open any exam page, browse public paper lists, and start attempting questions.
-              Login is needed only when you submit answers or want saved features.
+              Browse exams, open paper pages, and move straight to the questions you want.
             </p>
           </div>
         </header>
@@ -305,7 +305,7 @@ export function AllExamsPage() {
 
         <div className="catalog-grid">
           {loading ? (
-            <p>Loading exams...</p>
+            <HaloLoader label="Loading exams" fullHeight={false} />
           ) : error ? (
             <p>Unable to load exams. Please try again later.</p>
           ) : filteredExams.length === 0 ? (
