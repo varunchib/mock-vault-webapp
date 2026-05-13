@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { LoginModal } from '../auth/LoginModal'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
+import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 
 const plans = [
@@ -57,7 +58,7 @@ const plans = [
 
 export function Pricing() {
   const navigate = useNavigate()
-  const { isAuthenticated } = useAuth()
+  const { user, isAuthenticated } = useAuth()
   const [loginOpen, setLoginOpen] = useState(false)
 
   const handlePlanClick = (premium: boolean) => {
@@ -67,7 +68,7 @@ export function Pricing() {
     }
 
     if (isAuthenticated) {
-      navigate('/dashboard')
+      navigate(homePathForUser(user))
       return
     }
 

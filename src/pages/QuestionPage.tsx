@@ -177,17 +177,30 @@ export function QuestionPage() {
 
           <aside className="pyq-reader-side">
             <div className="pyq-action-card">
-              <h2>Attempt this topic as mock</h2>
-              <p>Public visitors can read the paper. Login is required to submit answers, save scores, and download PDFs.</p>
-              <button className="primary" type="button" onClick={gateAction}>
-                <Play size={16} /> Continue with account
-              </button>
-              <button type="button" onClick={gateAction}>
-                <Download size={16} /> Download PDF
-              </button>
-              <div className="pyq-login-note">
-                <Lock size={14} /> Login required for saved progress, analytics, and PDFs.
-              </div>
+              <h2>{isAuthenticated ? 'More from this exam' : 'Sign in free'}</h2>
+              <p>{isAuthenticated
+                ? 'Submit answers, save your progress, and track your performance across all exams.'
+                : 'Login is required to submit answers, save scores, and download PDFs. It\'s free.'
+              }</p>
+              {!isAuthenticated && (
+                <>
+                  <button className="primary" type="button" onClick={gateAction}>
+                    <Play size={16} /> Sign in with Google
+                  </button>
+                  <div className="pyq-login-note">
+                    <Lock size={14} /> Free to sign in — no credit card needed.
+                  </div>
+                </>
+              )}
+              {isAuthenticated && question.paperSlug && (
+                <Link
+                  className="primary"
+                  to={`/pyq/${question.paperSlug}`}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+                >
+                  <Play size={16} /> View full paper
+                </Link>
+              )}
             </div>
           </aside>
         </div>

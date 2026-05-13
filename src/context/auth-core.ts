@@ -12,7 +12,7 @@ export type AuthContextValue = {
   user: AuthUser | null
   isAuthenticated: boolean
   isLoading: boolean
-  loginWithGoogleCredential: (credential: string) => Promise<void>
+  loginWithGoogleCredential: (credential: string) => Promise<AuthUser>
   logout: () => Promise<void>
 }
 

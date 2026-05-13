@@ -1,36 +1,50 @@
-import { ClipboardList, FileText } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
+import { ClipboardList, FileText } from 'lucide-react'
 import {
   fetchDashboardBootstrap,
   type Exam,
   type MockItem,
-  type Question,
+  type RecentAttempt,
 } from '../lib/api'
-import { examPreviousPapersPath } from '../lib/routes'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useAuth } from '../context/useAuth'
 import { HaloLoader } from '../components/common/HaloLoader'
 
-type ExamCategoryGroup = {
-  label: string
-  exams: Exam[]
-}
-
-const categoryOrder = [
+export const categoryOrder = [
   'Central',
   'Banking',
-  'State',
+  'States',
   'Railways',
   'Teaching',
   'Medical',
   'Engineering',
 ]
 
-function normalizeExamCategory(category: string) {
-  const normalized = category.trim().toLowerCase()
+export const categoryIcons: Record<string, string> = {
+  central: '🏛️',
+  banking: '🏦',
+  states: '📍',
+  railways: '🚂',
+  teaching: '📚',
+  medical: '🏥',
+  engineering: '⚙️',
+}
 
+export const categoryFullLabels: Record<string, string> = {
+  central: 'Central Government',
+  banking: 'Banking & Finance',
+  states: 'State Government',
+  railways: 'Railways',
+  teaching: 'Teaching',
+  medical: 'Medical',
+  engineering: 'Engineering',
+}
+
+export function normalizeExamCategory(category: string): string {
+  const normalized = category.trim().toLowerCase()
   if (normalized.includes('bank')) return 'Banking'
-  if (normalized.includes('state')) return 'State'
+  if (normalized.includes('state')) return 'States'
   if (normalized.includes('rail')) return 'Railways'
   if (normalized.includes('teach')) return 'Teaching'
   if (normalized.includes('medical') || normalized.includes('neet')) return 'Medical'
@@ -41,195 +55,208 @@ function normalizeExamCategory(category: string) {
     normalized.includes('upsc') ||
     normalized.includes('defence') ||
     normalized.includes('defense')
-  ) {
-    return 'Central'
-  }
-
+  ) return 'Central'
   return category
 }
 
-function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
-  const grouped = new Map<string, Exam[]>()
+type ExamCategoryGroup = { label: string; exams: Exam[] }
 
+export function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
+  const grouped = new Map<string, Exam[]>()
   exams.forEach((exam) => {
     const label = normalizeExamCategory(exam.category)
     const current = grouped.get(label) ?? []
     current.push(exam)
     grouped.set(label, current)
   })
-
   return [...grouped.entries()]
     .map(([label, items]) => ({
       label,
-      exams: items.sort((left, right) => left.shortName.localeCompare(right.shortName)),
+      exams: items.sort((a, b) => a.shortName.localeCompare(b.shortName)),
     }))
-    .sort((left, right) => {
-      const leftRank = categoryOrder.indexOf(left.label)
-      const rightRank = categoryOrder.indexOf(right.label)
-
-      if (leftRank === -1 && rightRank === -1) return left.label.localeCompare(right.label)
-      if (leftRank === -1) return 1
-      if (rightRank === -1) return -1
-      return leftRank - rightRank
+    .sort((a, b) => {
+      const aRank = categoryOrder.indexOf(a.label)
+      const bRank = categoryOrder.indexOf(b.label)
+      if (aRank === -1 && bRank === -1) return a.label.localeCompare(b.label)
+      if (aRank === -1) return 1
+      if (bRank === -1) return -1
+      return aRank - bRank
     })
 }
 
-function getEnrolledExams(exams: Exam[], mocks: MockItem[], recentQuestions: Question[]) {
-  const examMap = new Map(exams.map((exam) => [exam.slug, exam]))
-  const seen = new Set<string>()
-  const orderedSlugs = [
-    ...recentQuestions.map((question) => question.examSlug),
-    ...mocks.map((mock) => mock.examSlug),
-    ...exams.map((exam) => exam.slug),
-  ]
-
-  return orderedSlugs
-    .map((slug) => {
-      if (seen.has(slug)) return null
-      seen.add(slug)
-      return examMap.get(slug) ?? null
-    })
-    .filter((exam): exam is Exam => Boolean(exam))
-    .slice(0, 6)
+function getGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
 }
 
 export function DashboardPage() {
+  const { user } = useAuth()
+  const firstName = user?.name?.split(' ')[0] ?? 'there'
+
   const [exams, setExams] = useState<Exam[]>([])
   const [mocks, setMocks] = useState<MockItem[]>([])
-  const [recentQuestions, setRecentQuestions] = useState<Question[]>([])
+  const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
+  const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   usePageMeta({
     title: 'Dashboard | PYQVault',
-    description: 'Your PYQVault dashboard for exam categories, mock tests, and recent preparation activity.',
+    description: 'Your PYQVault dashboard — browse exam categories, attempt mocks, and track your preparation.',
     canonicalPath: '/dashboard',
   })
 
   useEffect(() => {
     let cancelled = false
-
-    const loadDashboard = async () => {
+    const load = async () => {
       try {
         setLoading(true)
         setError(null)
         const data = await fetchDashboardBootstrap()
         if (cancelled) return
-
         setExams(data.exams)
         setMocks(data.mocks)
-        setRecentQuestions(data.recentQuestions)
-      } catch (loadError) {
-        if (!cancelled) {
-          setError(loadError instanceof Error ? loadError.message : 'Unable to load dashboard.')
-        }
+        setEnrolledExams(data.enrolledExams ?? [])
+        setRecentAttempts(data.recentAttempts ?? [])
+      } catch (err) {
+        if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load dashboard.')
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
-
-    void loadDashboard()
-
-    return () => {
-      cancelled = true
-    }
+    void load()
+    return () => { cancelled = true }
   }, [])
 
-  const groupedExams = useMemo(() => groupExamsByCategory(exams), [exams])
-  const enrolledExams = useMemo(
-    () => getEnrolledExams(exams, mocks, recentQuestions),
-    [exams, mocks, recentQuestions],
+  const freeMocks = useMemo(
+    () => mocks.filter((m) => m.isFree).slice(0, 6),
+    [mocks],
   )
-  const attemptedQuestions = recentQuestions.slice(0, 6)
 
-  if (loading) {
-    return <HaloLoader label="Loading dashboard" />
-  }
+  if (loading) return <HaloLoader label="Loading dashboard" />
 
   if (error) {
-    return <p>{error}</p>
+    return (
+      <div className="db-error-shell">
+        <div className="db-error-card">
+          <strong>Failed to load dashboard</strong>
+          <p>{error}</p>
+          <button type="button" onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="dashboard-flow">
-      {groupedExams.map((group) => (
-        <section className="dashboard-panel dashboard-category-panel" key={group.label}>
-          <div className="dashboard-panel-head">
-            <div>
-              <small>Category</small>
-              <h2>{group.label}</h2>
-            </div>
-            <Link to={`/exam?q=${encodeURIComponent(group.label)}`}>More</Link>
-          </div>
+    <div className="db-page">
 
-          <div className="dashboard-exam-grid">
-            {group.exams.slice(0, 4).map((exam) => (
-              <article className="dashboard-exam-card" key={exam.slug}>
-                <div className="dashboard-exam-body">
-                  <span className="dashboard-exam-icon">{exam.icon}</span>
+      {/* ── Welcome header ─────────────────────────── */}
+      <header className="db-header">
+        <div className="db-header-left">
+          <h1>{getGreeting()}, {firstName}</h1>
+          <p>Track your prep — attempts, enrolled exams, and available resources below.</p>
+        </div>
+        <div className="db-header-stats">
+          <div className="db-header-stat">
+            <strong>{enrolledExams.length}</strong>
+            <span>Enrolled</span>
+          </div>
+          <div className="db-header-stat">
+            <strong>{recentAttempts.length}</strong>
+            <span>Attempted</span>
+          </div>
+          <div className="db-header-stat">
+            <strong>{mocks.length}</strong>
+            <span>Mocks</span>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Enrolled exams ─────────────────────────── */}
+      {enrolledExams.length > 0 && (
+        <section className="db-enrolled-section">
+          <div className="db-row-head">
+            <div className="db-row-head-left">
+              <small>Continue preparing</small>
+              <h2>Enrolled exams</h2>
+            </div>
+            <Link className="db-row-view-all" to="/exam">View all →</Link>
+          </div>
+          <div className="db-enrolled-scroll">
+            {enrolledExams.map((exam) => (
+              <Link className="db-enrolled-chip" to={`/exam/${exam.slug}`} key={exam.slug}>
+                <span>{exam.icon}</span>
+                <div>
                   <strong>{exam.shortName}</strong>
-                  <small>{exam.name}</small>
-                  <p>{exam.papers} papers - {exam.mocks} mocks</p>
+                  <small>{exam.mocks} mocks · {exam.papers} papers</small>
                 </div>
-                <div className="dashboard-card-actions">
-                  <Link to={examPreviousPapersPath(exam.slug)}>
-                    <FileText size={14} /> Papers
-                  </Link>
-                  <Link to={`/mock-test/${exam.slug}`}>
-                    <ClipboardList size={14} /> Mocks
-                  </Link>
-                </div>
-              </article>
+              </Link>
             ))}
           </div>
         </section>
-      ))}
+      )}
 
-      <section className="dashboard-summary-grid">
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-head">
+      {/* ── Activity row: Recent attempts + Free mocks ── */}
+      <div className="db-activity-row">
+        <section className="db-panel">
+          <div className="db-panel-head">
             <div>
-              <small>Enrolled</small>
-              <h2>Enrolled exams</h2>
+              <small>History</small>
+              <h2>Recently attempted</h2>
             </div>
           </div>
+          {recentAttempts.length === 0 ? (
+            <p className="db-panel-empty">No attempts yet. Start with a free mock below.</p>
+          ) : (
+            recentAttempts.map((attempt) => {
+              const href = attempt.type === 'paper'
+                ? `/pyq/${attempt.slug}`
+                : `/mock-test/${attempt.examSlug}`
+              return (
+                <Link className="db-panel-row" to={href} key={`${attempt.type}-${attempt.slug}`}>
+                  <div className={`db-attempt-badge ${attempt.type}`}>
+                    {attempt.type === 'paper' ? <FileText size={13} /> : <ClipboardList size={13} />}
+                  </div>
+                  <div>
+                    <strong>{attempt.title}</strong>
+                    <small>{attempt.examName} · {attempt.type === 'paper' ? 'PYQ' : 'Mock'}</small>
+                  </div>
+                  <span>{attempt.questions}Q</span>
+                </Link>
+              )
+            })
+          )}
+        </section>
 
-          <div className="dashboard-list">
-            {enrolledExams.map((exam) => (
-              <Link className="dashboard-list-row" to={`/mock-test/${exam.slug}`} key={exam.slug}>
-                <div>
-                  <strong>{exam.shortName}</strong>
-                  <small>{exam.category}</small>
-                </div>
-                <span>{exam.mocks} mocks</span>
-              </Link>
-            ))}
-            {enrolledExams.length === 0 ? <p>No enrolled exams yet.</p> : null}
-          </div>
-        </article>
-
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-head">
+        <section className="db-panel">
+          <div className="db-panel-head">
             <div>
-              <small>Attempted</small>
-              <h2>Attempted questions</h2>
+              <small>Free access</small>
+              <h2>Free mock tests</h2>
             </div>
+            <Link className="db-panel-link" to="/mock-test">See all</Link>
           </div>
-
-          <div className="dashboard-list">
-            {attemptedQuestions.map((question) => (
-              <Link className="dashboard-list-row" to={`/question/${question.slug}`} key={question.slug}>
-                <div>
-                  <strong>{question.examName} Q{question.questionNo}</strong>
-                  <small>{question.subject} - {question.year}</small>
+          {freeMocks.length === 0 ? (
+            <p className="db-panel-empty">No free mocks available right now.</p>
+          ) : (
+            freeMocks.map((mock) => (
+              <Link className="db-panel-row" to={`/mock-test/${mock.examSlug}`} key={mock.slug}>
+                <div className="db-attempt-badge mock">
+                  <ClipboardList size={13} />
                 </div>
-                <span>Open</span>
+                <div>
+                  <strong>{mock.title}</strong>
+                  <small>{mock.examName} · {mock.difficulty}</small>
+                </div>
+                <span>{mock.questions}Q</span>
               </Link>
-            ))}
-            {attemptedQuestions.length === 0 ? <p>No attempted questions yet.</p> : null}
-          </div>
-        </article>
-      </section>
+            ))
+          )}
+        </section>
+      </div>
+
     </div>
   )
 }

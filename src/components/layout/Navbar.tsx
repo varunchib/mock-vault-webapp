@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { LoginModal } from '../auth/LoginModal'
 import { Logo } from '../ui/Logo'
+import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 
 export function Navbar() {
@@ -11,7 +12,7 @@ export function Navbar() {
 
   const goToDashboardOrLogin = () => {
     if (isAuthenticated) {
-      navigate('/dashboard')
+      navigate(homePathForUser(user))
       return
     }
     setLoginOpen(true)

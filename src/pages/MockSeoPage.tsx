@@ -1,4 +1,4 @@
-import { Clock3, FileText, Lock, Play, Search } from 'lucide-react'
+import { ChevronRight, Clock3, FileText, Lock, Play, Search } from 'lucide-react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
@@ -20,7 +20,7 @@ type ExamCategoryGroup = {
 const categoryOrder = [
   'Central',
   'Banking',
-  'State',
+  'States',
   'Railways',
   'Teaching',
   'Medical',
@@ -31,7 +31,7 @@ function normalizeExamCategory(category: string) {
   const normalized = category.trim().toLowerCase()
 
   if (normalized.includes('bank')) return 'Banking'
-  if (normalized.includes('state')) return 'State'
+  if (normalized.includes('state')) return 'States'
   if (normalized.includes('rail')) return 'Railways'
   if (normalized.includes('teach')) return 'Teaching'
   if (normalized.includes('medical') || normalized.includes('neet')) return 'Medical'
@@ -239,6 +239,7 @@ export function MockDetailPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [loginOpen, setLoginOpen] = useState(false)
+  const [diffFilter, setDiffFilter] = useState('All')
 
   useEffect(() => {
     if (!slug) return
@@ -283,14 +284,33 @@ export function MockDetailPage() {
 
   const freeMocks = examMocks.filter((mock) => mock.isFree)
   const totalQuestions = examMocks.reduce((sum, mock) => sum + mock.questions, 0)
+  const visibleMocks = diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)
   const homeHref = isAuthenticated ? '/dashboard' : '/'
 
+  const mockDetailTitle = exam ? `${exam.shortName} Mock Tests | PYQVault` : 'Mock Tests | PYQVault'
+  const mockDetailDesc = exam
+    ? `Open the full ${exam.shortName} mock test library with free and premium practice series.`
+    : 'Open mock test libraries by exam.'
+
   usePageMeta({
-    title: exam ? `${exam.shortName} Mock Tests | PYQVault` : 'Mock Tests | PYQVault',
-    description: exam
-      ? `Open the full ${exam.shortName} mock test library with free and premium practice series.`
-      : 'Open mock test libraries by exam.',
+    title: mockDetailTitle,
+    description: mockDetailDesc,
     canonicalPath: exam ? `/mock-test/${exam.slug}` : '/mock-test',
+    jsonLd: exam
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'ItemList',
+          name: mockDetailTitle,
+          description: mockDetailDesc,
+          numberOfItems: examMocks.length,
+          itemListElement: freeMocks.slice(0, 5).map((mock, index) => ({
+            '@type': 'ListItem',
+            position: index + 1,
+            name: mock.title,
+            description: mock.description,
+          })),
+        }
+      : undefined,
   })
 
   if (loading) {
@@ -305,23 +325,23 @@ export function MockDetailPage() {
 
   if (error || !exam) return <Navigate to="/mock-test" replace />
 
-  const openMock = () => {
+  const openMock = (mock: MockItem) => {
     if (!isAuthenticated) {
       setLoginOpen(true)
       return
     }
 
-    navigate('/dashboard')
+    navigate(`/mock-attempt/${mock.slug}`)
   }
 
   return (
     <section className="public-page mock-hub-page">
       <div className="public-shell">
-        <nav className="crumbs" aria-label="Breadcrumb">
-          <Link to={homeHref}>Home</Link>
-          <span>/</span>
+        <nav className="ep-breadcrumb" aria-label="Breadcrumb">
+          <Link to={homeHref}>{isAuthenticated ? 'Dashboard' : 'Home'}</Link>
+          <ChevronRight size={13} />
           <Link to="/mock-test">Mock Tests</Link>
-          <span>/</span>
+          <ChevronRight size={13} />
           <span>{exam.shortName}</span>
         </nav>
 
@@ -344,10 +364,22 @@ export function MockDetailPage() {
               <small>Series</small>
               <h2>Available mocks</h2>
             </div>
+            <div className="mock-diff-filter">
+              {['All', 'Beginner', 'Moderate', 'Advanced'].map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  className={`ep-filter-btn${diffFilter === d ? ' active' : ''}`}
+                  onClick={() => setDiffFilter(d)}
+                >
+                  {d}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="mock-series-grid">
-            {examMocks.map((mock) => (
+            {visibleMocks.map((mock) => (
               <article className="mock-series-card" key={mock.slug}>
                 <div className="mock-series-top">
                   <span>{mock.isFree ? 'Free' : 'Premium'}</span>
@@ -364,14 +396,16 @@ export function MockDetailPage() {
                     <span key={subject}>{subject}</span>
                   ))}
                 </div>
-                <button className="mock-series-button" type="button" onClick={openMock}>
+                <button className="mock-series-button" type="button" onClick={() => openMock(mock)}>
                   <Play size={15} /> Open mock
                 </button>
               </article>
             ))}
           </div>
 
-          {examMocks.length === 0 ? <p>No mocks have been published for this exam yet.</p> : null}
+          {visibleMocks.length === 0 ? (
+            <p>{diffFilter === 'All' ? 'No mocks published for this exam yet.' : `No ${diffFilter} mocks found.`}</p>
+          ) : null}
         </section>
 
         <section className="mock-hub-footnote">

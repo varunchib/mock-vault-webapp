@@ -1,4 +1,4 @@
-import { BookOpen, Download, FileText, Lock, Play, Search } from "lucide-react";
+import { Download, FileText, Play, Search } from "lucide-react";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
@@ -28,6 +28,7 @@ export function PreviousYearPapersPage() {
 
   useEffect(() => {
     if (!examSlug) return;
+
     queueMicrotask(() => {
       setLoading(true);
       setError(false);
@@ -46,15 +47,13 @@ export function PreviousYearPapersPage() {
     ? `${exam.shortName} Previous Year Question Papers with Solutions | PYQVault`
     : "Previous Year Question Papers | PYQVault";
   const description = exam
-    ? `Download and attempt ${exam.shortName} previous year question papers with solutions, explanations, and year-wise papers.`
+    ? `${exam.shortName} previous year question papers with solutions, answers, and year-wise practice.`
     : "Browse previous year question papers with solutions and explanations.";
 
   usePageMeta({
     title,
     description,
-    canonicalPath: exam
-      ? `/${exam.slug}-exam/previous-year-papers`
-      : "/previous-year-papers",
+    canonicalPath: exam ? `/${exam.slug}-exam/previous-year-papers` : "/previous-year-papers",
     jsonLd: exam
       ? {
           "@context": "https://schema.org",
@@ -73,8 +72,8 @@ export function PreviousYearPapersPage() {
 
   const filteredPapers = useMemo(() => {
     return papers.filter((paper) => {
-      const matchesYear = activeYear === "All" || paper.year === activeYear;
       const normalizedQuery = query.trim().toLowerCase();
+      const matchesYear = activeYear === "All" || paper.year === activeYear;
       const matchesQuery =
         !normalizedQuery ||
         paper.title.toLowerCase().includes(normalizedQuery) ||
@@ -89,8 +88,8 @@ export function PreviousYearPapersPage() {
 
   if (loading) {
     return (
-      <section className="pyp-page">
-        <div className="pyp-shell">
+      <section className="paper-list-page">
+        <div className="paper-list-shell">
           <HaloLoader label="Loading papers" />
         </div>
       </section>
@@ -100,22 +99,15 @@ export function PreviousYearPapersPage() {
   if (error || !exam) return <Navigate to="/exam" replace />;
 
   const homeHref = isAuthenticated ? "/dashboard" : "/";
-
-  const continueAttempt = (paperSlug: string) => {
-    navigate(`/pyq/${paperSlug}`);
-  };
-
-  const gatedAction = () => {
-    if (isAuthenticated) {
-      return;
-    }
-    setLoginOpen(true);
+  const openPdf = (paperSlug: string) => {
+    if (!isAuthenticated) { setLoginOpen(true); return }
+    window.open(`/pyq/${paperSlug}`, '_blank')
   };
 
   return (
-    <section className="pyp-page">
-      <div className="pyp-shell">
-        <nav className="crumbs" aria-label="Breadcrumb">
+    <section className="paper-list-page">
+      <div className="paper-list-shell">
+        <nav className="crumbs compact" aria-label="Breadcrumb">
           <Link to={homeHref}>Home</Link>
           <span>/</span>
           <Link to={`/exam/${exam.slug}`}>{exam.shortName}</Link>
@@ -123,104 +115,73 @@ export function PreviousYearPapersPage() {
           <span>Previous Year Papers</span>
         </nav>
 
-        <header className="pyp-hero">
+        <header className="paper-list-head">
           <div>
-            <span>{exam.category} Exam</span>
+            <small>{exam.category}</small>
             <h1>{exam.shortName} previous year papers</h1>
-            <p>Open papers, read questions, and move through the list quickly. Login is required only for submission, saved progress, and downloads.</p>
-            <div className="pyp-hero-stats">
-              <strong>{exam.papers}</strong>
-              <span>papers</span>
-              <strong>{exam.totalQuestions}</strong>
-              <span>solved questions</span>
-            </div>
+            <p>{exam.name} papers with solved questions, answer keys, and year-wise practice.</p>
           </div>
-          <aside>
-            <BookOpen size={18} />
-            <p>Simple public paper listing for {exam.shortName} with year filters and direct open links.</p>
-          </aside>
+          <div className="paper-list-stats">
+            <span>{exam.papers} papers</span>
+            <span>{exam.totalQuestions} questions</span>
+          </div>
         </header>
 
-        <div className="pyp-layout">
-          <main className="pyp-main">
-            <section className="pyp-toolbar">
-              <label>
-                <Search size={16} />
-                <input
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder={`Search ${exam.shortName} papers...`}
-                />
-              </label>
-            </section>
+        <section className="paper-list-controls">
+          <label>
+            <Search size={16} />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={`Search ${exam.shortName} papers...`}
+            />
+          </label>
+          <div>
+            {years.map((year) => (
+              <button
+                className={year === activeYear ? "active" : ""}
+                type="button"
+                key={year}
+                onClick={() => setActiveYear(year)}
+              >
+                {year}
+              </button>
+            ))}
+          </div>
+        </section>
 
-            <section className="pyp-year-filter">
-              {years.map((year) => (
-                <button
-                  className={year === activeYear ? "active" : ""}
-                  type="button"
-                  key={year}
-                  onClick={() => setActiveYear(year)}
-                >
-                  {year}
+        <section className="paper-table">
+          <div className="paper-table-head">
+            <span>Paper</span>
+            <span>Year</span>
+            <span>Questions</span>
+            <span>Action</span>
+          </div>
+
+          {filteredPapers.map((paper) => (
+            <article className="paper-table-row" key={paper.slug}>
+              <div className="paper-title-cell">
+                <FileText size={18} />
+                <div>
+                  <Link to={`/pyq/${paper.slug}`}>{paper.title}</Link>
+                  <small>{paper.shift} - {paper.subjects.slice(0, 3).join(", ")}</small>
+                </div>
+              </div>
+              <span>{paper.year}</span>
+              <span>{paper.questions}</span>
+              <div className="paper-row-actions">
+                <button type="button" onClick={() => navigate(`/pyq/${paper.slug}`)}>
+                  <Play size={15} /> Attempt
                 </button>
-              ))}
-            </section>
-
-            <section className="pyp-list-card">
-              <div className="pyp-list-head">
-                <h2>{exam.shortName} paper listing</h2>
-                <span>{filteredPapers.length} papers</span>
+                <button type="button" onClick={() => openPdf(paper.slug)}>
+                  <Download size={15} /> PDF
+                </button>
               </div>
+            </article>
+          ))}
 
-              <div className="pyp-paper-list">
-                {filteredPapers.map((paper) => (
-                  <article className="pyp-paper-row" key={paper.slug}>
-                    <div className="pyp-paper-icon">
-                      <FileText size={18} />
-                    </div>
-                    <div className="pyp-paper-copy">
-                      <Link to={`/pyq/${paper.slug}`}>{paper.title}</Link>
-                      <p>{paper.year} - {paper.shift} - {paper.questions} questions</p>
-                      <div>
-                        {paper.subjects.slice(0, 4).map((subject) => (
-                          <span key={subject}>{subject}</span>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="pyp-paper-actions">
-                      <Link to={`/pyq/${paper.slug}`}>Open paper</Link>
-                      <button className="primary" type="button" onClick={() => continueAttempt(paper.slug)}>
-                        <Play size={15} /> Attempt
-                      </button>
-                      <button type="button" onClick={gatedAction}>
-                        <Download size={15} /> PDF
-                      </button>
-                    </div>
-                  </article>
-                ))}
-
-                {filteredPapers.length === 0 ? (
-                  <p className="muted-copy">No papers matched this search or year filter.</p>
-                ) : null}
-              </div>
-            </section>
-          </main>
-
-          <aside className="pyp-side">
-            <div className="pyp-side-card highlight">
-              <Lock size={17} />
-              <h3>Open paper access</h3>
-              <p>Anyone can browse these papers. Login is required only for answer submission, saved progress, and PDF downloads.</p>
-              <button type="button" onClick={gatedAction}>Login for saved features</button>
-            </div>
-
-            <div className="pyp-side-card">
-              <h3>Coverage</h3>
-              <p>{exam.papers} papers, {exam.totalQuestions} solved questions, and subject coverage for {exam.shortName}.</p>
-            </div>
-          </aside>
-        </div>
+          {filteredPapers.length === 0 ? <p>No papers matched this search.</p> : null}
+        </section>
       </div>
 
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />

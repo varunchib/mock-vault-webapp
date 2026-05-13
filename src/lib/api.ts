@@ -67,11 +67,23 @@ export type AuthUser = {
   role: "user" | "admin";
 };
 
+export type RecentAttempt = {
+  type: "paper" | "mock";
+  slug: string;
+  examSlug: string;
+  examName: string;
+  title: string;
+  questions: number;
+  attemptedAt: string;
+};
+
 export type DashboardBootstrap = {
   user: AuthUser;
   exams: Exam[];
   mocks: MockItem[];
   recentQuestions: Question[];
+  enrolledExams: Exam[];
+  recentAttempts: RecentAttempt[];
 };
 
 export type AdminSummary = {
@@ -79,6 +91,27 @@ export type AdminSummary = {
   paperCount: number;
   mockCount: number;
   questionCount: number;
+  userCount: number;
+};
+
+export type AdminMockQuestionPayload = {
+  question: string;
+  options: QuestionOption[];
+  answerKey: string;
+  explanation: string;
+  subject: string;
+};
+
+export type AdminMockPayload = {
+  slug: string;
+  examSlug: string;
+  title: string;
+  description: string;
+  durationMinutes: number;
+  difficulty: "Beginner" | "Moderate" | "Advanced";
+  isFree: boolean;
+  subjects: string[];
+  questions: AdminMockQuestionPayload[];
 };
 
 type AuthPayload = {
@@ -152,6 +185,14 @@ export function fetchExamQuestions(slug: string): Promise<Question[]> {
   return requestJson<Question[]>(`/api/v1/exams/${encodeURIComponent(slug)}/questions`);
 }
 
+export function fetchQuestionCatalog(): Promise<Question[]> {
+  return requestJson<Question[]>("/api/v1/questions");
+}
+
+export function fetchPaperCatalog(): Promise<Paper[]> {
+  return requestJson<Paper[]>("/api/v1/papers");
+}
+
 export function fetchPaperBySlug(slug: string): Promise<Paper> {
   return requestJson<Paper>(`/api/v1/papers/${encodeURIComponent(slug)}`);
 }
@@ -172,12 +213,72 @@ export function fetchMockBySlug(slug: string): Promise<MockItem> {
   return requestJson<MockItem>(`/api/v1/mocks/${encodeURIComponent(slug)}`);
 }
 
+export function fetchMockQuestions(slug: string): Promise<Question[]> {
+  return requestJson<Question[]>(`/api/v1/mocks/${encodeURIComponent(slug)}/questions`);
+}
+
 export function fetchDashboardBootstrap(): Promise<DashboardBootstrap> {
   return requestJson<DashboardBootstrap>("/api/v1/dashboard");
 }
 
 export function fetchAdminSummary(): Promise<AdminSummary> {
   return requestJson<AdminSummary>("/api/v1/admin/summary");
+}
+
+export function saveAdminMock(payload: AdminMockPayload): Promise<{ message: string; slug: string }> {
+  return requestJson<{ message: string; slug: string }>("/api/v1/admin/mocks", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteAdminMock(slug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>(`/api/v1/admin/mocks/${encodeURIComponent(slug)}`, {
+    method: "DELETE",
+  });
+}
+
+export function deleteAdminQuestion(slug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>(`/api/v1/admin/questions/${encodeURIComponent(slug)}`, {
+    method: "DELETE",
+  });
+}
+
+export type AdminExamPayload = {
+  slug: string
+  name: string
+  shortName: string
+  category: string
+  icon: string
+  description: string
+  subjects: string[]
+}
+
+export function saveAdminExam(payload: AdminExamPayload): Promise<{ message: string; slug: string }> {
+  return requestJson<{ message: string; slug: string }>('/api/v1/admin/exams', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function deleteAdminExam(slug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>(`/api/v1/admin/exams/${encodeURIComponent(slug)}`, {
+    method: 'DELETE',
+  })
+}
+
+export function recordEnrollment(examSlug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>("/api/v1/activity/enroll", {
+    method: "POST",
+    body: JSON.stringify({ examSlug }),
+  });
+}
+
+export function recordAttempt(params: { examSlug: string; mockSlug?: string; paperSlug?: string }): Promise<{ message: string }> {
+  return requestJson<{ message: string }>("/api/v1/activity/attempt", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
 }
 
 export function fetchCurrentUser(): Promise<AuthPayload> {
