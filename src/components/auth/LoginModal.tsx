@@ -49,7 +49,12 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           <X size={18} />
         </button>
 
-        <div className="auth-mark">P</div>
+        <div className="auth-mark">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" width="40" height="40" aria-hidden="true">
+            <rect width="40" height="40" rx="11" fill="#18181b"/>
+            <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+        </div>
         <h2 id="auth-title">Login to continue</h2>
         <p>
           Use Google to save mock attempts, unlock gated PDFs, and keep your PYQ progress synced.
