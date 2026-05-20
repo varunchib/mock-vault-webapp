@@ -28,7 +28,7 @@ export function Navbar() {
       <nav className="site-nav">
         <Logo />
         <ul className="nav-mid" aria-label="Primary navigation">
-          <li><Link to="/exam">Exams</Link></li>
+          <li><Link to="/exams">Exams</Link></li>
           <li><a href="/#how">How it works</a></li>
           <li><a href="/#pricing">Pricing</a></li>
         </ul>

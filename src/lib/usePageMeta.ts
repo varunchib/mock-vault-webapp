@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
-const SITE_NAME = 'PYQVault'
-const SITE_ORIGIN = 'https://pyqvault.in'
+const SITE_NAME = 'Ministry of Papers'
+const SITE_ORIGIN = 'https://ministryofpapers.com'
 
 export type PageMeta = {
   title: string
@@ -55,7 +55,7 @@ export function usePageMeta({ title, description, canonicalPath, ogType = 'websi
     setMeta('twitter:card', 'summary_large_image')
     setMeta('twitter:title', title)
     setMeta('twitter:description', description)
-    setMeta('twitter:site', '@pyqvault')
+    setMeta('twitter:site', '@ministryofpapers')
 
     // Canonical
     if (canonicalPath) {

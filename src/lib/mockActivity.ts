@@ -1,6 +1,6 @@
 import type { MockItem } from './api'
 
-const mockAttemptKey = 'pyqvault.mock.attempts.v1'
+const mockAttemptKey = 'ministryofpapers.mock.attempts.v1'
 
 export type MockAttemptRecord = {
   mockSlug: string

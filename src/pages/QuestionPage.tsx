@@ -35,11 +35,11 @@ export function QuestionPage() {
   }, [slug]);
 
   const title = question
-    ? `${question.examName} ${question.year} Question ${question.questionNo} | PYQVault`
-    : "Solved Exam Question | PYQVault";
+    ? `${question.examName} ${question.year} Question ${question.questionNo} | Ministry of Papers`
+    : "Solved Exam Question | Ministry of Papers";
   const description = question
     ? `${question.question} Practice this PYQ and continue with related previous year questions.`
-    : "Read solved exam questions with answers and explanations on PYQVault.";
+    : "Read solved exam questions with answers and explanations on Ministry of Papers.";
 
   usePageMeta({
     title,

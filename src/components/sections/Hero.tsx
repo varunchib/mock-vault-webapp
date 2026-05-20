@@ -25,10 +25,10 @@ export function Hero() {
   const runSearch = (value = query) => {
     const trimmed = value.trim()
     if (!trimmed) {
-      navigate('/exam')
+      navigate('/exams')
       return
     }
-    navigate(`/exam?q=${encodeURIComponent(trimmed)}`)
+    navigate(`/exams?q=${encodeURIComponent(trimmed)}`)
   }
 
   return (

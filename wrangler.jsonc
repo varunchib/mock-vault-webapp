@@ -10,4 +10,8 @@
     "not_found_handling": "single-page-application",
   },
   "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    { "pattern": "ministryofpapers.com/*", "zone_name": "ministryofpapers.com" },
+    { "pattern": "www.ministryofpapers.com/*", "zone_name": "ministryofpapers.com" },
+  ],
 }

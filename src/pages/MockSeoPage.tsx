@@ -1,6 +1,6 @@
-import { ChevronRight, Clock3, FileText, Lock, Play, Search } from 'lucide-react'
+import { ChevronRight, Clock3, FileText, Lock, Play } from 'lucide-react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
 import { HaloLoader } from '../components/common/HaloLoader'
 import {
@@ -11,224 +11,7 @@ import {
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
-
-type ExamCategoryGroup = {
-  label: string
-  exams: Exam[]
-}
-
-const categoryOrder = [
-  'Central',
-  'Banking',
-  'States',
-  'Railways',
-  'Teaching',
-  'Medical',
-  'Engineering',
-]
-
-function normalizeExamCategory(category: string) {
-  const normalized = category.trim().toLowerCase()
-
-  if (normalized.includes('bank')) return 'Banking'
-  if (normalized.includes('state')) return 'States'
-  if (normalized.includes('rail')) return 'Railways'
-  if (normalized.includes('teach')) return 'Teaching'
-  if (normalized.includes('medical') || normalized.includes('neet')) return 'Medical'
-  if (normalized.includes('engineering') || normalized.includes('jee')) return 'Engineering'
-  if (
-    normalized.includes('central') ||
-    normalized.includes('ssc') ||
-    normalized.includes('upsc') ||
-    normalized.includes('defence') ||
-    normalized.includes('defense')
-  ) {
-    return 'Central'
-  }
-
-  return category
-}
-
-function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
-  const grouped = new Map<string, Exam[]>()
-
-  exams.forEach((exam) => {
-    const label = normalizeExamCategory(exam.category)
-    const current = grouped.get(label) ?? []
-    current.push(exam)
-    grouped.set(label, current)
-  })
-
-  return [...grouped.entries()]
-    .map(([label, items]) => ({
-      label,
-      exams: items.sort((left, right) => left.shortName.localeCompare(right.shortName)),
-    }))
-    .sort((left, right) => {
-      const leftRank = categoryOrder.indexOf(left.label)
-      const rightRank = categoryOrder.indexOf(right.label)
-
-      if (leftRank === -1 && rightRank === -1) return left.label.localeCompare(right.label)
-      if (leftRank === -1) return 1
-      if (rightRank === -1) return -1
-      return leftRank - rightRank
-    })
-}
-
-type MockSeriesStats = {
-  count: number
-  freeCount: number
-  totalQuestions: number
-}
-
-function buildMockStats(mocks: MockItem[]) {
-  const stats = new Map<string, MockSeriesStats>()
-
-  mocks.forEach((mock) => {
-    const current = stats.get(mock.examSlug) ?? {
-      count: 0,
-      freeCount: 0,
-      totalQuestions: 0,
-    }
-
-    current.count += 1
-    current.totalQuestions += mock.questions
-    if (mock.isFree) current.freeCount += 1
-
-    stats.set(mock.examSlug, current)
-  })
-
-  return stats
-}
-
-export function MockTestsPage() {
-  const [exams, setExams] = useState<Exam[]>([])
-  const [mocks, setMocks] = useState<MockItem[]>([])
-  const [query, setQuery] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  usePageMeta({
-    title: 'Mock Test Library | PYQVault',
-    description: 'Browse mock test series by exam family and open the full mock library for each exam.',
-    canonicalPath: '/mock-test',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'CollectionPage',
-      name: 'Competitive exam mock test library',
-      description: 'Grouped mock test catalog for Indian competitive exams.',
-    },
-  })
-
-  useEffect(() => {
-    let cancelled = false
-
-    void Promise.all([fetchExamCatalog(), fetchMockCatalog()])
-      .then(([examCatalog, mockCatalog]) => {
-        if (cancelled) return
-        setExams(examCatalog)
-        setMocks(mockCatalog)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setError(true)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  const mockStats = useMemo(() => buildMockStats(mocks), [mocks])
-  const filteredExams = useMemo(() => {
-    const normalized = query.trim().toLowerCase()
-
-    return exams.filter((exam) => {
-      if (!mockStats.has(exam.slug)) return false
-      if (!normalized) return true
-
-      return [
-        exam.name,
-        exam.shortName,
-        exam.category,
-        exam.description,
-        ...exam.subjects,
-      ]
-        .join(' ')
-        .toLowerCase()
-        .includes(normalized)
-    })
-  }, [exams, mockStats, query])
-  const groupedExams = useMemo(() => groupExamsByCategory(filteredExams), [filteredExams])
-
-  return (
-    <section className="public-page mock-catalog-page">
-      <div className="public-shell">
-        <header className="utility-page-hero">
-          <small>Mock Library</small>
-          <h1>Choose an exam and open its full mock test library</h1>
-          <p>Categories are grouped by exam family so users can move straight to the relevant mock series.</p>
-        </header>
-
-        <section className="mock-library-search">
-          <label>
-            <Search size={16} />
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search exam, subject, or category..."
-            />
-          </label>
-        </section>
-
-        {loading ? (
-          <HaloLoader label="Loading mock tests" />
-        ) : error ? (
-          <p>Unable to load mock tests right now.</p>
-        ) : groupedExams.length === 0 ? (
-          <p>No mock test categories matched your search.</p>
-        ) : (
-          groupedExams.map((group) => (
-            <section className="mock-library-section" key={group.label}>
-              <div className="mock-library-head">
-                <div>
-                  <small>Category</small>
-                  <h2>{group.label}</h2>
-                </div>
-              </div>
-
-              <div className="mock-library-grid">
-                {group.exams.map((exam) => {
-                  const stats = mockStats.get(exam.slug)
-                  if (!stats) return null
-
-                  return (
-                    <Link className="mock-library-card" to={`/mock-test/${exam.slug}`} key={exam.slug}>
-                      <div className="mock-library-card-top">
-                        <span>{exam.icon}</span>
-                        <small>{group.label}</small>
-                      </div>
-                      <strong>{exam.shortName}</strong>
-                      <p>{exam.name}</p>
-                      <div className="mock-library-metrics">
-                        <span>{stats.count} series</span>
-                        <span>{stats.freeCount} free</span>
-                        <span>{stats.totalQuestions} Qs</span>
-                      </div>
-                    </Link>
-                  )
-                })}
-              </div>
-            </section>
-          ))
-        )}
-      </div>
-    </section>
-  )
-}
+import { normalizeExamCategory } from './DashboardPage'
 
 export function MockDetailPage() {
   const navigate = useNavigate()
@@ -243,69 +26,56 @@ export function MockDetailPage() {
 
   useEffect(() => {
     if (!slug) return
-
     let cancelled = false
 
     void Promise.all([fetchExamCatalog(), fetchMockCatalog()])
       .then(([examCatalog, mockCatalog]) => {
         if (cancelled) return
+        const exams = examCatalog ?? []
+        const mocks = mockCatalog ?? []
 
-        const directExam = examCatalog.find((item) => item.slug === slug)
-        const matchedMock = mockCatalog.find((item) => item.slug === slug)
+        const directExam = exams.find((e) => e.slug === slug)
+        const matchedMock = mocks.find((m) => m.slug === slug)
         const resolvedExamSlug = directExam?.slug ?? matchedMock?.examSlug
 
-        if (!resolvedExamSlug) {
-          setError(true)
-          return
-        }
+        if (!resolvedExamSlug) { setError(true); return }
 
-        const resolvedExam = examCatalog.find((item) => item.slug === resolvedExamSlug) ?? null
-
-        if (!resolvedExam) {
-          setError(true)
-          return
-        }
+        const resolvedExam = exams.find((e) => e.slug === resolvedExamSlug) ?? null
+        if (!resolvedExam) { setError(true); return }
 
         setExam(resolvedExam)
-        setExamMocks(mockCatalog.filter((item) => item.examSlug === resolvedExamSlug))
+        setExamMocks(mocks.filter((m) => m.examSlug === resolvedExamSlug))
       })
-      .catch(() => {
-        if (cancelled) return
-        setError(true)
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+      .catch(() => { if (!cancelled) setError(true) })
+      .finally(() => { if (!cancelled) setLoading(false) })
 
-    return () => {
-      cancelled = true
-    }
+    return () => { cancelled = true }
   }, [slug])
 
-  const freeMocks = examMocks.filter((mock) => mock.isFree)
-  const totalQuestions = examMocks.reduce((sum, mock) => sum + mock.questions, 0)
+  const freeMocks = examMocks.filter((m) => m.isFree)
+  const totalQuestions = examMocks.reduce((sum, m) => sum + m.questions, 0)
   const visibleMocks = diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)
   const homeHref = isAuthenticated ? '/dashboard' : '/'
 
-  const mockDetailTitle = exam ? `${exam.shortName} Mock Tests | PYQVault` : 'Mock Tests | PYQVault'
-  const mockDetailDesc = exam
+  const title = exam ? `${exam.shortName} Mock Tests | Ministry of Papers` : 'Mock Tests | Ministry of Papers'
+  const desc = exam
     ? `Open the full ${exam.shortName} mock test library with free and premium practice series.`
     : 'Open mock test libraries by exam.'
 
   usePageMeta({
-    title: mockDetailTitle,
-    description: mockDetailDesc,
+    title,
+    description: desc,
     canonicalPath: exam ? `/mock-test/${exam.slug}` : '/mock-test',
     jsonLd: exam
       ? {
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: mockDetailTitle,
-          description: mockDetailDesc,
+          name: title,
+          description: desc,
           numberOfItems: examMocks.length,
-          itemListElement: freeMocks.slice(0, 5).map((mock, index) => ({
+          itemListElement: freeMocks.slice(0, 5).map((mock, i) => ({
             '@type': 'ListItem',
-            position: index + 1,
+            position: i + 1,
             name: mock.title,
             description: mock.description,
           })),
@@ -323,14 +93,10 @@ export function MockDetailPage() {
     )
   }
 
-  if (error || !exam) return <Navigate to="/mock-test" replace />
+  if (error || !exam) return <Navigate to="/tests" replace />
 
   const openMock = (mock: MockItem) => {
-    if (!isAuthenticated) {
-      setLoginOpen(true)
-      return
-    }
-
+    if (!isAuthenticated) { setLoginOpen(true); return }
     navigate(`/mock-attempt/${mock.slug}`)
   }
 
@@ -340,7 +106,7 @@ export function MockDetailPage() {
         <nav className="ep-breadcrumb" aria-label="Breadcrumb">
           <Link to={homeHref}>{isAuthenticated ? 'Dashboard' : 'Home'}</Link>
           <ChevronRight size={13} />
-          <Link to="/mock-test">Mock Tests</Link>
+          <Link to="/tests">Tests</Link>
           <ChevronRight size={13} />
           <span>{exam.shortName}</span>
         </nav>
@@ -392,9 +158,7 @@ export function MockDetailPage() {
                   <small><Clock3 size={14} /> {mock.durationMinutes} min</small>
                 </div>
                 <div className="mock-series-tags">
-                  {mock.subjects.slice(0, 4).map((subject) => (
-                    <span key={subject}>{subject}</span>
-                  ))}
+                  {mock.subjects.slice(0, 4).map((s) => <span key={s}>{s}</span>)}
                 </div>
                 <button className="mock-series-button" type="button" onClick={() => openMock(mock)}>
                   <Play size={15} /> Open mock
@@ -403,14 +167,14 @@ export function MockDetailPage() {
             ))}
           </div>
 
-          {visibleMocks.length === 0 ? (
-            <p>{diffFilter === 'All' ? 'No mocks published for this exam yet.' : `No ${diffFilter} mocks found.`}</p>
-          ) : null}
+          {visibleMocks.length === 0 && (
+            <p>{diffFilter === 'All' ? 'No mocks published yet.' : `No ${diffFilter} mocks found.`}</p>
+          )}
         </section>
 
         <section className="mock-hub-footnote">
           <Lock size={16} />
-          <span>Login is required for starting a mock, saving attempts, and viewing performance analytics.</span>
+          <span>Login is required to start a mock, save attempts, and view performance analytics.</span>
         </section>
       </div>
 

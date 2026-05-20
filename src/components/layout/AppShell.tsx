@@ -1,12 +1,8 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import {
   BarChart3,
-  BookOpenCheck,
   ChevronDown,
   ChevronRight,
-  ClipboardList,
-  Download,
-  FileText,
   Home,
   LibraryBig,
   LogOut,
@@ -24,21 +20,14 @@ type NavItem = {
 }
 
 const primaryNav: NavItem[] = [
-  { icon: Home, label: 'Dashboard', href: '/dashboard' },
-  { icon: ClipboardList, label: 'Mock Tests', href: '/mock-test' },
-  { icon: FileText, label: 'PYQ Papers', href: '/pyq-papers' },
-  { icon: BookOpenCheck, label: 'Practice', href: '/practice' },
-]
-
-const libraryNav: NavItem[] = [
-  { icon: LibraryBig, label: 'All Exams', href: '/exam' },
-  { icon: Download, label: 'PDF Library', href: '/pdf-library' },
-  { icon: BarChart3, label: 'Analytics', href: '/analytics' },
+  { icon: Home,        label: 'Dashboard', href: '/dashboard' },
+  { icon: LibraryBig,  label: 'All Exams', href: '/exams' },
+  { icon: BarChart3,   label: 'Analytics', href: '/analytics' },
 ]
 
 function isNavActive(href: string, pathname: string): boolean {
   if (href === '/dashboard') return pathname === '/dashboard'
-  if (href === '/exam') return pathname.startsWith('/exam') || pathname.startsWith('/exams')
+  if (href === '/exams') return pathname === '/exams' || pathname.startsWith('/exam/')
   return pathname === href || pathname.startsWith(href + '/')
 }
 
@@ -46,16 +35,12 @@ function getPageTitle(pathname: string): string {
   if (pathname === '/dashboard') return 'Dashboard'
   if (pathname.startsWith('/admin')) return 'Admin'
   if (pathname.startsWith('/mock-attempt/')) return 'Mock Attempt'
-  if (pathname.startsWith('/mock-test')) return 'Mock Tests'
+  if (pathname.startsWith('/mock-test')) return 'Tests'
   if (pathname.startsWith('/pyq/')) return 'Paper'
-  if (pathname.startsWith('/pyq-papers')) return 'PYQ Papers'
-  if (pathname.startsWith('/practice')) return 'Practice'
   if (pathname.startsWith('/analytics')) return 'Analytics'
-  if (pathname.startsWith('/pdf-library')) return 'PDF Library'
-  if (pathname.startsWith('/exams/')) return 'Exam Category'
+  if (pathname.startsWith('/exams')) return 'Exams'
   if (pathname.startsWith('/exam/')) return 'Exam'
-  if (pathname.startsWith('/exam')) return 'All Exams'
-  return 'PYQVault'
+  return 'Ministry of Papers'
 }
 
 function NavGroup({
@@ -150,36 +135,26 @@ export function AppShell({ children }: { children: ReactNode }) {
     <section className="vault-app vault-app-simple">
       <aside className="vault-sidebar vault-sidebar-simple">
         <Link className="vault-logo" to={homePathForUser(user)}>
-          <span>P</span>
-          <strong>PYQVault</strong>
+          <span>
+            <svg viewBox="0 0 40 40" fill="none" width="40" height="40" aria-hidden="true">
+              <rect width="40" height="40" rx="11" fill="currentColor" />
+              <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <strong>Ministry of Papers</strong>
         </Link>
 
         <NavGroup
-          title="Prepare"
+          title="Menu"
           items={primaryNav}
           currentPath={location.pathname}
           onNavigate={handleNavigate}
         />
-        <NavGroup
-          title="Library"
-          items={libraryNav}
-          currentPath={location.pathname}
-          onNavigate={handleNavigate}
-        />
 
-        <div className="vault-sidebar-footer">
-          <div className="vault-user-card">
-            <div className="vault-user-avatar">{avatarInitial}</div>
-            <div className="vault-user-details">
-              <strong>{firstName}</strong>
-              <small>{user?.email}</small>
-            </div>
-          </div>
-          <button className="vault-logout" type="button" onClick={() => void handleLogout()}>
-            <LogOut size={15} />
-            <span>Logout</span>
-          </button>
-        </div>
+        <button className="vault-logout" type="button" onClick={() => void handleLogout()}>
+          <LogOut size={15} />
+          <span>Logout</span>
+        </button>
       </aside>
 
       <div className="vault-workspace">

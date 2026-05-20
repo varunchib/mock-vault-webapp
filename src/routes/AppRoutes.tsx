@@ -5,16 +5,14 @@ import { useAuth } from '../context/useAuth'
 import { AdminDashboardPage } from '../pages/AdminDashboardPage'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { AnalyticsPage } from '../pages/AnalyticsPage'
-import { CategoryPage } from '../pages/CategoryPage'
-import { AllExamsPage, ExamPage } from '../pages/ExamPage'
+import { ExamCatalogPage } from '../pages/ExamCatalogPage'
+import { ExamPage } from '../pages/ExamPage'
 import { DashboardPage } from '../pages/DashboardPage'
 import { LandingPage } from '../pages/LandingPage'
 import { MockAttemptPage } from '../pages/MockAttemptPage'
-import { MockDetailPage, MockTestsPage } from '../pages/MockSeoPage'
-import { PdfLibraryPage } from '../pages/PdfLibraryPage'
-import { PreviousYearPapersPage } from '../pages/PreviousYearPapersPage'
-import { PracticePage } from '../pages/PracticePage'
-import { PyqPapersLibraryPage } from '../pages/PyqPapersLibraryPage'
+import { PaperAttemptPage } from '../pages/PaperAttemptPage'
+import { MockDetailPage } from '../pages/MockSeoPage'
+import { TestsPage } from '../pages/TestsPage'
 import { PyqPaperPage } from '../pages/PyqPaperPage'
 import { QuestionPage } from '../pages/QuestionPage'
 
@@ -66,19 +64,22 @@ export function AppRoutes() {
       <Route path="/" element={<RootRoute />} />
       <Route path="/dashboard" element={<ProtectedDashboard />} />
       <Route path="/admin" element={<ProtectedAdmin />} />
-      <Route path="/pyq-papers" element={<ProtectedPage><PyqPapersLibraryPage /></ProtectedPage>} />
-      <Route path="/practice" element={<ProtectedPage><PracticePage /></ProtectedPage>} />
-      <Route path="/pdf-library" element={<ProtectedPage><PdfLibraryPage /></ProtectedPage>} />
-      <Route path="/analytics" element={<ProtectedPage><AnalyticsPage /></ProtectedPage>} />
-      <Route path="/exam" element={<AllExamsPage />} />
+      <Route path="/exams" element={<ExamCatalogPage />} />
       <Route path="/exam/:slug" element={<ExamPage />} />
-      <Route path="/exams/:category" element={<CategoryPage />} />
-      <Route path="/:examPath/previous-year-papers" element={<PreviousYearPapersPage />} />
+      <Route path="/tests" element={<ProtectedPage><TestsPage /></ProtectedPage>} />
+      <Route path="/analytics" element={<ProtectedPage><AnalyticsPage /></ProtectedPage>} />
       <Route path="/question/:slug" element={<QuestionPage />} />
       <Route path="/pyq/:slug" element={<PyqPaperPage />} />
-      <Route path="/mock-test" element={<MockTestsPage />} />
       <Route path="/mock-test/:slug" element={<MockDetailPage />} />
       <Route path="/mock-attempt/:slug" element={<ProtectedPage><MockAttemptPage /></ProtectedPage>} />
+      <Route path="/paper-attempt/:slug" element={<ProtectedPage><PaperAttemptPage /></ProtectedPage>} />
+      {/* Legacy redirects */}
+      <Route path="/exam" element={<Navigate to="/exams" replace />} />
+      <Route path="/mock-test" element={<Navigate to="/tests" replace />} />
+      <Route path="/pyq-papers" element={<Navigate to="/tests?tab=papers" replace />} />
+      <Route path="/pdf-library" element={<Navigate to="/tests?tab=papers" replace />} />
+      <Route path="/practice" element={<Navigate to="/exams" replace />} />
+      <Route path="/attempted" element={<Navigate to="/analytics" replace />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

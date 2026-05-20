@@ -1,52 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://pyqvault.in/</loc>
+    <loc>https://ministryofpapers.com/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/exam</loc>
+    <loc>https://ministryofpapers.com/exam</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/mock-test</loc>
+    <loc>https://ministryofpapers.com/mock-test</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/exam/upsc-cse</loc>
+    <loc>https://ministryofpapers.com/exam/upsc-cse</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/exam/ssc-cgl</loc>
+    <loc>https://ministryofpapers.com/exam/ssc-cgl</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/exam/jkssb</loc>
+    <loc>https://ministryofpapers.com/exam/jkssb</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/exam/neet-ug</loc>
+    <loc>https://ministryofpapers.com/exam/neet-ug</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/upsc-cse/previous-year-papers</loc>
+    <loc>https://ministryofpapers.com/upsc-cse/previous-year-papers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/ssc-cgl/previous-year-papers</loc>
+    <loc>https://ministryofpapers.com/ssc-cgl/previous-year-papers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://pyqvault.in/jkssb/previous-year-papers</loc>
+    <loc>https://ministryofpapers.com/jkssb/previous-year-papers</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>

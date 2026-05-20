@@ -12,7 +12,7 @@ export function AnalyticsPage() {
   const [loading, setLoading] = useState(true)
 
   usePageMeta({
-    title: 'Analytics | PYQVault',
+    title: 'Analytics | Ministry of Papers',
     description: 'Preparation activity and mock test analytics.',
     canonicalPath: '/analytics',
   })
@@ -23,8 +23,8 @@ export function AnalyticsPage() {
     void fetchDashboardBootstrap()
       .then((data) => {
         if (cancelled) return
-        setExams(data.exams)
-        setMocks(data.mocks)
+        setExams(data.exams ?? [])
+        setMocks(data.mocks ?? [])
       })
       .finally(() => {
         if (!cancelled) setLoading(false)

@@ -14,20 +14,20 @@ import { usePageMeta } from '../lib/usePageMeta'
 
 export function LandingPage() {
   usePageMeta({
-    title: 'PYQVault — Every Exam Paper. Solved & Free.',
+    title: 'Ministry of Papers — Every Exam Paper. Solved & Free.',
     description: 'Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams. Every answer solved, explained, and free — no login needed.',
     canonicalPath: '/',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'WebSite',
-      name: 'PYQVault',
-      url: 'https://pyqvault.in',
+      name: 'Ministry of Papers',
+      url: 'https://ministryofpapers.com',
       description: '12 lakh+ solved PYQs. 240+ exams. No login. No paywall.',
       potentialAction: {
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: 'https://pyqvault.in/exam?q={search_term_string}',
+          urlTemplate: 'https://ministryofpapers.com/exams?q={search_term_string}',
         },
         'query-input': 'required name=search_term_string',
       },

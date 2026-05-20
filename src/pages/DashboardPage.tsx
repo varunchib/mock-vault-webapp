@@ -1,8 +1,10 @@
+import { ClipboardList, FileText, PlusCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
-import { ClipboardList, FileText } from 'lucide-react'
 import {
+  APIError,
   fetchDashboardBootstrap,
+  refreshAuthSession,
   type Exam,
   type MockItem,
   type RecentAttempt,
@@ -10,6 +12,7 @@ import {
 import { usePageMeta } from '../lib/usePageMeta'
 import { useAuth } from '../context/useAuth'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { readRecentlyViewed } from '../lib/examActivity'
 
 export const categoryOrder = [
   'Central',
@@ -42,20 +45,26 @@ export const categoryFullLabels: Record<string, string> = {
 }
 
 export function normalizeExamCategory(category: string): string {
-  const normalized = category.trim().toLowerCase()
-  if (normalized.includes('bank')) return 'Banking'
-  if (normalized.includes('state')) return 'States'
-  if (normalized.includes('rail')) return 'Railways'
-  if (normalized.includes('teach')) return 'Teaching'
-  if (normalized.includes('medical') || normalized.includes('neet')) return 'Medical'
-  if (normalized.includes('engineering') || normalized.includes('jee')) return 'Engineering'
+  const n = category.trim().toLowerCase()
+  if (n.includes('bank') || n.includes('ibps') || n.includes('rbi') || n.includes('nabard')) return 'Banking'
+  if (n.includes('rail') || n.includes('rrb') || n.includes('ntpc')) return 'Railways'
+  if (n.includes('teach') || n.includes('ctet') || n.includes(' tet') || n.startsWith('tet')) return 'Teaching'
+  if (n.includes('medical') || n.includes('neet') || n.includes('aiims')) return 'Medical'
+  if (n.includes('engineer') || n.includes('jee') || n.includes('gate')) return 'Engineering'
   if (
-    normalized.includes('central') ||
-    normalized.includes('ssc') ||
-    normalized.includes('upsc') ||
-    normalized.includes('defence') ||
-    normalized.includes('defense')
+    n.includes('central') || n.includes('ssc') || n.includes('upsc') ||
+    n.includes('defence') || n.includes('defense') || n.includes('nda') || n.includes('cds')
   ) return 'Central'
+  const stateMarkers = [
+    'state', 'psc', 'pcs', 'j&k', 'jammu', 'kashmir', 'jkssb', 'jkpsc',
+    'kerala', 'karnataka', 'maharashtra', 'mpsc', 'tnpsc', 'appsc', 'tspsc',
+    'rajasthan', 'haryana', 'punjab', 'gujarat', 'himachal', 'hp psc',
+    'uttarakhand', 'bihar', 'bpsc', 'jharkhand', 'odisha', 'opsc',
+    'bengal', 'wbpsc', 'assam', 'manipur', 'meghalaya', 'nagaland',
+    'tripura', 'sikkim', 'goa', 'chhattisgarh', 'cgpsc', 'uppsc', 'mppsc',
+    'andhra', 'telangana', 'tamilnadu', 'tamil',
+  ]
+  if (stateMarkers.some((m) => n.includes(m))) return 'States'
   return category
 }
 
@@ -103,25 +112,40 @@ export function DashboardPage() {
   const [error, setError] = useState<string | null>(null)
 
   usePageMeta({
-    title: 'Dashboard | PYQVault',
-    description: 'Your PYQVault dashboard — browse exam categories, attempt mocks, and track your preparation.',
+    title: 'Dashboard | Ministry of Papers',
+    description: 'Your Ministry of Papers dashboard — enrolled exams, recent activity, and preparation tools.',
     canonicalPath: '/dashboard',
   })
 
   useEffect(() => {
     let cancelled = false
     const load = async () => {
+      const applyData = (data: Awaited<ReturnType<typeof fetchDashboardBootstrap>>) => {
+        setExams(data.exams ?? [])
+        setMocks(data.mocks ?? [])
+        setEnrolledExams(data.enrolledExams ?? [])
+        setRecentAttempts(data.recentAttempts ?? [])
+      }
+
       try {
         setLoading(true)
         setError(null)
         const data = await fetchDashboardBootstrap()
         if (cancelled) return
-        setExams(data.exams)
-        setMocks(data.mocks)
-        setEnrolledExams(data.enrolledExams ?? [])
-        setRecentAttempts(data.recentAttempts ?? [])
+        applyData(data)
       } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'Unable to load dashboard.')
+        if (cancelled) return
+        if (err instanceof APIError && err.status === 401) {
+          try {
+            await refreshAuthSession()
+            const retried = await fetchDashboardBootstrap()
+            if (!cancelled) applyData(retried)
+            return
+          } catch {
+            // refresh failed — fall through to error state
+          }
+        }
+        setError('Unable to load dashboard. Please refresh.')
       } finally {
         if (!cancelled) setLoading(false)
       }
@@ -130,10 +154,7 @@ export function DashboardPage() {
     return () => { cancelled = true }
   }, [])
 
-  const freeMocks = useMemo(
-    () => mocks.filter((m) => m.isFree).slice(0, 6),
-    [mocks],
-  )
+  const recentlyViewed = useMemo(() => readRecentlyViewed(), [])
 
   if (loading) return <HaloLoader label="Loading dashboard" />
 
@@ -152,11 +173,11 @@ export function DashboardPage() {
   return (
     <div className="db-page">
 
-      {/* ── Welcome header ─────────────────────────── */}
+      {/* ── Welcome header ──────────────────────────── */}
       <header className="db-header">
         <div className="db-header-left">
           <h1>{getGreeting()}, {firstName}</h1>
-          <p>Track your prep — attempts, enrolled exams, and available resources below.</p>
+          <p>Your exam preparation hub — enrolled exams, recent activity, and more.</p>
         </div>
         <div className="db-header-stats">
           <div className="db-header-stat">
@@ -174,88 +195,105 @@ export function DashboardPage() {
         </div>
       </header>
 
-      {/* ── Enrolled exams ─────────────────────────── */}
-      {enrolledExams.length > 0 && (
-        <section className="db-enrolled-section">
-          <div className="db-row-head">
-            <div className="db-row-head-left">
-              <small>Continue preparing</small>
-              <h2>Enrolled exams</h2>
-            </div>
-            <Link className="db-row-view-all" to="/exam">View all →</Link>
+      {/* ── Enrolled exams ──────────────────────────── */}
+      <section className="db-section">
+        <div className="db-section-head">
+          <div>
+            <small>Your exams</small>
+            <h2>Enrolled</h2>
           </div>
-          <div className="db-enrolled-scroll">
+          <Link className="db-section-link" to="/exams">Browse all →</Link>
+        </div>
+
+        {enrolledExams.length === 0 ? (
+          <div className="db-enroll-cta">
+            <PlusCircle size={22} />
+            <div>
+              <strong>No exams enrolled yet</strong>
+              <p>Head to the Exams catalog and enroll in yours to track them here.</p>
+            </div>
+            <Link className="db-enroll-btn" to="/exams">Browse Exams</Link>
+          </div>
+        ) : (
+          <div className="db-enrolled-row">
             {enrolledExams.map((exam) => (
               <Link className="db-enrolled-chip" to={`/exam/${exam.slug}`} key={exam.slug}>
-                <span>{exam.icon}</span>
+                <span className="db-chip-icon">{exam.icon}</span>
                 <div>
                   <strong>{exam.shortName}</strong>
-                  <small>{exam.mocks} mocks · {exam.papers} papers</small>
+                  <small>
+                    {parseInt(exam.mocks) > 0 ? `${exam.mocks} mocks` : ''}
+                    {parseInt(exam.mocks) > 0 && parseInt(exam.papers) > 0 ? ' · ' : ''}
+                    {parseInt(exam.papers) > 0 ? `${exam.papers} papers` : ''}
+                  </small>
                 </div>
+              </Link>
+            ))}
+            <Link className="db-enrolled-chip db-add-chip" to="/exams">
+              <span className="db-chip-icon">＋</span>
+              <div><strong>Add exam</strong></div>
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* ── Recently viewed ─────────────────────────── */}
+      {recentlyViewed.length > 0 && (
+        <section className="db-section">
+          <div className="db-section-head">
+            <div>
+              <small>Browse history</small>
+              <h2>Recently viewed</h2>
+            </div>
+          </div>
+          <div className="db-viewed-row">
+            {recentlyViewed.map((rec) => (
+              <Link className="db-viewed-chip" to={`/exam/${rec.slug}`} key={rec.slug}>
+                <span>{rec.icon}</span>
+                <strong>{rec.shortName}</strong>
               </Link>
             ))}
           </div>
         </section>
       )}
 
-      {/* ── Activity row: Recent attempts + Free mocks ── */}
-      <div className="db-activity-row">
-        <section className="db-panel">
-          <div className="db-panel-head">
-            <div>
-              <small>History</small>
-              <h2>Recently attempted</h2>
-            </div>
+      {/* ── Recently attempted ──────────────────────── */}
+      <section className="db-section">
+        <div className="db-section-head">
+          <div>
+            <small>Activity</small>
+            <h2>Recently attempted</h2>
           </div>
-          {recentAttempts.length === 0 ? (
-            <p className="db-panel-empty">No attempts yet. Start with a free mock below.</p>
-          ) : (
-            recentAttempts.map((attempt) => {
+          <Link className="db-section-link" to="/tests">All tests →</Link>
+        </div>
+
+        {recentAttempts.length === 0 ? (
+          <div className="db-attempts-empty">
+            <p>No attempts yet — start a mock test or open a PYQ paper.</p>
+            <Link className="db-enroll-btn" to="/tests">Browse Tests</Link>
+          </div>
+        ) : (
+          <div className="db-attempt-list">
+            {recentAttempts.map((attempt) => {
               const href = attempt.type === 'paper'
                 ? `/pyq/${attempt.slug}`
                 : `/mock-test/${attempt.examSlug}`
               return (
-                <Link className="db-panel-row" to={href} key={`${attempt.type}-${attempt.slug}`}>
+                <Link className="db-attempt-row" to={href} key={`${attempt.type}-${attempt.slug}`}>
                   <div className={`db-attempt-badge ${attempt.type}`}>
                     {attempt.type === 'paper' ? <FileText size={13} /> : <ClipboardList size={13} />}
                   </div>
-                  <div>
+                  <div className="db-attempt-info">
                     <strong>{attempt.title}</strong>
-                    <small>{attempt.examName} · {attempt.type === 'paper' ? 'PYQ' : 'Mock'}</small>
+                    <small>{attempt.examName} · {attempt.type === 'paper' ? 'PYQ Paper' : 'Mock Test'}</small>
                   </div>
-                  <span>{attempt.questions}Q</span>
+                  <span className="db-attempt-qs">{attempt.questions}Q</span>
                 </Link>
               )
-            })
-          )}
-        </section>
-
-        <section className="db-panel">
-          <div className="db-panel-head">
-            <div>
-              <small>Free access</small>
-              <h2>Free mock tests</h2>
-            </div>
-            <Link className="db-panel-link" to="/mock-test">See all</Link>
+            })}
           </div>
-          {freeMocks.length === 0 ? (
-            <p className="db-panel-empty">No free mocks available right now.</p>
-          ) : (
-            freeMocks.map((mock) => (
-              <Link className="db-panel-row" to={`/mock-test/${mock.examSlug}`} key={mock.slug}>
-                <div className="db-attempt-badge mock">
-                  <ClipboardList size={13} />
-                </div>
-                <div>
-                  <strong>{mock.title}</strong>
-                  <small>{mock.examName} · {mock.difficulty}</small>
-                </div>
-                <span>{mock.questions}Q</span>
-              </Link>
-            ))
-          )}
-        </section>
-      </div>
+        )}
+      </section>
 
     </div>
   )

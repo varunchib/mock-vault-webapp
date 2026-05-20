@@ -1,5 +1,5 @@
 import {
-  BookOpen,
+  AlertTriangle,
   CheckCircle2,
   ClipboardList,
   Code2,
@@ -9,10 +9,10 @@ import {
   GraduationCap,
   Home,
   LayoutDashboard,
-  ListChecks,
   LogOut,
   Pencil,
   Plus,
+  RefreshCw,
   Save,
   Search,
   Trash2,
@@ -26,27 +26,39 @@ import { Link, useNavigate } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { useAuth } from '../context/useAuth'
 import {
+  clearAdminReports,
   deleteAdminExam,
   deleteAdminMock,
+  deleteAdminPaper,
   deleteAdminQuestion,
+  fetchAdminReports,
   fetchAdminSummary,
   fetchMockCatalog,
   fetchMockQuestions,
+  fetchPaperCatalog,
+  fetchPaperQuestions,
+  flushAdminCache,
   saveAdminExam,
   saveAdminMock,
+  saveAdminPaper,
+  updateAdminQuestion,
   type AdminExamPayload,
   type AdminMockPayload,
   type AdminMockQuestionPayload,
+  type AdminPaperPayload,
+  type AdminPaperQuestionPayload,
   type AdminSummary,
   type MockItem,
+  type Paper,
   type Question,
   type QuestionOption,
+  type QuestionReport,
 } from '../lib/api'
 import { usePageMeta } from '../lib/usePageMeta'
 
 // ─── Types ────────────────────────────────────────────────────
 
-type Tab = 'overview' | 'exams' | 'mocks' | 'import'
+type Tab = 'overview' | 'exams' | 'mocks' | 'papers'
 
 type StatusMsg = { kind: 'success' | 'error'; text: string }
 
@@ -84,14 +96,15 @@ type AdminExamDraft = {
   subjects: string
 }
 
-type ImportedMock = {
-  title?: unknown; slug?: unknown; examSlug?: unknown; durationMinutes?: unknown
-  difficulty?: unknown; description?: unknown; subjects?: unknown; isFree?: unknown; questions?: unknown
+type ImportedPaper = {
+  slug?: unknown; examSlug?: unknown; title?: unknown; year?: unknown; shift?: unknown
+  description?: unknown; subjects?: unknown; questions?: unknown
 }
 
-type ImportedQuestion = {
-  question?: unknown; options?: unknown; answer?: unknown
-  answerKey?: unknown; correct?: unknown; explanation?: unknown; subject?: unknown
+type ImportedPaperQuestion = {
+  questionNo?: unknown; question?: unknown; options?: unknown
+  answerKey?: unknown; answer?: unknown; correct?: unknown
+  explanation?: unknown; subject?: unknown; tags?: unknown
 }
 
 // ─── Helpers ──────────────────────────────────────────────────
@@ -172,22 +185,6 @@ function payloadFromDraft(draft: AdminMockDraft): AdminMockPayload {
   }
 }
 
-function draftQuestionFromImport(input: ImportedQuestion, fallback: string): AdminQuestionDraft | null {
-  const options = normalizeOptions(input.options)
-  if (!asString(input.question) || options.length < 2) return null
-  return {
-    id: crypto.randomUUID(),
-    question: asString(input.question),
-    optionA: options[0]?.text ?? '',
-    optionB: options[1]?.text ?? '',
-    optionC: options[2]?.text ?? '',
-    optionD: options[3]?.text ?? '',
-    answerKey: normalizeAnswer(input.answerKey ?? input.answer ?? input.correct),
-    explanation: asString(input.explanation),
-    subject: asString(input.subject, fallback),
-  }
-}
-
 function draftQuestionFromApi(q: Question): AdminQuestionDraft {
   return {
     id: crypto.randomUUID(),
@@ -202,29 +199,57 @@ function draftQuestionFromApi(q: Question): AdminQuestionDraft {
   }
 }
 
-function parseJsonDraft(raw: string, current: AdminMockDraft, defaultExamSlug: string, defaultSubject: string): AdminMockDraft {
-  const parsed = JSON.parse(raw) as ImportedMock | ImportedQuestion[]
-  const imported = Array.isArray(parsed) ? { questions: parsed } : parsed
-  const subjects = asStringList(imported.subjects)
-  const fallback = subjects[0] || defaultSubject || 'General'
-  const questionItems = Array.isArray(imported.questions) ? imported.questions : []
-  const questions = questionItems
-    .map((item) => draftQuestionFromImport(item as ImportedQuestion, fallback))
-    .filter((item): item is AdminQuestionDraft => Boolean(item))
-  if (!questions.length) throw new Error('JSON must include at least one valid question with two options.')
-  const title = asString(imported.title, current.title)
+function parsePaperJson(raw: string, defaultExamSlug: string): AdminPaperPayload {
+  const parsed = JSON.parse(raw) as ImportedPaper
+  const title = asString(parsed.title)
+  const slug = asString(parsed.slug, slugify(title))
+  const examSlug = asString(parsed.examSlug, defaultExamSlug)
+  const subjects = asStringList(parsed.subjects)
+  const questionItems = Array.isArray(parsed.questions) ? (parsed.questions as ImportedPaperQuestion[]) : []
+  const questions: AdminPaperQuestionPayload[] = questionItems
+    .filter((q) => asString(q.question))
+    .map((q, i) => ({
+      questionNo: asString(q.questionNo, String(i + 1)),
+      question: asString(q.question),
+      options: normalizeOptions(q.options),
+      answerKey: normalizeAnswer(q.answerKey ?? q.answer ?? q.correct),
+      explanation: asString(q.explanation),
+      subject: asString(q.subject, subjects[0] ?? 'General'),
+      tags: asStringList(q.tags),
+    }))
+    .filter((q) => q.options.length >= 2)
+  if (!slug || !examSlug || !title) throw new Error('Paper JSON must include slug, examSlug, and title.')
+  if (!questions.length) throw new Error('Paper JSON must include at least one valid question with two options.')
   return {
-    title,
-    slug: asString(imported.slug, current.slug || slugify(title)),
-    examSlug: asString(imported.examSlug, current.examSlug || defaultExamSlug),
-    durationMinutes: String(imported.durationMinutes ?? current.durationMinutes),
-    difficulty: normalizeDifficulty(imported.difficulty ?? current.difficulty),
-    description: asString(imported.description, current.description),
-    subjects: subjects.length ? subjects.join(', ') : current.subjects,
-    isFree: typeof imported.isFree === 'boolean' ? imported.isFree : current.isFree,
+    slug, examSlug, title,
+    year: asString(parsed.year),
+    shift: asString(parsed.shift),
+    description: asString(parsed.description),
+    subjects: subjects.length ? subjects : ['General'],
     questions,
   }
 }
+
+const SAMPLE_PAPER_JSON = `{
+  "slug": "jkssb-wildlife-guard-2026-may-10",
+  "examSlug": "jkssb",
+  "title": "JKSSB Wildlife Guard 2026 (May 10)",
+  "year": "2026",
+  "shift": "Morning",
+  "description": "JKSSB Wildlife Guard recruitment exam held on May 10, 2026.",
+  "subjects": ["Wildlife Conservation", "General Awareness", "Quantitative Aptitude"],
+  "questions": [
+    {
+      "questionNo": "1",
+      "question": "Which national park in J&K is known for the Hangul deer?",
+      "options": ["Dachigam National Park", "Hemis National Park", "Kishtwar National Park", "Salim Ali National Park"],
+      "answerKey": "A",
+      "explanation": "Dachigam National Park near Srinagar is the primary habitat of the Kashmir stag (Hangul), an endangered deer species.",
+      "subject": "Wildlife Conservation",
+      "tags": ["hangul", "national parks", "J&K wildlife"]
+    }
+  ]
+}`
 
 // ─── Empty drafts ─────────────────────────────────────────────
 
@@ -242,25 +267,6 @@ const emptyExamDraft = (): AdminExamDraft => ({
   slug: '', name: '', shortName: '', category: 'States', icon: '📋', description: '', subjects: '',
 })
 
-const SAMPLE_JSON = `{
-  "title": "JKSSB Finance Accounts Full Mock",
-  "slug": "jkssb-finance-accounts-full-mock",
-  "examSlug": "jkssb",
-  "durationMinutes": 120,
-  "difficulty": "Moderate",
-  "isFree": true,
-  "subjects": ["Finance", "Accounts", "General Awareness"],
-  "description": "Full-length JKSSB Finance Accounts mock.",
-  "questions": [
-    {
-      "question": "Which article deals with the Consolidated Fund of India?",
-      "options": ["Article 266", "Article 280", "Article 112", "Article 148"],
-      "answer": "A",
-      "explanation": "Article 266 defines the Consolidated Fund of India.",
-      "subject": "Finance"
-    }
-  ]
-}`
 
 // ─── Status banner ────────────────────────────────────────────
 
@@ -303,15 +309,35 @@ export function AdminDashboardPage() {
   const [examDraft, setExamDraft] = useState<AdminExamDraft>(emptyExamDraft())
   const [pendingDeleteExam, setPendingDeleteExam] = useState<string | null>(null)
 
-  // Import
-  const [jsonText, setJsonText] = useState(SAMPLE_JSON)
-  const [bulkText, setBulkText] = useState('')
+  // Paper state
+  const [papers, setPapers] = useState<Paper[]>([])
+  const [paperJsonText, setPaperJsonText] = useState(SAMPLE_PAPER_JSON)
+  const [paperJsonPreview, setPaperJsonPreview] = useState<AdminPaperPayload | null>(null)
+  const [paperJsonError, setPaperJsonError] = useState('')
+  const [pendingDeletePaper, setPendingDeletePaper] = useState<string | null>(null)
+  const [paperSearch, setPaperSearch] = useState('')
+
+  // Questions browser state (inline in papers tab)
+  const [selectedPaperSlug, setSelectedPaperSlug] = useState('')
+  const [paperQuestions, setPaperQuestions] = useState<Question[]>([])
+  const [paperQLoading, setPaperQLoading] = useState(false)
+  const [editingQuestion, setEditingQuestion] = useState<Question | null>(null)
+  const [editDraft, setEditDraft] = useState<AdminQuestionDraft>(emptyQuestion())
+  const [editSaving, setEditSaving] = useState(false)
+
+  // Reports
+  const [reports, setReports] = useState<QuestionReport[]>([])
+  const [reportCount, setReportCount] = useState(0)
+
+  // New question (manual entry in Papers tab)
+  const [newQDraft, setNewQDraft] = useState<AdminQuestionDraft>(emptyQuestion)
+  const [addingQ, setAddingQ] = useState(false)
 
   const exams = summary?.exams ?? []
   const selectedExam = exams.find((e) => e.slug === draft.examSlug) ?? exams[0]
   const selectedMock = mocks.find((m) => m.slug === selectedMockSlug) ?? null
 
-  usePageMeta({ title: 'Admin | PYQVault', description: 'Admin panel.', canonicalPath: '/admin' })
+  usePageMeta({ title: 'Admin | Ministry of Papers', description: 'Admin panel.', canonicalPath: '/admin' })
 
   const toast = (kind: StatusMsg['kind'], text: string) => {
     setStatusMsg({ kind, text })
@@ -321,9 +347,10 @@ export function AdminDashboardPage() {
   // ── Load data ───────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
-    const [summaryData, mockData] = await Promise.all([fetchAdminSummary(), fetchMockCatalog()])
+    const [summaryData, mockData, paperData] = await Promise.all([fetchAdminSummary(), fetchMockCatalog(), fetchPaperCatalog()])
     setSummary(summaryData)
-    setMocks(mockData)
+    setMocks(mockData ?? [])
+    setPapers(paperData ?? [])
     setDraft((cur) => cur.examSlug ? cur : emptyDraft(summaryData.exams[0]?.slug ?? ''))
   }, [])
 
@@ -484,42 +511,196 @@ export function AdminDashboardPage() {
     }
   }
 
-  // ── Import handlers ──────────────────────────────────────────
+  // ── Paper handlers ───────────────────────────────────────────
 
-  const importJson = (raw = jsonText) => {
+  const parsePaperPreview = (raw = paperJsonText) => {
     try {
-      const imported = parseJsonDraft(raw, draft, exams[0]?.slug ?? '', selectedExam?.subjects[0] ?? 'General')
-      setDraft(imported)
-      setQuestionDraft(emptyQuestion())
-      toast('success', `Imported ${imported.questions.length} questions. Review in Mock Builder.`)
-      setActiveTab('mocks')
+      const payload = parsePaperJson(raw, exams[0]?.slug ?? '')
+      setPaperJsonPreview(payload)
+      setPaperJsonError('')
     } catch (err) {
-      toast('error', err instanceof Error ? err.message : 'Invalid JSON.')
+      setPaperJsonPreview(null)
+      setPaperJsonError(err instanceof Error ? err.message : 'Invalid JSON.')
     }
   }
 
-  const importJsonFile = async (file: File | undefined) => {
-    if (!file) return
-    const text = await file.text()
-    setJsonText(text)
-    importJson(text)
+  const savePaper = async () => {
+    if (!paperJsonPreview) return
+    setSaving(true)
+    try {
+      await saveAdminPaper(paperJsonPreview)
+      toast('success', `Paper "${paperJsonPreview.title}" saved (${paperJsonPreview.questions.length} questions).`)
+      setPaperJsonPreview(null)
+      setPaperJsonText(SAMPLE_PAPER_JSON)
+      await loadData()
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to save paper.')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  const importBulk = () => {
-    const rows = bulkText.split('\n').map((l) => l.trim()).filter(Boolean).map((line) => {
-      const [question, optionA, optionB, optionC, optionD, answerKey, explanation] = line.split('|').map((p) => p?.trim() ?? '')
-      return { id: crypto.randomUUID(), question, optionA, optionB, optionC, optionD,
-        answerKey: ['A','B','C','D'].includes(answerKey?.toUpperCase()) ? answerKey.toUpperCase() : 'A',
-        explanation: explanation ?? '', subject: questionDraft.subject || selectedExam?.subjects[0] || 'General' }
-    }).filter((r) => r.question && r.optionA && r.optionB)
-    if (!rows.length) { toast('error', 'No valid rows found. Format: Question | A | B | C | D | Answer | Explanation'); return }
-    setDraft((cur) => ({ ...cur, questions: [...cur.questions, ...rows] }))
-    setBulkText('')
-    toast('success', `Added ${rows.length} questions from bulk import.`)
-    setActiveTab('mocks')
+  const confirmDeletePaper = async (slug: string) => {
+    setSaving(true)
+    try {
+      await deleteAdminPaper(slug)
+      toast('success', 'Paper deleted.')
+      setPendingDeletePaper(null)
+      await loadData()
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to delete paper.')
+    } finally {
+      setSaving(false)
+    }
   }
 
-  // ── Filtered mocks ────────────────────────────────────────────
+  const handleFlushCache = async () => {
+    setSaving(true)
+    try {
+      await flushAdminCache()
+      toast('success', 'Cache flushed.')
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to flush cache.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // ── Questions browser handlers ───────────────────────────────
+
+  const loadPaperQuestions = async (paperSlug: string) => {
+    setSelectedPaperSlug(paperSlug)
+    setPaperQuestions([])
+    setPaperQLoading(true)
+    setEditingQuestion(null)
+    try {
+      const qs = await fetchPaperQuestions(paperSlug)
+      setPaperQuestions(qs)
+    } catch {
+      toast('error', 'Unable to load paper questions.')
+    } finally {
+      setPaperQLoading(false)
+    }
+  }
+
+  const startEditQuestion = (q: Question) => {
+    setEditingQuestion(q)
+    setEditDraft({
+      id: crypto.randomUUID(),
+      question: q.question,
+      optionA: q.options[0]?.text ?? '',
+      optionB: q.options[1]?.text ?? '',
+      optionC: q.options[2]?.text ?? '',
+      optionD: q.options[3]?.text ?? '',
+      answerKey: normalizeAnswer(q.answerKey),
+      explanation: q.explanation,
+      subject: q.subject,
+    })
+  }
+
+  const cancelEdit = () => {
+    setEditingQuestion(null)
+    setEditDraft(emptyQuestion())
+  }
+
+  const saveEditQuestion = async () => {
+    if (!editingQuestion) return
+    setEditSaving(true)
+    try {
+      await updateAdminQuestion(editingQuestion.slug, {
+        question: editDraft.question.trim(),
+        options: [
+          { key: 'A', text: editDraft.optionA.trim() },
+          { key: 'B', text: editDraft.optionB.trim() },
+          { key: 'C', text: editDraft.optionC.trim() },
+          { key: 'D', text: editDraft.optionD.trim() },
+        ].filter((o) => o.text),
+        answerKey: editDraft.answerKey,
+        explanation: editDraft.explanation.trim(),
+        subject: editDraft.subject.trim(),
+        tags: editingQuestion.tags,
+      })
+      toast('success', 'Question updated.')
+      cancelEdit()
+      // Refresh whichever list is visible
+      if (selectedPaperSlug) {
+        const qs = await fetchPaperQuestions(selectedPaperSlug)
+        setPaperQuestions(qs)
+      }
+      if (selectedMockSlug) {
+        setSelectedMockQuestions(await fetchMockQuestions(selectedMockSlug))
+      }
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to update question.')
+    } finally {
+      setEditSaving(false)
+    }
+  }
+
+  // ── Add paper question (manual entry) ───────────────────────
+
+  const addPaperQuestion = async () => {
+    if (!selectedPaperSlug || !newQDraft.question.trim()) return
+    const paper = papers.find((p) => p.slug === selectedPaperSlug)
+    if (!paper) return
+    setAddingQ(true)
+    try {
+      const newQ: AdminPaperQuestionPayload = {
+        questionNo: String(paperQuestions.length + 1),
+        question: newQDraft.question.trim(),
+        options: [
+          { key: 'A', text: newQDraft.optionA.trim() },
+          { key: 'B', text: newQDraft.optionB.trim() },
+          { key: 'C', text: newQDraft.optionC.trim() },
+          { key: 'D', text: newQDraft.optionD.trim() },
+        ].filter((o) => o.text),
+        answerKey: newQDraft.answerKey,
+        explanation: newQDraft.explanation.trim(),
+        subject: newQDraft.subject.trim() || 'General',
+        tags: [],
+      }
+      const payload: AdminPaperPayload = {
+        slug: paper.slug,
+        examSlug: paper.examSlug,
+        title: paper.title,
+        year: paper.year ?? '',
+        shift: paper.shift ?? '',
+        description: paper.description ?? '',
+        subjects: paper.subjects ?? [],
+        questions: [
+          ...paperQuestions.map((q) => ({
+            questionNo: q.questionNo,
+            question: q.question,
+            options: q.options,
+            answerKey: q.answerKey,
+            explanation: q.explanation ?? '',
+            subject: q.subject,
+            tags: q.tags ?? [],
+          })),
+          newQ,
+        ],
+      }
+      await saveAdminPaper(payload)
+      await loadPaperQuestions(selectedPaperSlug)
+      setNewQDraft(emptyQuestion())
+      toast('success', 'Question added.')
+      await loadData()
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to add question.')
+    } finally {
+      setAddingQ(false)
+    }
+  }
+
+  // ── Load reports ─────────────────────────────────────────────
+
+  useEffect(() => {
+    void fetchAdminReports()
+      .then((data) => { setReports(data.reports); setReportCount(data.count) })
+      .catch(() => {})
+  }, [])
+
+  // ── Filtered lists ────────────────────────────────────────────
 
   const filteredMocks = useMemo(() => {
     const q = mockSearch.trim().toLowerCase()
@@ -529,10 +710,18 @@ export function AdminDashboardPage() {
     )
   }, [mocks, mockSearch])
 
+  const filteredPapers = useMemo(() => {
+    const q = paperSearch.trim().toLowerCase()
+    if (!q) return papers.slice(0, 5)
+    return papers.filter((p) =>
+      p.title.toLowerCase().includes(q) || p.examName.toLowerCase().includes(q) || (p.year ?? '').toLowerCase().includes(q)
+    )
+  }, [papers, paperSearch])
+
   // ── Tab labels ─────────────────────────────────────────────────
 
   const tabLabel: Record<Tab, string> = {
-    overview: 'Overview', exams: 'Exams', mocks: 'Mock Builder', import: 'Import',
+    overview: 'Overview', exams: 'Exams', mocks: 'Mock Builder', papers: 'Papers',
   }
 
   if (loading) return <HaloLoader label="Loading admin" />
@@ -542,12 +731,20 @@ export function AdminDashboardPage() {
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside className="admin-rail">
-        <Link className="vault-logo" to="/admin"><span>P</span><strong>PYQVault</strong></Link>
+        <Link className="vault-logo" to="/admin">
+          <span>
+            <svg viewBox="0 0 40 40" fill="none" width="40" height="40" aria-hidden="true">
+              <rect width="40" height="40" rx="11" fill="currentColor" />
+              <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </span>
+          <strong>Ministry of Papers</strong>
+        </Link>
 
         <nav className="admin-rail-nav">
-          {(['overview', 'exams', 'mocks', 'import'] as Tab[]).map((tab) => {
+          {(['overview', 'exams', 'mocks', 'papers'] as Tab[]).map((tab) => {
             const icons: Record<Tab, typeof Home> = {
-              overview: LayoutDashboard, exams: GraduationCap, mocks: ClipboardList, import: Code2,
+              overview: LayoutDashboard, exams: GraduationCap, mocks: ClipboardList, papers: FileText,
             }
             const Icon = icons[tab]
             return (
@@ -562,7 +759,7 @@ export function AdminDashboardPage() {
             )
           })}
           <div className="admin-rail-divider" />
-          <Link className="admin-nav-btn" to="/dashboard"><Home size={17} /> App home</Link>
+          <Link className="admin-nav-btn" to="/exams"><Home size={17} /> App home</Link>
         </nav>
 
         <button className="admin-rail-logout" type="button" onClick={() => void logout().then(() => navigate('/'))}>
@@ -603,6 +800,23 @@ export function AdminDashboardPage() {
             >
               <Save size={15} /> {saving ? 'Saving…' : 'Save exam'}
             </button>
+          )}
+          {activeTab === 'papers' && (
+            <div className="admin-head-actions">
+              <button type="button" className="admin-ghost-btn" onClick={() => void handleFlushCache()} disabled={saving}>
+                <RefreshCw size={14} /> Flush cache
+              </button>
+              {paperJsonPreview && (
+                <button
+                  type="button"
+                  className="admin-save-btn"
+                  onClick={() => void savePaper()}
+                  disabled={saving}
+                >
+                  <Save size={15} /> {saving ? 'Saving…' : `Save paper (${paperJsonPreview.questions.length} Qs)`}
+                </button>
+              )}
+            </div>
           )}
         </header>
 
@@ -652,10 +866,13 @@ export function AdminDashboardPage() {
                   <button type="button" className="admin-quick-btn" onClick={() => setActiveTab('mocks')}>
                     <ClipboardList size={18} /><span>Build mock</span>
                   </button>
-                  <button type="button" className="admin-quick-btn" onClick={() => setActiveTab('import')}>
-                    <UploadCloud size={18} /><span>Import JSON</span>
+                  <button type="button" className="admin-quick-btn" onClick={() => setActiveTab('papers')}>
+                    <FileText size={18} /><span>Upload paper</span>
                   </button>
-                  <Link className="admin-quick-btn" to="/exam">
+                  <button type="button" className="admin-quick-btn" onClick={() => void handleFlushCache()} disabled={saving}>
+                    <RefreshCw size={18} /><span>Flush cache</span>
+                  </button>
+                  <Link className="admin-quick-btn" to="/exams" target="_blank" rel="noopener noreferrer">
                     <Home size={18} /><span>View site</span>
                   </Link>
                 </div>
@@ -684,6 +901,34 @@ export function AdminDashboardPage() {
                 </div>
               </div>
             </div>
+
+            {reportCount > 0 && (
+              <div className="admin-tool-panel">
+                <div className="admin-panel-title">
+                  <div>
+                    <small>{reportCount} pending</small>
+                    <h2 style={{ display: 'flex', alignItems: 'center', gap: 6 }}><AlertTriangle size={15} /> Question Reports</h2>
+                  </div>
+                  <button type="button" className="admin-row-action danger" onClick={() => {
+                    void clearAdminReports().then(() => { setReports([]); setReportCount(0); toast('success', 'Reports cleared.') })
+                  }}>
+                    <Trash2 size={13} /> Clear all
+                  </button>
+                </div>
+                <div className="admin-manage-list">
+                  {reports.map((r, i) => (
+                    <div className="admin-manage-row" key={i}>
+                      <AlertTriangle size={14} style={{ flexShrink: 0, color: 'var(--warning, #f59e0b)' }} />
+                      <div>
+                        <strong>Q{r.questionNo} — {r.reportType}</strong>
+                        <small>{r.paperSlug} · {r.userEmail} · {new Date(r.timestamp).toLocaleDateString()}</small>
+                        {r.details && <p style={{ margin: '2px 0 0', fontSize: 12 }}>{r.details}</p>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -971,9 +1216,14 @@ export function AdminDashboardPage() {
                             <span>Q{i + 1}</span>
                             <strong>{q.subject}</strong>
                           </div>
-                          <button type="button" className="admin-row-action danger" onClick={() => void deleteQuestion(q.slug)}>
-                            <Trash2 size={13} /> Delete
-                          </button>
+                          <div className="admin-row-actions">
+                            <button type="button" className="admin-row-action" onClick={() => startEditQuestion(q)}>
+                              <Pencil size={13} /> Edit
+                            </button>
+                            <button type="button" className="admin-row-action danger" onClick={() => void deleteQuestion(q.slug)}>
+                              <Trash2 size={13} /> Delete
+                            </button>
+                          </div>
                         </div>
                         <p>{q.question}</p>
                         <div className="admin-option-grid">
@@ -994,84 +1244,353 @@ export function AdminDashboardPage() {
                 )}
               </div>
             )}
+
+            {/* Inline edit form — appears when editing a mock question */}
+            {editingQuestion && (
+              <div className="admin-tool-panel">
+                <div className="admin-panel-title">
+                  <div>
+                    <small>Editing Q{editingQuestion.questionNo}</small>
+                    <h2>{editingQuestion.subject}</h2>
+                  </div>
+                  <button type="button" className="admin-text-btn" onClick={cancelEdit}><X size={13} /> Cancel</button>
+                </div>
+                <div className="admin-form-stack">
+                  <label className="admin-field">
+                    Question text
+                    <textarea value={editDraft.question} onChange={(e) => setEditDraft((d) => ({ ...d, question: e.target.value }))} rows={4} />
+                  </label>
+                  <div className="admin-form-row">
+                    <label className="admin-field"><span>A</span><input value={editDraft.optionA} onChange={(e) => setEditDraft((d) => ({ ...d, optionA: e.target.value }))} /></label>
+                    <label className="admin-field"><span>B</span><input value={editDraft.optionB} onChange={(e) => setEditDraft((d) => ({ ...d, optionB: e.target.value }))} /></label>
+                  </div>
+                  <div className="admin-form-row">
+                    <label className="admin-field"><span>C</span><input value={editDraft.optionC} onChange={(e) => setEditDraft((d) => ({ ...d, optionC: e.target.value }))} /></label>
+                    <label className="admin-field"><span>D</span><input value={editDraft.optionD} onChange={(e) => setEditDraft((d) => ({ ...d, optionD: e.target.value }))} /></label>
+                  </div>
+                  <div className="admin-form-row">
+                    <label className="admin-field">
+                      Correct answer
+                      <select value={editDraft.answerKey} onChange={(e) => setEditDraft((d) => ({ ...d, answerKey: e.target.value }))}>
+                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                      </select>
+                    </label>
+                    <label className="admin-field">
+                      Subject
+                      <input value={editDraft.subject} onChange={(e) => setEditDraft((d) => ({ ...d, subject: e.target.value }))} />
+                    </label>
+                  </div>
+                  <label className="admin-field">
+                    Explanation
+                    <textarea value={editDraft.explanation} onChange={(e) => setEditDraft((d) => ({ ...d, explanation: e.target.value }))} rows={3} placeholder="Why is this the correct answer?" />
+                  </label>
+                  <button
+                    type="button"
+                    className="admin-save-btn"
+                    onClick={() => void saveEditQuestion()}
+                    disabled={editSaving || !editDraft.question.trim()}
+                  >
+                    <Save size={15} /> {editSaving ? 'Saving…' : 'Save changes'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
-        {/* ── Import tab ────────────────────────────────────────── */}
-        {activeTab === 'import' && (
+        {/* ── Papers tab ───────────────────────────────────────── */}
+        {activeTab === 'papers' && (
           <div className="admin-tab-body">
             <div className="admin-two-col">
               {/* JSON import */}
               <div className="admin-tool-panel">
                 <div className="admin-panel-title">
-                  <div><small>JSON import</small><h2>Upload question paper</h2></div>
+                  <div><small>JSON upload</small><h2>Upload paper</h2></div>
                   <div className="admin-row-actions">
                     <label className="admin-file-action">
                       <UploadCloud size={14} /> Upload file
-                      <input type="file" accept="application/json,.json" onChange={(e) => void importJsonFile(e.target.files?.[0])} />
+                      <input type="file" accept="application/json,.json" onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const text = await file.text()
+                        setPaperJsonText(text)
+                        parsePaperPreview(text)
+                      }} />
                     </label>
-                    <button type="button" className="admin-save-btn small" onClick={() => importJson()}>
-                      <Code2 size={14} /> Import
+                    <button type="button" className="admin-save-btn small" onClick={() => parsePaperPreview()}>
+                      <Code2 size={14} /> Parse
                     </button>
                   </div>
                 </div>
-                <textarea className="admin-bulk-box admin-json-box" value={jsonText} onChange={(e) => setJsonText(e.target.value)} />
+                <textarea
+                  className="admin-bulk-box admin-json-box"
+                  value={paperJsonText}
+                  onChange={(e) => { setPaperJsonText(e.target.value); setPaperJsonPreview(null); setPaperJsonError('') }}
+                />
+                {paperJsonError && <p className="admin-help-text" style={{ color: 'var(--error)' }}>{paperJsonError}</p>}
                 <p className="admin-help-text">
-                  Include mock fields + a <code>questions</code> array. Options can be a string array, A/B/C/D object, or <code>&#123;key, text&#125;</code> objects. Questions go straight to Mock Builder draft queue.
+                  Fields: <code>slug</code>, <code>examSlug</code>, <code>title</code>, <code>year</code>, <code>shift</code>, <code>description</code>, <code>subjects[]</code>, <code>questions[]</code>.
+                  Each question: <code>questionNo</code>, <code>question</code>, <code>options[]</code>, <code>answerKey</code>, <code>explanation</code>, <code>subject</code>, <code>tags[]</code>.
+                  Submitting overwrites the paper if slug already exists.
                 </p>
               </div>
 
-              {/* Bulk rows */}
+              {/* Preview */}
               <div className="admin-tool-panel">
                 <div className="admin-panel-title">
-                  <div><small>Pipe-delimited rows</small><h2>Bulk paste</h2></div>
-                  <button type="button" className="admin-save-btn small" onClick={importBulk}>
-                    <UploadCloud size={14} /> Import rows
-                  </button>
+                  <div><small>Parsed preview</small><h2>{paperJsonPreview ? paperJsonPreview.title : 'No paper parsed yet'}</h2></div>
                 </div>
-                <textarea
-                  className="admin-bulk-box"
-                  value={bulkText}
-                  onChange={(e) => setBulkText(e.target.value)}
-                  placeholder={`Question | Option A | Option B | Option C | Option D | Answer | Explanation\nWhat is 2+2? | 3 | 4 | 5 | 6 | B | Basic arithmetic`}
-                />
-                <p className="admin-help-text">
-                  One question per line. Pipe <code>|</code> separated. Answer is A/B/C/D. Subject defaults to first subject of selected exam.
-                </p>
+                {paperJsonPreview ? (
+                  <div className="admin-form-stack">
+                    <div className="admin-manage-row">
+                      <div>
+                        <strong>Slug</strong>
+                        <small>{paperJsonPreview.slug}</small>
+                      </div>
+                    </div>
+                    <div className="admin-manage-row">
+                      <div>
+                        <strong>Exam · Year · Shift</strong>
+                        <small>{paperJsonPreview.examSlug} · {paperJsonPreview.year || '—'} · {paperJsonPreview.shift || '—'}</small>
+                      </div>
+                    </div>
+                    <div className="admin-manage-row">
+                      <div>
+                        <strong>Subjects</strong>
+                        <small>{paperJsonPreview.subjects.join(', ')}</small>
+                      </div>
+                    </div>
+                    <div className="admin-manage-row">
+                      <div>
+                        <strong>Questions</strong>
+                        <small>{paperJsonPreview.questions.length} questions parsed</small>
+                      </div>
+                    </div>
+                    {paperJsonPreview.questions.slice(0, 3).map((q, i) => (
+                      <div className="admin-manage-row" key={i}>
+                        <span className="admin-q-num">Q{q.questionNo}</span>
+                        <div>
+                          <strong>{q.question.length > 80 ? q.question.slice(0, 80) + '…' : q.question}</strong>
+                          <small>{q.subject} · Ans: {q.answerKey} · Tags: {q.tags.length ? q.tags.join(', ') : '—'}</small>
+                        </div>
+                      </div>
+                    ))}
+                    {paperJsonPreview.questions.length > 3 && (
+                      <p className="admin-help-text">… and {paperJsonPreview.questions.length - 3} more questions</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="admin-empty">Click "Parse" after pasting or uploading a JSON file to preview before saving.</p>
+                )}
               </div>
             </div>
 
-            {/* Quick tips */}
-            <div className="admin-tool-panel admin-tips-panel">
+            {/* Published papers */}
+            <div className="admin-tool-panel">
               <div className="admin-panel-title">
-                <div><small>Reference</small><h2>Import format tips</h2></div>
+                <div><small>{papers.length} published</small><h2>All papers</h2></div>
               </div>
-              <div className="admin-tips-grid">
-                <div className="admin-tip">
-                  <BookOpen size={16} />
-                  <div>
-                    <strong>JSON — array shorthand</strong>
-                    <code>{'[{"question":"...","options":["A","B","C","D"],"answer":"A","subject":"Math"}]'}</code>
+              <label className="admin-search-bar">
+                <Search size={14} />
+                <input value={paperSearch} onChange={(e) => setPaperSearch(e.target.value)} placeholder="Search by title, exam or year…" />
+                {paperSearch && <button type="button" onClick={() => setPaperSearch('')} aria-label="Clear"><X size={13} /></button>}
+              </label>
+              {!paperSearch && papers.length > 5 && (
+                <p className="admin-help-text">Showing 5 most recent · search to find more</p>
+              )}
+              <div className="admin-manage-list">
+                {filteredPapers.map((paper) => (
+                  <div className={`admin-manage-row${selectedPaperSlug === paper.slug ? ' active' : ''}`} key={paper.slug}>
+                    <div>
+                      <strong>{paper.title}</strong>
+                      <small>{paper.examName} · {paper.year}{paper.shift ? ` · ${paper.shift}` : ''} · {paper.questions}Q</small>
+                    </div>
+                    <div className="admin-row-actions">
+                      {pendingDeletePaper === paper.slug ? (
+                        <>
+                          <button className="admin-row-action danger" type="button" onClick={() => void confirmDeletePaper(paper.slug)} disabled={saving}>Confirm</button>
+                          <button className="admin-row-action" type="button" onClick={() => setPendingDeletePaper(null)}>Cancel</button>
+                        </>
+                      ) : (
+                        <>
+                          <button className="admin-row-action" type="button" title="Browse & edit questions" onClick={() => void loadPaperQuestions(paper.slug)}><Pencil size={13} /></button>
+                          <Link className="admin-row-action" to={`/pyq/${paper.slug}`} target="_blank"><ExternalLink size={13} /></Link>
+                          <button className="admin-row-action danger" type="button" onClick={() => setPendingDeletePaper(paper.slug)}><Trash2 size={13} /></button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="admin-tip">
-                  <Code2 size={16} />
-                  <div>
-                    <strong>JSON — full mock</strong>
-                    <code>{'{"title":"...","examSlug":"...","questions":[...]}'}</code>
-                  </div>
-                </div>
-                <div className="admin-tip">
-                  <ListChecks size={16} />
-                  <div>
-                    <strong>Bulk row format</strong>
-                    <code>Question text | Opt A | Opt B | Opt C | Opt D | B | Explanation</code>
-                  </div>
-                </div>
+                ))}
+                {filteredPapers.length === 0 && <p className="admin-empty">{paperSearch ? 'No papers matched.' : 'No papers published yet.'}</p>}
               </div>
             </div>
+
+            {/* Add question manually */}
+            {selectedPaperSlug && (
+              <div className="admin-tool-panel">
+                <div className="admin-panel-title">
+                  <div><small>Manual entry · Q{paperQuestions.length + 1}</small><h2>Add question</h2></div>
+                </div>
+                <div className="admin-form-stack">
+                  <label className="admin-field">
+                    Question text
+                    <textarea value={newQDraft.question} onChange={(e) => setNewQDraft((d) => ({ ...d, question: e.target.value }))} rows={3} placeholder="Enter the question…" />
+                  </label>
+                  <div className="admin-form-row">
+                    <label className="admin-field"><span>A</span><input value={newQDraft.optionA} onChange={(e) => setNewQDraft((d) => ({ ...d, optionA: e.target.value }))} /></label>
+                    <label className="admin-field"><span>B</span><input value={newQDraft.optionB} onChange={(e) => setNewQDraft((d) => ({ ...d, optionB: e.target.value }))} /></label>
+                  </div>
+                  <div className="admin-form-row">
+                    <label className="admin-field"><span>C</span><input value={newQDraft.optionC} onChange={(e) => setNewQDraft((d) => ({ ...d, optionC: e.target.value }))} /></label>
+                    <label className="admin-field"><span>D</span><input value={newQDraft.optionD} onChange={(e) => setNewQDraft((d) => ({ ...d, optionD: e.target.value }))} /></label>
+                  </div>
+                  <div className="admin-form-row">
+                    <label className="admin-field">
+                      Correct answer
+                      <select value={newQDraft.answerKey} onChange={(e) => setNewQDraft((d) => ({ ...d, answerKey: e.target.value }))}>
+                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                      </select>
+                    </label>
+                    <label className="admin-field">
+                      Subject
+                      <input value={newQDraft.subject} onChange={(e) => setNewQDraft((d) => ({ ...d, subject: e.target.value }))} placeholder="e.g. Mathematics" />
+                    </label>
+                  </div>
+                  <label className="admin-field">
+                    Explanation
+                    <textarea value={newQDraft.explanation} onChange={(e) => setNewQDraft((d) => ({ ...d, explanation: e.target.value }))} rows={2} placeholder="Why is this the correct answer?" />
+                  </label>
+                  <button
+                    type="button"
+                    className="admin-save-btn"
+                    onClick={() => void addPaperQuestion()}
+                    disabled={addingQ || !newQDraft.question.trim() || !newQDraft.optionA.trim() || !newQDraft.optionB.trim()}
+                  >
+                    <Plus size={15} /> {addingQ ? 'Adding…' : `Add Q${paperQuestions.length + 1}`}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Inline question browser */}
+            {selectedPaperSlug && (
+              <div className="admin-two-col">
+                {/* Edit form */}
+                <div className="admin-tool-panel">
+                  <div className="admin-panel-title">
+                    <div>
+                      <small>{editingQuestion ? `Editing Q${editingQuestion.questionNo}` : 'Edit question'}</small>
+                      <h2>{editingQuestion ? editingQuestion.subject : 'Select a question to edit'}</h2>
+                    </div>
+                    {editingQuestion && (
+                      <button type="button" className="admin-text-btn" onClick={cancelEdit}><X size={13} /> Cancel</button>
+                    )}
+                  </div>
+                  {editingQuestion ? (
+                    <div className="admin-form-stack">
+                      <label className="admin-field">
+                        Question text
+                        <textarea value={editDraft.question} onChange={(e) => setEditDraft((d) => ({ ...d, question: e.target.value }))} rows={4} />
+                      </label>
+                      <div className="admin-form-row">
+                        <label className="admin-field"><span>A</span><input value={editDraft.optionA} onChange={(e) => setEditDraft((d) => ({ ...d, optionA: e.target.value }))} /></label>
+                        <label className="admin-field"><span>B</span><input value={editDraft.optionB} onChange={(e) => setEditDraft((d) => ({ ...d, optionB: e.target.value }))} /></label>
+                      </div>
+                      <div className="admin-form-row">
+                        <label className="admin-field"><span>C</span><input value={editDraft.optionC} onChange={(e) => setEditDraft((d) => ({ ...d, optionC: e.target.value }))} /></label>
+                        <label className="admin-field"><span>D</span><input value={editDraft.optionD} onChange={(e) => setEditDraft((d) => ({ ...d, optionD: e.target.value }))} /></label>
+                      </div>
+                      <div className="admin-form-row">
+                        <label className="admin-field">
+                          Correct answer
+                          <select value={editDraft.answerKey} onChange={(e) => setEditDraft((d) => ({ ...d, answerKey: e.target.value }))}>
+                            <option>A</option><option>B</option><option>C</option><option>D</option>
+                          </select>
+                        </label>
+                        <label className="admin-field">
+                          Subject
+                          <input value={editDraft.subject} onChange={(e) => setEditDraft((d) => ({ ...d, subject: e.target.value }))} />
+                        </label>
+                      </div>
+                      <label className="admin-field">
+                        Explanation
+                        <textarea value={editDraft.explanation} onChange={(e) => setEditDraft((d) => ({ ...d, explanation: e.target.value }))} rows={3} placeholder="Why is this the correct answer?" />
+                      </label>
+                      <button
+                        type="button"
+                        className="admin-save-btn"
+                        onClick={() => void saveEditQuestion()}
+                        disabled={editSaving || !editDraft.question.trim()}
+                      >
+                        <Save size={15} /> {editSaving ? 'Saving…' : 'Save changes'}
+                      </button>
+                    </div>
+                  ) : (
+                    <p className="admin-empty">Click the pencil icon on a question below to edit it.</p>
+                  )}
+                </div>
+
+                {/* Question list */}
+                <div className="admin-tool-panel admin-mock-preview">
+                  <div className="admin-panel-title">
+                    <div>
+                      <small>{paperQuestions.length} questions</small>
+                      <h2>{papers.find((p) => p.slug === selectedPaperSlug)?.title ?? selectedPaperSlug}</h2>
+                    </div>
+                    <button type="button" className="admin-text-btn" onClick={() => { setSelectedPaperSlug(''); setEditingQuestion(null) }}><X size={13} /> Close</button>
+                  </div>
+                  {paperQLoading ? <HaloLoader label="Loading questions" /> : (
+                    <div className="admin-question-detail-list">
+                      {paperQuestions.map((q, i) => (
+                        <article className="admin-question-detail" key={q.slug}>
+                          <div className="admin-question-detail-head">
+                            <div>
+                              <span>Q{i + 1}</span>
+                              <strong>{q.subject}</strong>
+                            </div>
+                            <div className="admin-row-actions">
+                              <button type="button" className="admin-row-action" onClick={() => startEditQuestion(q)}>
+                                <Pencil size={13} /> Edit
+                              </button>
+                              <button type="button" className="admin-row-action danger" onClick={async () => {
+                                try {
+                                  await deleteAdminQuestion(q.slug)
+                                  setPaperQuestions((cur) => cur.filter((x) => x.slug !== q.slug))
+                                  toast('success', 'Question deleted.')
+                                  await loadData()
+                                } catch (err) {
+                                  toast('error', err instanceof Error ? err.message : 'Failed to delete.')
+                                }
+                              }}>
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </div>
+                          <p>{q.question.length > 120 ? q.question.slice(0, 120) + '…' : q.question}</p>
+                          <div className="admin-option-grid">
+                            {q.options.map((opt) => (
+                              <div className={opt.key === q.answerKey ? 'correct' : ''} key={opt.key}>
+                                <strong>{opt.key}</strong><span>{opt.text}</span>
+                              </div>
+                            ))}
+                          </div>
+                          {q.explanation && (
+                            <div className="admin-answer-box">
+                              <strong>Answer: {q.answerKey}</strong>
+                              <p>{q.explanation}</p>
+                            </div>
+                          )}
+                        </article>
+                      ))}
+                      {paperQuestions.length === 0 && <p className="admin-empty">No questions in this paper.</p>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         )}
+
       </main>
     </section>
   )

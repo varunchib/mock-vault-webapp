@@ -81,7 +81,6 @@ export type DashboardBootstrap = {
   user: AuthUser;
   exams: Exam[];
   mocks: MockItem[];
-  recentQuestions: Question[];
   enrolledExams: Exam[];
   recentAttempts: RecentAttempt[];
 };
@@ -147,10 +146,12 @@ function buildUrl(path: string) {
 }
 
 async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  const method = (init?.method ?? "GET").toUpperCase()
+  const needsContentType = method !== "GET" && method !== "HEAD"
   const response = await fetch(buildUrl(path), {
     credentials: "include",
     headers: {
-      "Content-Type": "application/json",
+      ...(needsContentType ? { "Content-Type": "application/json" } : {}),
       ...(init?.headers ?? {}),
     },
     ...init,
@@ -185,9 +186,6 @@ export function fetchExamQuestions(slug: string): Promise<Question[]> {
   return requestJson<Question[]>(`/api/v1/exams/${encodeURIComponent(slug)}/questions`);
 }
 
-export function fetchQuestionCatalog(): Promise<Question[]> {
-  return requestJson<Question[]>("/api/v1/questions");
-}
 
 export function fetchPaperCatalog(): Promise<Paper[]> {
   return requestJson<Paper[]>("/api/v1/papers");
@@ -274,6 +272,18 @@ export function recordEnrollment(examSlug: string): Promise<{ message: string }>
   });
 }
 
+export function recordUnenrollment(examSlug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>("/api/v1/activity/enroll", {
+    method: "DELETE",
+    body: JSON.stringify({ examSlug }),
+  });
+}
+
+export function fetchEnrolledSlugs(): Promise<{ slugs: string[] }> {
+  return requestJson<{ slugs: string[] }>("/api/v1/user/enrolled-slugs");
+}
+
+
 export function recordAttempt(params: { examSlug: string; mockSlug?: string; paperSlug?: string }): Promise<{ message: string }> {
   return requestJson<{ message: string }>("/api/v1/activity/attempt", {
     method: "POST",
@@ -302,4 +312,94 @@ export function authenticateWithGoogle(credential: string): Promise<AuthPayload>
     method: "POST",
     body: JSON.stringify({ credential }),
   });
+}
+
+export type AdminPaperQuestionPayload = {
+  questionNo: string;
+  question: string;
+  options: QuestionOption[];
+  answerKey: string;
+  explanation: string;
+  subject: string;
+  tags: string[];
+};
+
+export type AdminPaperPayload = {
+  slug: string;
+  examSlug: string;
+  title: string;
+  year: string;
+  shift: string;
+  description: string;
+  subjects: string[];
+  questions: AdminPaperQuestionPayload[];
+};
+
+export function saveAdminPaper(payload: AdminPaperPayload): Promise<{ message: string; slug: string }> {
+  return requestJson<{ message: string; slug: string }>("/api/v1/admin/papers", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export function deleteAdminPaper(slug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>(`/api/v1/admin/papers/${encodeURIComponent(slug)}`, {
+    method: "DELETE",
+  });
+}
+
+export function flushAdminCache(): Promise<{ message: string }> {
+  return requestJson<{ message: string }>("/api/v1/admin/cache-flush", {
+    method: "POST",
+  });
+}
+
+export type AdminUpdateQuestionPayload = {
+  question: string
+  options: QuestionOption[]
+  answerKey: string
+  explanation: string
+  subject: string
+  tags: string[]
+}
+
+export function updateAdminQuestion(slug: string, payload: AdminUpdateQuestionPayload): Promise<{ message: string; slug: string }> {
+  return requestJson<{ message: string; slug: string }>(`/api/v1/admin/questions/${encodeURIComponent(slug)}`, {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  })
+}
+
+// ── Reports ──────────────────────────────────────────────────────────────────
+
+export type QuestionReport = {
+  questionSlug: string
+  questionNo: string
+  paperSlug: string
+  reportType: string
+  details: string
+  userId: string
+  userEmail: string
+  timestamp: string
+}
+
+export function submitReport(payload: {
+  questionSlug: string
+  questionNo: string
+  paperSlug: string
+  reportType: string
+  details: string
+}): Promise<{ message: string }> {
+  return requestJson<{ message: string }>('/api/v1/reports', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
+}
+
+export function fetchAdminReports(): Promise<{ reports: QuestionReport[]; count: number }> {
+  return requestJson<{ reports: QuestionReport[]; count: number }>('/api/v1/admin/reports')
+}
+
+export function clearAdminReports(): Promise<{ message: string }> {
+  return requestJson<{ message: string }>('/api/v1/admin/reports', { method: 'DELETE' })
 }

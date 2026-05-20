@@ -37,7 +37,7 @@ export function MockAttemptPage() {
   const recordedAttempt = useRef(false)
 
   usePageMeta({
-    title: mock ? `${mock.title} Attempt | PYQVault` : 'Mock Attempt | PYQVault',
+    title: mock ? `${mock.title} Attempt | Ministry of Papers` : 'Mock Attempt | Ministry of Papers',
     description: mock?.description ?? 'Attempt a timed mock test.',
     canonicalPath: slug ? `/mock-attempt/${slug}` : '/mock-attempt',
   })

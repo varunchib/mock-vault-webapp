@@ -27,7 +27,7 @@ export function QuestionDemo() {
 
   const shareQuestion = async () => {
     const shareData = {
-      title: 'UPSC 2023 Q47 — PYQVault',
+      title: 'UPSC 2023 Q47 — Ministry of Papers',
       text: 'UPSC Prelims 2023 Q47. Answer: Chenab.',
       url: window.location.href,
     }
@@ -37,7 +37,7 @@ export function QuestionDemo() {
       return
     }
 
-    window.alert('Share:\nhttps://pyqvault.in/upsc-prelims-2023/q47\nAnswer: Chenab')
+    window.alert('Share:\nhttps://ministryofpapers.com/upsc-prelims-2023/q47\nAnswer: Chenab')
   }
 
   return (

@@ -5,4 +5,4 @@ Disallow: /admin
 Disallow: /mock-attempt/
 Disallow: /analytics
 
-Sitemap: https://pyqvault.in/sitemap.xml
+Sitemap: https://ministryofpapers.com/sitemap.xml
