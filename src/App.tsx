@@ -12,8 +12,9 @@ function AppChrome() {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
   const isAdminRoute = location.pathname.startsWith('/admin')
+  const isAttemptRoute = location.pathname.startsWith('/mock-attempt')
   const isLandingRoute = location.pathname === '/'
-  const useUserShell = isAuthenticated && !isAdminRoute
+  const useUserShell = isAuthenticated && !isAdminRoute && !isAttemptRoute
 
   if (isLoading) {
     return <main><section className="public-page"><div className="public-shell"><HaloLoader label="Loading session" /></div></section></main>
@@ -24,6 +25,10 @@ function AppChrome() {
   }
 
   if (isAdminRoute) {
+    return <main><AppRoutes /></main>
+  }
+
+  if (isAttemptRoute) {
     return <main><AppRoutes /></main>
   }
 

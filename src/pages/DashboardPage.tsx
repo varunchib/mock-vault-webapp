@@ -1,235 +1,300 @@
-import { ClipboardList, FileText } from 'lucide-react'
+import { ClipboardList, FileText, PlusCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import {
+  APIError,
   fetchDashboardBootstrap,
+  refreshAuthSession,
   type Exam,
   type MockItem,
-  type Question,
+  type RecentAttempt,
 } from '../lib/api'
-import { examPreviousPapersPath } from '../lib/routes'
 import { usePageMeta } from '../lib/usePageMeta'
+import { useAuth } from '../context/useAuth'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { readRecentlyViewed } from '../lib/examActivity'
 
-type ExamCategoryGroup = {
-  label: string
-  exams: Exam[]
-}
-
-const categoryOrder = [
+export const categoryOrder = [
   'Central',
   'Banking',
-  'State',
+  'States',
   'Railways',
   'Teaching',
   'Medical',
   'Engineering',
 ]
 
-function normalizeExamCategory(category: string) {
-  const normalized = category.trim().toLowerCase()
+export const categoryIcons: Record<string, string> = {
+  central: '🏛️',
+  banking: '🏦',
+  states: '📍',
+  railways: '🚂',
+  teaching: '📚',
+  medical: '🏥',
+  engineering: '⚙️',
+}
 
-  if (normalized.includes('bank')) return 'Banking'
-  if (normalized.includes('state')) return 'State'
-  if (normalized.includes('rail')) return 'Railways'
-  if (normalized.includes('teach')) return 'Teaching'
-  if (normalized.includes('medical') || normalized.includes('neet')) return 'Medical'
-  if (normalized.includes('engineering') || normalized.includes('jee')) return 'Engineering'
+export const categoryFullLabels: Record<string, string> = {
+  central: 'Central Government',
+  banking: 'Banking & Finance',
+  states: 'State Government',
+  railways: 'Railways',
+  teaching: 'Teaching',
+  medical: 'Medical',
+  engineering: 'Engineering',
+}
+
+export function normalizeExamCategory(category: string): string {
+  const n = category.trim().toLowerCase()
+  if (n.includes('bank') || n.includes('ibps') || n.includes('rbi') || n.includes('nabard')) return 'Banking'
+  if (n.includes('rail') || n.includes('rrb') || n.includes('ntpc')) return 'Railways'
+  if (n.includes('teach') || n.includes('ctet') || n.includes(' tet') || n.startsWith('tet')) return 'Teaching'
+  if (n.includes('medical') || n.includes('neet') || n.includes('aiims')) return 'Medical'
+  if (n.includes('engineer') || n.includes('jee') || n.includes('gate')) return 'Engineering'
   if (
-    normalized.includes('central') ||
-    normalized.includes('ssc') ||
-    normalized.includes('upsc') ||
-    normalized.includes('defence') ||
-    normalized.includes('defense')
-  ) {
-    return 'Central'
-  }
-
+    n.includes('central') || n.includes('ssc') || n.includes('upsc') ||
+    n.includes('defence') || n.includes('defense') || n.includes('nda') || n.includes('cds')
+  ) return 'Central'
+  const stateMarkers = [
+    'state', 'psc', 'pcs', 'j&k', 'jammu', 'kashmir', 'jkssb', 'jkpsc',
+    'kerala', 'karnataka', 'maharashtra', 'mpsc', 'tnpsc', 'appsc', 'tspsc',
+    'rajasthan', 'haryana', 'punjab', 'gujarat', 'himachal', 'hp psc',
+    'uttarakhand', 'bihar', 'bpsc', 'jharkhand', 'odisha', 'opsc',
+    'bengal', 'wbpsc', 'assam', 'manipur', 'meghalaya', 'nagaland',
+    'tripura', 'sikkim', 'goa', 'chhattisgarh', 'cgpsc', 'uppsc', 'mppsc',
+    'andhra', 'telangana', 'tamilnadu', 'tamil',
+  ]
+  if (stateMarkers.some((m) => n.includes(m))) return 'States'
   return category
 }
 
-function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
-  const grouped = new Map<string, Exam[]>()
+type ExamCategoryGroup = { label: string; exams: Exam[] }
 
+export function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
+  const grouped = new Map<string, Exam[]>()
   exams.forEach((exam) => {
     const label = normalizeExamCategory(exam.category)
     const current = grouped.get(label) ?? []
     current.push(exam)
     grouped.set(label, current)
   })
-
   return [...grouped.entries()]
     .map(([label, items]) => ({
       label,
-      exams: items.sort((left, right) => left.shortName.localeCompare(right.shortName)),
+      exams: items.sort((a, b) => a.shortName.localeCompare(b.shortName)),
     }))
-    .sort((left, right) => {
-      const leftRank = categoryOrder.indexOf(left.label)
-      const rightRank = categoryOrder.indexOf(right.label)
-
-      if (leftRank === -1 && rightRank === -1) return left.label.localeCompare(right.label)
-      if (leftRank === -1) return 1
-      if (rightRank === -1) return -1
-      return leftRank - rightRank
+    .sort((a, b) => {
+      const aRank = categoryOrder.indexOf(a.label)
+      const bRank = categoryOrder.indexOf(b.label)
+      if (aRank === -1 && bRank === -1) return a.label.localeCompare(b.label)
+      if (aRank === -1) return 1
+      if (bRank === -1) return -1
+      return aRank - bRank
     })
 }
 
-function getEnrolledExams(exams: Exam[], mocks: MockItem[], recentQuestions: Question[]) {
-  const examMap = new Map(exams.map((exam) => [exam.slug, exam]))
-  const seen = new Set<string>()
-  const orderedSlugs = [
-    ...recentQuestions.map((question) => question.examSlug),
-    ...mocks.map((mock) => mock.examSlug),
-    ...exams.map((exam) => exam.slug),
-  ]
-
-  return orderedSlugs
-    .map((slug) => {
-      if (seen.has(slug)) return null
-      seen.add(slug)
-      return examMap.get(slug) ?? null
-    })
-    .filter((exam): exam is Exam => Boolean(exam))
-    .slice(0, 6)
+function getGreeting(): string {
+  const hour = new Date().getHours()
+  if (hour < 12) return 'Good morning'
+  if (hour < 17) return 'Good afternoon'
+  return 'Good evening'
 }
 
 export function DashboardPage() {
+  const { user } = useAuth()
+  const firstName = user?.name?.split(' ')[0] ?? 'there'
+
   const [exams, setExams] = useState<Exam[]>([])
   const [mocks, setMocks] = useState<MockItem[]>([])
-  const [recentQuestions, setRecentQuestions] = useState<Question[]>([])
+  const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
+  const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   usePageMeta({
-    title: 'Dashboard | PYQVault',
-    description: 'Your PYQVault dashboard for exam categories, mock tests, and recent preparation activity.',
+    title: 'Dashboard | Ministry of Papers',
+    description: 'Your Ministry of Papers dashboard — enrolled exams, recent activity, and preparation tools.',
     canonicalPath: '/dashboard',
   })
 
   useEffect(() => {
     let cancelled = false
+    const load = async () => {
+      const applyData = (data: Awaited<ReturnType<typeof fetchDashboardBootstrap>>) => {
+        setExams(data.exams ?? [])
+        setMocks(data.mocks ?? [])
+        setEnrolledExams(data.enrolledExams ?? [])
+        setRecentAttempts(data.recentAttempts ?? [])
+      }
 
-    const loadDashboard = async () => {
       try {
         setLoading(true)
         setError(null)
         const data = await fetchDashboardBootstrap()
         if (cancelled) return
-
-        setExams(data.exams)
-        setMocks(data.mocks)
-        setRecentQuestions(data.recentQuestions)
-      } catch (loadError) {
-        if (!cancelled) {
-          setError(loadError instanceof Error ? loadError.message : 'Unable to load dashboard.')
+        applyData(data)
+      } catch (err) {
+        if (cancelled) return
+        if (err instanceof APIError && err.status === 401) {
+          try {
+            await refreshAuthSession()
+            const retried = await fetchDashboardBootstrap()
+            if (!cancelled) applyData(retried)
+            return
+          } catch {
+            // refresh failed — fall through to error state
+          }
         }
+        setError('Unable to load dashboard. Please refresh.')
       } finally {
         if (!cancelled) setLoading(false)
       }
     }
-
-    void loadDashboard()
-
-    return () => {
-      cancelled = true
-    }
+    void load()
+    return () => { cancelled = true }
   }, [])
 
-  const groupedExams = useMemo(() => groupExamsByCategory(exams), [exams])
-  const enrolledExams = useMemo(
-    () => getEnrolledExams(exams, mocks, recentQuestions),
-    [exams, mocks, recentQuestions],
-  )
-  const attemptedQuestions = recentQuestions.slice(0, 6)
+  const recentlyViewed = useMemo(() => readRecentlyViewed(), [])
 
-  if (loading) {
-    return <HaloLoader label="Loading dashboard" />
-  }
+  if (loading) return <HaloLoader label="Loading dashboard" />
 
   if (error) {
-    return <p>{error}</p>
+    return (
+      <div className="db-error-shell">
+        <div className="db-error-card">
+          <strong>Failed to load dashboard</strong>
+          <p>{error}</p>
+          <button type="button" onClick={() => window.location.reload()}>Retry</button>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="dashboard-flow">
-      {groupedExams.map((group) => (
-        <section className="dashboard-panel dashboard-category-panel" key={group.label}>
-          <div className="dashboard-panel-head">
-            <div>
-              <small>Category</small>
-              <h2>{group.label}</h2>
-            </div>
-            <Link to={`/exam?q=${encodeURIComponent(group.label)}`}>More</Link>
-          </div>
+    <div className="db-page">
 
-          <div className="dashboard-exam-grid">
-            {group.exams.slice(0, 4).map((exam) => (
-              <article className="dashboard-exam-card" key={exam.slug}>
-                <div className="dashboard-exam-body">
-                  <span className="dashboard-exam-icon">{exam.icon}</span>
+      {/* ── Welcome header ──────────────────────────── */}
+      <header className="db-header">
+        <div className="db-header-left">
+          <h1>{getGreeting()}, {firstName}</h1>
+          <p>Your exam preparation hub — enrolled exams, recent activity, and more.</p>
+        </div>
+        <div className="db-header-stats">
+          <div className="db-header-stat">
+            <strong>{enrolledExams.length}</strong>
+            <span>Enrolled</span>
+          </div>
+          <div className="db-header-stat">
+            <strong>{recentAttempts.length}</strong>
+            <span>Attempted</span>
+          </div>
+          <div className="db-header-stat">
+            <strong>{mocks.length}</strong>
+            <span>Mocks</span>
+          </div>
+        </div>
+      </header>
+
+      {/* ── Enrolled exams ──────────────────────────── */}
+      <section className="db-section">
+        <div className="db-section-head">
+          <div>
+            <small>Your exams</small>
+            <h2>Enrolled</h2>
+          </div>
+          <Link className="db-section-link" to="/exams">Browse all →</Link>
+        </div>
+
+        {enrolledExams.length === 0 ? (
+          <div className="db-enroll-cta">
+            <PlusCircle size={22} />
+            <div>
+              <strong>No exams enrolled yet</strong>
+              <p>Head to the Exams catalog and enroll in yours to track them here.</p>
+            </div>
+            <Link className="db-enroll-btn" to="/exams">Browse Exams</Link>
+          </div>
+        ) : (
+          <div className="db-enrolled-row">
+            {enrolledExams.map((exam) => (
+              <Link className="db-enrolled-chip" to={`/exam/${exam.slug}`} key={exam.slug}>
+                <span className="db-chip-icon">{exam.icon}</span>
+                <div>
                   <strong>{exam.shortName}</strong>
-                  <small>{exam.name}</small>
-                  <p>{exam.papers} papers - {exam.mocks} mocks</p>
+                  <small>
+                    {parseInt(exam.mocks) > 0 ? `${exam.mocks} mocks` : ''}
+                    {parseInt(exam.mocks) > 0 && parseInt(exam.papers) > 0 ? ' · ' : ''}
+                    {parseInt(exam.papers) > 0 ? `${exam.papers} papers` : ''}
+                  </small>
                 </div>
-                <div className="dashboard-card-actions">
-                  <Link to={examPreviousPapersPath(exam.slug)}>
-                    <FileText size={14} /> Papers
-                  </Link>
-                  <Link to={`/mock-test/${exam.slug}`}>
-                    <ClipboardList size={14} /> Mocks
-                  </Link>
-                </div>
-              </article>
+              </Link>
+            ))}
+            <Link className="db-enrolled-chip db-add-chip" to="/exams">
+              <span className="db-chip-icon">＋</span>
+              <div><strong>Add exam</strong></div>
+            </Link>
+          </div>
+        )}
+      </section>
+
+      {/* ── Recently viewed ─────────────────────────── */}
+      {recentlyViewed.length > 0 && (
+        <section className="db-section">
+          <div className="db-section-head">
+            <div>
+              <small>Browse history</small>
+              <h2>Recently viewed</h2>
+            </div>
+          </div>
+          <div className="db-viewed-row">
+            {recentlyViewed.map((rec) => (
+              <Link className="db-viewed-chip" to={`/exam/${rec.slug}`} key={rec.slug}>
+                <span>{rec.icon}</span>
+                <strong>{rec.shortName}</strong>
+              </Link>
             ))}
           </div>
         </section>
-      ))}
+      )}
 
-      <section className="dashboard-summary-grid">
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-head">
-            <div>
-              <small>Enrolled</small>
-              <h2>Enrolled exams</h2>
-            </div>
+      {/* ── Recently attempted ──────────────────────── */}
+      <section className="db-section">
+        <div className="db-section-head">
+          <div>
+            <small>Activity</small>
+            <h2>Recently attempted</h2>
           </div>
+          <Link className="db-section-link" to="/tests">All tests →</Link>
+        </div>
 
-          <div className="dashboard-list">
-            {enrolledExams.map((exam) => (
-              <Link className="dashboard-list-row" to={`/mock-test/${exam.slug}`} key={exam.slug}>
-                <div>
-                  <strong>{exam.shortName}</strong>
-                  <small>{exam.category}</small>
-                </div>
-                <span>{exam.mocks} mocks</span>
-              </Link>
-            ))}
-            {enrolledExams.length === 0 ? <p>No enrolled exams yet.</p> : null}
+        {recentAttempts.length === 0 ? (
+          <div className="db-attempts-empty">
+            <p>No attempts yet — start a mock test or open a PYQ paper.</p>
+            <Link className="db-enroll-btn" to="/tests">Browse Tests</Link>
           </div>
-        </article>
-
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-head">
-            <div>
-              <small>Attempted</small>
-              <h2>Attempted questions</h2>
-            </div>
+        ) : (
+          <div className="db-attempt-list">
+            {recentAttempts.map((attempt) => {
+              const href = attempt.type === 'paper'
+                ? `/pyq/${attempt.slug}`
+                : `/mock-test/${attempt.examSlug}`
+              return (
+                <Link className="db-attempt-row" to={href} key={`${attempt.type}-${attempt.slug}`}>
+                  <div className={`db-attempt-badge ${attempt.type}`}>
+                    {attempt.type === 'paper' ? <FileText size={13} /> : <ClipboardList size={13} />}
+                  </div>
+                  <div className="db-attempt-info">
+                    <strong>{attempt.title}</strong>
+                    <small>{attempt.examName} · {attempt.type === 'paper' ? 'PYQ Paper' : 'Mock Test'}</small>
+                  </div>
+                  <span className="db-attempt-qs">{attempt.questions}Q</span>
+                </Link>
+              )
+            })}
           </div>
-
-          <div className="dashboard-list">
-            {attemptedQuestions.map((question) => (
-              <Link className="dashboard-list-row" to={`/question/${question.slug}`} key={question.slug}>
-                <div>
-                  <strong>{question.examName} Q{question.questionNo}</strong>
-                  <small>{question.subject} - {question.year}</small>
-                </div>
-                <span>Open</span>
-              </Link>
-            ))}
-            {attemptedQuestions.length === 0 ? <p>No attempted questions yet.</p> : null}
-          </div>
-        </article>
+        )}
       </section>
+
     </div>
   )
 }

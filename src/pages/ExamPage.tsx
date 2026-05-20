@@ -1,330 +1,465 @@
 import {
-  ArrowRight,
   BookOpen,
+  ChevronRight,
+  ClipboardList,
   FileText,
   Lock,
-  Play,
   Search,
-} from "lucide-react";
-import { Link, Navigate, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
-import { LoginModal } from "../components/auth/LoginModal";
-import { HaloLoader } from "../components/common/HaloLoader";
-import { examPreviousPapersPath } from "../lib/routes";
+  Timer,
+  X,
+} from 'lucide-react'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { LoginModal } from '../components/auth/LoginModal'
+import { HaloLoader } from '../components/common/HaloLoader'
 import {
-  fetchExamCatalog,
+  fetchEnrolledSlugs,
   fetchExamBySlug,
   fetchExamPapers,
   fetchExamQuestions,
+  fetchMockCatalog,
+  recordEnrollment,
+  recordUnenrollment,
   type Exam,
+  type MockItem,
   type Paper,
   type Question,
-} from "../lib/api";
-import { useAuth } from "../context/useAuth";
-import { usePageMeta } from "../lib/usePageMeta";
+} from '../lib/api'
+import { useAuth } from '../context/useAuth'
+import { usePageMeta } from '../lib/usePageMeta'
+import { recordExamView } from '../lib/examActivity'
+import { normalizeExamCategory } from './DashboardPage'
+
+type Tab = 'papers' | 'mocks' | 'subjects'
+
+const FREE_QUESTION_LIMIT = 10
 
 export function ExamPage() {
-  const navigate = useNavigate();
-  const { slug } = useParams();
-  const [exam, setExam] = useState<Exam | null>(null);
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const [loginOpen, setLoginOpen] = useState(false);
+  const { slug } = useParams()
+  const [searchParams] = useSearchParams()
+  const { isAuthenticated } = useAuth()
+
+  const initialTab = (searchParams.get('tab') as Tab | null) ?? 'papers'
+  const initialSubject = searchParams.get('subject')
+
+  const [exam, setExam] = useState<Exam | null>(null)
+  const [papers, setPapers] = useState<Paper[]>([])
+  const [allMocks, setAllMocks] = useState<MockItem[]>([])
+  const [examQuestions, setExamQuestions] = useState<Question[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const [activeTab, setActiveTab] = useState<Tab>(initialTab)
+  const [paperSearch, setPaperSearch] = useState('')
+  const [diffFilter, setDiffFilter] = useState('All')
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const [isEnrolled, setIsEnrolled] = useState(false)
+  const [enrollBusy, setEnrollBusy] = useState(false)
 
   useEffect(() => {
-    if (!slug) return;
-    queueMicrotask(() => {
-      setLoading(true);
-      setError(false);
-    });
+    if (!slug) return
+    setLoading(true)
+    setError(false)
+    setPaperSearch('')
+    setDiffFilter('All')
+    setSelectedSubject(null)
 
     Promise.all([
       fetchExamBySlug(slug),
       fetchExamPapers(slug),
+      fetchMockCatalog(),
       fetchExamQuestions(slug),
+      isAuthenticated ? fetchEnrolledSlugs().catch(() => null) : Promise.resolve(null),
     ])
-      .then(([examData, paperData, questionData]) => {
-        setExam(examData);
-        setPapers(paperData);
-        setQuestions(questionData);
+      .then(([examData, paperData, mockData, questionData, enrollData]) => {
+        setExam(examData)
+        setPapers(paperData ?? [])
+        setAllMocks(mockData ?? [])
+        setExamQuestions(questionData ?? [])
+        if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
+        recordExamView(examData)
       })
-      .catch(() => {
-        setError(true);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [slug]);
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [slug, isAuthenticated, retryCount])
 
-  const title = exam
-    ? `${exam.shortName} Previous Year Question Papers with Solutions | PYQVault`
-    : "Exam PYQs and Mock Tests | PYQVault";
-  const description =
-    exam?.description ??
-    "Browse solved previous year questions, mock tests, answer keys, and explanations on PYQVault.";
+  const handleEnrollToggle = async () => {
+    if (!slug) return
+    setEnrollBusy(true)
+    try {
+      if (isEnrolled) {
+        await recordUnenrollment(slug)
+        setIsEnrolled(false)
+      } else {
+        await recordEnrollment(slug)
+        setIsEnrolled(true)
+      }
+    } catch { /* silent */ }
+    finally { setEnrollBusy(false) }
+  }
+
+  const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
+  const filteredMocks = useMemo(
+    () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
+    [examMocks, diffFilter],
+  )
+
+  const filteredPapers = useMemo(() => {
+    const q = paperSearch.trim().toLowerCase()
+    if (!q) return papers
+    return papers.filter(
+      (p) =>
+        p.title.toLowerCase().includes(q) ||
+        p.year.includes(q) ||
+        p.shift.toLowerCase().includes(q) ||
+        p.subjects.some((s) => s.toLowerCase().includes(q)),
+    )
+  }, [papers, paperSearch])
+
+  const papersByYear = useMemo(() => {
+    const map = new Map<string, Paper[]>()
+    filteredPapers.forEach((p) => {
+      const yr = p.year || 'Other'
+      map.set(yr, [...(map.get(yr) ?? []), p])
+    })
+    return [...map.entries()].sort(([a], [b]) => b.localeCompare(a))
+  }, [filteredPapers])
+
+  const subjectQuestions = useMemo(() => {
+    if (!selectedSubject) return []
+    return examQuestions.filter((q) => q.subject.toLowerCase() === selectedSubject.toLowerCase())
+  }, [examQuestions, selectedSubject])
+
+  const visibleSubjectQuestions = isAuthenticated
+    ? subjectQuestions
+    : subjectQuestions.slice(0, FREE_QUESTION_LIMIT)
+
+  const isGated = !isAuthenticated && subjectQuestions.length > FREE_QUESTION_LIMIT
+
+  const title = exam ? `${exam.shortName} — Mock Tests & PYQ Papers | Ministry of Papers` : 'Exam Hub | Ministry of Papers'
 
   usePageMeta({
     title,
-    description,
-    canonicalPath: exam ? `/exam/${exam.slug}` : "/exam",
+    description: exam?.description ?? 'Browse solved papers, mock tests, and subjects.',
+    canonicalPath: exam ? `/exam/${exam.slug}` : '/exam',
     jsonLd: exam
-      ? {
-          "@context": "https://schema.org",
-          "@type": "CollectionPage",
-          name: title,
-          description,
-          about: exam.name,
-        }
+      ? { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description: exam.description, about: exam.name }
       : undefined,
-  });
+  })
 
-  if (!slug) return <Navigate to="/" replace />;
+  if (!slug) return <Navigate to="/" replace />
 
   if (loading) {
-    return (
-      <section className="public-page exam-public-page">
-        <div className="public-shell">
-          <HaloLoader label="Loading exam" />
-        </div>
-      </section>
-    );
+    const loader = <HaloLoader label="Loading exam" />
+    return isAuthenticated ? loader : (
+      <section className="public-page"><div className="public-shell">{loader}</div></section>
+    )
   }
-  if (error || !exam) return <Navigate to="/" replace />;
 
-  const recentQuestions = questions.slice(0, 3);
-  const latestPaper = papers[0];
-  const homeHref = isAuthenticated ? "/dashboard" : "/";
-
-  const continueAttempt = () => {
-    if (latestPaper) {
-      navigate(`/pyq/${latestPaper.slug}`);
-      return;
-    }
-    if (!isAuthenticated) {
-      setLoginOpen(true);
-    }
-  };
-
-  return (
-    <section className="public-page exam-public-page">
-      <div className="public-shell">
-        <nav className="crumbs" aria-label="Breadcrumb">
-          <Link to={homeHref}>Home</Link>
-          <span>/</span>
-          <span>{exam.shortName}</span>
-        </nav>
-
-        <header className="public-hero compact sober-hero">
-          <div>
-            <span className="public-kicker">
-              {exam.icon} {exam.category} Exam
-            </span>
-            <h1>{exam.name} previous year question papers</h1>
-            <p>{exam.description}</p>
-            <div className="public-actions">
-              <Link
-                className="dash-primary link-button"
-                to={examPreviousPapersPath(exam.slug)}
-              >
-                <FileText size={17} /> View all papers
-              </Link>
-              <button
-                className="dash-secondary"
-                type="button"
-                onClick={continueAttempt}
-              >
-                <Play size={17} /> Attempt latest
-              </button>
-            </div>
-          </div>
-          <div className="exam-score-card">
-            <div>
-              <strong>{exam.totalQuestions}</strong>
-              <span>Solved questions</span>
-            </div>
-            <div>
-              <strong>{exam.papers}</strong>
-              <span>PYQ papers</span>
-            </div>
-            <div>
-              <strong>{exam.mocks}</strong>
-              <span>Mock tests</span>
-            </div>
-          </div>
-        </header>
-
-        <section className="public-grid two-col">
-          <div className="public-card">
-            <div className="public-card-head">
-              <h2>Solved question papers</h2>
-              <Search size={18} />
-            </div>
-            <div className="link-list">
-              {papers.map((paper) => (
-                <Link to={`/pyq/${paper.slug}`} key={paper.slug}>
-                  <span>
-                    <FileText size={16} /> {paper.title}
-                  </span>
-                  <ArrowRight size={16} />
-                </Link>
-              ))}
-              {papers.length === 0 ? (
-                <p className="muted-copy">
-                  Solved paper pages for this exam are being added.
-                </p>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="public-card">
-            <div className="public-card-head">
-              <h2>Browse by subject</h2>
-              <BookOpen size={18} />
-            </div>
-            <div className="subject-cloud">
-              {exam.subjects.map((subject) => (
-                <span key={subject}>{subject}</span>
-              ))}
-            </div>
-            <div className="year-row">
-              {exam.popularYears.map((year) => (
-                <button type="button" key={year}>
-                  {year}
-                </button>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section className="public-card seo-copy-card">
-          <h2>Public paper pages. Login only when you submit.</h2>
-          <p>
-            Students can open papers and read the question flow without an account.
-            Login is required when they submit answers, save progress, download PDFs,
-            or want analytics.
-          </p>
-          <div className="locked-row">
-            <Lock size={16} /> Submitting answers, saved history, PDFs, and analytics require login.
-          </div>
-        </section>
-
-        {recentQuestions.length ? (
-          <section className="public-card seo-copy-card">
-            <h2>Recently solved questions</h2>
-            <div className="link-list">
-              {recentQuestions.map((question) => (
-                <Link to={`/question/${question.slug}`} key={question.slug}>
-                  <span>
-                    Q{question.questionNo}. {question.subject} - {question.year}
-                  </span>
-                  <span>Open</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        ) : null}
+  if (error || !exam) {
+    const errorContent = (
+      <div className="ep-page">
+        <div className="ec-error">
+          <strong>Unable to load exam</strong>
+          <p>Could not reach the server. Check your connection and try again.</p>
+          <button type="button" onClick={() => setRetryCount((c) => c + 1)}>Retry</button>
+        </div>
       </div>
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
-    </section>
-  );
-}
+    )
+    return isAuthenticated ? errorContent : (
+      <section className="public-page"><div className="public-shell">{errorContent}</div></section>
+    )
+  }
 
-export function AllExamsPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [exams, setExams] = useState<Exam[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const query = searchParams.get("q") ?? "";
+  const homeHref = isAuthenticated ? '/exams' : '/'
+  const totalQuestions = parseInt(exam.totalQuestions) || examQuestions.length
 
-  usePageMeta({
-    title: "All Competitive Exam PYQs and Mock Tests | PYQVault",
-    description:
-      "Browse UPSC, SSC, JKSSB, NEET, banking, railway, state PSC and other exam PYQs with solved answers and explanations.",
-    canonicalPath: "/exam",
-  });
+  const hub = (
+    <div className="ep-page">
 
-  useEffect(() => {
-    queueMicrotask(() => {
-      setLoading(true);
-      setError(false);
-    });
-    fetchExamCatalog()
-      .then(setExams)
-      .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, []);
+      {/* ── Breadcrumb ─────────────────────────────── */}
+      <nav className="ep-breadcrumb" aria-label="Breadcrumb">
+        <Link to={homeHref}>{isAuthenticated ? 'Exams' : 'Home'}</Link>
+        <ChevronRight size={13} />
+        <span>{exam.shortName}</span>
+      </nav>
 
-  const filteredExams = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    if (!normalized) return exams;
+      {/* ── Hero header ────────────────────────────── */}
+      <header className="ep-hero">
+        <div className="ep-hero-left">
+          <div className="ep-hero-icon">{exam.icon}</div>
+          <div className="ep-hero-info">
+            <span className="ep-category-tag">{normalizeExamCategory(exam.category)}</span>
+            <h1>{exam.name}</h1>
+            <p className="ep-desc">{exam.description}</p>
 
-    return exams.filter((examItem) =>
-      [
-        examItem.name,
-        examItem.shortName,
-        examItem.category,
-        examItem.description,
-        ...examItem.subjects,
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(normalized),
-    );
-  }, [exams, query]);
-
-  return (
-    <section className="public-page">
-      <div className="public-shell">
-        <header className="utility-page-hero">
-          <div>
-            <small>Browse Exams</small>
-            <h1>Exam library</h1>
-            <p>
-              Browse exams, open paper pages, and move straight to the questions you want.
-            </p>
+            {/* Stats row */}
+            <div className="ep-stats-row">
+              {parseInt(exam.papers) > 0 && (
+                <span className="ep-stat-chip">
+                  <FileText size={12} />
+                  {exam.papers} Papers
+                </span>
+              )}
+              {examMocks.length > 0 && (
+                <span className="ep-stat-chip">
+                  <ClipboardList size={12} />
+                  {examMocks.length} Mocks
+                </span>
+              )}
+              {totalQuestions > 0 && (
+                <span className="ep-stat-chip">
+                  <BookOpen size={12} />
+                  {totalQuestions} Questions
+                </span>
+              )}
+              {exam.subjects.length > 0 && (
+                <span className="ep-stat-chip">
+                  {exam.subjects.length} Subjects
+                </span>
+              )}
+            </div>
           </div>
-        </header>
+        </div>
 
-        <section className="pyp-sober-toolbar" style={{ marginBottom: "1.5rem" }}>
-          <label>
-            <Search size={16} />
+        {isAuthenticated && (
+          <button
+            className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
+            type="button"
+            disabled={enrollBusy}
+            onClick={() => void handleEnrollToggle()}
+          >
+            {enrollBusy ? '…' : isEnrolled ? '✓ Enrolled' : '+ Enroll'}
+          </button>
+        )}
+      </header>
+
+      {/* ── Tab bar ────────────────────────────────── */}
+      <div className="ep-tab-bar">
+        <button
+          className={`ep-tab${activeTab === 'papers' ? ' active' : ''}`}
+          type="button"
+          onClick={() => { setActiveTab('papers'); setSelectedSubject(null) }}
+        >
+          <FileText size={14} />
+          PYQ Papers
+          {papers.length > 0 && <span className="ep-tab-count">{papers.length}</span>}
+        </button>
+        <button
+          className={`ep-tab${activeTab === 'mocks' ? ' active' : ''}`}
+          type="button"
+          onClick={() => { setActiveTab('mocks'); setSelectedSubject(null) }}
+        >
+          <ClipboardList size={14} />
+          Mock Tests
+          {examMocks.length > 0 && <span className="ep-tab-count">{examMocks.length}</span>}
+        </button>
+        <button
+          className={`ep-tab${activeTab === 'subjects' ? ' active' : ''}`}
+          type="button"
+          onClick={() => { setActiveTab('subjects'); setSelectedSubject(null) }}
+        >
+          <BookOpen size={14} />
+          Subjects
+          {exam.subjects.length > 0 && <span className="ep-tab-count">{exam.subjects.length}</span>}
+        </button>
+      </div>
+
+      {/* ── PYQ Papers ─────────────────────────────── */}
+      {activeTab === 'papers' && (
+        <div className="ep-tab-body">
+          <label className="ep-search-bar">
+            <Search size={14} />
             <input
-              value={query}
-              onChange={(event) => {
-                const next = event.target.value;
-                if (next.trim()) setSearchParams({ q: next });
-                else setSearchParams({});
-              }}
-              placeholder="Search your exam, subject, category..."
+              value={paperSearch}
+              onChange={(e) => setPaperSearch(e.target.value)}
+              placeholder="Search by title, year, shift, subject…"
             />
+            {paperSearch && (
+              <button type="button" onClick={() => setPaperSearch('')} aria-label="Clear">
+                <X size={13} />
+              </button>
+            )}
           </label>
-        </section>
 
-        <div className="catalog-grid">
-          {loading ? (
-            <HaloLoader label="Loading exams" fullHeight={false} />
-          ) : error ? (
-            <p>Unable to load exams. Please try again later.</p>
-          ) : filteredExams.length === 0 ? (
-            <p>No exams matched your search.</p>
+          {filteredPapers.length === 0 ? (
+            <p className="ep-empty">
+              {paperSearch ? 'No papers matched your search.' : 'No papers available yet.'}
+            </p>
           ) : (
-            filteredExams.map((examItem) => (
-              <Link
-                className="catalog-card"
-                to={examPreviousPapersPath(examItem.slug)}
-                key={examItem.slug}
-              >
-                <span>{examItem.icon}</span>
-                <strong>{examItem.shortName}</strong>
-                <small>{examItem.papers} papers</small>
-              </Link>
-            ))
+            <div className="ep-papers-list">
+              {papersByYear.map(([year, yearPapers]) => (
+                <div className="ep-year-group" key={year}>
+                  <div className="ep-year-label">{year}</div>
+                  <div className="ep-paper-grid">
+                    {yearPapers.map((paper) => (
+                      <Link className="ep-paper-card" to={`/pyq/${paper.slug}`} key={paper.slug}>
+                        <div className="ep-paper-card-main">
+                          <strong>{paper.title}</strong>
+                          {paper.shift && <small>{paper.shift}</small>}
+                          <div className="ep-paper-tags">
+                            {paper.subjects.slice(0, 4).map((s) => <span key={s}>{s}</span>)}
+                          </div>
+                        </div>
+                        <div className="ep-paper-card-right">
+                          <span className="ep-q-count">{paper.questions} Qs</span>
+                          <span className="ep-attempt-btn">Open <ChevronRight size={12} /></span>
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
         </div>
-      </div>
-    </section>
-  );
+      )}
+
+      {/* ── Mock Tests ─────────────────────────────── */}
+      {activeTab === 'mocks' && (
+        <div className="ep-tab-body">
+          <div className="ep-filter-bar">
+            {['All', 'Beginner', 'Moderate', 'Advanced'].map((d) => (
+              <button
+                key={d}
+                type="button"
+                className={`ep-filter-btn${diffFilter === d ? ' active' : ''}`}
+                onClick={() => setDiffFilter(d)}
+              >
+                {d}
+              </button>
+            ))}
+          </div>
+
+          {filteredMocks.length === 0 ? (
+            <p className="ep-empty">
+              {diffFilter === 'All' ? 'No mock tests available yet.' : `No ${diffFilter} mocks found.`}
+            </p>
+          ) : (
+            <div className="ep-mock-grid">
+              {filteredMocks.map((mock) => (
+                <div className={`ep-mock-card ep-mock-${mock.difficulty.toLowerCase()}`} key={mock.slug}>
+                  <div className="ep-mock-badges">
+                    <span className={`ep-diff-badge diff-${mock.difficulty.toLowerCase()}`}>
+                      {mock.difficulty}
+                    </span>
+                    {mock.isFree && <span className="ep-free-badge">Free</span>}
+                  </div>
+                  <strong className="ep-mock-title">{mock.title}</strong>
+                  <p className="ep-mock-desc">{mock.description}</p>
+                  <div className="ep-mock-meta">
+                    <span><Timer size={12} /> {mock.durationMinutes} min</span>
+                    <span><ClipboardList size={12} /> {mock.questions} Qs</span>
+                  </div>
+                  <div className="ep-mock-footer">
+                    {isAuthenticated ? (
+                      <Link className="ep-start-btn" to={`/mock-attempt/${mock.slug}`}>
+                        Start Mock
+                      </Link>
+                    ) : (
+                      <button className="ep-start-btn" type="button" onClick={() => setLoginOpen(true)}>
+                        Login to Start
+                      </button>
+                    )}
+                    <Link className="ep-preview-btn" to={`/mock-test/${mock.slug}`}>
+                      Preview
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ── Subjects grid ──────────────────────────── */}
+      {activeTab === 'subjects' && !selectedSubject && (
+        <div className="ep-tab-body">
+          {exam.subjects.length === 0 ? (
+            <p className="ep-empty">No subjects listed for this exam yet.</p>
+          ) : (
+            <>
+              <p className="ep-subjects-hint">Select a subject to browse its previous year questions.</p>
+              <div className="ep-subject-grid">
+                {exam.subjects.map((subject) => {
+                  const count = examQuestions.filter(
+                    (q) => q.subject.toLowerCase() === subject.toLowerCase(),
+                  ).length
+                  return (
+                    <button
+                      className="ep-subject-card"
+                      key={subject}
+                      type="button"
+                      onClick={() => setSelectedSubject(subject)}
+                    >
+                      <BookOpen size={15} />
+                      <span>{subject}</span>
+                      {count > 0 && <span className="ep-subject-count">{count} Qs</span>}
+                    </button>
+                  )
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* ── Subject drill-down ─────────────────────── */}
+      {activeTab === 'subjects' && selectedSubject && (
+        <div className="ep-tab-body">
+          <div className="ep-subject-drill-head">
+            <button className="ep-back-btn" type="button" onClick={() => setSelectedSubject(null)}>
+              <ChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
+              All Subjects
+            </button>
+            <h2>{selectedSubject}</h2>
+            <span>{subjectQuestions.length} questions</span>
+          </div>
+
+          {subjectQuestions.length === 0 ? (
+            <p className="ep-empty">No questions indexed for this subject yet.</p>
+          ) : (
+            <>
+              <div className="ep-question-list">
+                {visibleSubjectQuestions.map((q, i) => (
+                  <Link className="ep-question-row" to={`/question/${q.slug}`} key={q.slug}>
+                    <span className="ep-q-num">Q{i + 1}</span>
+                    <div className="ep-q-body">
+                      <span>{q.question}</span>
+                      <small>{q.paper} · {q.year}</small>
+                    </div>
+                    <ChevronRight size={14} className="ep-q-arrow" />
+                  </Link>
+                ))}
+              </div>
+
+              {isGated && (
+                <div className="ep-gate">
+                  <div className="ep-gate-inner">
+                    <Lock size={20} />
+                    <strong>Sign in to see all {subjectQuestions.length} questions</strong>
+                    <p>{FREE_QUESTION_LIMIT} of {subjectQuestions.length} shown. Login is free.</p>
+                    <button className="ep-gate-btn" type="button" onClick={() => setLoginOpen(true)}>
+                      Sign in with Google
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+    </div>
+  )
+
+  return (
+    <>
+      {isAuthenticated ? hub : (
+        <section className="public-page"><div className="public-shell">{hub}</div></section>
+      )}
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
+    </>
+  )
 }
+

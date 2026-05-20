@@ -21,7 +21,7 @@ export function Footer() {
         ))}
       </div>
       <div className="footer-bot">
-        <p>© 2026 PYQVault · Made for India&apos;s aspirants</p>
+        <p>© 2026 Ministry of Papers · Made for India&apos;s aspirants</p>
         <p>UPSC · SSC · IBPS · State PSCs · NEET · JEE · RRB</p>
       </div>
     </footer>

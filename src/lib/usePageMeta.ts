@@ -1,9 +1,13 @@
-﻿import { useEffect } from 'react'
+import { useEffect } from 'react'
 
-type PageMeta = {
+const SITE_NAME = 'Ministry of Papers'
+const SITE_ORIGIN = 'https://ministryofpapers.com'
+
+export type PageMeta = {
   title: string
   description: string
   canonicalPath?: string
+  ogType?: 'website' | 'article'
   jsonLd?: Record<string, unknown>
 }
 
@@ -16,39 +20,55 @@ function upsertMeta(selector: string, create: () => HTMLMetaElement, content: st
   element.content = content
 }
 
-export function usePageMeta({ title, description, canonicalPath, jsonLd }: PageMeta) {
+function setMeta(name: string, content: string) {
+  upsertMeta(`meta[name="${name}"]`, () => {
+    const m = document.createElement('meta')
+    m.name = name
+    return m
+  }, content)
+}
+
+function setProperty(property: string, content: string) {
+  upsertMeta(`meta[property="${property}"]`, () => {
+    const m = document.createElement('meta')
+    m.setAttribute('property', property)
+    return m
+  }, content)
+}
+
+export function usePageMeta({ title, description, canonicalPath, ogType = 'website', jsonLd }: PageMeta) {
   useEffect(() => {
     document.title = title
 
-    upsertMeta('meta[name="description"]', () => {
-      const meta = document.createElement('meta')
-      meta.name = 'description'
-      return meta
-    }, description)
+    setMeta('description', description)
 
-    upsertMeta('meta[property="og:title"]', () => {
-      const meta = document.createElement('meta')
-      meta.setAttribute('property', 'og:title')
-      return meta
-    }, title)
-
-    upsertMeta('meta[property="og:description"]', () => {
-      const meta = document.createElement('meta')
-      meta.setAttribute('property', 'og:description')
-      return meta
-    }, description)
-
+    // Open Graph
+    setProperty('og:title', title)
+    setProperty('og:description', description)
+    setProperty('og:type', ogType)
+    setProperty('og:site_name', SITE_NAME)
     if (canonicalPath) {
-      const href = `${window.location.origin}${canonicalPath}`
+      setProperty('og:url', `${SITE_ORIGIN}${canonicalPath}`)
+    }
+
+    // Twitter / X Cards
+    setMeta('twitter:card', 'summary_large_image')
+    setMeta('twitter:title', title)
+    setMeta('twitter:description', description)
+    setMeta('twitter:site', '@ministryofpapers')
+
+    // Canonical
+    if (canonicalPath) {
       let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]')
       if (!canonical) {
         canonical = document.createElement('link')
         canonical.rel = 'canonical'
         document.head.appendChild(canonical)
       }
-      canonical.href = href
+      canonical.href = `${SITE_ORIGIN}${canonicalPath}`
     }
 
+    // JSON-LD structured data
     const scriptId = 'page-json-ld'
     document.getElementById(scriptId)?.remove()
     if (jsonLd) {
@@ -58,5 +78,5 @@ export function usePageMeta({ title, description, canonicalPath, jsonLd }: PageM
       script.textContent = JSON.stringify(jsonLd)
       document.head.appendChild(script)
     }
-  }, [title, description, canonicalPath, jsonLd])
+  }, [title, description, canonicalPath, ogType, jsonLd])
 }

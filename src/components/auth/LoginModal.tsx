@@ -2,6 +2,7 @@ import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 import { env } from '../../lib/env'
 
@@ -24,9 +25,9 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
     setIsSubmitting(true)
 
     try {
-      await loginWithGoogleCredential(response.credential)
+      const user = await loginWithGoogleCredential(response.credential)
       onClose()
-      navigate('/dashboard')
+      navigate(homePathForUser(user))
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed. Please try again.'
       setErrorMessage(message)

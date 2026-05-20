@@ -52,6 +52,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     loginWithGoogleCredential: async (credential: string) => {
       const response = await authenticateWithGoogle(credential);
       setUser(response.user);
+      return response.user;
     },
     logout: async () => {
       try {

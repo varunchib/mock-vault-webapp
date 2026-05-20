@@ -10,8 +10,30 @@ import { StatsStrip } from '../components/sections/StatsStrip'
 import { Testimonials } from '../components/sections/Testimonials'
 import { Ticker } from '../components/sections/Ticker'
 import { ValueProps } from '../components/sections/ValueProps'
+import { usePageMeta } from '../lib/usePageMeta'
 
 export function LandingPage() {
+  usePageMeta({
+    title: 'Ministry of Papers — Every Exam Paper. Solved & Free.',
+    description: 'Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams. Every answer solved, explained, and free — no login needed.',
+    canonicalPath: '/',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Ministry of Papers',
+      url: 'https://ministryofpapers.com',
+      description: '12 lakh+ solved PYQs. 240+ exams. No login. No paywall.',
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: 'https://ministryofpapers.com/exams?q={search_term_string}',
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    },
+  })
+
   return (
     <>
       <Hero />

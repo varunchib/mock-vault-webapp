@@ -20,12 +20,12 @@ export type Testimonial = {
 }
 
 export const quickTags = [
-  { label: 'UPSC 2023', query: 'UPSC Prelims 2023 solved' },
-  { label: 'SSC CGL', query: 'SSC CGL 2023 all shifts' },
-  { label: 'JKSSB', query: 'JKSSB Finance 2024' },
-  { label: 'NEET', query: 'NEET 2023 biology' },
-  { label: 'RRB NTPC', query: 'RRB NTPC 2022 GK' },
-  { label: 'Raj. Patwari', query: 'Rajasthan Patwari 2023' },
+  { label: 'UPSC', query: 'UPSC' },
+  { label: 'SSC CGL', query: 'SSC CGL' },
+  { label: 'JKSSB', query: 'JKSSB' },
+  { label: 'NEET', query: 'NEET' },
+  { label: 'RRB NTPC', query: 'RRB NTPC' },
+  { label: 'Patwari', query: 'Patwari' },
 ] as const
 
 export const tickerItems = [

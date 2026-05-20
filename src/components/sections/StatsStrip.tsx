@@ -32,7 +32,7 @@ function CountStat({ target, suffix, label }: { target: number; suffix: string; 
 
 export function StatsStrip() {
   return (
-    <section className="stats-strip" aria-label="PYQVault platform stats">
+    <section className="stats-strip" aria-label="Ministry of Papers platform stats">
       {stats.map((stat) => (
         <CountStat key={stat.label} {...stat} />
       ))}

@@ -5,7 +5,7 @@ import { SectionHeader } from '../ui/SectionHeader'
 export function ValueProps() {
   return (
     <Reveal as="section" className="vp-section">
-      <SectionHeader eyebrow="Why PYQVault" title={'The smartest way\nto crack any exam'} />
+      <SectionHeader eyebrow="Why Ministry of Papers" title={'The smartest way\nto crack any exam'} />
       <div className="vp-grid">
         {valueProps.map((card, index) => (
           <Reveal className="vp-card" delay={index * 0.08} key={card.title}>
