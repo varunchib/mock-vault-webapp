@@ -1646,17 +1646,10 @@ footer {
 }
 
 .auth-mark {
-  width: 48px;
-  height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
-  border-radius: 13px;
-  background: var(--ink);
-  color: var(--hl);
-  font-family: 'Fraunces', serif;
-  font-size: 25px;
   font-weight: 800;
 }
 
