@@ -29,6 +29,25 @@ export function TestsPage() {
     title: 'Tests | Ministry of Papers',
     description: 'Mock tests and previous year papers for all competitive exams.',
     canonicalPath: '/tests',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Mock Tests & PYQ Papers — Ministry of Papers',
+      description: 'Full-length mock tests and previous year question papers for UPSC, SSC, IBPS, NEET, JEE and 240+ exams.',
+      url: 'https://ministryofpapers.com/tests',
+      publisher: {
+        '@type': 'Organization',
+        name: 'Ministry of Papers',
+        url: 'https://ministryofpapers.com',
+      },
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+          { '@type': 'ListItem', position: 2, name: 'Tests', item: 'https://ministryofpapers.com/tests' },
+        ],
+      },
+    },
   })
 
   useEffect(() => {

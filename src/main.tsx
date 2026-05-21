@@ -12,7 +12,7 @@ declare global {
 
 function loadGA() {
   const id = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined
-  if (!id) return
+  if (!id || !import.meta.env.PROD) return
 
   const script = document.createElement('script')
   script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`
