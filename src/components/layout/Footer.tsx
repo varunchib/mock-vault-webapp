@@ -1,5 +1,35 @@
-﻿import { footerColumns } from '../../data/landing'
+import { Link } from 'react-router-dom'
 import { Logo } from '../ui/Logo'
+
+const footerColumns = [
+  {
+    title: 'Exams',
+    links: [
+      { label: 'UPSC CSE', href: '/exam/upsc-cse' },
+      { label: 'SSC CGL / CHSL', href: '/exam/ssc-cgl' },
+      { label: 'IBPS PO / Clerk', href: '/exam/ibps-po' },
+      { label: 'NEET UG', href: '/exam/neet-ug' },
+      { label: 'JEE Main', href: '/exam/jee-main' },
+      { label: 'State PSCs', href: '/exams' },
+    ],
+  },
+  {
+    title: 'Platform',
+    links: [
+      { label: 'All Exams', href: '/exams' },
+      { label: 'Mock Tests', href: '/tests' },
+      { label: 'PYQ Papers', href: '/tests?tab=papers' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'Privacy Policy', href: '/privacy' },
+      { label: 'Terms of Service', href: '/terms' },
+      { label: 'Contact Us', href: 'mailto:hello@ministryofpapers.com', external: true },
+    ],
+  },
+]
 
 export function Footer() {
   return (
@@ -14,7 +44,12 @@ export function Footer() {
             <h4>{column.title}</h4>
             <ul>
               {column.links.map((link) => (
-                <li key={link}><a href="#top">{link}</a></li>
+                <li key={link.label}>
+                  {'external' in link && link.external
+                    ? <a href={link.href}>{link.label}</a>
+                    : <Link to={link.href}>{link.label}</Link>
+                  }
+                </li>
               ))}
             </ul>
           </div>
@@ -22,7 +57,13 @@ export function Footer() {
       </div>
       <div className="footer-bot">
         <p>© 2026 Ministry of Papers · Made for India&apos;s aspirants</p>
-        <p>UPSC · SSC · IBPS · State PSCs · NEET · JEE · RRB</p>
+        <p>
+          <Link to="/privacy">Privacy</Link>
+          {' · '}
+          <Link to="/terms">Terms</Link>
+          {' · '}
+          UPSC · SSC · IBPS · State PSCs · NEET · JEE
+        </p>
       </div>
     </footer>
   )
