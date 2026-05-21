@@ -6,13 +6,13 @@ import './index.css'
 declare global {
   interface Window {
     dataLayer: unknown[]
-    gtag: (...args: unknown[]) => void
+    gtag: (...args: unknown[]) => void // signature only — impl uses `arguments`
   }
 }
 
 function loadGA() {
   const id = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined
-  if (!id || !import.meta.env.PROD) return
+  if (!id) return
 
   const script = document.createElement('script')
   script.src = `https://www.googletagmanager.com/gtag/js?id=${id}`
@@ -20,7 +20,9 @@ function loadGA() {
   document.head.appendChild(script)
 
   window.dataLayer = window.dataLayer ?? []
-  window.gtag = (...args: unknown[]) => { window.dataLayer.push(args) }
+  // Must be a regular function — arrow functions don't have `arguments`, and GA4
+  // checks for the Arguments object type to identify gtag commands in the dataLayer.
+  window.gtag = function() { window.dataLayer.push(arguments) } // eslint-disable-line prefer-rest-params
   window.gtag('js', new Date())
   window.gtag('config', id)
 }

@@ -29,12 +29,13 @@ export const quickTags = [
 ] as const
 
 export const tickerItems = [
-  '🔥 UPSC 2024 uploaded',
-  '📄 SSC CGL 2024 all shifts live',
-  '⚡ JKSSB 2024 answer key out',
-  '🎯 NEET 2024 solved',
-  '📝 Bihar PSC 2024 paper added',
-  '🔒 UP Police 2024 uploaded',
+  '🆕 IBPS PO Pre 2025 (Aug 23 Shift 1) — just added',
+  '🔥 UPSC 2025 uploaded',
+  '📄 SSC CGL 2025 all shifts live',
+  '⚡ JKSSB 2025 answer key out',
+  '🎯 NEET 2025 solved',
+  '📝 Bihar PSC 2025 paper added',
+  '🔒 UP Police 2025 uploaded',
 ] as const
 
 export const stats = [
