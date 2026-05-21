@@ -1,4 +1,5 @@
 import { BrowserRouter, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import { GoogleProvider } from './components/auth/GoogleProvider'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Footer } from './components/layout/Footer'
@@ -11,6 +12,12 @@ import { AppRoutes } from './routes/AppRoutes'
 function AppChrome() {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
+
+  useEffect(() => {
+    const id = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined
+    if (!id || typeof window.gtag !== 'function') return
+    window.gtag('config', id, { page_path: location.pathname + location.search })
+  }, [location.pathname, location.search])
   const isAdminRoute = location.pathname.startsWith('/admin')
   const isAttemptRoute = location.pathname.startsWith('/mock-attempt')
   const isLandingRoute = location.pathname === '/'
