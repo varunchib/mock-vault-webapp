@@ -1,5 +1,5 @@
 import { BrowserRouter, useLocation } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { GoogleProvider } from './components/auth/GoogleProvider'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Footer } from './components/layout/Footer'
@@ -13,7 +13,9 @@ function AppChrome() {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
 
+  const isFirstRender = useRef(true)
   useEffect(() => {
+    if (isFirstRender.current) { isFirstRender.current = false; return }
     const id = import.meta.env.VITE_GA_MEASUREMENT_ID as string | undefined
     if (!id || typeof window.gtag !== 'function') return
     window.gtag('config', id, { page_path: location.pathname + location.search })

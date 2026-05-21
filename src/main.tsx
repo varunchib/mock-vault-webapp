@@ -22,7 +22,7 @@ function loadGA() {
   window.dataLayer = window.dataLayer ?? []
   window.gtag = (...args: unknown[]) => { window.dataLayer.push(args) }
   window.gtag('js', new Date())
-  window.gtag('config', id, { send_page_view: false })
+  window.gtag('config', id)
 }
 
 if ('requestIdleCallback' in window) {
