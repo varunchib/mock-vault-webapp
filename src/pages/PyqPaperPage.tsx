@@ -60,8 +60,19 @@ export function PyqPaperPage() {
           '@type': 'LearningResource',
           name: paper.title,
           description: paper.description,
+          url: `https://ministryofpapers.com/pyq/${paper.slug}`,
           educationalLevel: 'Competitive exam preparation',
           learningResourceType: 'Previous year question paper',
+          teaches: paper.subjects?.join(', '),
+          provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+              { '@type': 'ListItem', position: 2, name: paper.examName ?? 'Exam', item: `https://ministryofpapers.com/exam/${paper.examSlug ?? ''}` },
+              { '@type': 'ListItem', position: 3, name: paper.title, item: `https://ministryofpapers.com/pyq/${paper.slug}` },
+            ],
+          },
         }
       : undefined,
   })

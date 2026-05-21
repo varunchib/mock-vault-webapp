@@ -144,7 +144,23 @@ export function ExamPage() {
     description: exam?.description ?? 'Browse solved papers, mock tests, and subjects.',
     canonicalPath: exam ? `/exam/${exam.slug}` : '/exam',
     jsonLd: exam
-      ? { '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description: exam.description, about: exam.name }
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'CollectionPage',
+          name: title,
+          description: exam.description,
+          url: `https://ministryofpapers.com/exam/${exam.slug}`,
+          about: { '@type': 'Thing', name: exam.name },
+          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+              { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
+              { '@type': 'ListItem', position: 3, name: exam.shortName, item: `https://ministryofpapers.com/exam/${exam.slug}` },
+            ],
+          },
+        }
       : undefined,
   })
 

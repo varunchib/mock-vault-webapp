@@ -29,6 +29,25 @@ export function ExamCatalogPage() {
     title: 'Exams | Ministry of Papers',
     description: 'Browse competitive exams — UPSC, SSC, Banking, Railways, and more.',
     canonicalPath: '/exams',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Exam Catalog — Ministry of Papers',
+      description: 'Browse competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for 240+ exams.',
+      url: 'https://ministryofpapers.com/exams',
+      publisher: {
+        '@type': 'Organization',
+        name: 'Ministry of Papers',
+        url: 'https://ministryofpapers.com',
+      },
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+          { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
+        ],
+      },
+    },
   })
 
   const load = () => {

@@ -17,21 +17,32 @@ export function LandingPage() {
     title: 'Ministry of Papers — Every Exam Paper. Solved & Free.',
     description: 'Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams. Every answer solved, explained, and free — no login needed.',
     canonicalPath: '/',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'WebSite',
-      name: 'Ministry of Papers',
-      url: 'https://ministryofpapers.com',
-      description: '12 lakh+ solved PYQs. 240+ exams. No login. No paywall.',
-      potentialAction: {
-        '@type': 'SearchAction',
-        target: {
-          '@type': 'EntryPoint',
-          urlTemplate: 'https://ministryofpapers.com/exams?q={search_term_string}',
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        name: 'Ministry of Papers',
+        url: 'https://ministryofpapers.com',
+        description: '12 lakh+ solved PYQs. 240+ exams. No login. No paywall.',
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: 'https://ministryofpapers.com/exams?q={search_term_string}',
+          },
+          'query-input': 'required name=search_term_string',
         },
-        'query-input': 'required name=search_term_string',
       },
-    },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: 'Ministry of Papers',
+        url: 'https://ministryofpapers.com',
+        logo: 'https://ministryofpapers.com/favicon.svg',
+        description: 'Free previous year question papers and mock tests for UPSC, SSC, IBPS, NEET, JEE and 240+ Indian competitive exams.',
+        sameAs: ['https://x.com/ministryofpapers'],
+      },
+    ] as unknown as Record<string, unknown>,
   })
 
   return (

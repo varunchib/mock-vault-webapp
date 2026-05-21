@@ -48,10 +48,31 @@ export function QuestionPage() {
     jsonLd: question
       ? {
           "@context": "https://schema.org",
-          "@type": "Question",
-          name: question.question,
-          about: question.examName,
-          educationalLevel: "Competitive exam preparation",
+          "@type": "QAPage",
+          name: title,
+          url: `https://ministryofpapers.com/question/${question.slug}`,
+          mainEntity: {
+            "@type": "Question",
+            name: question.question,
+            text: question.question,
+            answerCount: 1,
+            educationalLevel: "Competitive exam preparation",
+            about: { "@type": "Thing", name: question.examName },
+            acceptedAnswer: {
+              "@type": "Answer",
+              text: `The correct answer is explained on Ministry of Papers. Exam: ${question.examName}, Year: ${question.year}.`,
+              url: `https://ministryofpapers.com/question/${question.slug}`,
+              author: { "@type": "Organization", name: "Ministry of Papers" },
+            },
+          },
+          breadcrumb: {
+            "@type": "BreadcrumbList",
+            itemListElement: [
+              { "@type": "ListItem", position: 1, name: "Home", item: "https://ministryofpapers.com" },
+              { "@type": "ListItem", position: 2, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug ?? ""}` },
+              { "@type": "ListItem", position: 3, name: `Q${question.questionNo}`, item: `https://ministryofpapers.com/question/${question.slug}` },
+            ],
+          },
         }
       : undefined,
   });

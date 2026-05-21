@@ -1,8 +1,10 @@
 User-agent: *
 Allow: /
+
 Disallow: /dashboard
 Disallow: /admin
-Disallow: /mock-attempt/
 Disallow: /analytics
+Disallow: /mock-attempt/
+Disallow: /paper-attempt/
 
 Sitemap: https://ministryofpapers.com/sitemap.xml
