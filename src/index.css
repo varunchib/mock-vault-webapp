@@ -9102,3 +9102,424 @@ html {
   .pa-topbar-center { display: none; }
   .pa-topbar-right .pa-timer { display: flex; font-size: 13px; }
 }
+
+/* ── Logout overlay ──────────────────────────────────────────────────────── */
+.logout-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(24, 24, 27, .72);
+  backdrop-filter: blur(8px);
+  display: grid;
+  place-items: center;
+}
+
+.logout-overlay-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  color: #fff;
+}
+
+.logout-overlay-inner span {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: .01em;
+  color: rgba(255,255,255,.85);
+}
+
+.logout-spinner {
+  width: 44px;
+  height: 44px;
+  color: #FDE047;
+  animation: spin 0.9s linear infinite;
+  stroke-dasharray: 90;
+  stroke-dashoffset: 60;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Sidebar revamp ──────────────────────────────────────────────────────── */
+.vault-sidebar-simple {
+  background: #111113;
+  border-right: 1px solid rgba(255,255,255,.06);
+  padding: 18px 14px;
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.vault-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #fff;
+  text-decoration: none;
+  padding: 6px 8px 6px 4px;
+  border-radius: 12px;
+  margin-bottom: 28px;
+  transition: background .15s;
+}
+
+.vault-logo:hover {
+  background: rgba(255,255,255,.05);
+}
+
+.vault-logo-mark {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: rgba(253,224,71,.1);
+  border: 1px solid rgba(253,224,71,.2);
+}
+
+.vault-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.vault-logo-text strong {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.3px;
+  color: #fff;
+}
+
+.vault-logo-text small {
+  font-size: 11px;
+  font-weight: 500;
+  color: #71717a;
+  letter-spacing: .02em;
+}
+
+.vault-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.vault-nav-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: #3f3f46;
+  padding: 0 10px;
+  margin: 0 0 8px;
+}
+
+/* Override old nav-item to match new structure */
+.vault-sidebar-simple .vault-nav-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #71717a;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+  transition: all .14s;
+  cursor: pointer;
+}
+
+.vault-sidebar-simple .vault-nav-item:hover {
+  background: rgba(255,255,255,.06);
+  color: #e4e4e7;
+}
+
+.vault-sidebar-simple .vault-nav-item.active {
+  background: rgba(253,224,71,.13);
+  color: #FDE047;
+}
+
+.vault-nav-icon {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,.05);
+  flex-shrink: 0;
+  transition: background .14s;
+}
+
+.vault-sidebar-simple .vault-nav-item:hover .vault-nav-icon {
+  background: rgba(255,255,255,.09);
+}
+
+.vault-sidebar-simple .vault-nav-item.active .vault-nav-icon {
+  background: rgba(253,224,71,.18);
+}
+
+.vault-sidebar-bottom {
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,.07);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vault-sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(255,255,255,.04);
+}
+
+.vault-sidebar-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(253,224,71,.18);
+  color: #FDE047;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.vault-sidebar-user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  min-width: 0;
+}
+
+.vault-sidebar-user-info strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: #e4e4e7;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vault-sidebar-user-info small {
+  font-size: 11px;
+  color: #52525b;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vault-sidebar-simple .vault-logout {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #52525b;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .14s;
+  margin-top: 0;
+}
+
+.vault-sidebar-simple .vault-logout:hover {
+  color: #ef4444;
+  background: rgba(239, 68, 68, .09);
+}
+
+/* Collapse sidebar labels/text at narrow width */
+@media (max-width: 1120px) {
+  .vault-app-simple {
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+
+  .vault-logo-text,
+  .vault-nav-label,
+  .vault-sidebar-user-info,
+  .vault-sidebar-simple .vault-nav-item > span:not(.vault-nav-icon),
+  .vault-sidebar-simple .vault-logout > span {
+    display: none;
+  }
+
+  .vault-logo {
+    justify-content: center;
+    padding: 6px;
+    margin-bottom: 20px;
+  }
+
+  .vault-sidebar-simple .vault-nav-item {
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  .vault-nav-icon {
+    width: 34px;
+    height: 34px;
+  }
+
+  .vault-sidebar-user {
+    justify-content: center;
+    padding: 8px 0;
+  }
+
+  .vault-sidebar-simple .vault-logout {
+    justify-content: center;
+    padding: 9px 0;
+  }
+}
+
+/* ── Legal pages (Privacy / Terms) ──────────────────────────────────────── */
+.legal-page {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* Limited Use box — required by Google OAuth verification */
+.legal-limited-use {
+  background: #eff6ff;
+  border: 1.5px solid #bfdbfe;
+  border-left: 4px solid #2563eb;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 4px;
+}
+
+.legal-limited-use strong {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 6px;
+}
+
+.legal-limited-use p {
+  font-size: 14px;
+  color: #1e40af;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.legal-limited-use a {
+  color: #1d4ed8;
+  font-weight: 600;
+}
+
+/* Inline code in legal pages */
+.legal-body code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 12.5px;
+  background: var(--line2);
+  color: var(--ink2);
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--line);
+}
+
+.legal-hero {
+  margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--line);
+}
+
+.legal-hero h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.1;
+  margin: 12px 0 10px;
+  letter-spacing: -.4px;
+}
+
+.legal-hero p {
+  font-size: 14px;
+  color: var(--ink4);
+  font-weight: 500;
+}
+
+.legal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.legal-body section h2 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+  margin-top: 0;
+}
+
+.legal-body section h3 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink2);
+  margin: 14px 0 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.legal-body section p {
+  font-size: 15px;
+  color: var(--ink2);
+  line-height: 1.75;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+.legal-body section p:last-child {
+  margin-bottom: 0;
+}
+
+.legal-body section ul {
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.legal-body section ul li {
+  font-size: 15px;
+  color: var(--ink2);
+  line-height: 1.7;
+}
+
+.legal-body a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* Footer legal links */
+.footer-bot a {
+  color: var(--ink4);
+  text-decoration: none;
+  transition: color .15s;
+}
+
+.footer-bot a:hover {
+  color: var(--ink);
+}

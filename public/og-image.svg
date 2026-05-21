@@ -1,0 +1,42 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="630" fill="#18181B"/>
+  <pattern id="g" width="48" height="48" patternUnits="userSpaceOnUse">
+    <path d="M 48 0 L 0 0 0 48" fill="none" stroke="#ffffff" stroke-width="0.4" opacity="0.04"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#g)"/>
+
+  <!-- Logo mark -->
+  <rect x="72" y="68" width="72" height="72" rx="18" fill="#ffffff"/>
+  <path d="M88 132 L88 100 L108 120 L120 96 L132 120 L152 100 L152 132"
+    stroke="#18181B" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- Brand text -->
+  <text x="162" y="100" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="700" fill="#ffffff" opacity="0.95" letter-spacing="1">MINISTRY</text>
+  <text x="162" y="126" font-family="Georgia, 'Times New Roman', serif" font-size="13" fill="#ffffff" opacity="0.5" letter-spacing="5">OF PAPERS</text>
+
+  <!-- Headline -->
+  <text x="72" y="308" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="#ffffff" opacity="0.97">Every Exam Paper.</text>
+  <text x="72" y="394" font-family="Georgia, 'Times New Roman', serif" font-size="72" font-weight="700" fill="#FDE047">Solved &amp; Free.</text>
+
+  <!-- Sub-line -->
+  <text x="72" y="462" font-family="-apple-system, Arial, sans-serif" font-size="24" fill="#ffffff" opacity="0.5">12 lakh+ PYQs &nbsp;·&nbsp; 240+ Exams &nbsp;·&nbsp; No Login &nbsp;·&nbsp; No Paywall</text>
+
+  <!-- Exam pills -->
+  <rect x="72"  y="508" width="108" height="38" rx="19" fill="#27272A"/>
+  <text x="126" y="532" font-family="-apple-system, Arial, sans-serif" font-size="15" fill="#ffffff" opacity="0.8" text-anchor="middle">UPSC</text>
+
+  <rect x="194" y="508" width="130" height="38" rx="19" fill="#27272A"/>
+  <text x="259" y="532" font-family="-apple-system, Arial, sans-serif" font-size="15" fill="#ffffff" opacity="0.8" text-anchor="middle">SSC CGL</text>
+
+  <rect x="338" y="508" width="130" height="38" rx="19" fill="#27272A"/>
+  <text x="403" y="532" font-family="-apple-system, Arial, sans-serif" font-size="15" fill="#ffffff" opacity="0.8" text-anchor="middle">IBPS PO</text>
+
+  <rect x="482" y="508" width="110" height="38" rx="19" fill="#27272A"/>
+  <text x="537" y="532" font-family="-apple-system, Arial, sans-serif" font-size="15" fill="#ffffff" opacity="0.8" text-anchor="middle">NEET</text>
+
+  <rect x="606" y="508" width="130" height="38" rx="19" fill="#27272A"/>
+  <text x="671" y="532" font-family="-apple-system, Arial, sans-serif" font-size="15" fill="#ffffff" opacity="0.8" text-anchor="middle">JEE Main</text>
+
+  <rect x="750" y="508" width="130" height="38" rx="19" fill="#27272A"/>
+  <text x="815" y="532" font-family="-apple-system, Arial, sans-serif" font-size="15" fill="#ffffff" opacity="0.8" text-anchor="middle">JKSSB</text>
+</svg>
