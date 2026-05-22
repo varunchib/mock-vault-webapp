@@ -129,13 +129,14 @@ export function AppShell({ children }: { children: ReactNode }) {
           {/* Logo */}
           <Link className="vault-logo" to={homePathForUser(user)}>
             <span className="vault-logo-mark">
-              <svg viewBox="0 0 40 40" fill="none" width="24" height="24" aria-hidden="true">
-                <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="#FDE047" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+              <svg viewBox="0 0 40 40" fill="none" width="32" height="32" aria-hidden="true">
+                <rect width="40" height="40" rx="10" fill="rgba(253,224,71,0.15)" />
+                <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="#FDE047" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </span>
             <div className="vault-logo-text">
-              <strong>MINISTRY</strong>
-              <small>of papers</small>
+              <strong>Ministry</strong>
+              <small>of Papers</small>
             </div>
           </Link>
 
