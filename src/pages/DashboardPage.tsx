@@ -274,7 +274,7 @@ export function DashboardPage() {
           </div>
         ) : (
           <div className="db-attempt-list">
-            {recentAttempts.map((attempt) => {
+            {[...new Map(recentAttempts.map((a) => [`${a.type}-${a.slug}`, a])).values()].map((attempt) => {
               const href = attempt.type === 'paper'
                 ? `/pyq/${attempt.slug}`
                 : `/mock-test/${attempt.examSlug}`
