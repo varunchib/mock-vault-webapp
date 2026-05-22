@@ -112,7 +112,11 @@ export function PyqPaperPage() {
 
   const handlePdf = () => {
     if (!isAuthenticated) { setLoginOpen(true); return }
-    window.print()
+    if (paper?.sourceUrl) {
+      window.open(paper.sourceUrl, '_blank', 'noopener,noreferrer')
+    } else {
+      window.print()
+    }
   }
 
   const selectAnswer = (qSlug: string, key: string) => {
