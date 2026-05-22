@@ -335,7 +335,14 @@ export function PaperAttemptPage() {
           <section className="pa-question-panel">
             <div className="pa-q-header">
               <span className="pa-q-num">Q{reviewIndex + 1} <small>of {questions.length}</small></span>
-              <span className="pa-q-subject">{rq?.subject}</span>
+              {rq?.subject && (
+                <Link
+                  className="pa-q-subject pa-q-subject-link"
+                  to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(rq.subject)}`}
+                >
+                  {rq.subject}
+                </Link>
+              )}
             </div>
 
             {rq && (
@@ -460,7 +467,14 @@ export function PaperAttemptPage() {
         <section className="pa-question-panel">
           <div className="pa-q-header">
             <span className="pa-q-num">Q{currentIndex + 1} <small>of {questions.length}</small></span>
-            <span className="pa-q-subject">{currentQuestion?.subject}</span>
+            {currentQuestion?.subject && (
+              <Link
+                className="pa-q-subject pa-q-subject-link"
+                to={`/exam/${paper!.examSlug}?tab=subjects&subject=${encodeURIComponent(currentQuestion.subject)}`}
+              >
+                {currentQuestion.subject}
+              </Link>
+            )}
             <button type="button" className={`pa-mark-btn${marked[currentQuestion?.slug ?? ''] ? ' active' : ''}`} onClick={toggleMarked}>
               <Flag size={13} />
               {marked[currentQuestion?.slug ?? ''] ? 'Marked' : 'Mark for Review'}
