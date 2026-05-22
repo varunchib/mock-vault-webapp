@@ -4187,6 +4187,7 @@ footer {
   gap: 7px;
   height: 38px;
   padding: 0 16px;
+  text-decoration: none;
   border: 1.5px solid var(--line);
   border-radius: 10px;
   background: #fff;
