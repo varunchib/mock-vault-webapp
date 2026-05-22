@@ -114,8 +114,6 @@ export function PyqPaperPage() {
     if (!isAuthenticated) { setLoginOpen(true); return }
     if (paper?.sourceUrl) {
       window.open(paper.sourceUrl, '_blank', 'noopener,noreferrer')
-    } else {
-      window.print()
     }
   }
 
@@ -164,10 +162,11 @@ export function PyqPaperPage() {
               <Play size={14} /> Attempt Online
             </button>
           )}
-          <button className="pyq-action-btn" type="button" onClick={handlePdf}>
-            <Download size={14} />
-            {isAuthenticated ? 'Download PDF' : 'PDF'}
-          </button>
+          {paper?.sourceUrl && (
+            <button className="pyq-action-btn" type="button" onClick={handlePdf}>
+              <Download size={14} /> Download PDF
+            </button>
+          )}
         </div>
       </header>
 
