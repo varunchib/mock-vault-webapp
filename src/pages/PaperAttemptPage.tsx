@@ -22,6 +22,7 @@ import {
   type Paper,
   type Question,
 } from '../lib/api'
+import { savePaperResult } from '../lib/mockActivity'
 import { usePageMeta } from '../lib/usePageMeta'
 
 // ── KaTeX inline/block renderer ────────────────────────────────
@@ -121,8 +122,9 @@ export function PaperAttemptPage() {
   const [reviewMode, setReviewMode] = useState(false)
   const [reviewIndex, setReviewIndex] = useState(0)
 
-  const recordedRef = useRef(false)
-  const startTimeRef = useRef(Date.now())
+  const recordedRef    = useRef(false)
+  const resultSavedRef = useRef(false)
+  const startTimeRef   = useRef(Date.now())
 
   usePageMeta({
     title: paper ? `${paper.title} — Attempt | Ministry of Papers` : 'Paper Attempt | Ministry of Papers',
@@ -156,6 +158,31 @@ export function PaperAttemptPage() {
     void recordAttempt({ examSlug: paper.examSlug, paperSlug: paper.slug }).catch(() => undefined)
     recordedRef.current = true
   }, [paper])
+
+  // Save result once on submit
+  useEffect(() => {
+    if (!submitted || !paper || resultSavedRef.current) return
+    resultSavedRef.current = true
+    const { correct, wrong, skipped, subjectScores } = computeResults(questions, answers)
+    const negMark = paper.negativeMarking ?? 0
+    const rawScore = negMark > 0 ? parseFloat((correct - wrong * negMark).toFixed(2)) : undefined
+    savePaperResult({
+      paperSlug: paper.slug,
+      examSlug: paper.examSlug,
+      examName: paper.examName,
+      paperTitle: paper.title,
+      totalQuestions: questions.length,
+      attemptedAt: new Date().toISOString(),
+      answered: Object.keys(answers).length,
+      correct,
+      wrong,
+      skipped,
+      rawScore,
+      timeTakenSeconds: Math.floor((Date.now() - startTimeRef.current) / 1000),
+      subjects: subjectScores,
+    })
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [submitted])
 
   // Timer countdown
   useEffect(() => {
@@ -213,6 +240,8 @@ export function PaperAttemptPage() {
   // ── Submission summary ────────────────────────────────────────
   if (submitted && !reviewMode) {
     const scorePercent = questions.length > 0 ? Math.round((results.correct / questions.length) * 100) : 0
+    const negMark = paper.negativeMarking ?? 0
+    const rawScore = negMark > 0 ? parseFloat((results.correct - results.wrong * negMark).toFixed(2)) : null
     return (
       <div className="pa-result-page">
         <header className="pa-result-header">
@@ -228,10 +257,13 @@ export function PaperAttemptPage() {
         <main className="pa-result-main">
           <section className="pa-score-card">
             <div className="pa-score-ring">
-              <strong>{results.correct}</strong>
+              <strong>{rawScore !== null ? rawScore : results.correct}</strong>
               <span>/ {questions.length}</span>
             </div>
             <p className="pa-score-pct">{scorePercent}% correct</p>
+            {rawScore !== null && (
+              <p className="pa-negmark-note">Negative marking: -{negMark}/wrong · Raw score: {rawScore}</p>
+            )}
             <p className="pa-time-taken">Time taken: {formatTime(timeTaken)}</p>
 
             <div className="pa-score-legend">

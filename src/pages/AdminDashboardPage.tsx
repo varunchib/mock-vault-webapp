@@ -79,6 +79,7 @@ type AdminMockDraft = {
   slug: string
   examSlug: string
   durationMinutes: string
+  negativeMarking: string
   difficulty: 'Beginner' | 'Moderate' | 'Advanced'
   description: string
   subjects: string
@@ -178,6 +179,7 @@ function payloadFromDraft(draft: AdminMockDraft): AdminMockPayload {
     title: draft.title.trim(),
     description: draft.description.trim(),
     durationMinutes: Number(draft.durationMinutes),
+    negativeMarking: Number(draft.negativeMarking) || 0,
     difficulty: draft.difficulty,
     isFree: draft.isFree,
     subjects: draft.subjects.split(',').map((s) => s.trim()).filter(Boolean),
@@ -259,7 +261,7 @@ const emptyQuestion = (): AdminQuestionDraft => ({
 })
 
 const emptyDraft = (examSlug = ''): AdminMockDraft => ({
-  title: '', slug: '', examSlug, durationMinutes: '30', difficulty: 'Moderate',
+  title: '', slug: '', examSlug, durationMinutes: '30', negativeMarking: '0', difficulty: 'Moderate',
   description: '', subjects: '', isFree: true, questions: [],
 })
 
@@ -429,6 +431,7 @@ export function AdminDashboardPage() {
       slug: selectedMock.slug,
       examSlug: selectedMock.examSlug,
       durationMinutes: String(selectedMock.durationMinutes),
+      negativeMarking: String(selectedMock.negativeMarking ?? 0),
       difficulty: selectedMock.difficulty,
       description: selectedMock.description,
       subjects: selectedMock.subjects.join(', '),
@@ -1064,6 +1067,10 @@ export function AdminDashboardPage() {
                     <label className="admin-field">
                       Duration (min)
                       <input value={draft.durationMinutes} onChange={(e) => updateDraft('durationMinutes', e.target.value)} inputMode="numeric" />
+                    </label>
+                    <label className="admin-field">
+                      Neg. marking
+                      <input value={draft.negativeMarking} onChange={(e) => updateDraft('negativeMarking', e.target.value)} inputMode="decimal" placeholder="0.25" />
                     </label>
                     <label className="admin-field">
                       Access

@@ -32,9 +32,9 @@ function formatMinutes(seconds: number) {
 function ScoreRing({ score, total }: { score: number; total: number }) {
   const r = 52
   const circ = 2 * Math.PI * r
-  const pct = total > 0 ? score / total : 0
+  const pct = total > 0 ? Math.max(0, score) / total : 0
   const filled = pct * circ
-  const accuracy = Math.round(pct * 100)
+  const accuracy = total > 0 ? Math.round((Math.max(0, score) / total) * 100) : 0
 
   const color = accuracy >= 70 ? '#16a34a' : accuracy >= 50 ? '#d97706' : '#dc2626'
 
@@ -52,7 +52,7 @@ function ScoreRing({ score, total }: { score: number; total: number }) {
         />
       </svg>
       <div className="mr-ring-center">
-        <strong style={{ color }}>{score}</strong>
+        <strong style={{ color: score < 0 ? '#dc2626' : color }}>{score}</strong>
         <span>/ {total}</span>
       </div>
     </div>
@@ -82,7 +82,7 @@ function ResultScreen({
   mock, score, answeredCount, questions, subjects, timeTaken, onDashboard, onBack,
 }: {
   mock: MockItem
-  score: number
+  score: number       // correct count
   answeredCount: number
   questions: Question[]
   subjects: SubjectResult[]
@@ -90,11 +90,14 @@ function ResultScreen({
   onDashboard: () => void
   onBack: () => void
 }) {
+  const wrong = answeredCount - score
+  const skipped = questions.length - answeredCount
+  const negMark = mock.negativeMarking ?? 0
+  // rawScore accounts for negative marking; can be negative
+  const rawScore = parseFloat((score - wrong * negMark).toFixed(2))
   const accuracy = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0
   const percentile = estimatePercentile(score, questions.length, mock.examSlug)
   const cutoff = getCutoffComparison(score, questions.length, mock.examSlug)
-  const wrong = answeredCount - score
-  const skipped = questions.length - answeredCount
 
   return (
     <div className="mr-screen">
@@ -115,7 +118,10 @@ function ResultScreen({
       <div className="mr-body">
         {/* ── Left: score + stats ── */}
         <div className="mr-left">
-          <ScoreRing score={score} total={questions.length} />
+          <ScoreRing score={negMark > 0 ? rawScore : score} total={questions.length} />
+          {negMark > 0 && (
+            <p className="mr-negmark-note">-{negMark} per wrong · raw score: <strong>{rawScore}</strong></p>
+          )}
 
           <div className="mr-stat-list">
             <div className="mr-stat">
@@ -140,6 +146,12 @@ function ResultScreen({
               <span className="mr-stat-label">Skipped</span>
               <strong className="mr-stat-val muted">{skipped}</strong>
             </div>
+            {negMark > 0 && (
+              <div className="mr-stat">
+                <span className="mr-stat-label">Raw Score</span>
+                <strong className={`mr-stat-val ${rawScore >= 0 ? 'good' : 'bad'}`}>{rawScore}</strong>
+              </div>
+            )}
             {percentile > 0 && (
               <div className="mr-stat">
                 <span className="mr-stat-label">Est. Percentile</span>
@@ -319,6 +331,9 @@ export function MockAttemptPage() {
   useEffect(() => {
     if (!submitted || !mock || resultSavedRef.current) return
     resultSavedRef.current = true
+    const wrong = answeredCount - score
+    const negMark = mock.negativeMarking ?? 0
+    const rawScore = parseFloat((score - wrong * negMark).toFixed(2))
     saveAttemptResult({
       mockSlug: mock.slug,
       examSlug: mock.examSlug,
@@ -328,8 +343,9 @@ export function MockAttemptPage() {
       attemptedAt: new Date().toISOString(),
       answered: answeredCount,
       correct: score,
-      wrong: answeredCount - score,
+      wrong,
       skipped: questions.length - answeredCount,
+      rawScore: negMark > 0 ? rawScore : undefined,
       timeTakenSeconds: mock.durationMinutes * 60 - remainingAtSubmitRef.current,
       subjects: subjectBreakdown,
     })

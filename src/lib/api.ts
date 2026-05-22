@@ -44,6 +44,7 @@ export type Paper = {
   description: string;
   questions: number;
   subjects: string[];
+  negativeMarking: number;
 };
 
 export type MockItem = {
@@ -57,6 +58,22 @@ export type MockItem = {
   difficulty: "Beginner" | "Moderate" | "Advanced";
   isFree: boolean;
   subjects: string[];
+  negativeMarking: number;
+};
+
+export type CutoffCategory = {
+  category: string;
+  marks: number;
+  source: string;
+};
+
+export type ExamCutoffSet = {
+  stage: string;
+  year: string;
+  totalMarks: number;
+  avgScore: number;
+  stdDev: number;
+  cutoffs: CutoffCategory[];
 };
 
 export type AuthUser = {
@@ -107,6 +124,7 @@ export type AdminMockPayload = {
   title: string;
   description: string;
   durationMinutes: number;
+  negativeMarking: number;
   difficulty: "Beginner" | "Moderate" | "Advanced";
   isFree: boolean;
   subjects: string[];
@@ -402,4 +420,18 @@ export function fetchAdminReports(): Promise<{ reports: QuestionReport[]; count:
 
 export function clearAdminReports(): Promise<{ message: string }> {
   return requestJson<{ message: string }>('/api/v1/admin/reports', { method: 'DELETE' })
+}
+
+export function fetchExamCutoffs(examSlug: string): Promise<ExamCutoffSet[]> {
+  return requestJson<ExamCutoffSet[]>(`/api/v1/exams/${examSlug}/cutoffs`)
+}
+
+export function adminUpsertCutoff(payload: {
+  examSlug: string; stage: string; year: string; category: string;
+  marks: number; totalMarks: number; avgScore: number; stdDev: number; source?: string;
+}): Promise<{ message: string }> {
+  return requestJson<{ message: string }>('/api/v1/admin/cutoffs', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  })
 }

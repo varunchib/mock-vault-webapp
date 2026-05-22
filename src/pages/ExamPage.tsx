@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   BookOpen,
   ChevronRight,
   ClipboardList,
@@ -8,7 +9,7 @@ import {
   Timer,
   X,
 } from 'lucide-react'
-import { Link, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
 import { HaloLoader } from '../components/common/HaloLoader'
@@ -29,6 +30,7 @@ import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
+import { readAllResults } from '../lib/mockActivity'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
@@ -100,6 +102,10 @@ export function ExamPage() {
   }
 
   const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
+  const hasAnalytics = useMemo(
+    () => isAuthenticated && !!slug && readAllResults(slug).length > 0,
+    [isAuthenticated, slug],
+  )
   const filteredMocks = useMemo(
     () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
     [examMocks, diffFilter],
@@ -240,14 +246,21 @@ export function ExamPage() {
         </div>
 
         {isAuthenticated && (
-          <button
-            className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
-            type="button"
-            disabled={enrollBusy}
-            onClick={() => void handleEnrollToggle()}
-          >
-            {enrollBusy ? '…' : isEnrolled ? '✓ Enrolled' : '+ Enroll'}
-          </button>
+          <div className="ep-hero-actions">
+            {hasAnalytics && (
+              <Link to={`/analytics/${slug}`} className="ep-analytics-btn">
+                <BarChart3 size={13} /> Your Analytics
+              </Link>
+            )}
+            <button
+              className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
+              type="button"
+              disabled={enrollBusy}
+              onClick={() => void handleEnrollToggle()}
+            >
+              {enrollBusy ? '…' : isEnrolled ? '✓ Enrolled' : '+ Enroll'}
+            </button>
+          </div>
         )}
       </header>
 

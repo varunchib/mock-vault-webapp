@@ -19,6 +19,7 @@ import { TermsPage }         from '../pages/TermsPage'
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
 const AdminDashboardPage  = lazy(() => import('../pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
 const AnalyticsPage       = lazy(() => import('../pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
+const ExamAnalyticsPage   = lazy(() => import('../pages/ExamAnalyticsPage').then(m => ({ default: m.ExamAnalyticsPage })))
 const TestsPage           = lazy(() => import('../pages/TestsPage').then(m => ({ default: m.TestsPage })))
 const MockAttemptPage     = lazy(() => import('../pages/MockAttemptPage').then(m => ({ default: m.MockAttemptPage })))
 const PaperAttemptPage    = lazy(() => import('../pages/PaperAttemptPage').then(m => ({ default: m.PaperAttemptPage })))
@@ -68,7 +69,8 @@ export function AppRoutes() {
       <Route path="/exams"              element={<ExamCatalogPage />} />
       <Route path="/exam/:slug"         element={<ExamPage />} />
       <Route path="/tests"              element={<ProtectedPage><Lazy><TestsPage /></Lazy></ProtectedPage>} />
-      <Route path="/analytics"          element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
+      <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
+      <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/question/:slug"     element={<QuestionPage />} />
       <Route path="/pyq/:slug"          element={<PyqPaperPage />} />
       <Route path="/mock-test/:slug"    element={<MockDetailPage />} />
