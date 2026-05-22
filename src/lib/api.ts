@@ -46,6 +46,8 @@ export type Paper = {
   subjects: string[];
   negativeMarking: number;
   sourceUrl: string;
+  durationMinutes: number;
+  maxMarks: number;
 };
 
 export type MockItem = {
