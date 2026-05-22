@@ -10,11 +10,13 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
+  Moon,
   Pencil,
   Plus,
   RefreshCw,
   Save,
   Search,
+  Sun,
   Trash2,
   UploadCloud,
   Users,
@@ -297,6 +299,13 @@ export function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [statusMsg, setStatusMsg] = useState<StatusMsg | null>(null)
   const [saving, setSaving] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === '1')
+
+  const toggleDark = () => setDarkMode((d) => {
+    const next = !d
+    localStorage.setItem('admin-dark', next ? '1' : '0')
+    return next
+  })
 
   // Mock draft
   const [draft, setDraft] = useState<AdminMockDraft>(emptyDraft())
@@ -730,7 +739,7 @@ export function AdminDashboardPage() {
   if (loading) return <HaloLoader label="Loading admin" />
 
   return (
-    <section className="admin-workspace">
+    <section className={`admin-workspace${darkMode ? ' admin-dark' : ''}`}>
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside className="admin-rail">
@@ -763,6 +772,10 @@ export function AdminDashboardPage() {
           })}
           <div className="admin-rail-divider" />
           <Link className="admin-nav-btn" to="/exams"><Home size={17} /> App home</Link>
+          <button type="button" className="admin-dark-toggle" onClick={toggleDark}>
+            {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+            {darkMode ? 'Light mode' : 'Dark mode'}
+          </button>
         </nav>
 
         <button className="admin-rail-logout" type="button" onClick={() => void logout().then(() => navigate('/'))}>

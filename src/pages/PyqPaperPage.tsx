@@ -110,11 +110,6 @@ export function PyqPaperPage() {
   const visibleQuestions = isAuthenticated ? questions : questions.slice(0, FREE_LIMIT)
   const isGated = !isAuthenticated && questions.length > FREE_LIMIT
 
-  const handlePdf = () => {
-    if (!isAuthenticated) { setLoginOpen(true); return }
-    window.print()
-  }
-
   const selectAnswer = (qSlug: string, key: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [qSlug]: key }))
   }
@@ -160,10 +155,16 @@ export function PyqPaperPage() {
               <Play size={14} /> Attempt Online
             </button>
           )}
-          <button className="pyq-action-btn" type="button" onClick={handlePdf}>
-            <Download size={14} />
-            {isAuthenticated ? 'Download PDF' : 'PDF'}
-          </button>
+          {paper?.sourceUrl && (
+            <a
+              className="pyq-action-btn"
+              href={paper.sourceUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Download size={14} /> Download PDF
+            </a>
+          )}
         </div>
       </header>
 
