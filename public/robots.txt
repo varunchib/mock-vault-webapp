@@ -1,10 +1,61 @@
 User-agent: *
 Allow: /
-
 Disallow: /dashboard
 Disallow: /admin
 Disallow: /analytics
 Disallow: /mock-attempt/
 Disallow: /paper-attempt/
+
+# ── Google (Search + AI Overviews) ────────────────────────────────────────
+User-agent: Googlebot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# ── Bing / Microsoft Copilot ──────────────────────────────────────────────
+User-agent: Bingbot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+# ── Anthropic / Claude ────────────────────────────────────────────────────
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+# ── Perplexity ────────────────────────────────────────────────────────────
+User-agent: PerplexityBot
+Allow: /
+
+# ── Meta AI ───────────────────────────────────────────────────────────────
+User-agent: FacebookBot
+Allow: /
+
+# ── Apple Intelligence ────────────────────────────────────────────────────
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# ── Common search crawlers ────────────────────────────────────────────────
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: Slurp
+Allow: /
+
+User-agent: YandexBot
+Allow: /
 
 Sitemap: https://ministryofpapers.com/sitemap.xml

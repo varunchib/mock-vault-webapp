@@ -6,7 +6,7 @@ interface Env {
   ASSETS: { fetch(req: Request): Promise<Response> }
 }
 
-const BOT_UA = /Googlebot|Bingbot|bingbot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
+const BOT_UA = /Googlebot|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
 const API    = 'https://api.ministryofpapers.com'
 
 const STATIC_META: Record<string, { title: string; description: string }> = {
@@ -103,7 +103,15 @@ export default {
     // Static assets (.js, .css, .png, .svg, .woff2, etc.) → pass through
     const lastSeg = path.split('/').pop() ?? ''
     if (lastSeg.includes('.') && !lastSeg.endsWith('.html')) {
-      return env.ASSETS.fetch(request)
+      const res = await env.ASSETS.fetch(request)
+      // Ensure llms.txt is served as plain text (some CDNs default to octet-stream)
+      if (path === '/llms.txt') {
+        const headers = new Headers(res.headers)
+        headers.set('content-type', 'text/plain; charset=UTF-8')
+        headers.set('x-robots-tag', 'all')
+        return new Response(res.body, { status: res.status, headers })
+      }
+      return res
     }
 
     // Non-bot → serve SPA directly

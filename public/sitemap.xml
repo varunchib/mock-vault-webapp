@@ -1,136 +1,189 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- Core pages -->
   <url>
     <loc>https://ministryofpapers.com/</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://ministryofpapers.com/exams</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://ministryofpapers.com/tests</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
-
-  <!-- Exam pages -->
-  <url>
-    <loc>https://ministryofpapers.com/exam/upsc-cse</loc>
-    <lastmod>2026-05-21</lastmod>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/exam/ssc-cgl</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/exam/ctet</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/exam/ibps-po-clerk</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/mock-test/ctet</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/exam/neet-ug</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/exam/ibps-clerk</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/ibps-clerk</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/exam/ibps-po</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/ibps-po</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ministryofpapers.com/exam/jee-main</loc>
-    <lastmod>2026-05-21</lastmod>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/jee-main</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ministryofpapers.com/exam/jkssb</loc>
-    <lastmod>2026-05-21</lastmod>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/jkssb</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/exam/neet-ug</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/neet-ug</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/exam/rrb-group-d</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/rrb-group-d</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://ministryofpapers.com/exam/rrb-ntpc</loc>
-    <lastmod>2026-05-21</lastmod>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/rrb-ntpc</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/exam/bihar-psc</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/exam/sbi-po</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/sbi-po</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/exam/up-police</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/exam/ssc-cgl</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://ministryofpapers.com/exam/rajasthan-patwari</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://ministryofpapers.com/exam/hpsc</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://ministryofpapers.com/exam/up-tgt-pgt</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://ministryofpapers.com/exam/ssc-chsl</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Mock test hub pages -->
-  <url>
-    <loc>https://ministryofpapers.com/mock-test/upsc-cse</loc>
-    <lastmod>2026-05-21</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>https://ministryofpapers.com/mock-test/ssc-cgl</loc>
-    <lastmod>2026-05-21</lastmod>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/mock-test/ibps-po-clerk</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/exam/ssc-chsl</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/ssc-chsl</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/mock-test/neet-ug</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/exam/ssc-mts</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/mock-test/jkssb</loc>
-    <lastmod>2026-05-21</lastmod>
+    <loc>https://ministryofpapers.com/mock-test/ssc-mts</loc>
+    <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
-
+  <url>
+    <loc>https://ministryofpapers.com/exam/upsc-cse</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/mock-test/upsc-cse</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/pyq/ibps-po-pre-2025-aug-23-shift-1</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ministryofpapers.com/pyq/jkssb-wildlife-guard-2026-may-10</loc>
+    <lastmod>2026-05-22</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
 </urlset>

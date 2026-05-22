@@ -1,0 +1,46 @@
+# Ministry of Papers
+
+> Free previous year question papers (PYQs) and full-length mock tests for India's top competitive exams — UPSC, SSC, IBPS, NEET, JEE, Railways, State PSCs and 200+ more. Every answer is solved and explained. No login required to browse.
+
+## About
+
+Ministry of Papers is an Indian ed-tech platform built for competitive exam aspirants. It provides:
+- Solved previous year question papers with detailed explanations
+- Timed, full-length mock tests that replicate real exam conditions
+- Subject-wise question banks covering Reasoning, Quant, English, GK, Science, and more
+- Cutoff analysis and percentile estimates after each mock test
+- Free access to all public content — no paywall for PYQs
+
+## Exams Covered
+
+- UPSC CSE (Civil Services Prelims & Mains)
+- SSC CGL, CHSL, MTS
+- IBPS PO, IBPS Clerk, SBI PO, SBI Clerk
+- RRB NTPC, RRB Group D
+- NEET UG
+- JEE Main
+- CTET
+- JKSSB (Jammu & Kashmir PSC)
+- And 200+ more state and central government exams
+
+## Key Pages
+
+- [Home](https://ministryofpapers.com/): Landing page and search
+- [Exam Catalog](https://ministryofpapers.com/exams): Browse all 240+ exams
+- [Mock Tests](https://ministryofpapers.com/tests): Full-length timed practice tests
+- [UPSC CSE Hub](https://ministryofpapers.com/exam/upsc-cse): PYQs and mocks for UPSC
+- [SSC CGL Hub](https://ministryofpapers.com/exam/ssc-cgl): PYQs and mocks for SSC CGL
+- [IBPS PO Hub](https://ministryofpapers.com/exam/ibps-po): PYQs and mocks for IBPS PO
+- [SBI PO Hub](https://ministryofpapers.com/exam/sbi-po): PYQs and mocks for SBI PO
+- [NEET UG Hub](https://ministryofpapers.com/exam/neet-ug): PYQs and mocks for NEET UG
+- [JEE Main Hub](https://ministryofpapers.com/exam/jee-main): PYQs and mocks for JEE Main
+- [Privacy Policy](https://ministryofpapers.com/privacy): Data and privacy information
+- [Terms of Service](https://ministryofpapers.com/terms): Terms of use
+
+## Content Policy
+
+All question papers and answers are sourced from official exam bodies (UPSC, SSC, IBPS, NTA, etc.) and are in the public domain. Explanations are original content created by the Ministry of Papers team.
+
+## Contact
+
+For content corrections or API access: support@ministryofpapers.com
