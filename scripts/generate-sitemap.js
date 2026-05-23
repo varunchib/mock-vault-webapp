@@ -16,6 +16,17 @@ async function fetchSlugs(path) {
   return data.map(item => item.slug).filter(Boolean)
 }
 
+async function fetchQuestionSlugsForPaper(paperSlug) {
+  try {
+    const res = await fetch(`${API}/api/v1/papers/${encodeURIComponent(paperSlug)}/questions`, { signal: AbortSignal.timeout(10000) })
+    if (!res.ok) return []
+    const data = await res.json()
+    return data.map(item => item.slug).filter(Boolean)
+  } catch {
+    return []
+  }
+}
+
 function url(loc, priority, freq = 'weekly') {
   return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${TODAY}</lastmod>\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
 }
@@ -28,11 +39,15 @@ async function generate() {
     fetchSlugs('/api/v1/papers'),
   ])
 
-  console.log(`  ${examSlugs.length} exams, ${paperSlugs.length} papers`)
+  const questionSlugArrays = await Promise.all(paperSlugs.map(fetchQuestionSlugsForPaper))
+  const questionSlugs = questionSlugArrays.flat()
+
+  console.log(`  ${examSlugs.length} exams, ${paperSlugs.length} papers, ${questionSlugs.length} questions`)
 
   const urls = [
     url(`${BASE}/`,         '1.0', 'daily'),
     url(`${BASE}/exams`,    '0.9', 'daily'),
+    url(`${BASE}/about`,    '0.5', 'monthly'),
     url(`${BASE}/privacy`,  '0.3', 'yearly'),
     url(`${BASE}/terms`,    '0.3', 'yearly'),
     ...examSlugs.flatMap(slug => [
@@ -40,6 +55,7 @@ async function generate() {
       url(`${BASE}/mock-test/${slug}`, '0.8'),
     ]),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
+    ...questionSlugs.map(slug => url(`${BASE}/question/${slug}`, '0.7', 'monthly')),
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`

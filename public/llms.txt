@@ -27,6 +27,7 @@ Ministry of Papers is an Indian ed-tech platform built for competitive exam aspi
 
 - [Home](https://ministryofpapers.com/): Landing page and search
 - [Exam Catalog](https://ministryofpapers.com/exams): Browse all 240+ exams
+- [About](https://ministryofpapers.com/about): Mission, content policy, and contact
 - [Mock Tests](https://ministryofpapers.com/exams): Full-length timed practice tests (access via exam hub pages)
 - [UPSC CSE Hub](https://ministryofpapers.com/exam/upsc-cse): PYQs and mocks for UPSC
 - [SSC CGL Hub](https://ministryofpapers.com/exam/ssc-cgl): PYQs and mocks for SSC CGL
