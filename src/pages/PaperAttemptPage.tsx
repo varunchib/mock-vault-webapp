@@ -89,6 +89,7 @@ function computeResults(questions: Question[], answers: Record<string, string>) 
   let correct = 0, wrong = 0, skipped = 0
   const bySubject: Record<string, SubjectScore> = {}
   for (const q of questions) {
+    if (q.answerKey === 'Deleted') continue
     if (!bySubject[q.subject]) bySubject[q.subject] = { subject: q.subject, correct: 0, wrong: 0, skipped: 0, total: 0 }
     bySubject[q.subject].total++
     const chosen = answers[q.slug]
@@ -205,6 +206,7 @@ export function PaperAttemptPage() {
   }, [currentIndex, questions])
 
   const currentQuestion = questions[currentIndex]
+  const activeQuestions = questions.filter(q => q.answerKey !== 'Deleted')
   const answeredCount = Object.keys(answers).length
   const markedCount = Object.values(marked).filter(Boolean).length
   const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000)
@@ -240,9 +242,11 @@ export function PaperAttemptPage() {
 
   // ── Submission summary ────────────────────────────────────────
   if (submitted && !reviewMode) {
-    const scorePercent = questions.length > 0 ? Math.round((results.correct / questions.length) * 100) : 0
+    const activeCount = activeQuestions.length
+    const scorePercent = activeCount > 0 ? Math.round((results.correct / activeCount) * 100) : 0
     const negMark = paper.negativeMarking ?? 0
     const rawScore = negMark > 0 ? parseFloat((results.correct - results.wrong * negMark).toFixed(2)) : null
+    const deletedCount = questions.length - activeCount
     return (
       <div className="pa-result-page">
         <header className="pa-result-header">
@@ -259,9 +263,12 @@ export function PaperAttemptPage() {
           <section className="pa-score-card">
             <div className="pa-score-ring">
               <strong>{rawScore !== null ? rawScore : results.correct}</strong>
-              <span>/ {questions.length}</span>
+              <span>/ {activeCount}</span>
             </div>
             <p className="pa-score-pct">{scorePercent}% correct</p>
+            {deletedCount > 0 && (
+              <p className="pa-negmark-note">{deletedCount} question{deletedCount !== 1 ? 's' : ''} officially deleted — not counted in score</p>
+            )}
             {rawScore !== null && (
               <p className="pa-negmark-note">Negative marking: -{negMark}/wrong · Raw score: {rawScore}</p>
             )}
@@ -350,32 +357,41 @@ export function PaperAttemptPage() {
               <>
                 <div className="pa-q-text"><MathText text={rq.question} /></div>
 
-                <div className="pa-options">
-                  {rq.options.map((opt) => {
-                    const isChosen = chosen === opt.key
-                    const isCorrectOpt = opt.key === rq.answerKey
-                    let cls = 'pa-option'
-                    if (isCorrectOpt) cls += ' correct'
-                    else if (isChosen && !isCorrect) cls += ' wrong'
-                    return (
-                      <div key={opt.key} className={cls}>
-                        <span className="pa-opt-key">{opt.key}</span>
-                        <MathText text={opt.text} />
-                        {isCorrectOpt && <CheckCircle2 size={14} className="pa-opt-check" />}
-                      </div>
-                    )
-                  })}
-                </div>
-
-                {!chosen && (
-                  <div className="pa-not-attempted">Not attempted · Correct answer: <strong>{rq.answerKey}</strong></div>
-                )}
-
-                {rq.explanation && (
-                  <div className="pa-explanation">
-                    <strong>Explanation</strong>
-                    <MathText text={rq.explanation} />
+                {rq.answerKey === 'Deleted' ? (
+                  <div className="pa-deleted-notice">
+                    <span className="pa-deleted-badge">Deleted Question</span>
+                    <p>{rq.explanation}</p>
                   </div>
+                ) : (
+                  <>
+                    <div className="pa-options">
+                      {rq.options.map((opt) => {
+                        const isChosen = chosen === opt.key
+                        const isCorrectOpt = opt.key === rq.answerKey
+                        let cls = 'pa-option'
+                        if (isCorrectOpt) cls += ' correct'
+                        else if (isChosen && !isCorrect) cls += ' wrong'
+                        return (
+                          <div key={opt.key} className={cls}>
+                            <span className="pa-opt-key">{opt.key}</span>
+                            <MathText text={opt.text} />
+                            {isCorrectOpt && <CheckCircle2 size={14} className="pa-opt-check" />}
+                          </div>
+                        )
+                      })}
+                    </div>
+
+                    {!chosen && (
+                      <div className="pa-not-attempted">Not attempted · Correct answer: <strong>{rq.answerKey}</strong></div>
+                    )}
+
+                    {rq.explanation && (
+                      <div className="pa-explanation">
+                        <strong>Explanation</strong>
+                        <MathText text={rq.explanation} />
+                      </div>
+                    )}
+                  </>
                 )}
               </>
             )}
@@ -401,7 +417,8 @@ export function PaperAttemptPage() {
               {questions.map((q, i) => {
                 const ch = answers[q.slug]
                 let cls = 'pa-palette-btn'
-                if (!ch) cls += ' visited'
+                if (q.answerKey === 'Deleted') cls += ' deleted'
+                else if (!ch) cls += ' visited'
                 else if (ch === q.answerKey) cls += ' answered'
                 else cls += ' wrong'
                 if (i === reviewIndex) cls += ' current'
@@ -488,29 +505,38 @@ export function PaperAttemptPage() {
                 <MathText text={currentQuestion.question} />
               </div>
 
-              <div className="pa-options">
-                {currentQuestion.options.map((opt) => {
-                  const chosen = answers[currentQuestion.slug] === opt.key
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      className={`pa-option${chosen ? ' selected' : ''}`}
-                      onClick={() => chooseOption(opt.key)}
-                    >
-                      <span className="pa-opt-key">{opt.key}</span>
-                      <MathText text={opt.text} />
-                    </button>
-                  )
-                })}
-              </div>
+              {currentQuestion.answerKey === 'Deleted' ? (
+                <div className="pa-deleted-notice">
+                  <span className="pa-deleted-badge">Deleted Question</span>
+                  <p>{currentQuestion.explanation}</p>
+                </div>
+              ) : (
+                <>
+                  <div className="pa-options">
+                    {currentQuestion.options.map((opt) => {
+                      const chosen = answers[currentQuestion.slug] === opt.key
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          className={`pa-option${chosen ? ' selected' : ''}`}
+                          onClick={() => chooseOption(opt.key)}
+                        >
+                          <span className="pa-opt-key">{opt.key}</span>
+                          <MathText text={opt.text} />
+                        </button>
+                      )
+                    })}
+                  </div>
 
-              {answers[currentQuestion.slug] && (
-                <button type="button" className="pa-clear-btn" onClick={() => {
-                  setAnswers((cur) => { const next = { ...cur }; delete next[currentQuestion.slug]; return next })
-                }}>
-                  Clear response
-                </button>
+                  {answers[currentQuestion.slug] && (
+                    <button type="button" className="pa-clear-btn" onClick={() => {
+                      setAnswers((cur) => { const next = { ...cur }; delete next[currentQuestion.slug]; return next })
+                    }}>
+                      Clear response
+                    </button>
+                  )}
+                </>
               )}
             </>
           ) : (

@@ -4400,6 +4400,69 @@ footer {
   margin: 0;
 }
 
+/* ── Deleted question — PYQ paper page ──────────────── */
+.pyq-question-card.deleted { opacity: .85; background: #fafafa; }
+
+.pyq-deleted-badge {
+  margin-left: auto;
+  padding: 2px 8px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  white-space: nowrap;
+}
+
+.pyq-deleted-notice {
+  margin-top: 10px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+.pyq-deleted-notice strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #dc2626;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.pyq-deleted-notice p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #7f1d1d;
+  margin: 0;
+}
+
+/* ── Deleted question — individual question page ────── */
+.pyq-reader-deleted {
+  border: 1px solid #fecaca !important;
+  background: #fff5f5 !important;
+}
+.pyq-deleted-badge-lg {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  margin-bottom: 10px;
+}
+.pyq-deleted-reason {
+  font-size: 14px;
+  line-height: 1.65;
+  color: #7f1d1d;
+  margin: 0 0 16px;
+}
+
 /* ── Mobile ─────────────────────────────────────────── */
 @media (max-width: 640px) {
   .pyq-paper-header { flex-direction: column; gap: 16px; }
@@ -8982,6 +9045,38 @@ html {
 }
 .pa-explanation strong { display: block; font-size: 12px; font-weight: 700; color: #0369a1; margin-bottom: 6px; text-transform: uppercase; letter-spacing: .06em; }
 .pa-explanation span { font-size: 13px; line-height: 1.6; color: #1e3a5f; }
+
+/* ── Deleted question — attempt & review ──────────── */
+.pa-deleted-notice {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  margin-bottom: 12px;
+}
+.pa-deleted-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  background: #dc2626;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.pa-deleted-notice p {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #7f1d1d;
+  margin: 0;
+}
+.pa-palette-btn.deleted {
+  background: #e5e7eb;
+  color: #6b7280;
+  border-color: #d1d5db;
+  text-decoration: line-through;
+}
 
 /* Question nav footer */
 .pa-q-actions {

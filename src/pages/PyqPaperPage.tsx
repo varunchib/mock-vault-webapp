@@ -171,13 +171,14 @@ export function PyqPaperPage() {
 
       <div className="pyq-question-list">
         {visibleQuestions.map((q, index) => {
+          const isDeleted = q.answerKey === 'Deleted'
           const chosen = selectedAnswers[q.slug]
           const isRevealed = revealed[q.slug]
           const isExplOpen = explOpen[q.slug]
           const isCorrect = chosen === q.answerKey
 
           return (
-            <article className="pyq-question-card" key={q.slug}>
+            <article className={`pyq-question-card${isDeleted ? ' deleted' : ''}`} key={q.slug}>
               <div className="pyq-q-header">
                 <span className="pyq-q-num">Q{index + 1}</span>
                 <Link
@@ -187,80 +188,90 @@ export function PyqPaperPage() {
                 >
                   {q.subject}
                 </Link>
+                {isDeleted && <span className="pyq-deleted-badge">Deleted</span>}
               </div>
 
               <QuestionRenderer className="pyq-q-text" text={q.question} />
 
-              <div className="pyq-options">
-                {q.options.map((opt, i) => {
-                  const label = OPTION_LABELS[i] ?? opt.key
-                  const isChosen = chosen === opt.key
-                  const isCorrectOpt = opt.key === q.answerKey
-
-                  let cls = 'pyq-option'
-                  if (isRevealed) {
-                    if (isCorrectOpt) cls += ' correct'
-                    else if (isChosen && !isCorrect) cls += ' wrong'
-                  } else if (isChosen) {
-                    cls += ' chosen'
-                  }
-
-                  return (
-                    <button
-                      key={opt.key}
-                      type="button"
-                      className={cls}
-                      onClick={() => selectAnswer(q.slug, opt.key)}
-                      disabled={isRevealed}
-                    >
-                      <span className="pyq-opt-key">{label}</span>
-                      <span>{opt.text}</span>
-                    </button>
-                  )
-                })}
-              </div>
-
-              {q.tags.length > 0 && (
-                <div className="pyq-q-tags">
-                  {q.tags.map((tag) => (
-                    <span key={tag} className="pyq-q-tag">{tag}</span>
-                  ))}
-                </div>
-              )}
-
-              <div className="pyq-q-actions">
-                {!isRevealed ? (
-                  <button
-                    type="button"
-                    className="pyq-reveal-btn"
-                    onClick={() => revealAnswer(q.slug)}
-                    disabled={!chosen}
-                  >
-                    Check Answer
-                  </button>
-                ) : (
-                  <>
-                    <div className={`pyq-result ${isCorrect ? 'correct' : 'wrong'}`}>
-                      {isCorrect ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
-                    </div>
-                    {q.explanation && (
-                      <button
-                        type="button"
-                        className={`pyq-expl-btn${isExplOpen ? ' open' : ''}`}
-                        onClick={() => toggleExpl(q.slug)}
-                      >
-                        📖 {isExplOpen ? 'Hide' : 'Explanation'}
-                      </button>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {isRevealed && isExplOpen && q.explanation && (
-                <div className="pyq-explanation">
-                  <strong>Explanation</strong>
+              {isDeleted ? (
+                <div className="pyq-deleted-notice">
+                  <strong>This question was officially deleted by BPSC</strong>
                   <p>{q.explanation}</p>
                 </div>
+              ) : (
+                <>
+                  <div className="pyq-options">
+                    {q.options.map((opt, i) => {
+                      const label = OPTION_LABELS[i] ?? opt.key
+                      const isChosen = chosen === opt.key
+                      const isCorrectOpt = opt.key === q.answerKey
+
+                      let cls = 'pyq-option'
+                      if (isRevealed) {
+                        if (isCorrectOpt) cls += ' correct'
+                        else if (isChosen && !isCorrect) cls += ' wrong'
+                      } else if (isChosen) {
+                        cls += ' chosen'
+                      }
+
+                      return (
+                        <button
+                          key={opt.key}
+                          type="button"
+                          className={cls}
+                          onClick={() => selectAnswer(q.slug, opt.key)}
+                          disabled={isRevealed}
+                        >
+                          <span className="pyq-opt-key">{label}</span>
+                          <span>{opt.text}</span>
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  {q.tags.length > 0 && (
+                    <div className="pyq-q-tags">
+                      {q.tags.map((tag) => (
+                        <span key={tag} className="pyq-q-tag">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="pyq-q-actions">
+                    {!isRevealed ? (
+                      <button
+                        type="button"
+                        className="pyq-reveal-btn"
+                        onClick={() => revealAnswer(q.slug)}
+                        disabled={!chosen}
+                      >
+                        Check Answer
+                      </button>
+                    ) : (
+                      <>
+                        <div className={`pyq-result ${isCorrect ? 'correct' : 'wrong'}`}>
+                          {isCorrect ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
+                        </div>
+                        {q.explanation && (
+                          <button
+                            type="button"
+                            className={`pyq-expl-btn${isExplOpen ? ' open' : ''}`}
+                            onClick={() => toggleExpl(q.slug)}
+                          >
+                            📖 {isExplOpen ? 'Hide' : 'Explanation'}
+                          </button>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  {isRevealed && isExplOpen && q.explanation && (
+                    <div className="pyq-explanation">
+                      <strong>Explanation</strong>
+                      <p>{q.explanation}</p>
+                    </div>
+                  )}
+                </>
               )}
             </article>
           )
