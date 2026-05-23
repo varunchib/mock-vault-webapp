@@ -418,7 +418,10 @@ export function ExamPage() {
                         <Link className="ep-paper-card-inner" to={`/pyq/${paper.slug}`}>
                           <div className="ep-paper-card-main">
                             <strong>{paper.title}</strong>
-                            {paper.shift && <small>{paper.shift}</small>}
+                            <div className="ep-paper-meta">
+                              {paper.shift && <small>{paper.shift}</small>}
+                              {paper.heldOn && <small className="ep-paper-date">{new Date(paper.heldOn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</small>}
+                            </div>
                           </div>
                           <div className="ep-paper-card-right">
                             <span className="ep-q-count">{paper.questions} Qs</span>

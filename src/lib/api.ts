@@ -48,6 +48,7 @@ export type Paper = {
   sourceUrl: string;
   durationMinutes: number;
   maxMarks: number;
+  heldOn?: string;
 };
 
 export type MockItem = {

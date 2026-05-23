@@ -404,7 +404,7 @@ export function AnalyticsPage() {
             Attempt a mock test or a PYQ paper and your score, subject breakdown,
             and cutoff comparison will appear here.
           </p>
-          <Link to="/tests" className="an-empty-btn">
+          <Link to="/exams" className="an-empty-btn">
             Browse Tests &amp; Papers
           </Link>
         </div>
