@@ -102,6 +102,7 @@ export function QuestionPage() {
   }
 
   if (error || !question) return <Navigate to="/" replace />;
+  const isDeleted = question.answerKey === 'Deleted';
   const homeHref = isAuthenticated ? "/dashboard" : "/";
 
   const submitAttempt = () => {
@@ -150,55 +151,69 @@ export function QuestionPage() {
               </h1>
             </header>
 
-            <section className="pyq-reader-card">
-              <h2>Choose your answer</h2>
-              <div className="pyq-option-list">
-                {question.options.map((option) => {
-                  const isSelected = selected === option.key;
-                  const stateClass = optionState.get(option.key) ?? "";
-
-                  return (
-                    <button
-                      className={`${isSelected ? "selected" : ""} ${stateClass}`.trim()}
-                      type="button"
-                      key={option.key}
-                      onClick={() => setSelected(option.key)}
-                    >
-                      <span>{option.key}</span>
-                      <strong>{option.text}</strong>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="q-actions">
-                <button className="qa-btn primary" type="button" onClick={submitAttempt} disabled={!selected}>
-                  Submit answer
-                </button>
-                <button className="qa-btn ghost" type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
-                  <Share2 size={16} /> Copy Link
-                </button>
-              </div>
-              {!isAuthenticated ? (
-                <div className="pyq-login-note">
-                  <Lock size={14} /> You can open and attempt the question freely. Login is required when you submit.
-                </div>
-              ) : null}
-            </section>
-
-            {submitted ? (
-              <section className="pyq-reader-card explanation-card">
-                <div className="answer-line">
-                  <CheckCircle2 size={18} /> Correct answer:
-                  <strong>{question.answer}</strong>
-                </div>
-                <p>{question.explanation}</p>
-                <div className="pyq-tag-list">
-                  {question.tags.map((tag) => (
-                    <span key={tag}>{tag}</span>
-                  ))}
+            {isDeleted ? (
+              <section className="pyq-reader-card pyq-reader-deleted">
+                <div className="pyq-deleted-badge-lg">Deleted Question</div>
+                <p className="pyq-deleted-reason">{question.explanation}</p>
+                <div className="q-actions">
+                  <button className="qa-btn ghost" type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
+                    <Share2 size={16} /> Copy Link
+                  </button>
                 </div>
               </section>
-            ) : null}
+            ) : (
+              <>
+                <section className="pyq-reader-card">
+                  <h2>Choose your answer</h2>
+                  <div className="pyq-option-list">
+                    {question.options.map((option) => {
+                      const isSelected = selected === option.key;
+                      const stateClass = optionState.get(option.key) ?? "";
+
+                      return (
+                        <button
+                          className={`${isSelected ? "selected" : ""} ${stateClass}`.trim()}
+                          type="button"
+                          key={option.key}
+                          onClick={() => setSelected(option.key)}
+                        >
+                          <span>{option.key}</span>
+                          <strong>{option.text}</strong>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="q-actions">
+                    <button className="qa-btn primary" type="button" onClick={submitAttempt} disabled={!selected}>
+                      Submit answer
+                    </button>
+                    <button className="qa-btn ghost" type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
+                      <Share2 size={16} /> Copy Link
+                    </button>
+                  </div>
+                  {!isAuthenticated ? (
+                    <div className="pyq-login-note">
+                      <Lock size={14} /> You can open and attempt the question freely. Login is required when you submit.
+                    </div>
+                  ) : null}
+                </section>
+
+                {submitted ? (
+                  <section className="pyq-reader-card explanation-card">
+                    <div className="answer-line">
+                      <CheckCircle2 size={18} /> Correct answer:
+                      <strong>{question.answer}</strong>
+                    </div>
+                    <p>{question.explanation}</p>
+                    <div className="pyq-tag-list">
+                      {question.tags.map((tag) => (
+                        <span key={tag}>{tag}</span>
+                      ))}
+                    </div>
+                  </section>
+                ) : null}
+              </>
+            )}
           </main>
 
           <aside className="pyq-reader-side">
