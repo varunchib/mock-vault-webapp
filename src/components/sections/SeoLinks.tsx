@@ -1,9 +1,20 @@
-﻿import { Link } from 'react-router-dom'
-import { paperCatalog } from '../../data/catalog'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+import { fetchPaperCatalog, type Paper } from '../../lib/api'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
 
 export function SeoLinks() {
+  const [papers, setPapers] = useState<Paper[]>([])
+
+  useEffect(() => {
+    fetchPaperCatalog()
+      .then(all => setPapers(all.slice(0, 16)))
+      .catch(() => {})
+  }, [])
+
+  if (papers.length === 0) return null
+
   return (
     <Reveal as="section" className="seo-section">
       <SectionHeader
@@ -12,7 +23,7 @@ export function SeoLinks() {
         subtitle="Paper pages are the main Google entry points. Questions stay free; mock mode and PDFs require login."
       />
       <div className="seo-grid">
-        {paperCatalog.map((paper) => (
+        {papers.map((paper) => (
           <Link className="seo-card" to={`/pyq/${paper.slug}`} key={paper.slug}>
             <span className="seo-text">📄 {paper.title}</span>
             <span className="seo-count">{paper.questions} Qs</span>

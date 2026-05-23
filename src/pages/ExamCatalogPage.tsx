@@ -26,8 +26,8 @@ export function ExamCatalogPage() {
   const [query, setQuery] = useState(searchParams.get('q') ?? '')
 
   usePageMeta({
-    title: 'Exams | Ministry of Papers',
-    description: 'Browse competitive exams — UPSC, SSC, Banking, Railways, and more.',
+    title: 'Exam Catalog — Browse 240+ Competitive Exams | Ministry of Papers',
+    description: 'Browse 240+ competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.',
     canonicalPath: '/exams',
     jsonLd: {
       '@context': 'https://schema.org',
