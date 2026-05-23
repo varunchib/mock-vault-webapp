@@ -17,8 +17,8 @@ const footerColumns = [
     title: 'Platform',
     links: [
       { label: 'All Exams', href: '/exams' },
-      { label: 'Mock Tests', href: '/tests' },
-      { label: 'PYQ Papers', href: '/tests?tab=papers' },
+      { label: 'Mock Tests', href: '/exams' },
+      { label: 'PYQ Papers', href: '/exams' },
     ],
   },
   {

@@ -264,13 +264,13 @@ export function DashboardPage() {
             <small>Activity</small>
             <h2>Recently attempted</h2>
           </div>
-          <Link className="db-section-link" to="/tests">All tests →</Link>
+          <Link className="db-section-link" to="/exams">All tests →</Link>
         </div>
 
         {recentAttempts.length === 0 ? (
           <div className="db-attempts-empty">
             <p>No attempts yet — start a mock test or open a PYQ paper.</p>
-            <Link className="db-enroll-btn" to="/tests">Browse Tests</Link>
+            <Link className="db-enroll-btn" to="/exams">Browse Tests</Link>
           </div>
         ) : (
           <div className="db-attempt-list">
