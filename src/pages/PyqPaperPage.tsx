@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import {
   fetchPaperBySlug,
   fetchPaperQuestions,
@@ -188,7 +189,7 @@ export function PyqPaperPage() {
                 </Link>
               </div>
 
-              <p className="pyq-q-text">{q.question}</p>
+              <QuestionRenderer className="pyq-q-text" text={q.question} />
 
               <div className="pyq-options">
                 {q.options.map((opt, i) => {

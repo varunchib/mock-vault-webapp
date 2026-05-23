@@ -1,6 +1,6 @@
 import { CheckCircle2, Download, Lock, Play, Share2 } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, Fragment } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
 import { HaloLoader } from "../components/common/HaloLoader";
 import { examPreviousPapersPath } from "../lib/routes";
@@ -142,7 +142,12 @@ export function QuestionPage() {
                 <span>{question.paper}</span>
                 <span>{question.subject}</span>
               </div>
-              <h1>Q{question.questionNo}. {question.question}</h1>
+              <h1>
+                Q{question.questionNo}.{' '}
+                {question.question.split('\n').map((line, i, arr) => (
+                  <Fragment key={i}>{line}{i < arr.length - 1 && <br />}</Fragment>
+                ))}
+              </h1>
             </header>
 
             <section className="pyq-reader-card">
