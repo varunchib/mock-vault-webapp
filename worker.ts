@@ -18,9 +18,13 @@ const STATIC_META: Record<string, { title: string; description: string }> = {
     title: 'Exam Catalog — Browse 240+ Competitive Exams | Ministry of Papers',
     description: 'Browse 240+ competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.',
   },
-  '/tests': {
-    title: 'Mock Tests & PYQ Papers | Ministry of Papers',
-    description: 'Full-length mock tests and previous year question papers for UPSC, SSC, IBPS, NEET, JEE and 240+ exams. Free and fully solved.',
+  '/privacy': {
+    title: 'Privacy Policy | Ministry of Papers',
+    description: 'Privacy policy for Ministry of Papers — how we collect, use and protect your data.',
+  },
+  '/terms': {
+    title: 'Terms of Service | Ministry of Papers',
+    description: 'Terms of service for Ministry of Papers.',
   },
 }
 

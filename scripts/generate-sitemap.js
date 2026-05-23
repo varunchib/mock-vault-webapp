@@ -31,9 +31,10 @@ async function generate() {
   console.log(`  ${examSlugs.length} exams, ${paperSlugs.length} papers`)
 
   const urls = [
-    url(`${BASE}/`,      '1.0', 'daily'),
-    url(`${BASE}/exams`, '0.9', 'daily'),
-    url(`${BASE}/tests`, '0.9', 'weekly'),
+    url(`${BASE}/`,         '1.0', 'daily'),
+    url(`${BASE}/exams`,    '0.9', 'daily'),
+    url(`${BASE}/privacy`,  '0.3', 'yearly'),
+    url(`${BASE}/terms`,    '0.3', 'yearly'),
     ...examSlugs.flatMap(slug => [
       url(`${BASE}/exam/${slug}`,      '0.9'),
       url(`${BASE}/mock-test/${slug}`, '0.8'),

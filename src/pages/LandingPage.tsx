@@ -71,6 +71,21 @@ export function LandingPage() {
             name: 'Do I need to download an app to use Ministry of Papers?',
             acceptedAnswer: { '@type': 'Answer', text: 'No app needed. Ministry of Papers is a fully web-based platform that works on any browser on mobile or desktop. Just open ministryofpapers.com and start practising.' },
           },
+          {
+            '@type': 'Question',
+            name: 'Can I practise JKSSB and JKPSC previous year questions on Ministry of Papers?',
+            acceptedAnswer: { '@type': 'Answer', text: 'Yes. Ministry of Papers has a dedicated section for Jammu & Kashmir exams including JKSSB Finance Accounts Assistant, Junior Assistant, JKPSC KAS (CCE), JKPSC JE, Wildlife Guard, and other J&K government recruitment exams.' },
+          },
+          {
+            '@type': 'Question',
+            name: 'How does the scoring work in mock tests?',
+            acceptedAnswer: { '@type': 'Answer', text: 'Mock tests on Ministry of Papers follow the exact pattern of the real exam including negative marking. After submission you get a detailed scorecard showing your marks, accuracy, subject-wise breakdown, and comparison with cutoff scores.' },
+          },
+          {
+            '@type': 'Question',
+            name: 'Is Ministry of Papers useful for UPSC CSE preparation?',
+            acceptedAnswer: { '@type': 'Answer', text: 'Yes. Ministry of Papers has all UPSC Civil Services Preliminary and Mains previous year question papers with subject-tagged, fully solved questions. You can filter by year, subject, or paper and practise in mock exam mode.' },
+          },
         ],
       },
     ] as unknown as Record<string, unknown>,
