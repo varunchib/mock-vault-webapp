@@ -6943,10 +6943,12 @@ footer {
   margin-bottom: 3px;
 }
 .ep-paper-card-main small {
-  display: block;
   font-size: 12px;
   color: #6b7280;
 }
+.ep-paper-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 2px; }
+.ep-paper-meta small { display: inline; }
+.ep-paper-date { color: #9ca3af; }
 .ep-paper-tags {
   display: flex;
   flex-wrap: wrap;
