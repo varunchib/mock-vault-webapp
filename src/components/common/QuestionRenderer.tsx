@@ -99,10 +99,11 @@ function MatchTable({ data }: { data: MatchData }) {
   )
 }
 
-function MultilineText({ text }: { text: string }) {
+function MultilineText({ text, className }: { text: string; className?: string }) {
   const lines = text.split(/\r?\n/)
+  const cls = ['qr-text', className].filter(Boolean).join(' ')
   return (
-    <p className="qr-text">
+    <p className={cls}>
       {lines.map((line, i) => (
         <React.Fragment key={i}>
           {line}
@@ -120,7 +121,7 @@ export function QuestionRenderer({ text, className }: { text: string; className?
   if (match) return <MatchTable data={match} />
 
   if (text.includes('\n') || text.includes('\r')) {
-    return <div className={className}><MultilineText text={text} /></div>
+    return <MultilineText text={text} className={className} />
   }
 
   return <p className={className}>{text}</p>

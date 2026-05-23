@@ -28,7 +28,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 // ── KaTeX inline/block renderer ────────────────────────────────
 
 function renderMath(text: string): string {
-  // Replace $$...$$ (display) then $...$ (inline)
+  // Replace $$...$$ (display) then $...$ (inline), then newlines → <br>
   return text
     .replace(/\$\$(.+?)\$\$/gs, (_, expr) => {
       try { return katex.renderToString(expr, { displayMode: true, throwOnError: false }) }
@@ -38,6 +38,7 @@ function renderMath(text: string): string {
       try { return katex.renderToString(expr, { displayMode: false, throwOnError: false }) }
       catch { return expr }
     })
+    .replace(/\n/g, '<br>')
 }
 
 function MathText({ text, className }: { text: string; className?: string }) {
