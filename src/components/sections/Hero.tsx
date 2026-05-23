@@ -37,7 +37,7 @@ export function Hero() {
       <motion.div variants={stagger} initial="hidden" animate="show" className="hero-inner">
         <motion.div variants={item} className="hero-chip">
           <span className="chip-dot" />
-          New - UPSC 2024 paper just added
+          New - UPSC 2025 paper just added
         </motion.div>
 
         <motion.h1 variants={item}>
