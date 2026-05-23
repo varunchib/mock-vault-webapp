@@ -14,6 +14,7 @@ import { PyqPaperPage }      from '../pages/PyqPaperPage'
 import { MockDetailPage }    from '../pages/MockSeoPage'
 import { PrivacyPolicyPage } from '../pages/PrivacyPolicyPage'
 import { TermsPage }         from '../pages/TermsPage'
+import { AboutPage }         from '../pages/AboutPage'
 
 // Lazy — auth-gated or heavy pages not needed on initial load
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
@@ -76,6 +77,7 @@ export function AppRoutes() {
       <Route path="/paper-attempt/:slug" element={<ProtectedPage><Lazy><PaperAttemptPage /></Lazy></ProtectedPage>} />
       <Route path="/privacy"      element={<PrivacyPolicyPage />} />
       <Route path="/terms"        element={<TermsPage />} />
+      <Route path="/about"        element={<AboutPage />} />
       {/* Legacy redirects */}
       <Route path="/exam"        element={<Navigate to="/exams" replace />} />
       <Route path="/mock-test"   element={<Navigate to="/exams" replace />} />
