@@ -8,17 +8,20 @@ import {
   ChevronRight,
   Clock3,
   Flag,
+  Maximize2,
   RotateCcw,
   XCircle,
 } from 'lucide-react'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { useAuth } from '../context/useAuth'
 import {
   fetchPaperBySlug,
   fetchPaperQuestions,
-  recordAttempt,
+  startLiveAttempt,
+  syncLiveAttempt,
+  submitLiveAttempt,
   type Paper,
   type Question,
 } from '../lib/api'
@@ -28,7 +31,6 @@ import { usePageMeta } from '../lib/usePageMeta'
 // ── KaTeX inline/block renderer ────────────────────────────────
 
 function renderMath(text: string): string {
-  // Replace $$...$$ (display) then $...$ (inline), then newlines → <br>
   return text
     .replace(/\$\$(.+?)\$\$/gs, (_, expr) => {
       try { return katex.renderToString(expr, { displayMode: true, throwOnError: false }) }
@@ -102,7 +104,7 @@ function computeResults(questions: Question[], answers: Record<string, string>) 
 
 // ── Main component ─────────────────────────────────────────────
 
-const DEFAULT_DURATION = 120 * 60 // 2 hours in seconds
+const DEFAULT_DURATION = 120 * 60
 
 export function PaperAttemptPage() {
   const navigate = useNavigate()
@@ -114,6 +116,9 @@ export function PaperAttemptPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  const [attemptId, setAttemptId] = useState<string | null>(null)
+  const [resumed, setResumed] = useState(false)
+
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
   const [marked, setMarked] = useState<Record<string, boolean>>({})
@@ -124,9 +129,15 @@ export function PaperAttemptPage() {
   const [reviewMode, setReviewMode] = useState(false)
   const [reviewIndex, setReviewIndex] = useState(0)
 
-  const recordedRef    = useRef(false)
+  // Fullscreen state
+  const [isFullscreen, setIsFullscreen] = useState(false)
+
   const resultSavedRef = useRef(false)
   const startTimeRef   = useRef(Date.now())
+  const submittedRef   = useRef(false)
+
+  // Keep submittedRef in sync for use inside event listeners
+  useEffect(() => { submittedRef.current = submitted }, [submitted])
 
   usePageMeta({
     title: paper ? `${paper.title} — Attempt | Ministry of Papers` : 'Paper Attempt | Ministry of Papers',
@@ -134,6 +145,7 @@ export function PaperAttemptPage() {
     canonicalPath: slug ? `/paper-attempt/${slug}` : '/paper-attempt',
   })
 
+  // ── Load paper + questions + start live attempt ────────────────
   useEffect(() => {
     if (!slug) return
     let cancelled = false
@@ -142,9 +154,40 @@ export function PaperAttemptPage() {
         const paperData = await fetchPaperBySlug(slug)
         const qs = await fetchPaperQuestions(slug)
         if (cancelled) return
+
+        const durationSeconds = (paperData.durationMinutes > 0 ? paperData.durationMinutes : 120) * 60
+
+        let liveState = null
+        try {
+          liveState = await startLiveAttempt({
+            paperSlug: paperData.slug,
+            examSlug: paperData.examSlug,
+            paperTitle: paperData.title,
+            examName: paperData.examName ?? '',
+            totalQuestions: qs.length,
+            durationSeconds,
+          })
+        } catch {
+          // Redis unavailable — continue with fresh local state
+        }
+
+        if (cancelled) return
         setPaper(paperData)
         setQuestions(qs)
-        setRemainingSeconds(DEFAULT_DURATION)
+
+        if (liveState?.resumed) {
+          setAnswers(liveState.answers ?? {})
+          setMarked(liveState.marked ?? {})
+          setCurrentIndex(liveState.currentIndex ?? 0)
+          setRemainingSeconds(liveState.remainingSeconds > 0 ? liveState.remainingSeconds : durationSeconds)
+          setResumed(true)
+        } else {
+          setRemainingSeconds(durationSeconds)
+        }
+        if (liveState?.attemptId) {
+          setAttemptId(liveState.attemptId)
+          startTimeRef.current = Date.now()
+        }
       } catch {
         if (!cancelled) setError(true)
       } finally {
@@ -155,19 +198,106 @@ export function PaperAttemptPage() {
     return () => { cancelled = true }
   }, [slug])
 
+  // ── Fullscreen ─────────────────────────────────────────────────
   useEffect(() => {
-    if (!paper || recordedRef.current) return
-    void recordAttempt({ examSlug: paper.examSlug, paperSlug: paper.slug }).catch(() => undefined)
-    recordedRef.current = true
-  }, [paper])
+    const onFsChange = () => {
+      const inFs = !!document.fullscreenElement
+      setIsFullscreen(inFs)
+    }
+    document.addEventListener('fullscreenchange', onFsChange)
+    document.documentElement.requestFullscreen?.()
+      .then(() => setIsFullscreen(true))
+      .catch(() => { /* browser denied — show warning button instead */ })
+    return () => {
+      document.removeEventListener('fullscreenchange', onFsChange)
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {})
+      }
+    }
+  }, [])
 
-  // Save result once on submit
+  // ── Redis sync helpers ─────────────────────────────────────────
+  const syncFnRef = useRef<() => void>(() => {})
+  const buildSyncFn = useCallback(() => {
+    return () => {
+      if (!paper || !attemptId || submittedRef.current) return
+      syncLiveAttempt({
+        paperSlug: paper.slug,
+        answers,
+        marked,
+        currentIndex,
+        remainingSeconds,
+      }).catch(() => {})
+    }
+  }, [paper, attemptId, answers, marked, currentIndex, remainingSeconds])
+
+  useEffect(() => { syncFnRef.current = buildSyncFn() }, [buildSyncFn])
+
+  // Sync on question navigation
+  const prevIndexRef = useRef(currentIndex)
+  useEffect(() => {
+    if (loading || submitted) return
+    if (currentIndex !== prevIndexRef.current) {
+      prevIndexRef.current = currentIndex
+      syncFnRef.current()
+    }
+  }, [currentIndex, loading, submitted])
+
+  // Heartbeat sync every 30 s
+  useEffect(() => {
+    if (loading || submitted) return
+    const id = window.setInterval(() => syncFnRef.current(), 30_000)
+    return () => window.clearInterval(id)
+  }, [loading, submitted])
+
+  // ── Timer countdown ────────────────────────────────────────────
+  useEffect(() => {
+    if (submitted || loading || remainingSeconds <= 0) return
+    const id = window.setInterval(() => {
+      setRemainingSeconds((s) => {
+        if (s <= 1) {
+          window.clearInterval(id)
+          if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+          setSubmitted(true)
+          return 0
+        }
+        return s - 1
+      })
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [loading, remainingSeconds, submitted])
+
+  // ── Track visited ──────────────────────────────────────────────
+  useEffect(() => {
+    const q = questions[currentIndex]
+    if (!q) return
+    setVisited((prev) => { const next = new Set(prev); next.add(q.slug); return next })
+  }, [currentIndex, questions])
+
+  // ── Save result on submit ──────────────────────────────────────
   useEffect(() => {
     if (!submitted || !paper || resultSavedRef.current) return
     resultSavedRef.current = true
+
     const { correct, wrong, skipped, subjectScores } = computeResults(questions, answers)
+    const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000)
     const negMark = paper.negativeMarking ?? 0
     const rawScore = negMark > 0 ? parseFloat((correct - wrong * negMark).toFixed(2)) : undefined
+
+    // Persist final scores to backend
+    if (attemptId) {
+      submitLiveAttempt({
+        attemptId,
+        paperSlug: paper.slug,
+        correct,
+        wrong,
+        skipped,
+        timeTakenSeconds: timeTaken,
+        answers,
+      }).catch(() => {})
+    }
+
+    // Local activity log
     savePaperResult({
       paperSlug: paper.slug,
       examSlug: paper.examSlug,
@@ -180,30 +310,11 @@ export function PaperAttemptPage() {
       wrong,
       skipped,
       rawScore,
-      timeTakenSeconds: Math.floor((Date.now() - startTimeRef.current) / 1000),
+      timeTakenSeconds: timeTaken,
       subjects: subjectScores,
     })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitted])
-
-  // Timer countdown
-  useEffect(() => {
-    if (submitted || loading || remainingSeconds <= 0) return
-    const id = window.setInterval(() => {
-      setRemainingSeconds((s) => {
-        if (s <= 1) { window.clearInterval(id); setSubmitted(true); return 0 }
-        return s - 1
-      })
-    }, 1000)
-    return () => window.clearInterval(id)
-  }, [loading, remainingSeconds, submitted])
-
-  // Track visited
-  useEffect(() => {
-    const q = questions[currentIndex]
-    if (!q) return
-    setVisited((prev) => { const next = new Set(prev); next.add(q.slug); return next })
-  }, [currentIndex, questions])
 
   const currentQuestion = questions[currentIndex]
   const activeQuestions = questions.filter(q => q.answerKey !== 'Deleted')
@@ -234,13 +345,21 @@ export function PaperAttemptPage() {
   const goTo = (index: number) => setCurrentIndex(Math.max(0, Math.min(index, questions.length - 1)))
 
   const doSubmit = () => {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
     setSubmitted(true)
     setConfirmSubmit(false)
   }
 
-  const timerWarning = remainingSeconds < 300
+  const enterFullscreen = () => {
+    document.documentElement.requestFullscreen?.()
+      .then(() => setIsFullscreen(true))
+      .catch(() => {})
+  }
 
-  // ── Submission summary ────────────────────────────────────────
+  const timerWarning = remainingSeconds < 300
+  const showFsWarning = !isFullscreen && !submitted
+
+  // ── Submission summary ─────────────────────────────────────────
   if (submitted && !reviewMode) {
     const activeCount = activeQuestions.length
     const scorePercent = activeCount > 0 ? Math.round((results.correct / activeCount) * 100) : 0
@@ -438,12 +557,26 @@ export function PaperAttemptPage() {
     )
   }
 
-  // ── Confirm submit modal ───────────────────────────────────────
+  // ── Exam hall ──────────────────────────────────────────────────
   const notAttempted = questions.length - answeredCount
 
-  // ── Exam hall ──────────────────────────────────────────────────
   return (
     <div className="pa-attempt-page">
+      {/* Fullscreen warning */}
+      {showFsWarning && (
+        <button type="button" className="pa-fullscreen-warn" onClick={enterFullscreen}>
+          <Maximize2 size={14} />
+          You left fullscreen — click to return
+        </button>
+      )}
+
+      {/* Resumed notice */}
+      {resumed && !submitted && (
+        <div className="pa-resumed-notice">
+          Resuming from where you left off · {answeredCount} answered · {formatTime(remainingSeconds)} remaining
+        </div>
+      )}
+
       {/* Confirm submit dialog */}
       {confirmSubmit && (
         <div className="pa-confirm-overlay">
@@ -472,6 +605,11 @@ export function PaperAttemptPage() {
           </div>
         </div>
         <div className="pa-topbar-right">
+          {!isFullscreen && (
+            <button type="button" className="pa-fs-btn" onClick={enterFullscreen} title="Enter fullscreen">
+              <Maximize2 size={15} />
+            </button>
+          )}
           <button type="button" className="pa-submit-topbar-btn" onClick={() => setConfirmSubmit(true)}>
             Submit Paper
           </button>

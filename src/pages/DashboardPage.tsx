@@ -1,10 +1,12 @@
-import { ClipboardList, FileText, PlusCircle } from 'lucide-react'
+import { ClipboardList, FileText, Play, PlusCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import {
   APIError,
+  fetchActiveLiveAttempts,
   fetchDashboardBootstrap,
   refreshAuthSession,
+  type ActiveAttempt,
   type Exam,
   type MockItem,
   type RecentAttempt,
@@ -93,6 +95,14 @@ export function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
     })
 }
 
+function formatRemainingTime(seconds: number): string {
+  if (seconds <= 0) return '0:00'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}m`
+}
+
 function getGreeting(): string {
   const hour = new Date().getHours()
   if (hour < 12) return 'Good morning'
@@ -108,6 +118,7 @@ export function DashboardPage() {
   const [mocks, setMocks] = useState<MockItem[]>([])
   const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
+  const [activeAttempts, setActiveAttempts] = useState<ActiveAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -130,16 +141,23 @@ export function DashboardPage() {
       try {
         setLoading(true)
         setError(null)
-        const data = await fetchDashboardBootstrap()
+        const [data, liveAttempts] = await Promise.all([
+          fetchDashboardBootstrap(),
+          fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
+        ])
         if (cancelled) return
         applyData(data)
+        setActiveAttempts(liveAttempts)
       } catch (err) {
         if (cancelled) return
         if (err instanceof APIError && err.status === 401) {
           try {
             await refreshAuthSession()
-            const retried = await fetchDashboardBootstrap()
-            if (!cancelled) applyData(retried)
+            const [retried, liveAttempts] = await Promise.all([
+              fetchDashboardBootstrap(),
+              fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
+            ])
+            if (!cancelled) { applyData(retried); setActiveAttempts(liveAttempts) }
             return
           } catch {
             // refresh failed — fall through to error state
@@ -194,6 +212,37 @@ export function DashboardPage() {
           </div>
         </div>
       </header>
+
+      {/* ── In-progress tests ──────────────────────── */}
+      {activeAttempts.length > 0 && (
+        <section className="db-section db-inprogress-section">
+          <div className="db-section-head">
+            <div>
+              <small>Continue where you left off</small>
+              <h2>In Progress</h2>
+            </div>
+          </div>
+          <div className="db-inprogress-list">
+            {activeAttempts.map((attempt) => (
+              <div className="db-inprogress-card" key={attempt.paperSlug}>
+                <div className="db-inprogress-info">
+                  <strong>{attempt.paperTitle}</strong>
+                  <small>{attempt.examName}</small>
+                </div>
+                <div className="db-inprogress-meta">
+                  <span className="db-inprogress-count">{attempt.answeredCount}/{attempt.totalQuestions} answered</span>
+                  <span className="db-inprogress-timer">
+                    {formatRemainingTime(attempt.remainingSeconds)} left
+                  </span>
+                </div>
+                <Link className="db-inprogress-btn" to={`/paper-attempt/${attempt.paperSlug}`}>
+                  <Play size={13} /> Resume
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Enrolled exams ──────────────────────────── */}
       <section className="db-section">
