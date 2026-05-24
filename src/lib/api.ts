@@ -313,6 +313,81 @@ export function recordAttempt(params: { examSlug: string; mockSlug?: string; pap
   });
 }
 
+// ── Live attempt (Redis-backed) ───────────────────────────────────────────────
+
+export type LiveAttemptState = {
+  attemptId: string;
+  paperSlug: string;
+  examSlug: string;
+  paperTitle: string;
+  examName: string;
+  totalQuestions: number;
+  answers: Record<string, string>;
+  marked: Record<string, boolean>;
+  currentIndex: number;
+  remainingSeconds: number;
+  startedAt: string;
+  resumed: boolean;
+};
+
+export type ActiveAttempt = {
+  paperSlug: string;
+  examSlug: string;
+  paperTitle: string;
+  examName: string;
+  totalQuestions: number;
+  answeredCount: number;
+  currentIndex: number;
+  remainingSeconds: number;
+  startedAt: string;
+};
+
+export function startLiveAttempt(params: {
+  paperSlug: string;
+  examSlug: string;
+  paperTitle: string;
+  examName: string;
+  totalQuestions: number;
+  durationSeconds: number;
+}): Promise<LiveAttemptState> {
+  return requestJson<LiveAttemptState>("/api/v1/activity/attempt/start", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
+export function syncLiveAttempt(params: {
+  paperSlug: string;
+  answers: Record<string, string>;
+  marked: Record<string, boolean>;
+  currentIndex: number;
+  remainingSeconds: number;
+}): Promise<{ ok: boolean }> {
+  return requestJson<{ ok: boolean }>("/api/v1/activity/attempt/sync", {
+    method: "PUT",
+    body: JSON.stringify(params),
+  });
+}
+
+export function fetchActiveLiveAttempts(): Promise<ActiveAttempt[]> {
+  return requestJson<ActiveAttempt[]>("/api/v1/activity/attempt/active");
+}
+
+export function submitLiveAttempt(params: {
+  attemptId: string;
+  paperSlug: string;
+  correct: number;
+  wrong: number;
+  skipped: number;
+  timeTakenSeconds: number;
+  answers: Record<string, string>;
+}): Promise<{ ok: boolean }> {
+  return requestJson<{ ok: boolean }>("/api/v1/activity/attempt/submit", {
+    method: "POST",
+    body: JSON.stringify(params),
+  });
+}
+
 export function fetchCurrentUser(): Promise<AuthPayload> {
   return requestJson<AuthPayload>("/api/v1/auth/me");
 }
