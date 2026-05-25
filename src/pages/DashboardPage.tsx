@@ -114,7 +114,6 @@ export function DashboardPage() {
   const { user } = useAuth()
   const firstName = user?.name?.split(' ')[0] ?? 'there'
 
-  const [exams, setExams] = useState<Exam[]>([])
   const [mocks, setMocks] = useState<MockItem[]>([])
   const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
@@ -132,7 +131,6 @@ export function DashboardPage() {
     let cancelled = false
     const load = async () => {
       const applyData = (data: Awaited<ReturnType<typeof fetchDashboardBootstrap>>) => {
-        setExams(data.exams ?? [])
         setMocks(data.mocks ?? [])
         setEnrolledExams(data.enrolledExams ?? [])
         setRecentAttempts(data.recentAttempts ?? [])
@@ -217,14 +215,16 @@ export function DashboardPage() {
       {activeAttempts.length > 0 && (
         <section className="db-section db-inprogress-section">
           <div className="db-section-head">
-            <div>
-              <small>Continue where you left off</small>
-              <h2>In Progress</h2>
+            <div className="db-inprogress-heading">
+              <span className="db-live-dot" aria-hidden="true" />
+              <small>Live</small>
+              <h2>Tests In Progress</h2>
             </div>
           </div>
           <div className="db-inprogress-list">
             {activeAttempts.map((attempt) => (
               <div className="db-inprogress-card" key={attempt.paperSlug}>
+                <span className="db-live-badge">● LIVE</span>
                 <div className="db-inprogress-info">
                   <strong>{attempt.paperTitle}</strong>
                   <small>{attempt.examName}</small>
