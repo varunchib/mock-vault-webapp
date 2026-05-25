@@ -17,6 +17,12 @@ export type QuestionOption = {
   text: string;
 };
 
+export type QuestionTranslation = {
+  passage?: string;
+  question: string;
+  options: string[];
+};
+
 export type Question = {
   slug: string;
   examSlug: string;
@@ -32,6 +38,7 @@ export type Question = {
   answer: string;
   explanation: string;
   tags: string[];
+  translations?: Partial<Record<"en" | "hi", QuestionTranslation>>;
 };
 
 export type Paper = {

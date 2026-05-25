@@ -15,6 +15,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { useAuth } from '../context/useAuth'
 import {
   fetchPaperBySlug,
@@ -26,6 +27,7 @@ import {
   type Question,
 } from '../lib/api'
 import { savePaperResult } from '../lib/mockActivity'
+import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { usePageMeta } from '../lib/usePageMeta'
 
 // ── KaTeX inline/block renderer ────────────────────────────────
@@ -116,6 +118,9 @@ export function PaperAttemptPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  const [examStarted, setExamStarted] = useState(false)
+  const [startingExam, setStartingExam] = useState(false)
+
   const [attemptId, setAttemptId] = useState<string | null>(null)
   const [resumed, setResumed] = useState(false)
 
@@ -128,15 +133,15 @@ export function PaperAttemptPage() {
   const [confirmSubmit, setConfirmSubmit] = useState(false)
   const [reviewMode, setReviewMode] = useState(false)
   const [reviewIndex, setReviewIndex] = useState(0)
+  const [language, setLanguage] = useState<QuestionLanguage>('en')
+  const [activeSubject, setActiveSubject] = useState<string | null>(null)
 
-  // Fullscreen state
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   const resultSavedRef = useRef(false)
   const startTimeRef   = useRef(Date.now())
   const submittedRef   = useRef(false)
 
-  // Keep submittedRef in sync for use inside event listeners
   useEffect(() => { submittedRef.current = submitted }, [submitted])
 
   usePageMeta({
@@ -145,49 +150,19 @@ export function PaperAttemptPage() {
     canonicalPath: slug ? `/paper-attempt/${slug}` : '/paper-attempt',
   })
 
-  // ── Load paper + questions + start live attempt ────────────────
+  // ── Load paper + questions only (live attempt starts on exam start) ──
   useEffect(() => {
     if (!slug) return
     let cancelled = false
     const load = async () => {
       try {
-        const paperData = await fetchPaperBySlug(slug)
-        const qs = await fetchPaperQuestions(slug)
-        if (cancelled) return
-
-        const durationSeconds = (paperData.durationMinutes > 0 ? paperData.durationMinutes : 120) * 60
-
-        let liveState = null
-        try {
-          liveState = await startLiveAttempt({
-            paperSlug: paperData.slug,
-            examSlug: paperData.examSlug,
-            paperTitle: paperData.title,
-            examName: paperData.examName ?? '',
-            totalQuestions: qs.length,
-            durationSeconds,
-          })
-        } catch {
-          // Redis unavailable — continue with fresh local state
-        }
-
+        const [paperData, qs] = await Promise.all([
+          fetchPaperBySlug(slug),
+          fetchPaperQuestions(slug),
+        ])
         if (cancelled) return
         setPaper(paperData)
         setQuestions(qs)
-
-        if (liveState?.resumed) {
-          setAnswers(liveState.answers ?? {})
-          setMarked(liveState.marked ?? {})
-          setCurrentIndex(liveState.currentIndex ?? 0)
-          setRemainingSeconds(liveState.remainingSeconds > 0 ? liveState.remainingSeconds : durationSeconds)
-          setResumed(true)
-        } else {
-          setRemainingSeconds(durationSeconds)
-        }
-        if (liveState?.attemptId) {
-          setAttemptId(liveState.attemptId)
-          startTimeRef.current = Date.now()
-        }
       } catch {
         if (!cancelled) setError(true)
       } finally {
@@ -198,23 +173,66 @@ export function PaperAttemptPage() {
     return () => { cancelled = true }
   }, [slug])
 
-  // ── Fullscreen ─────────────────────────────────────────────────
+  // ── Fullscreen change listener (no auto-request on mount) ─────
   useEffect(() => {
-    const onFsChange = () => {
-      const inFs = !!document.fullscreenElement
-      setIsFullscreen(inFs)
-    }
+    const onFsChange = () => setIsFullscreen(!!document.fullscreenElement)
     document.addEventListener('fullscreenchange', onFsChange)
-    document.documentElement.requestFullscreen?.()
-      .then(() => setIsFullscreen(true))
-      .catch(() => { /* browser denied — show warning button instead */ })
     return () => {
       document.removeEventListener('fullscreenchange', onFsChange)
-      if (document.fullscreenElement) {
-        document.exitFullscreen?.().catch(() => {})
-      }
+      if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
     }
   }, [])
+
+  // ── Start exam handler ────────────────────────────────────────
+  const handleStartExam = useCallback(async () => {
+    if (!paper || !questions.length || startingExam) return
+    setStartingExam(true)
+    const durationSeconds = (paper.durationMinutes > 0 ? paper.durationMinutes : 120) * 60
+    let startIdx = 0
+    try {
+      const liveState = await startLiveAttempt({
+        paperSlug: paper.slug,
+        examSlug: paper.examSlug,
+        paperTitle: paper.title,
+        examName: paper.examName ?? '',
+        totalQuestions: questions.length,
+        durationSeconds,
+      })
+      if (liveState?.resumed) {
+        setAnswers(liveState.answers ?? {})
+        setMarked(liveState.marked ?? {})
+        startIdx = liveState.currentIndex ?? 0
+        setCurrentIndex(startIdx)
+        if (liveState?.attemptId) setAttemptId(liveState.attemptId)
+        // Timer already expired while user was away — auto-submit immediately
+        if (liveState.remainingSeconds <= 0) {
+          startTimeRef.current = Date.now()
+          setExamStarted(true)
+          setSubmitted(true)
+          setStartingExam(false)
+          return
+        }
+        setRemainingSeconds(liveState.remainingSeconds)
+        setResumed(true)
+      } else {
+        setRemainingSeconds(durationSeconds)
+      }
+      if (liveState?.attemptId) setAttemptId(liveState.attemptId)
+    } catch {
+      setRemainingSeconds(durationSeconds)
+    }
+    // Auto-select the subject of the starting question for multi-subject exams
+    const distinctSubjects = new Set(questions.map((q) => q.subject))
+    if (distinctSubjects.size > 1) {
+      setActiveSubject(questions[startIdx]?.subject ?? null)
+    }
+    startTimeRef.current = Date.now()
+    document.documentElement.requestFullscreen?.()
+      .then(() => setIsFullscreen(true))
+      .catch(() => {})
+    setExamStarted(true)
+    setStartingExam(false)
+  }, [paper, questions, startingExam])
 
   // ── Redis sync helpers ─────────────────────────────────────────
   const syncFnRef = useRef<() => void>(() => {})
@@ -233,26 +251,24 @@ export function PaperAttemptPage() {
 
   useEffect(() => { syncFnRef.current = buildSyncFn() }, [buildSyncFn])
 
-  // Sync on question navigation
   const prevIndexRef = useRef(currentIndex)
   useEffect(() => {
-    if (loading || submitted) return
+    if (loading || submitted || !examStarted) return
     if (currentIndex !== prevIndexRef.current) {
       prevIndexRef.current = currentIndex
       syncFnRef.current()
     }
-  }, [currentIndex, loading, submitted])
+  }, [currentIndex, loading, submitted, examStarted])
 
-  // Heartbeat sync every 30 s
   useEffect(() => {
-    if (loading || submitted) return
+    if (loading || submitted || !examStarted) return
     const id = window.setInterval(() => syncFnRef.current(), 30_000)
     return () => window.clearInterval(id)
-  }, [loading, submitted])
+  }, [loading, submitted, examStarted])
 
   // ── Timer countdown ────────────────────────────────────────────
   useEffect(() => {
-    if (submitted || loading || remainingSeconds <= 0) return
+    if (submitted || loading || !examStarted || remainingSeconds <= 0) return
     const id = window.setInterval(() => {
       setRemainingSeconds((s) => {
         if (s <= 1) {
@@ -265,7 +281,7 @@ export function PaperAttemptPage() {
       })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [loading, remainingSeconds, submitted])
+  }, [loading, examStarted, remainingSeconds, submitted])
 
   // ── Track visited ──────────────────────────────────────────────
   useEffect(() => {
@@ -284,7 +300,6 @@ export function PaperAttemptPage() {
     const negMark = paper.negativeMarking ?? 0
     const rawScore = negMark > 0 ? parseFloat((correct - wrong * negMark).toFixed(2)) : undefined
 
-    // Persist final scores to backend
     if (attemptId) {
       submitLiveAttempt({
         attemptId,
@@ -297,7 +312,6 @@ export function PaperAttemptPage() {
       }).catch(() => {})
     }
 
-    // Local activity log
     savePaperResult({
       paperSlug: paper.slug,
       examSlug: paper.examSlug,
@@ -316,11 +330,42 @@ export function PaperAttemptPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitted])
 
+  // ── Subject grouping memos ─────────────────────────────────────
+  const subjectList = useMemo(() => {
+    const map = new Map<string, { count: number; answered: number }>()
+    for (const q of questions) {
+      if (q.answerKey === 'Deleted') continue
+      if (!map.has(q.subject)) map.set(q.subject, { count: 0, answered: 0 })
+      const e = map.get(q.subject)!
+      e.count++
+      if (answers[q.slug]) e.answered++
+    }
+    return [...map.entries()].map(([name, { count, answered }]) => ({ name, count, answered }))
+  }, [questions, answers])
+
+  const filteredQuestions = useMemo(
+    () => activeSubject ? questions.filter((q) => q.subject === activeSubject) : questions,
+    [questions, activeSubject],
+  )
+
+  const switchSubject = useCallback((subject: string) => {
+    setActiveSubject(subject)
+    const first = questions.findIndex((q) => q.subject === subject)
+    if (first !== -1) setCurrentIndex(first)
+  }, [questions])
+
   const currentQuestion = questions[currentIndex]
-  const activeQuestions = questions.filter(q => q.answerKey !== 'Deleted')
+  const localizedCurrent = currentQuestion ? getLocalizedQuestion(currentQuestion, language) : null
+  const hasHindiQuestions = questions.some(hasHindi)
+  const activeQuestions = questions.filter((q) => q.answerKey !== 'Deleted')
   const answeredCount = Object.keys(answers).length
   const markedCount = Object.values(marked).filter(Boolean).length
   const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000)
+
+  const filteredIndex = useMemo(
+    () => currentQuestion ? filteredQuestions.findIndex((q) => q.slug === currentQuestion.slug) : -1,
+    [filteredQuestions, currentQuestion],
+  )
 
   const results = useMemo(
     () => computeResults(questions, answers),
@@ -332,6 +377,87 @@ export function PaperAttemptPage() {
   if (loading) return <HaloLoader label="Loading paper" />
   if (error || !paper) return <Navigate to={`/pyq/${slug}`} replace />
 
+  // ── Pre-exam intro screen ──────────────────────────────────────
+  if (!examStarted) {
+    const durationMins = paper.durationMinutes > 0 ? paper.durationMinutes : 120
+    const hasNeg = (paper.negativeMarking ?? 0) > 0
+    return (
+      <div className="pa-intro-page">
+        <div className="pa-intro-card">
+          <span className="pa-intro-exam-badge">{paper.examName}</span>
+          <h1 className="pa-intro-title">{paper.title}</h1>
+
+          <div className="pa-intro-stats">
+            <div className="pa-intro-stat">
+              <strong>{questions.length}</strong>
+              <span>Questions</span>
+            </div>
+            <div className="pa-intro-stat">
+              <strong>{durationMins}</strong>
+              <span>Minutes</span>
+            </div>
+            {paper.maxMarks > 0 && (
+              <div className="pa-intro-stat">
+                <strong>{paper.maxMarks}</strong>
+                <span>Max Marks</span>
+              </div>
+            )}
+            {hasNeg && (
+              <div className="pa-intro-stat pa-intro-stat-neg">
+                <strong>-{paper.negativeMarking}</strong>
+                <span>Negative</span>
+              </div>
+            )}
+            {subjectList.length > 1 && (
+              <div className="pa-intro-stat">
+                <strong>{subjectList.length}</strong>
+                <span>Subjects</span>
+              </div>
+            )}
+          </div>
+
+          <div className="pa-intro-instructions">
+            <h3>Before you begin</h3>
+            <ul>
+              <li>The timer starts the moment you click <strong>Start Exam</strong>.</li>
+              <li>Each question has four options — select the best answer.</li>
+              {hasNeg && (
+                <li><strong>{paper.negativeMarking} mark{paper.negativeMarking !== 1 ? 's' : ''}</strong> will be deducted for each wrong answer. Skipped questions carry no penalty.</li>
+              )}
+              {subjectList.length > 1 && (
+                <li>Questions are grouped by subject. Use the subject tabs to jump to any section.</li>
+              )}
+              <li>You can <strong>Mark for Review</strong> and come back to any question before submitting.</li>
+              <li>Your progress is saved to the cloud. If you close the tab, resume from your Dashboard.</li>
+            </ul>
+          </div>
+
+          <div className="pa-intro-fs-warn">
+            <Maximize2 size={16} />
+            <div>
+              <strong>Fullscreen mode</strong>
+              <p>The exam will open in fullscreen for a distraction-free experience.</p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="pa-intro-start-btn"
+            onClick={handleStartExam}
+            disabled={startingExam || questions.length === 0}
+          >
+            {startingExam ? 'Starting…' : 'Start Exam →'}
+          </button>
+
+          <Link className="pa-intro-back-link" to={`/pyq/${paper.slug}`}>
+            ← Back to paper
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  // ── Action helpers (only needed once exam started) ─────────────
   const chooseOption = (key: string) => {
     if (!currentQuestion || submitted) return
     setAnswers((cur) => ({ ...cur, [currentQuestion.slug]: key }))
@@ -343,6 +469,20 @@ export function PaperAttemptPage() {
   }
 
   const goTo = (index: number) => setCurrentIndex(Math.max(0, Math.min(index, questions.length - 1)))
+
+  const goPrev = () => {
+    if (filteredIndex <= 0) return
+    const prevQ = filteredQuestions[filteredIndex - 1]
+    const gi = questions.findIndex((q) => q.slug === prevQ.slug)
+    if (gi !== -1) setCurrentIndex(gi)
+  }
+
+  const goNext = () => {
+    if (filteredIndex >= filteredQuestions.length - 1) return
+    const nextQ = filteredQuestions[filteredIndex + 1]
+    const gi = questions.findIndex((q) => q.slug === nextQ.slug)
+    if (gi !== -1) setCurrentIndex(gi)
+  }
 
   const doSubmit = () => {
     if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
@@ -358,6 +498,7 @@ export function PaperAttemptPage() {
 
   const timerWarning = remainingSeconds < 300
   const showFsWarning = !isFullscreen && !submitted
+  const hasSubjectTabs = subjectList.length > 1
 
   // ── Submission summary ─────────────────────────────────────────
   if (submitted && !reviewMode) {
@@ -440,6 +581,7 @@ export function PaperAttemptPage() {
   // ── Review mode ────────────────────────────────────────────────
   if (submitted && reviewMode) {
     const rq = questions[reviewIndex]
+    const localizedReview = rq ? getLocalizedQuestion(rq, language) : null
     const chosen = rq ? answers[rq.slug] : undefined
     const isCorrect = rq && chosen === rq.answerKey
 
@@ -451,6 +593,12 @@ export function PaperAttemptPage() {
             <strong>{paper.title} — Review</strong>
           </div>
           <div className="pa-topbar-right">
+            {hasHindiQuestions && (
+              <div className="pyq-language-toggle compact" aria-label="Question language">
+                <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
+                <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
+              </div>
+            )}
             <span className="pa-review-badge">Review mode</span>
             <button type="button" className="pa-exit-btn" onClick={() => setReviewMode(false)}>
               Back to results
@@ -460,60 +608,68 @@ export function PaperAttemptPage() {
 
         <div className="pa-attempt-body">
           <section className="pa-question-panel">
-            <div className="pa-q-header">
-              <span className="pa-q-num">Q{reviewIndex + 1} <small>of {questions.length}</small></span>
-              {rq?.subject && (
-                <Link
-                  className="pa-q-subject pa-q-subject-link"
-                  to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(rq.subject)}`}
-                >
-                  {rq.subject}
-                </Link>
+            <div className="pa-question-scroll">
+              <div className="pa-q-header">
+                <span className="pa-q-num">Q{reviewIndex + 1} <small>of {questions.length}</small></span>
+                {rq?.subject && (
+                  <Link
+                    className="pa-q-subject pa-q-subject-link"
+                    to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(rq.subject)}`}
+                  >
+                    {rq.subject}
+                  </Link>
+                )}
+              </div>
+
+              {rq && (
+                <>
+                  {localizedReview?.passage && (
+                    <div className="pyq-passage">
+                      <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
+                      <QuestionRenderer text={localizedReview.passage} />
+                    </div>
+                  )}
+                  <div className="pa-q-text"><MathText text={localizedReview?.question ?? rq.question} /></div>
+
+                  {rq.answerKey === 'Deleted' ? (
+                    <div className="pa-deleted-notice">
+                      <span className="pa-deleted-badge">Deleted Question</span>
+                      <p>{rq.explanation}</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="pa-options">
+                        {(localizedReview?.options ?? rq.options).map((opt) => {
+                          const isChosen = chosen === opt.key
+                          const isCorrectOpt = opt.key === rq.answerKey
+                          let cls = 'pa-option'
+                          if (isCorrectOpt) cls += ' correct'
+                          else if (isChosen && !isCorrect) cls += ' wrong'
+                          return (
+                            <div key={opt.key} className={cls}>
+                              <span className="pa-opt-key">{opt.key}</span>
+                              <MathText text={opt.text} />
+                              {isCorrectOpt && <CheckCircle2 size={14} className="pa-opt-check" />}
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                      {!chosen && (
+                        <div className="pa-not-attempted">Not attempted · Correct answer: <strong>{rq.answerKey}</strong></div>
+                      )}
+
+                      {rq.explanation && (
+                        <div className="pa-explanation">
+                          <strong>Explanation</strong>
+                          <MathText text={rq.explanation} />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
               )}
             </div>
-
-            {rq && (
-              <>
-                <div className="pa-q-text"><MathText text={rq.question} /></div>
-
-                {rq.answerKey === 'Deleted' ? (
-                  <div className="pa-deleted-notice">
-                    <span className="pa-deleted-badge">Deleted Question</span>
-                    <p>{rq.explanation}</p>
-                  </div>
-                ) : (
-                  <>
-                    <div className="pa-options">
-                      {rq.options.map((opt) => {
-                        const isChosen = chosen === opt.key
-                        const isCorrectOpt = opt.key === rq.answerKey
-                        let cls = 'pa-option'
-                        if (isCorrectOpt) cls += ' correct'
-                        else if (isChosen && !isCorrect) cls += ' wrong'
-                        return (
-                          <div key={opt.key} className={cls}>
-                            <span className="pa-opt-key">{opt.key}</span>
-                            <MathText text={opt.text} />
-                            {isCorrectOpt && <CheckCircle2 size={14} className="pa-opt-check" />}
-                          </div>
-                        )
-                      })}
-                    </div>
-
-                    {!chosen && (
-                      <div className="pa-not-attempted">Not attempted · Correct answer: <strong>{rq.answerKey}</strong></div>
-                    )}
-
-                    {rq.explanation && (
-                      <div className="pa-explanation">
-                        <strong>Explanation</strong>
-                        <MathText text={rq.explanation} />
-                      </div>
-                    )}
-                  </>
-                )}
-              </>
-            )}
 
             <footer className="pa-q-actions">
               <button type="button" className="pa-nav-btn" onClick={() => setReviewIndex((i) => Math.max(0, i - 1))} disabled={reviewIndex === 0}>
@@ -560,8 +716,13 @@ export function PaperAttemptPage() {
   // ── Exam hall ──────────────────────────────────────────────────
   const notAttempted = questions.length - answeredCount
 
+  // Questions visible in palette (filtered by active subject)
+  const paletteEntries = activeSubject
+    ? questions.map((q, i) => ({ q, i })).filter(({ q }) => q.subject === activeSubject)
+    : questions.map((q, i) => ({ q, i }))
+
   return (
-    <div className="pa-attempt-page">
+    <div className={`pa-attempt-page${hasSubjectTabs ? ' has-subjects' : ''}`}>
       {/* Fullscreen warning */}
       {showFsWarning && (
         <button type="button" className="pa-fullscreen-warn" onClick={enterFullscreen}>
@@ -605,6 +766,12 @@ export function PaperAttemptPage() {
           </div>
         </div>
         <div className="pa-topbar-right">
+          {hasHindiQuestions && (
+            <div className="pyq-language-toggle compact" aria-label="Question language">
+              <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
+              <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
+            </div>
+          )}
           {!isFullscreen && (
             <button type="button" className="pa-fs-btn" onClick={enterFullscreen} title="Enter fullscreen">
               <Maximize2 size={15} />
@@ -616,80 +783,105 @@ export function PaperAttemptPage() {
         </div>
       </header>
 
+      {/* Subject tabs bar */}
+      {hasSubjectTabs && (
+        <nav className="pa-subject-tabs" aria-label="Question subjects">
+          {subjectList.map((s) => (
+            <button
+              key={s.name}
+              type="button"
+              className={`pa-subject-tab${activeSubject === s.name ? ' active' : ''}`}
+              onClick={() => switchSubject(s.name)}
+            >
+              {s.name}
+              <span className="pa-subject-tab-count">{s.answered}/{s.count}</span>
+            </button>
+          ))}
+        </nav>
+      )}
+
       {/* Body: question + palette */}
       <div className="pa-attempt-body">
 
         {/* Question panel */}
         <section className="pa-question-panel">
-          <div className="pa-q-header">
-            <span className="pa-q-num">Q{currentIndex + 1} <small>of {questions.length}</small></span>
-            {currentQuestion?.subject && (
-              <Link
-                className="pa-q-subject pa-q-subject-link"
-                to={`/exam/${paper!.examSlug}?tab=subjects&subject=${encodeURIComponent(currentQuestion.subject)}`}
-              >
-                {currentQuestion.subject}
-              </Link>
+          <div className="pa-question-scroll">
+            <div className="pa-q-header">
+              <span className="pa-q-num">
+                Q{currentIndex + 1} <small>of {questions.length}</small>
+              </span>
+              {currentQuestion?.subject && (
+                <span className="pa-q-subject">{currentQuestion.subject}</span>
+              )}
+              <button type="button" className={`pa-mark-btn${marked[currentQuestion?.slug ?? ''] ? ' active' : ''}`} onClick={toggleMarked}>
+                <Flag size={13} />
+                {marked[currentQuestion?.slug ?? ''] ? 'Marked' : 'Mark for Review'}
+              </button>
+            </div>
+
+            {currentQuestion ? (
+              <>
+                {localizedCurrent?.passage && (
+                  <div className="pyq-passage">
+                    <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
+                    <QuestionRenderer text={localizedCurrent.passage} />
+                  </div>
+                )}
+                <div className="pa-q-text">
+                  <MathText text={localizedCurrent?.question ?? currentQuestion.question} />
+                </div>
+
+                {currentQuestion.answerKey === 'Deleted' ? (
+                  <div className="pa-deleted-notice">
+                    <span className="pa-deleted-badge">Deleted Question</span>
+                    <p>{currentQuestion.explanation}</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="pa-options">
+                      {(localizedCurrent?.options ?? currentQuestion.options).map((opt) => {
+                        const chosen = answers[currentQuestion.slug] === opt.key
+                        return (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            className={`pa-option${chosen ? ' selected' : ''}`}
+                            onClick={() => chooseOption(opt.key)}
+                          >
+                            <span className="pa-opt-key">{opt.key}</span>
+                            <MathText text={opt.text} />
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    {answers[currentQuestion.slug] && (
+                      <button type="button" className="pa-clear-btn" onClick={() => {
+                        setAnswers((cur) => { const next = { ...cur }; delete next[currentQuestion.slug]; return next })
+                      }}>
+                        Clear response
+                      </button>
+                    )}
+                  </>
+                )}
+              </>
+            ) : (
+              <div className="pa-empty-q">
+                <AlertTriangle size={20} />
+                <p>No questions available for this paper.</p>
+              </div>
             )}
-            <button type="button" className={`pa-mark-btn${marked[currentQuestion?.slug ?? ''] ? ' active' : ''}`} onClick={toggleMarked}>
-              <Flag size={13} />
-              {marked[currentQuestion?.slug ?? ''] ? 'Marked' : 'Mark for Review'}
-            </button>
           </div>
 
-          {currentQuestion ? (
-            <>
-              <div className="pa-q-text">
-                <MathText text={currentQuestion.question} />
-              </div>
-
-              {currentQuestion.answerKey === 'Deleted' ? (
-                <div className="pa-deleted-notice">
-                  <span className="pa-deleted-badge">Deleted Question</span>
-                  <p>{currentQuestion.explanation}</p>
-                </div>
-              ) : (
-                <>
-                  <div className="pa-options">
-                    {currentQuestion.options.map((opt) => {
-                      const chosen = answers[currentQuestion.slug] === opt.key
-                      return (
-                        <button
-                          key={opt.key}
-                          type="button"
-                          className={`pa-option${chosen ? ' selected' : ''}`}
-                          onClick={() => chooseOption(opt.key)}
-                        >
-                          <span className="pa-opt-key">{opt.key}</span>
-                          <MathText text={opt.text} />
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  {answers[currentQuestion.slug] && (
-                    <button type="button" className="pa-clear-btn" onClick={() => {
-                      setAnswers((cur) => { const next = { ...cur }; delete next[currentQuestion.slug]; return next })
-                    }}>
-                      Clear response
-                    </button>
-                  )}
-                </>
-              )}
-            </>
-          ) : (
-            <div className="pa-empty-q">
-              <AlertTriangle size={20} />
-              <p>No questions available for this paper.</p>
-            </div>
-          )}
-
           <footer className="pa-q-actions">
-            <button type="button" className="pa-nav-btn" onClick={() => goTo(currentIndex - 1)} disabled={currentIndex === 0}>
+            <button type="button" className="pa-nav-btn" onClick={goPrev} disabled={filteredIndex <= 0}>
               <ChevronLeft size={16} /> Previous
             </button>
-            <span className="pa-q-progress">{currentIndex + 1} / {questions.length}</span>
-            <button type="button" className="pa-nav-btn primary" onClick={() => goTo(currentIndex + 1)} disabled={currentIndex >= questions.length - 1}>
+            <span className="pa-q-progress">
+              {filteredIndex + 1} / {filteredQuestions.length}
+              {activeSubject && hasSubjectTabs && <small> in {activeSubject}</small>}
+            </span>
+            <button type="button" className="pa-nav-btn primary" onClick={goNext} disabled={filteredIndex >= filteredQuestions.length - 1}>
               Save &amp; Next <ChevronRight size={16} />
             </button>
           </footer>
@@ -712,7 +904,7 @@ export function PaperAttemptPage() {
           </div>
 
           <div className="pa-palette-grid">
-            {questions.map((q, i) => {
+            {paletteEntries.map(({ q, i }) => {
               const status = getStatus(q.slug, currentQuestion?.slug ?? '', answers, marked, visited)
               return (
                 <button

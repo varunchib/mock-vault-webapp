@@ -1,10 +1,11 @@
-import { CheckCircle2, Download, Lock, Play, Share2 } from "lucide-react";
+import { CheckCircle2, Lock, Play, Share2 } from "lucide-react";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
 import { HaloLoader } from "../components/common/HaloLoader";
 import { examPreviousPapersPath } from "../lib/routes";
 import { fetchQuestionBySlug, type Question } from "../lib/api";
+import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from "../lib/questionLanguage";
 import { useAuth } from "../context/useAuth";
 import { usePageMeta } from "../lib/usePageMeta";
 
@@ -17,6 +18,7 @@ export function QuestionPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [language, setLanguage] = useState<QuestionLanguage>("en");
 
   useEffect(() => {
     if (!slug) return;
@@ -104,6 +106,7 @@ export function QuestionPage() {
   if (error || !question) return <Navigate to="/" replace />;
   const isDeleted = question.answerKey === 'Deleted';
   const homeHref = isAuthenticated ? "/dashboard" : "/";
+  const localized = getLocalizedQuestion(question, language);
 
   const submitAttempt = () => {
     if (!selected) return;
@@ -145,11 +148,26 @@ export function QuestionPage() {
               </div>
               <h1>
                 Q{question.questionNo}.{' '}
-                {question.question.split('\n').map((line, i, arr) => (
+                {localized.question.split('\n').map((line, i, arr) => (
                   <Fragment key={i}>{line}{i < arr.length - 1 && <br />}</Fragment>
                 ))}
               </h1>
+              {hasHindi(question) && (
+                <div className="pyq-language-toggle" aria-label="Question language">
+                  <button type="button" className={language === "en" ? "active" : ""} onClick={() => setLanguage("en")}>English</button>
+                  <button type="button" className={language === "hi" ? "active" : ""} onClick={() => setLanguage("hi")}>हिन्दी</button>
+                </div>
+              )}
             </header>
+
+            {localized.passage && (
+              <section className="pyq-reader-card">
+                <div className="pyq-passage">
+                  <strong>{language === "hi" ? "अनुच्छेद" : "Passage"}</strong>
+                  <p>{localized.passage}</p>
+                </div>
+              </section>
+            )}
 
             {isDeleted ? (
               <section className="pyq-reader-card pyq-reader-deleted">
@@ -166,7 +184,7 @@ export function QuestionPage() {
                 <section className="pyq-reader-card">
                   <h2>Choose your answer</h2>
                   <div className="pyq-option-list">
-                    {question.options.map((option) => {
+                    {localized.options.map((option) => {
                       const isSelected = selected === option.key;
                       const stateClass = optionState.get(option.key) ?? "";
 

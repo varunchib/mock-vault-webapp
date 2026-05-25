@@ -7,12 +7,12 @@ import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import {
   fetchPaperBySlug,
   fetchPaperQuestions,
-  recordAttempt,
   type Paper,
   type Question,
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
+import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 
 const FREE_LIMIT = 10
 
@@ -30,6 +30,7 @@ export function PyqPaperPage() {
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [explOpen, setExplOpen] = useState<Record<string, boolean>>({})
   const [loginOpen, setLoginOpen] = useState(false)
+  const [language, setLanguage] = useState<QuestionLanguage>('en')
   const { isAuthenticated } = useAuth()
 
   useEffect(() => {
@@ -110,6 +111,7 @@ export function PyqPaperPage() {
   const firstQuestion = questions[0]
   const visibleQuestions = isAuthenticated ? questions : questions.slice(0, FREE_LIMIT)
   const isGated = !isAuthenticated && questions.length > FREE_LIMIT
+  const hasHindiQuestions = questions.some(hasHindi)
 
   const selectAnswer = (qSlug: string, key: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [qSlug]: key }))
@@ -144,6 +146,16 @@ export function PyqPaperPage() {
           </div>
         </div>
         <div className="pyq-paper-actions">
+          {hasHindiQuestions && (
+            <div className="pyq-language-toggle" aria-label="Question language">
+              <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>
+                English
+              </button>
+              <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>
+                हिन्दी
+              </button>
+            </div>
+          )}
           {firstQuestion && (
             <button
               className="pyq-action-btn primary"
@@ -171,6 +183,7 @@ export function PyqPaperPage() {
 
       <div className="pyq-question-list">
         {visibleQuestions.map((q, index) => {
+          const localized = getLocalizedQuestion(q, language)
           const isDeleted = q.answerKey === 'Deleted'
           const chosen = selectedAnswers[q.slug]
           const isRevealed = revealed[q.slug]
@@ -191,7 +204,14 @@ export function PyqPaperPage() {
                 {isDeleted && <span className="pyq-deleted-badge">Deleted</span>}
               </div>
 
-              <QuestionRenderer className="pyq-q-text" text={q.question} />
+              {localized.passage && (
+                <div className="pyq-passage">
+                  <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
+                  <QuestionRenderer text={localized.passage} />
+                </div>
+              )}
+
+              <QuestionRenderer className="pyq-q-text" text={localized.question} />
 
               {isDeleted ? (
                 <div className="pyq-deleted-notice">
@@ -201,7 +221,7 @@ export function PyqPaperPage() {
               ) : (
                 <>
                   <div className="pyq-options">
-                    {q.options.map((opt, i) => {
+                    {localized.options.map((opt, i) => {
                       const label = OPTION_LABELS[i] ?? opt.key
                       const isChosen = chosen === opt.key
                       const isCorrectOpt = opt.key === q.answerKey
