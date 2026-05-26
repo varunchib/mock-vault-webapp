@@ -244,6 +244,14 @@ export default {
     const ua   = request.headers.get('User-Agent') ?? ''
     const path = url.pathname
 
+    // Canonical redirect: enforce HTTPS and non-www
+    if (url.protocol === 'http:' || url.hostname === 'www.ministryofpapers.com') {
+      const dest = new URL(request.url)
+      dest.protocol = 'https:'
+      dest.hostname = 'ministryofpapers.com'
+      return Response.redirect(dest.toString(), 301)
+    }
+
     // Static assets (.js, .css, .png, .svg, .woff2, etc.) → pass through
     const lastSeg = path.split('/').pop() ?? ''
     if (lastSeg.includes('.') && !lastSeg.endsWith('.html')) {
