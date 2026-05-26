@@ -9,6 +9,7 @@ import {
   Clock3,
   Flag,
   Maximize2,
+  Play,
   RotateCcw,
   XCircle,
 } from 'lucide-react'
@@ -18,17 +19,22 @@ import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { useAuth } from '../context/useAuth'
 import {
+  APIError,
+  fetchActiveLiveAttempts,
   fetchPaperBySlug,
   fetchPaperQuestions,
+  refreshAuthSession,
   startLiveAttempt,
   syncLiveAttempt,
   submitLiveAttempt,
+  type ActiveAttempt,
   type Paper,
   type Question,
 } from '../lib/api'
 import { savePaperResult } from '../lib/mockActivity'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { usePageMeta } from '../lib/usePageMeta'
+import { paperAttemptSeoTitle } from '../lib/pageTitles'
 
 // ── KaTeX inline/block renderer ────────────────────────────────
 
@@ -123,6 +129,8 @@ export function PaperAttemptPage() {
 
   const [attemptId, setAttemptId] = useState<string | null>(null)
   const [resumed, setResumed] = useState(false)
+  const [resumeDetected, setResumeDetected] = useState(false)
+  const [existingAttempt, setExistingAttempt] = useState<ActiveAttempt | null>(null)
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, string>>({})
@@ -137,32 +145,52 @@ export function PaperAttemptPage() {
   const [activeSubject, setActiveSubject] = useState<string | null>(null)
 
   const [isFullscreen, setIsFullscreen] = useState(false)
+  const [exiting, setExiting] = useState(false)
 
-  const resultSavedRef = useRef(false)
-  const startTimeRef   = useRef(Date.now())
-  const submittedRef   = useRef(false)
+  const resultSavedRef      = useRef(false)
+  const startTimeRef        = useRef(Date.now())
+  const submittedRef        = useRef(false)
+  const resumeFetchedAtMs   = useRef(0)
+  const [, forceResumeTick] = useState(0)
 
   useEffect(() => { submittedRef.current = submitted }, [submitted])
 
+  useEffect(() => {
+    if (!resumeDetected || examStarted) return
+    const id = window.setInterval(() => forceResumeTick((n) => n + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [resumeDetected, examStarted])
+
   usePageMeta({
-    title: paper ? `${paper.title} — Attempt | Ministry of Papers` : 'Paper Attempt | Ministry of Papers',
-    description: paper?.description ?? 'Attempt a full-length previous year question paper.',
+    title: paper
+      ? paperAttemptSeoTitle({ examName: paper.examName, year: paper.year, shift: paper.shift })
+      : 'Paper Attempt | Ministry of Papers',
+    description: paper
+      ? `Attempting ${paper.examName}${paper.year ? ` ${paper.year}` : ''} previous year paper. ${paper.questions} questions with timer on Ministry of Papers.`
+      : 'Attempt a full-length previous year question paper.',
     canonicalPath: slug ? `/paper-attempt/${slug}` : '/paper-attempt',
   })
 
-  // ── Load paper + questions only (live attempt starts on exam start) ──
+  // ── Load paper + questions; detect active live attempt ───────────
   useEffect(() => {
     if (!slug) return
     let cancelled = false
     const load = async () => {
       try {
-        const [paperData, qs] = await Promise.all([
+        const [paperData, qs, liveAttempts] = await Promise.all([
           fetchPaperBySlug(slug),
           fetchPaperQuestions(slug),
+          fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
         ])
         if (cancelled) return
         setPaper(paperData)
         setQuestions(qs)
+        const existing = liveAttempts.find((a) => a.paperSlug === slug)
+        if (existing) {
+          resumeFetchedAtMs.current = Date.now()
+          setExistingAttempt(existing)
+          setResumeDetected(true)
+        }
       } catch {
         if (!cancelled) setError(true)
       } finally {
@@ -234,18 +262,71 @@ export function PaperAttemptPage() {
     setStartingExam(false)
   }, [paper, questions, startingExam])
 
+  // ── Resume handler — calls startLiveAttempt to restore full state ──
+  const handleResumeExam = useCallback(async () => {
+    if (!paper || !questions.length || startingExam) return
+    setStartingExam(true)
+    const durationSeconds = (paper.durationMinutes > 0 ? paper.durationMinutes : 120) * 60
+    let startIdx = 0
+    try {
+      const liveState = await startLiveAttempt({
+        paperSlug: paper.slug,
+        examSlug: paper.examSlug,
+        paperTitle: paper.title,
+        examName: paper.examName ?? '',
+        totalQuestions: questions.length,
+        durationSeconds,
+      })
+      if (liveState?.resumed) {
+        setAnswers(liveState.answers ?? {})
+        setMarked(liveState.marked ?? {})
+        startIdx = liveState.currentIndex ?? 0
+        setCurrentIndex(startIdx)
+        if (liveState.attemptId) setAttemptId(liveState.attemptId)
+        if (liveState.remainingSeconds <= 0) {
+          startTimeRef.current = Date.now()
+          setExamStarted(true)
+          setSubmitted(true)
+          setStartingExam(false)
+          return
+        }
+        setRemainingSeconds(liveState.remainingSeconds)
+        setResumed(true)
+      } else {
+        setRemainingSeconds(durationSeconds)
+      }
+      if (liveState?.attemptId) setAttemptId(liveState.attemptId)
+    } catch {
+      setRemainingSeconds(durationSeconds)
+    }
+    const distinctSubjects = new Set(questions.map((q) => q.subject))
+    if (distinctSubjects.size > 1) {
+      setActiveSubject(questions[startIdx]?.subject ?? null)
+    }
+    startTimeRef.current = Date.now()
+    document.documentElement.requestFullscreen?.()
+      .then(() => setIsFullscreen(true))
+      .catch(() => {})
+    setExamStarted(true)
+    setStartingExam(false)
+  }, [paper, questions, startingExam])
+
   // ── Redis sync helpers ─────────────────────────────────────────
   const syncFnRef = useRef<() => void>(() => {})
   const buildSyncFn = useCallback(() => {
     return () => {
       if (!paper || !attemptId || submittedRef.current) return
-      syncLiveAttempt({
-        paperSlug: paper.slug,
-        answers,
-        marked,
-        currentIndex,
-        remainingSeconds,
-      }).catch(() => {})
+      const payload = { paperSlug: paper.slug, answers, marked, currentIndex, remainingSeconds }
+      syncLiveAttempt(payload).catch(async (err) => {
+        if (err instanceof APIError && err.status === 401) {
+          try {
+            await refreshAuthSession()
+            await syncLiveAttempt(payload)
+          } catch {
+            // refresh failed — state will be retried on next sync cycle
+          }
+        }
+      })
     }
   }, [paper, attemptId, answers, marked, currentIndex, remainingSeconds])
 
@@ -262,9 +343,26 @@ export function PaperAttemptPage() {
 
   useEffect(() => {
     if (loading || submitted || !examStarted) return
-    const id = window.setInterval(() => syncFnRef.current(), 30_000)
+    const id = window.setInterval(() => syncFnRef.current(), 10_000)
     return () => window.clearInterval(id)
   }, [loading, submitted, examStarted])
+
+  // ── Exit handler: sync first, then navigate ────────────────────
+  const handleExit = useCallback(async () => {
+    if (!paper) return
+    setExiting(true)
+    if (attemptId && !submittedRef.current) {
+      const payload = { paperSlug: paper.slug, answers, marked, currentIndex, remainingSeconds }
+      try {
+        await syncLiveAttempt(payload)
+      } catch (err) {
+        if (err instanceof APIError && err.status === 401) {
+          try { await refreshAuthSession(); await syncLiveAttempt(payload) } catch { /* silent */ }
+        }
+      }
+    }
+    navigate(`/pyq/${paper.slug}`)
+  }, [paper, attemptId, answers, marked, currentIndex, remainingSeconds, navigate])
 
   // ── Timer countdown ────────────────────────────────────────────
   useEffect(() => {
@@ -282,6 +380,17 @@ export function PaperAttemptPage() {
     }, 1000)
     return () => window.clearInterval(id)
   }, [loading, examStarted, remainingSeconds, submitted])
+
+  // ── Sync on unmount + browser close (catches "Exit Paper" navigation) ──
+  useEffect(() => {
+    return () => { syncFnRef.current() }
+  }, [])
+
+  useEffect(() => {
+    const onUnload = () => syncFnRef.current()
+    window.addEventListener('beforeunload', onUnload)
+    return () => window.removeEventListener('beforeunload', onUnload)
+  }, [])
 
   // ── Track visited ──────────────────────────────────────────────
   useEffect(() => {
@@ -301,15 +410,12 @@ export function PaperAttemptPage() {
     const rawScore = negMark > 0 ? parseFloat((correct - wrong * negMark).toFixed(2)) : undefined
 
     if (attemptId) {
-      submitLiveAttempt({
-        attemptId,
-        paperSlug: paper.slug,
-        correct,
-        wrong,
-        skipped,
-        timeTakenSeconds: timeTaken,
-        answers,
-      }).catch(() => {})
+      const submitPayload = { attemptId, paperSlug: paper.slug, correct, wrong, skipped, timeTakenSeconds: timeTaken, answers }
+      submitLiveAttempt(submitPayload).catch(async (err) => {
+        if (err instanceof APIError && err.status === 401) {
+          try { await refreshAuthSession(); await submitLiveAttempt(submitPayload) } catch { /* silent */ }
+        }
+      })
     }
 
     savePaperResult({
@@ -377,10 +483,57 @@ export function PaperAttemptPage() {
   if (loading) return <HaloLoader label="Loading paper" />
   if (error || !paper) return <Navigate to={`/pyq/${slug}`} replace />
 
-  // ── Pre-exam intro screen ──────────────────────────────────────
+  // ── Pre-exam screen (intro for new, compact resume card for ongoing) ──
   if (!examStarted) {
     const durationMins = paper.durationMinutes > 0 ? paper.durationMinutes : 120
     const hasNeg = (paper.negativeMarking ?? 0) > 0
+
+    if (resumeDetected && existingAttempt) {
+      const elapsed = Math.floor((Date.now() - resumeFetchedAtMs.current) / 1000)
+      const liveRemaining = Math.max(0, existingAttempt.remainingSeconds - elapsed)
+      return (
+        <div className="pa-intro-page">
+          <div className="pa-intro-card pa-resume-card">
+            <span className="pa-intro-exam-badge">{paper.examName}</span>
+            <h1 className="pa-intro-title">{paper.title}</h1>
+
+            <div className="pa-resume-progress">
+              <div className="pa-resume-stat">
+                <strong>{existingAttempt.answeredCount}</strong>
+                <span>of {questions.length} answered</span>
+              </div>
+              <div className="pa-resume-divider" />
+              <div className="pa-resume-stat">
+                <strong>{formatTime(liveRemaining)}</strong>
+                <span>remaining</span>
+              </div>
+            </div>
+
+            <div className="pa-intro-fs-warn">
+              <Maximize2 size={16} />
+              <div>
+                <strong>Continue in fullscreen</strong>
+                <p>The exam will resume from where you left off.</p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="pa-intro-start-btn"
+              onClick={handleResumeExam}
+              disabled={startingExam}
+            >
+              {startingExam ? 'Resuming…' : <><Play size={16} /> Continue Exam →</>}
+            </button>
+
+            <Link className="pa-intro-back-link" to={`/pyq/${paper.slug}`}>
+              ← Exit to paper
+            </Link>
+          </div>
+        </div>
+      )
+    }
+
     return (
       <div className="pa-intro-page">
         <div className="pa-intro-card">
@@ -510,70 +663,75 @@ export function PaperAttemptPage() {
     return (
       <div className="pa-result-page">
         <header className="pa-result-header">
-          <div className="pa-result-header-inner">
-            <CheckCircle2 size={28} className="pa-result-icon" />
-            <div>
-              <small>{paper.examName}</small>
-              <h1>{paper.title}</h1>
-            </div>
+          <CheckCircle2 size={20} className="pa-result-icon" />
+          <div className="pa-result-header-text">
+            <small>{paper.examName}</small>
+            <h1>{paper.title}</h1>
           </div>
         </header>
 
-        <main className="pa-result-main">
-          <section className="pa-score-card">
+        <div className="pa-result-body">
+          <section className="pa-score-panel">
             <div className="pa-score-ring">
               <strong>{rawScore !== null ? rawScore : results.correct}</strong>
               <span>/ {activeCount}</span>
             </div>
-            <p className="pa-score-pct">{scorePercent}% correct</p>
-            {deletedCount > 0 && (
-              <p className="pa-negmark-note">{deletedCount} question{deletedCount !== 1 ? 's' : ''} officially deleted — not counted in score</p>
-            )}
-            {rawScore !== null && (
-              <p className="pa-negmark-note">Negative marking: -{negMark}/wrong · Raw score: {rawScore}</p>
-            )}
-            <p className="pa-time-taken">Time taken: {formatTime(timeTaken)}</p>
+            <p className="pa-score-pct">{scorePercent}%</p>
+            <p className="pa-score-label">correct</p>
 
-            <div className="pa-score-legend">
-              <div className="pa-legend-item answered"><CheckCircle2 size={14} />{results.correct} Correct</div>
-              <div className="pa-legend-item wrong"><XCircle size={14} />{results.wrong} Wrong</div>
-              <div className="pa-legend-item skipped"><AlertTriangle size={14} />{results.skipped} Skipped</div>
+            <div className="pa-score-stats">
+              <div className="pa-stat pa-stat--c"><span>{results.correct}</span><small>Correct</small></div>
+              <div className="pa-stat pa-stat--w"><span>{results.wrong}</span><small>Wrong</small></div>
+              <div className="pa-stat pa-stat--s"><span>{results.skipped}</span><small>Skipped</small></div>
+            </div>
+
+            <div className="pa-score-meta">
+              <p className="pa-time-taken">Time: {formatTime(timeTaken)}</p>
+              {rawScore !== null && (
+                <p className="pa-negmark-note">−{negMark}/wrong · Raw: {rawScore}</p>
+              )}
+              {deletedCount > 0 && (
+                <p className="pa-negmark-note">{deletedCount} Q deleted</p>
+              )}
             </div>
           </section>
 
-          <section className="pa-subject-table">
-            <h2>Subject-wise performance</h2>
-            <table>
-              <thead>
-                <tr><th>Subject</th><th>Total</th><th>Correct</th><th>Wrong</th><th>Skipped</th><th>Score%</th></tr>
-              </thead>
-              <tbody>
-                {results.subjectScores.map((s) => (
-                  <tr key={s.subject}>
-                    <td>{s.subject}</td>
-                    <td>{s.total}</td>
-                    <td className="correct">{s.correct}</td>
-                    <td className="wrong">{s.wrong}</td>
-                    <td className="skipped">{s.skipped}</td>
-                    <td>{s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <section className="pa-subject-panel">
+            {results.subjectScores.length > 0 ? (
+              <table className="pa-subject-table">
+                <thead>
+                  <tr><th>Subject</th><th>Qs</th><th>✓</th><th>✗</th><th>—</th><th>%</th></tr>
+                </thead>
+                <tbody>
+                  {results.subjectScores.map((s) => (
+                    <tr key={s.subject}>
+                      <td>{s.subject}</td>
+                      <td>{s.total}</td>
+                      <td className="correct">{s.correct}</td>
+                      <td className="wrong">{s.wrong}</td>
+                      <td className="skipped">{s.skipped}</td>
+                      <td>{s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="pa-subject-empty">No subject breakdown available</div>
+            )}
           </section>
+        </div>
 
-          <div className="pa-result-actions">
-            <button type="button" className="pa-btn-review" onClick={() => { setReviewMode(true); setReviewIndex(0) }}>
-              <BookOpen size={16} /> Review Answers
-            </button>
-            <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/pyq/${paper.slug}`)}>
-              Back to Paper
-            </button>
-            <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/exam/${paper.examSlug}`)}>
-              Back to Exam
-            </button>
-          </div>
-        </main>
+        <footer className="pa-result-footer">
+          <button type="button" className="pa-btn-review" onClick={() => { setReviewMode(true); setReviewIndex(0) }}>
+            <BookOpen size={15} /> Review Answers
+          </button>
+          <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/pyq/${paper.slug}`)}>
+            Back to Paper
+          </button>
+          <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/exam/${paper.examSlug}`)}>
+            Back to Exam
+          </button>
+        </footer>
       </div>
     )
   }
@@ -729,13 +887,6 @@ export function PaperAttemptPage() {
           <Maximize2 size={14} />
           You left fullscreen — click to return
         </button>
-      )}
-
-      {/* Resumed notice */}
-      {resumed && !submitted && (
-        <div className="pa-resumed-notice">
-          Resuming from where you left off · {answeredCount} answered · {formatTime(remainingSeconds)} remaining
-        </div>
       )}
 
       {/* Confirm submit dialog */}
@@ -923,9 +1074,9 @@ export function PaperAttemptPage() {
             Submit Paper
           </button>
 
-          <Link className="pa-exit-link" to={`/pyq/${paper.slug}`}>
-            Exit Paper
-          </Link>
+          <button type="button" className="pa-exit-link" onClick={handleExit} disabled={exiting}>
+            {exiting ? 'Saving…' : 'Exit Paper'}
+          </button>
         </aside>
       </div>
     </div>
