@@ -286,7 +286,7 @@ export function ExamPage() {
   }
 
   const homeHref = isAuthenticated ? '/exams' : '/'
-  const totalQuestions = parseInt(exam.totalQuestions) || examQuestions.length
+  const totalQuestions = exam.totalQuestions || examQuestions.length
 
   const hub = (
     <div className="ep-page">
@@ -309,7 +309,7 @@ export function ExamPage() {
 
             {/* Stats row */}
             <div className="ep-stats-row">
-              {parseInt(exam.papers) > 0 && (
+              {exam.papers > 0 && (
                 <span className="ep-stat-chip">
                   <FileText size={12} />
                   {exam.papers} Papers

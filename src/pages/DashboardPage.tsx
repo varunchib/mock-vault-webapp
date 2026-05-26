@@ -293,9 +293,9 @@ export function DashboardPage() {
                 <div>
                   <strong>{exam.shortName}</strong>
                   <small>
-                    {parseInt(exam.mocks) > 0 ? `${exam.mocks} mocks` : ''}
-                    {parseInt(exam.mocks) > 0 && parseInt(exam.papers) > 0 ? ' · ' : ''}
-                    {parseInt(exam.papers) > 0 ? `${exam.papers} papers` : ''}
+                    {exam.mocks > 0 ? `${exam.mocks} mocks` : ''}
+                    {exam.mocks > 0 && exam.papers > 0 ? ' · ' : ''}
+                    {exam.papers > 0 ? `${exam.papers} papers` : ''}
                   </small>
                 </div>
               </Link>

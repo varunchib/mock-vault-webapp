@@ -188,9 +188,9 @@ export function ExamCatalogPage() {
                 <strong className="ec-card-name">{exam.shortName}</strong>
                 <p className="ec-card-full">{exam.name}</p>
                 <div className="ec-card-meta">
-                  {parseInt(exam.papers) > 0 && <span>{exam.papers} PYQs</span>}
-                  {parseInt(exam.mocks) > 0 && <span>{exam.mocks} Mocks</span>}
-                  {parseInt(exam.totalQuestions) > 0 && <span>{exam.totalQuestions} Qs</span>}
+                  {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
+                  {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
+                  {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
                 </div>
                 <span className="ec-card-cta">View exam →</span>
               </Link>

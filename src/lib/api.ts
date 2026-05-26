@@ -4,9 +4,9 @@ export type Exam = {
   shortName: string;
   category: string;
   icon: string;
-  totalQuestions: string;
-  papers: string;
-  mocks: string;
+  totalQuestions: number;
+  papers: number;
+  mocks: number;
   description: string;
   popularYears: string[];
   subjects: string[];
