@@ -14,6 +14,7 @@ import {
 } from '../lib/api'
 import { recordMockAttempt, saveAttemptResult, type SubjectResult } from '../lib/mockActivity'
 import { usePageMeta } from '../lib/usePageMeta'
+import { mockAttemptSeoTitle, mockAttemptSeoDescription } from '../lib/pageTitles'
 import { estimatePercentile, getCutoffComparison } from '../data/examCutoffs'
 
 function formatTime(totalSeconds: number) {
@@ -256,8 +257,12 @@ export function MockAttemptPage() {
   const remainingAtSubmitRef = useRef(0)
 
   usePageMeta({
-    title: mock ? `${mock.title} | Ministry of Papers` : 'Mock Attempt | Ministry of Papers',
-    description: mock?.description ?? 'Attempt a timed mock test.',
+    title: mock
+      ? mockAttemptSeoTitle({ examName: mock.examName, title: mock.title, questions: mock.questions })
+      : 'Mock Test Attempt | Ministry of Papers',
+    description: mock
+      ? mockAttemptSeoDescription({ examName: mock.examName, title: mock.title, questions: mock.questions })
+      : 'Attempt a full-length timed mock test on Ministry of Papers.',
     canonicalPath: slug ? `/mock-attempt/${slug}` : '/mock-attempt',
   })
 

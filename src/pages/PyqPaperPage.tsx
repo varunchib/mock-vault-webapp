@@ -12,6 +12,7 @@ import {
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
+import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 
 const FREE_LIMIT = 10
@@ -48,31 +49,39 @@ export function PyqPaperPage() {
       .finally(() => setLoading(false))
   }, [slug, retryCount])
 
-  const title = paper
-    ? `${paper.title} — Questions & Answers | Ministry of Papers`
+  const seoTitle = paper
+    ? paperSeoTitle({ examName: paper.examName, year: paper.year, shift: paper.shift })
     : 'Solved PYQ Paper | Ministry of Papers'
+  const seoDesc = paper
+    ? paperSeoDescription({ examName: paper.examName, year: paper.year, shift: paper.shift, heldOn: paper.heldOn, questions: paper.questions, subjects: paper.subjects, description: paper.description })
+    : 'Solved previous year question paper with answers and explanations.'
 
   usePageMeta({
-    title,
-    description: paper?.description ?? 'Solved previous year question paper with answers and explanations.',
+    title: seoTitle,
+    description: seoDesc,
     canonicalPath: paper ? `/pyq/${paper.slug}` : '/pyq',
+    ogType: 'article',
     jsonLd: paper
       ? {
           '@context': 'https://schema.org',
           '@type': 'LearningResource',
-          name: paper.title,
-          description: paper.description,
+          name: seoTitle.replace(' | Ministry of Papers', ''),
+          description: seoDesc,
           url: `https://ministryofpapers.com/pyq/${paper.slug}`,
-          educationalLevel: 'Competitive exam preparation',
-          learningResourceType: 'Previous year question paper',
+          educationalLevel: 'Competitive Exam Preparation',
+          learningResourceType: 'Previous Year Question Paper',
+          numberOfQuestions: paper.questions,
           teaches: paper.subjects?.join(', '),
+          about: { '@type': 'Thing', name: paper.examName },
+          ...(paper.heldOn ? { datePublished: paper.heldOn } : {}),
           provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
           breadcrumb: {
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
-              { '@type': 'ListItem', position: 2, name: paper.examName ?? 'Exam', item: `https://ministryofpapers.com/exam/${paper.examSlug ?? ''}` },
-              { '@type': 'ListItem', position: 3, name: paper.title, item: `https://ministryofpapers.com/pyq/${paper.slug}` },
+              { '@type': 'ListItem', position: 2, name: paper.examName, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
+              { '@type': 'ListItem', position: 3, name: `${paper.examName} ${paper.year} Papers`, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
+              { '@type': 'ListItem', position: 4, name: seoTitle.replace(' | Ministry of Papers', ''), item: `https://ministryofpapers.com/pyq/${paper.slug}` },
             ],
           },
         }

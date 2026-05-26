@@ -8,6 +8,7 @@ import { fetchQuestionBySlug, type Question } from "../lib/api";
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from "../lib/questionLanguage";
 import { useAuth } from "../context/useAuth";
 import { usePageMeta } from "../lib/usePageMeta";
+import { questionSeoTitle, questionSeoDescription } from "../lib/pageTitles";
 
 export function QuestionPage() {
   const { slug } = useParams();
@@ -36,35 +37,38 @@ export function QuestionPage() {
       .finally(() => setLoading(false));
   }, [slug]);
 
-  const title = question
-    ? `${question.examName} ${question.year} Question ${question.questionNo} | Ministry of Papers`
+  const seoTitle = question
+    ? questionSeoTitle({ examName: question.examName, year: question.year, questionNo: question.questionNo, question: question.question })
     : "Solved Exam Question | Ministry of Papers";
-  const description = question
-    ? `${question.question} Practice this PYQ and continue with related previous year questions.`
+  const seoDesc = question
+    ? questionSeoDescription({ examName: question.examName, year: question.year, questionNo: question.questionNo, question: question.question, answer: question.answer })
     : "Read solved exam questions with answers and explanations on Ministry of Papers.";
 
   usePageMeta({
-    title,
-    description,
+    title: seoTitle,
+    description: seoDesc,
     canonicalPath: question ? `/question/${question.slug}` : "/question",
+    ogType: "article",
     jsonLd: question
       ? {
           "@context": "https://schema.org",
           "@type": "QAPage",
-          name: title,
+          name: seoTitle.replace(" | Ministry of Papers", ""),
+          description: seoDesc,
           url: `https://ministryofpapers.com/question/${question.slug}`,
           mainEntity: {
             "@type": "Question",
-            name: question.question,
-            text: question.question,
+            name: question.question.replace(/<[^>]+>/g, "").slice(0, 200),
+            text: question.question.replace(/<[^>]+>/g, ""),
             answerCount: 1,
-            educationalLevel: "Competitive exam preparation",
+            educationalLevel: "Competitive Exam Preparation",
             about: { "@type": "Thing", name: question.examName },
+            ...(question.year ? { datePublished: question.year } : {}),
             acceptedAnswer: {
               "@type": "Answer",
-              text: `The correct answer is explained on Ministry of Papers. Exam: ${question.examName}, Year: ${question.year}.`,
+              text: question.answer || `Correct answer: ${question.answerKey}. Full explanation on Ministry of Papers.`,
               url: `https://ministryofpapers.com/question/${question.slug}`,
-              author: { "@type": "Organization", name: "Ministry of Papers" },
+              author: { "@type": "Organization", name: "Ministry of Papers", url: "https://ministryofpapers.com" },
             },
           },
           breadcrumb: {
@@ -72,7 +76,8 @@ export function QuestionPage() {
             itemListElement: [
               { "@type": "ListItem", position: 1, name: "Home", item: "https://ministryofpapers.com" },
               { "@type": "ListItem", position: 2, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug ?? ""}` },
-              { "@type": "ListItem", position: 3, name: `Q${question.questionNo}`, item: `https://ministryofpapers.com/question/${question.slug}` },
+              { "@type": "ListItem", position: 3, name: `${question.examName} ${question.year} Papers`, item: `https://ministryofpapers.com/exam/${question.examSlug ?? ""}` },
+              { "@type": "ListItem", position: 4, name: `Q.${question.questionNo}`, item: `https://ministryofpapers.com/question/${question.slug}` },
             ],
           },
         }

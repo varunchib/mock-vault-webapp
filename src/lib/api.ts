@@ -512,6 +512,18 @@ export function fetchExamCutoffs(examSlug: string): Promise<ExamCutoffSet[]> {
   return requestJson<ExamCutoffSet[]>(`/api/v1/exams/${examSlug}/cutoffs`)
 }
 
+export type LeaderboardEntry = {
+  rank: number
+  userId: string
+  name: string
+  scorePct: number
+  isMe: boolean
+}
+
+export function fetchLeaderboard(examSlug: string): Promise<{ top10: LeaderboardEntry[]; userRank: number }> {
+  return requestJson(`/api/v1/analytics/leaderboard?examSlug=${encodeURIComponent(examSlug)}`)
+}
+
 export function adminUpsertCutoff(payload: {
   examSlug: string; stage: string; year: string; category: string;
   marks: number; totalMarks: number; avgScore: number; stdDev: number; source?: string;

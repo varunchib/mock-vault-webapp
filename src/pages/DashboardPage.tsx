@@ -1,6 +1,6 @@
-import { ClipboardList, FileText, Play, PlusCircle } from 'lucide-react'
+import { ArrowRight, ClipboardList, FileText, PlusCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   APIError,
   fetchActiveLiveAttempts,
@@ -120,6 +120,8 @@ export function DashboardPage() {
   const [activeAttempts, setActiveAttempts] = useState<ActiveAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [, forceTimerTick] = useState(0)
+  const attemptsFetchedAtMs = useRef(0)
 
   usePageMeta({
     title: 'Dashboard | Ministry of Papers',
@@ -145,6 +147,7 @@ export function DashboardPage() {
         ])
         if (cancelled) return
         applyData(data)
+        attemptsFetchedAtMs.current = Date.now()
         setActiveAttempts(liveAttempts)
       } catch (err) {
         if (cancelled) return
@@ -155,7 +158,11 @@ export function DashboardPage() {
               fetchDashboardBootstrap(),
               fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
             ])
-            if (!cancelled) { applyData(retried); setActiveAttempts(liveAttempts) }
+            if (!cancelled) {
+              applyData(retried)
+              attemptsFetchedAtMs.current = Date.now()
+              setActiveAttempts(liveAttempts)
+            }
             return
           } catch {
             // refresh failed — fall through to error state
@@ -171,6 +178,17 @@ export function DashboardPage() {
   }, [])
 
   const recentlyViewed = useMemo(() => readRecentlyViewed(), [])
+
+  useEffect(() => {
+    if (!activeAttempts.length) return
+    const id = window.setInterval(() => forceTimerTick((n) => n + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [activeAttempts.length])
+
+  const getLiveRemaining = (attempt: ActiveAttempt): number => {
+    const elapsed = Math.floor((Date.now() - attemptsFetchedAtMs.current) / 1000)
+    return Math.max(0, attempt.remainingSeconds - elapsed)
+  }
 
   if (loading) return <HaloLoader label="Loading dashboard" />
 
@@ -213,30 +231,34 @@ export function DashboardPage() {
 
       {/* ── In-progress tests ──────────────────────── */}
       {activeAttempts.length > 0 && (
-        <section className="db-section db-inprogress-section">
+        <section className="db-section db-ip-section">
           <div className="db-section-head">
-            <div className="db-inprogress-heading">
+            <div className="db-ip-heading">
               <span className="db-live-dot" aria-hidden="true" />
-              <small>Live</small>
-              <h2>Tests In Progress</h2>
+              <span className="db-ip-heading-label">In Progress</span>
+              <span className="db-ip-heading-count">
+                {activeAttempts.length} active
+              </span>
             </div>
           </div>
-          <div className="db-inprogress-list">
+          <div className="db-ip-list">
             {activeAttempts.map((attempt) => (
-              <div className="db-inprogress-card" key={attempt.paperSlug}>
-                <span className="db-live-badge">● LIVE</span>
-                <div className="db-inprogress-info">
+              <div className="db-ip-card" key={attempt.paperSlug}>
+                <div className="db-ip-accent" />
+                <div className="db-ip-info">
                   <strong>{attempt.paperTitle}</strong>
                   <small>{attempt.examName}</small>
                 </div>
-                <div className="db-inprogress-meta">
-                  <span className="db-inprogress-count">{attempt.answeredCount}/{attempt.totalQuestions} answered</span>
-                  <span className="db-inprogress-timer">
-                    {formatRemainingTime(attempt.remainingSeconds)} left
-                  </span>
+                <div className="db-ip-stat">
+                  <strong>{attempt.answeredCount}<em>/{attempt.totalQuestions}</em></strong>
+                  <small>answered</small>
                 </div>
-                <Link className="db-inprogress-btn" to={`/paper-attempt/${attempt.paperSlug}`}>
-                  <Play size={13} /> Resume
+                <div className="db-ip-timer">
+                  <strong>{formatRemainingTime(getLiveRemaining(attempt))}</strong>
+                  <small>remaining</small>
+                </div>
+                <Link className="db-ip-btn" to={`/paper-attempt/${attempt.paperSlug}`}>
+                  Resume <ArrowRight size={14} />
                 </Link>
               </div>
             ))}

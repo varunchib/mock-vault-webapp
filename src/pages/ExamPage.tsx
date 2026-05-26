@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   BookOpen,
   ChevronRight,
   ClipboardList,
@@ -28,9 +27,9 @@ import {
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
+import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
 import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
-import { readAllResults } from '../lib/mockActivity'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
@@ -162,10 +161,6 @@ export function ExamPage() {
   }
 
   const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
-  const hasAnalytics = useMemo(
-    () => isAuthenticated && !!slug && readAllResults(slug).length > 0,
-    [isAuthenticated, slug],
-  )
   const filteredMocks = useMemo(
     () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
     [examMocks, diffFilter],
@@ -234,18 +229,23 @@ export function ExamPage() {
   const hasMore = visibleCount < gatedQuestions.length
   const isGated = !isAuthenticated && filteredSubjectQuestions.length > FREE_QUESTION_LIMIT
 
-  const title = exam ? `${exam.shortName} — Mock Tests & PYQ Papers | Ministry of Papers` : 'Exam Hub | Ministry of Papers'
+  const seoTitle = exam
+    ? examHubSeoTitle({ shortName: exam.shortName })
+    : 'Exam Hub | Ministry of Papers'
+  const seoDesc = exam
+    ? examHubSeoDescription({ shortName: exam.shortName, papers: exam.papers, mocks: exam.mocks, description: exam.description })
+    : 'Browse solved papers, mock tests, and subjects.'
 
   usePageMeta({
-    title,
-    description: exam?.description ?? 'Browse solved papers, mock tests, and subjects.',
+    title: seoTitle,
+    description: seoDesc,
     canonicalPath: exam ? `/exam/${exam.slug}` : '/exam',
     jsonLd: exam
       ? {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
-          name: title,
-          description: exam.description,
+          name: seoTitle.replace(' | Ministry of Papers', ''),
+          description: seoDesc,
           url: `https://ministryofpapers.com/exam/${exam.slug}`,
           about: { '@type': 'Thing', name: exam.name },
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
@@ -338,11 +338,6 @@ export function ExamPage() {
 
         {isAuthenticated && (
           <div className="ep-hero-actions">
-            {hasAnalytics && (
-              <Link to={`/analytics/${slug}`} className="ep-analytics-btn">
-                <BarChart3 size={13} /> Your Analytics
-              </Link>
-            )}
             <button
               className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
               type="button"

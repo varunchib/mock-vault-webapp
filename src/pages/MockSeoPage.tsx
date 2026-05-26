@@ -11,6 +11,7 @@ import {
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
+import { mockListingSeoTitle, mockListingSeoDescription } from '../lib/pageTitles'
 import { normalizeExamCategory } from './DashboardPage'
 
 export function MockDetailPage() {
@@ -57,21 +58,23 @@ export function MockDetailPage() {
   const visibleMocks = diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)
   const homeHref = isAuthenticated ? '/dashboard' : '/'
 
-  const title = exam ? `${exam.shortName} Mock Tests | Ministry of Papers` : 'Mock Tests | Ministry of Papers'
-  const desc = exam
-    ? `Open the full ${exam.shortName} mock test library with free and premium practice series.`
+  const seoTitle = exam
+    ? mockListingSeoTitle({ shortName: exam.shortName })
+    : 'Mock Tests | Ministry of Papers'
+  const seoDesc = exam
+    ? mockListingSeoDescription({ shortName: exam.shortName, totalMocks: examMocks.length, freeMocks: freeMocks.length })
     : 'Open mock test libraries by exam.'
 
   usePageMeta({
-    title,
-    description: desc,
+    title: seoTitle,
+    description: seoDesc,
     canonicalPath: exam ? `/mock-test/${exam.slug}` : '/mock-test',
     jsonLd: exam
       ? {
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: title,
-          description: desc,
+          name: seoTitle.replace(' | Ministry of Papers', ''),
+          description: seoDesc,
           numberOfItems: examMocks.length,
           itemListElement: freeMocks.slice(0, 5).map((mock, i) => ({
             '@type': 'ListItem',
@@ -79,6 +82,14 @@ export function MockDetailPage() {
             name: mock.title,
             description: mock.description,
           })),
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+              { '@type': 'ListItem', position: 2, name: exam.shortName, item: `https://ministryofpapers.com/exam/${exam.slug}` },
+              { '@type': 'ListItem', position: 3, name: 'Mock Tests', item: `https://ministryofpapers.com/mock-test/${exam.slug}` },
+            ],
+          },
         }
       : undefined,
   })
