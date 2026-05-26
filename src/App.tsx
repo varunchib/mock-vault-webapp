@@ -21,7 +21,7 @@ function AppChrome() {
     window.gtag('config', id, { page_path: location.pathname + location.search })
   }, [location.pathname, location.search])
   const isAdminRoute = location.pathname.startsWith('/admin')
-  const isAttemptRoute = location.pathname.startsWith('/mock-attempt')
+  const isAttemptRoute = location.pathname.startsWith('/mock-attempt') || location.pathname.startsWith('/paper-attempt')
   const isLandingRoute = location.pathname === '/'
   const useUserShell = isAuthenticated && !isAdminRoute && !isAttemptRoute
 

@@ -17,13 +17,14 @@ const footerColumns = [
     title: 'Platform',
     links: [
       { label: 'All Exams', href: '/exams' },
-      { label: 'Mock Tests', href: '/tests' },
-      { label: 'PYQ Papers', href: '/tests?tab=papers' },
+      { label: 'Mock Tests', href: '/exams' },
+      { label: 'PYQ Papers', href: '/exams' },
     ],
   },
   {
     title: 'Company',
     links: [
+      { label: 'About', href: '/about' },
       { label: 'Privacy Policy', href: '/privacy' },
       { label: 'Terms of Service', href: '/terms' },
       { label: 'Contact Us', href: 'mailto:hello@ministryofpapers.com', external: true },

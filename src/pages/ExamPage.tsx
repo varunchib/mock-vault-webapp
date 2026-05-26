@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   BookOpen,
   ChevronRight,
   ClipboardList,
@@ -28,13 +27,66 @@ import {
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
+import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
 import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
-import { readAllResults } from '../lib/mockActivity'
+import { QuestionRenderer } from '../components/common/QuestionRenderer'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
 const FREE_QUESTION_LIMIT = 10
+const PAGE_SIZE = 15
+
+function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagClick: (tag: string) => void }) {
+  const [selected, setSelected] = useState<string | null>(null)
+  const answered = selected !== null
+
+  function pick(key: string) {
+    if (answered) return
+    setSelected(key)
+  }
+
+  return (
+    <div className="sq-card">
+      <div className="sq-card-head">
+        <span className="sq-q-num">Q{idx + 1}</span>
+        {q.tags[0] && (
+          <button type="button" className="sq-tag sq-tag-btn" onClick={() => onTagClick(q.tags[0])}>
+            {q.tags[0]}
+          </button>
+        )}
+        <span className="sq-source">{q.paper}{q.year ? ` · ${q.year}` : ' · PYQ'}</span>
+      </div>
+      <QuestionRenderer className="sq-question" text={q.question} />
+      <div className="sq-options">
+        {q.options.map((opt) => {
+          const isCorrect = opt.key === q.answerKey
+          const isSelected = opt.key === selected
+          let cls = 'sq-option'
+          if (answered) {
+            if (isCorrect) cls += ' correct'
+            else if (isSelected) cls += ' wrong'
+          }
+          return (
+            <button
+              key={opt.key}
+              type="button"
+              className={cls}
+              onClick={() => pick(opt.key)}
+              disabled={answered}
+            >
+              <span className="sq-opt-key">{opt.key}</span>
+              <span className="sq-opt-text">{opt.text}</span>
+            </button>
+          )
+        })}
+      </div>
+      {answered && q.explanation && (
+        <p className="sq-explanation">{q.explanation}</p>
+      )}
+    </div>
+  )
+}
 
 export function ExamPage() {
   const { slug } = useParams()
@@ -55,6 +107,8 @@ export function ExamPage() {
   const [paperSearch, setPaperSearch] = useState('')
   const [diffFilter, setDiffFilter] = useState('All')
   const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject)
+  const [topicFilter, setTopicFilter] = useState<string | null>(null)
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
   const [loginOpen, setLoginOpen] = useState(false)
   const [isEnrolled, setIsEnrolled] = useState(false)
   const [enrollBusy, setEnrollBusy] = useState(false)
@@ -65,7 +119,12 @@ export function ExamPage() {
     setError(false)
     setPaperSearch('')
     setDiffFilter('All')
-    setSelectedSubject(null)
+
+    const tabFromUrl = (searchParams.get('tab') as Tab | null) ?? 'papers'
+    const subjectFromUrl = searchParams.get('subject')
+    setActiveTab(tabFromUrl)
+    setSelectedSubject(subjectFromUrl)
+    setTopicFilter(null)
 
     Promise.all([
       fetchExamBySlug(slug),
@@ -84,7 +143,7 @@ export function ExamPage() {
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
-  }, [slug, isAuthenticated, retryCount])
+  }, [slug, isAuthenticated, retryCount, searchParams])
 
   const handleEnrollToggle = async () => {
     if (!slug) return
@@ -102,10 +161,6 @@ export function ExamPage() {
   }
 
   const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
-  const hasAnalytics = useMemo(
-    () => isAuthenticated && !!slug && readAllResults(slug).length > 0,
-    [isAuthenticated, slug],
-  )
   const filteredMocks = useMemo(
     () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
     [examMocks, diffFilter],
@@ -132,29 +187,65 @@ export function ExamPage() {
     return [...map.entries()].sort(([a], [b]) => b.localeCompare(a))
   }, [filteredPapers])
 
+  // Only PYQ paper questions belong in the subject bank — exclude mock questions
+  const paperQuestions = useMemo(
+    () => examQuestions.filter((q) => q.paperSlug),
+    [examQuestions],
+  )
+
+  // Subjects derived from PYQ paper questions only
+  const computedSubjects = useMemo(() => {
+    const map = new Map<string, number>()
+    paperQuestions.forEach((q) => {
+      if (q.subject) map.set(q.subject, (map.get(q.subject) ?? 0) + 1)
+    })
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b))
+  }, [paperQuestions])
+
   const subjectQuestions = useMemo(() => {
+    setVisibleCount(PAGE_SIZE)
     if (!selectedSubject) return []
-    return examQuestions.filter((q) => q.subject.toLowerCase() === selectedSubject.toLowerCase())
-  }, [examQuestions, selectedSubject])
+    return paperQuestions.filter((q) => q.subject.toLowerCase() === selectedSubject.toLowerCase())
+  }, [paperQuestions, selectedSubject])
 
-  const visibleSubjectQuestions = isAuthenticated
-    ? subjectQuestions
-    : subjectQuestions.slice(0, FREE_QUESTION_LIMIT)
+  // Sub-topics available for the selected subject (from tags)
+  const availableTopics = useMemo(() => {
+    const set = new Set<string>()
+    subjectQuestions.forEach((q) => q.tags.forEach((t) => set.add(t)))
+    return [...set].sort()
+  }, [subjectQuestions])
 
-  const isGated = !isAuthenticated && subjectQuestions.length > FREE_QUESTION_LIMIT
+  const filteredSubjectQuestions = useMemo(() => {
+    setVisibleCount(PAGE_SIZE)
+    if (!topicFilter) return subjectQuestions
+    return subjectQuestions.filter((q) => q.tags.includes(topicFilter))
+  }, [subjectQuestions, topicFilter])
 
-  const title = exam ? `${exam.shortName} — Mock Tests & PYQ Papers | Ministry of Papers` : 'Exam Hub | Ministry of Papers'
+  const gatedQuestions = isAuthenticated
+    ? filteredSubjectQuestions
+    : filteredSubjectQuestions.slice(0, FREE_QUESTION_LIMIT)
+
+  const visibleSubjectQuestions = gatedQuestions.slice(0, visibleCount)
+  const hasMore = visibleCount < gatedQuestions.length
+  const isGated = !isAuthenticated && filteredSubjectQuestions.length > FREE_QUESTION_LIMIT
+
+  const seoTitle = exam
+    ? examHubSeoTitle({ shortName: exam.shortName })
+    : 'Exam Hub | Ministry of Papers'
+  const seoDesc = exam
+    ? examHubSeoDescription({ shortName: exam.shortName, papers: exam.papers, mocks: exam.mocks, description: exam.description })
+    : 'Browse solved papers, mock tests, and subjects.'
 
   usePageMeta({
-    title,
-    description: exam?.description ?? 'Browse solved papers, mock tests, and subjects.',
+    title: seoTitle,
+    description: seoDesc,
     canonicalPath: exam ? `/exam/${exam.slug}` : '/exam',
     jsonLd: exam
       ? {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
-          name: title,
-          description: exam.description,
+          name: seoTitle.replace(' | Ministry of Papers', ''),
+          description: seoDesc,
           url: `https://ministryofpapers.com/exam/${exam.slug}`,
           about: { '@type': 'Thing', name: exam.name },
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
@@ -195,7 +286,7 @@ export function ExamPage() {
   }
 
   const homeHref = isAuthenticated ? '/exams' : '/'
-  const totalQuestions = parseInt(exam.totalQuestions) || examQuestions.length
+  const totalQuestions = exam.totalQuestions || examQuestions.length
 
   const hub = (
     <div className="ep-page">
@@ -218,7 +309,7 @@ export function ExamPage() {
 
             {/* Stats row */}
             <div className="ep-stats-row">
-              {parseInt(exam.papers) > 0 && (
+              {exam.papers > 0 && (
                 <span className="ep-stat-chip">
                   <FileText size={12} />
                   {exam.papers} Papers
@@ -247,11 +338,6 @@ export function ExamPage() {
 
         {isAuthenticated && (
           <div className="ep-hero-actions">
-            {hasAnalytics && (
-              <Link to={`/analytics/${slug}`} className="ep-analytics-btn">
-                <BarChart3 size={13} /> Your Analytics
-              </Link>
-            )}
             <button
               className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
               type="button"
@@ -287,11 +373,11 @@ export function ExamPage() {
         <button
           className={`ep-tab${activeTab === 'subjects' ? ' active' : ''}`}
           type="button"
-          onClick={() => { setActiveTab('subjects'); setSelectedSubject(null) }}
+          onClick={() => { setActiveTab('subjects'); setSelectedSubject(null); setTopicFilter(null) }}
         >
           <BookOpen size={14} />
           Subjects
-          {exam.subjects.length > 0 && <span className="ep-tab-count">{exam.subjects.length}</span>}
+          {computedSubjects.length > 0 && <span className="ep-tab-count">{computedSubjects.length}</span>}
         </button>
       </div>
 
@@ -323,19 +409,39 @@ export function ExamPage() {
                   <div className="ep-year-label">{year}</div>
                   <div className="ep-paper-grid">
                     {yearPapers.map((paper) => (
-                      <Link className="ep-paper-card" to={`/pyq/${paper.slug}`} key={paper.slug}>
-                        <div className="ep-paper-card-main">
-                          <strong>{paper.title}</strong>
-                          {paper.shift && <small>{paper.shift}</small>}
-                          <div className="ep-paper-tags">
-                            {paper.subjects.slice(0, 4).map((s) => <span key={s}>{s}</span>)}
+                      <div className="ep-paper-card" key={paper.slug}>
+                        <Link className="ep-paper-card-inner" to={`/pyq/${paper.slug}`}>
+                          <div className="ep-paper-card-main">
+                            <strong>{paper.title}</strong>
+                            <div className="ep-paper-meta">
+                              {paper.shift && <small>{paper.shift}</small>}
+                              {paper.heldOn && <small className="ep-paper-date">{new Date(paper.heldOn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</small>}
+                            </div>
                           </div>
-                        </div>
-                        <div className="ep-paper-card-right">
-                          <span className="ep-q-count">{paper.questions} Qs</span>
-                          <span className="ep-attempt-btn">Open <ChevronRight size={12} /></span>
-                        </div>
-                      </Link>
+                          <div className="ep-paper-card-right">
+                            <span className="ep-q-count">{paper.questions} Qs</span>
+                            <span className="ep-attempt-btn">Open <ChevronRight size={12} /></span>
+                          </div>
+                        </Link>
+                        {paper.subjects.length > 0 && (
+                          <div className="ep-paper-tags">
+                            {paper.subjects.slice(0, 4).map((s) => (
+                              <button
+                                key={s}
+                                type="button"
+                                className="ep-paper-tag-btn"
+                                onClick={() => {
+                                  setActiveTab('subjects')
+                                  setSelectedSubject(s)
+                                  setTopicFilter(null)
+                                }}
+                              >
+                                {s}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -405,29 +511,24 @@ export function ExamPage() {
       {/* ── Subjects grid ──────────────────────────── */}
       {activeTab === 'subjects' && !selectedSubject && (
         <div className="ep-tab-body">
-          {exam.subjects.length === 0 ? (
-            <p className="ep-empty">No subjects listed for this exam yet.</p>
+          {computedSubjects.length === 0 ? (
+            <p className="ep-empty">No questions indexed for this exam yet.</p>
           ) : (
             <>
-              <p className="ep-subjects-hint">Select a subject to browse its previous year questions.</p>
+              <p className="ep-subjects-hint">Select a subject to browse its questions.</p>
               <div className="ep-subject-grid">
-                {exam.subjects.map((subject) => {
-                  const count = examQuestions.filter(
-                    (q) => q.subject.toLowerCase() === subject.toLowerCase(),
-                  ).length
-                  return (
-                    <button
-                      className="ep-subject-card"
-                      key={subject}
-                      type="button"
-                      onClick={() => setSelectedSubject(subject)}
-                    >
-                      <BookOpen size={15} />
-                      <span>{subject}</span>
-                      {count > 0 && <span className="ep-subject-count">{count} Qs</span>}
-                    </button>
-                  )
-                })}
+                {computedSubjects.map(([subject, count]) => (
+                  <button
+                    className="ep-subject-card"
+                    key={subject}
+                    type="button"
+                    onClick={() => { setSelectedSubject(subject); setTopicFilter(null) }}
+                  >
+                    <BookOpen size={15} />
+                    <span>{subject}</span>
+                    <span className="ep-subject-count">{count} Qs</span>
+                  </button>
+                ))}
               </div>
             </>
           )}
@@ -438,28 +539,44 @@ export function ExamPage() {
       {activeTab === 'subjects' && selectedSubject && (
         <div className="ep-tab-body">
           <div className="ep-subject-drill-head">
-            <button className="ep-back-btn" type="button" onClick={() => setSelectedSubject(null)}>
+            <button className="ep-back-btn" type="button" onClick={() => { setSelectedSubject(null); setTopicFilter(null) }}>
               <ChevronRight size={14} style={{ transform: 'rotate(180deg)' }} />
               All Subjects
             </button>
             <h2>{selectedSubject}</h2>
-            <span>{subjectQuestions.length} questions</span>
+            <span>{filteredSubjectQuestions.length}{topicFilter ? ` of ${subjectQuestions.length}` : ''} questions</span>
           </div>
 
-          {subjectQuestions.length === 0 ? (
+          {/* Sub-topic filter chips */}
+          {availableTopics.length > 0 && (
+            <div className="ep-topic-chips">
+              <button
+                className={`ep-topic-chip${!topicFilter ? ' active' : ''}`}
+                type="button"
+                onClick={() => setTopicFilter(null)}
+              >
+                All
+              </button>
+              {availableTopics.map((t) => (
+                <button
+                  key={t}
+                  className={`ep-topic-chip${topicFilter === t ? ' active' : ''}`}
+                  type="button"
+                  onClick={() => setTopicFilter(topicFilter === t ? null : t)}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {filteredSubjectQuestions.length === 0 ? (
             <p className="ep-empty">No questions indexed for this subject yet.</p>
           ) : (
             <>
-              <div className="ep-question-list">
+              <div className="sq-list">
                 {visibleSubjectQuestions.map((q, i) => (
-                  <Link className="ep-question-row" to={`/question/${q.slug}`} key={q.slug}>
-                    <span className="ep-q-num">Q{i + 1}</span>
-                    <div className="ep-q-body">
-                      <span>{q.question}</span>
-                      <small>{q.paper} · {q.year}</small>
-                    </div>
-                    <ChevronRight size={14} className="ep-q-arrow" />
-                  </Link>
+                  <SubjectMCQ key={q.slug} q={q} idx={i} onTagClick={setTopicFilter} />
                 ))}
               </div>
 
@@ -467,12 +584,24 @@ export function ExamPage() {
                 <div className="ep-gate">
                   <div className="ep-gate-inner">
                     <Lock size={20} />
-                    <strong>Sign in to see all {subjectQuestions.length} questions</strong>
-                    <p>{FREE_QUESTION_LIMIT} of {subjectQuestions.length} shown. Login is free.</p>
+                    <strong>Sign in to see all {filteredSubjectQuestions.length} questions</strong>
+                    <p>{FREE_QUESTION_LIMIT} of {filteredSubjectQuestions.length} shown. Login is free.</p>
                     <button className="ep-gate-btn" type="button" onClick={() => setLoginOpen(true)}>
                       Sign in with Google
                     </button>
                   </div>
+                </div>
+              )}
+
+              {hasMore && !isGated && (
+                <div className="sq-load-more">
+                  <button
+                    className="sq-load-btn"
+                    type="button"
+                    onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                  >
+                    Load more · {Math.min(PAGE_SIZE, gatedQuestions.length - visibleCount)} more questions
+                  </button>
                 </div>
               )}
             </>

@@ -26,8 +26,8 @@ export function ExamCatalogPage() {
   const [query, setQuery] = useState(searchParams.get('q') ?? '')
 
   usePageMeta({
-    title: 'Exams | Ministry of Papers',
-    description: 'Browse competitive exams — UPSC, SSC, Banking, Railways, and more.',
+    title: 'Exam Catalog — Browse 240+ Competitive Exams | Ministry of Papers',
+    description: 'Browse 240+ competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.',
     canonicalPath: '/exams',
     jsonLd: {
       '@context': 'https://schema.org',
@@ -188,9 +188,9 @@ export function ExamCatalogPage() {
                 <strong className="ec-card-name">{exam.shortName}</strong>
                 <p className="ec-card-full">{exam.name}</p>
                 <div className="ec-card-meta">
-                  {parseInt(exam.papers) > 0 && <span>{exam.papers} PYQs</span>}
-                  {parseInt(exam.mocks) > 0 && <span>{exam.mocks} Mocks</span>}
-                  {parseInt(exam.totalQuestions) > 0 && <span>{exam.totalQuestions} Qs</span>}
+                  {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
+                  {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
+                  {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
                 </div>
                 <span className="ec-card-cta">View exam →</span>
               </Link>

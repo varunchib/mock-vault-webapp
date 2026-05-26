@@ -1,12 +1,12 @@
-import {
-  ArrowLeft, BarChart3, CheckCircle2, Clock3, Target, TrendingUp, XCircle,
-} from 'lucide-react'
+import { ArrowLeft, Clock3, Medal, Target, TrendingUp } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
+import { analyticsSeoTitle, analyticsSeoDescription } from '../lib/pageTitles'
 import { readAllResults } from '../lib/mockActivity'
 import { examCutoffs, estimatePercentile } from '../data/examCutoffs'
-import { fetchExamCutoffs, type ExamCutoffSet } from '../lib/api'
+import { fetchExamCutoffs, fetchLeaderboard, type ExamCutoffSet, type LeaderboardEntry } from '../lib/api'
+import { useAuth } from '../context/useAuth'
 
 // ── Constants ─────────────────────────────────────────────────────────────
 
@@ -15,11 +15,6 @@ const POOL: Record<string, number> = {
   'ibps-po': 1000000, 'ibps-clerk': 1500000, 'sbi-po': 800000,
   'sbi-clerk': 700000, 'rrb-ntpc': 3000000, 'neet-ug': 2000000,
 }
-
-const COLORS = [
-  '#3b82f6', '#10b981', '#f59e0b', '#ef4444',
-  '#8b5cf6', '#ec4899', '#14b8a6', '#f97316', '#6366f1',
-]
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -30,335 +25,206 @@ function fmtTime(s: number) {
   return `${s}s`
 }
 
-function scoreColor(pct: number) {
-  return pct >= 70 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626'
-}
-
 function scoreClass(pct: number): 'good' | 'mid' | 'bad' {
   return pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'bad'
 }
 
-// ── SVG: Score trend line chart ───────────────────────────────────────────
-
-function ScoreTrendChart({ results }: { results: ReturnType<typeof readAllResults> }) {
-  if (results.length === 0) return null
-
-  const W = 400, H = 190
-  const pad = { left: 38, right: 16, top: 22, bottom: 36 }
-  const pw = W - pad.left - pad.right
-  const ph = H - pad.top - pad.bottom
-
-  const scores = results.map(r =>
-    r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0
-  )
-  const n = scores.length
-
-  const ptX = (i: number) => pad.left + (n === 1 ? pw / 2 : (i / (n - 1)) * pw)
-  const ptY = (s: number) => pad.top + (1 - s / 100) * ph
-
-  const pts = scores.map((s, i) => `${ptX(i).toFixed(1)},${ptY(s).toFixed(1)}`)
-  const linePath = `M ${pts.join(' L ')}`
-  const BOTTOM = pad.top + ph
-  const areaPath = `${linePath} L ${ptX(n - 1).toFixed(1)},${BOTTOM} L ${ptX(0).toFixed(1)},${BOTTOM} Z`
-
-  const labelStep = Math.max(1, Math.ceil(n / 8))
-  const trend = n > 1 ? scores[n - 1] - scores[0] : 0
-
-  return (
-    <div className="ea-chart-wrap">
-      <div className="ea-chart-title">
-        Score Trend
-        {trend !== 0 && (
-          <span className={`ea-trend-badge ${trend > 0 ? 'up' : 'down'}`}>
-            {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
-          </span>
-        )}
-      </div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="ea-svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="ea-area-grad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.22" />
-            <stop offset="100%" stopColor="#3b82f6" stopOpacity="0.01" />
-          </linearGradient>
-          <linearGradient id="ea-line-grad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#6366f1" />
-            <stop offset="100%" stopColor="#3b82f6" />
-          </linearGradient>
-        </defs>
-
-        {/* Y-axis grid + labels */}
-        {[25, 50, 75, 100].map(y => (
-          <g key={y}>
-            <line
-              x1={pad.left} y1={ptY(y)} x2={W - pad.right} y2={ptY(y)}
-              stroke="#f1f5f9" strokeWidth={1}
-            />
-            <text x={pad.left - 5} y={ptY(y) + 4} textAnchor="end" fontSize={9} fill="#94a3b8">
-              {y}
-            </text>
-          </g>
-        ))}
-
-        {/* X-axis labels */}
-        {scores.map((_, i) => {
-          if (i % labelStep !== 0 && i !== n - 1) return null
-          return (
-            <text key={i} x={ptX(i)} y={H - 6} textAnchor="middle" fontSize={9} fill="#94a3b8">
-              #{i + 1}
-            </text>
-          )
-        })}
-
-        {/* Area fill (only when multiple points) */}
-        {n > 1 && <path d={areaPath} fill="url(#ea-area-grad)" />}
-
-        {/* Line */}
-        {n > 1 && (
-          <path
-            d={linePath} fill="none"
-            stroke="url(#ea-line-grad)" strokeWidth={2.5}
-            strokeLinecap="round" strokeLinejoin="round"
-          />
-        )}
-
-        {/* Dots */}
-        {scores.map((s, i) => (
-          <circle
-            key={i}
-            cx={ptX(i)} cy={ptY(s)}
-            r={n > 12 ? 2.5 : 4}
-            fill="#3b82f6" stroke="#fff" strokeWidth={1.5}
-          />
-        ))}
-      </svg>
-    </div>
-  )
+function normalPdf(x: number, mean: number, std: number) {
+  return Math.exp(-0.5 * ((x - mean) / std) ** 2) / (std * Math.sqrt(2 * Math.PI))
 }
 
-// ── SVG: Subject donut chart ──────────────────────────────────────────────
+// ── Score Distribution (bell curve) chart ─────────────────────────────────
 
-type SubjectStat = { name: string; total: number; correct: number }
+type DistChartProps = {
+  userScore: number
+  totalMarks: number
+  avgScore: number
+  stdDev: number
+  cutoff: number
+  cutoffLabel: string
+}
 
-function DonutChart({ subjects }: { subjects: SubjectStat[] }) {
-  if (subjects.length === 0) return null
+function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutoffLabel }: DistChartProps) {
+  const W = 560, H = 200
+  const PAD = { left: 36, right: 16, top: 20, bottom: 36 }
+  const pw = W - PAD.left - PAD.right
+  const ph = H - PAD.top - PAD.bottom
 
-  const R = 62, SW = 18, CX = 90, CY = 90
-  const circ = 2 * Math.PI * R
+  const xMin = Math.max(0, avgScore - stdDev * 3.2)
+  const xMax = Math.min(totalMarks, avgScore + stdDev * 3.2)
+  const STEPS = 120
+  const step = (xMax - xMin) / STEPS
 
-  const grand = subjects.reduce((s, sub) => s + sub.total, 0)
-  const grandCorrect = subjects.reduce((s, sub) => s + sub.correct, 0)
-  const overall = grand > 0 ? Math.round((grandCorrect / grand) * 100) : 0
-
-  // Build segments with cumulative dashoffset
-  let cumLen = 0
-  const segments = subjects.map((sub, i) => {
-    const len = grand > 0 ? (sub.total / grand) * circ : 0
-    const seg = {
-      len,
-      dashOffset: -cumLen,
-      color: COLORS[i % COLORS.length],
-      name: sub.name,
-    }
-    cumLen += len
-    return seg
+  const points = Array.from({ length: STEPS + 1 }, (_, i) => {
+    const x = xMin + i * step
+    return { x, y: normalPdf(x, avgScore, stdDev) }
   })
+  const maxY = Math.max(...points.map(p => p.y))
 
-  const legendItems = subjects.slice(0, 6)
-  const hasMore = subjects.length > 6
+  const toSvgX = (v: number) => PAD.left + ((v - xMin) / (xMax - xMin)) * pw
+  const toSvgY = (v: number) => PAD.top + (1 - v / maxY) * ph
+
+  const curvePts = points.map(p => `${toSvgX(p.x).toFixed(1)},${toSvgY(p.y).toFixed(1)}`).join(' L ')
+  const curveD = `M ${curvePts}`
+  const BOTTOM = PAD.top + ph
+  const areaD = `${curveD} L ${toSvgX(xMax).toFixed(1)},${BOTTOM} L ${toSvgX(xMin).toFixed(1)},${BOTTOM} Z`
+
+  // Above-cutoff shaded region
+  const cutoffX = Math.max(xMin, Math.min(xMax, cutoff))
+  const cutoffPts = points
+    .filter(p => p.x >= cutoffX)
+    .map(p => `${toSvgX(p.x).toFixed(1)},${toSvgY(p.y).toFixed(1)}`)
+    .join(' L ')
+  const shadeD = cutoffPts
+    ? `M ${cutoffPts} L ${toSvgX(xMax).toFixed(1)},${BOTTOM} L ${toSvgX(cutoffX).toFixed(1)},${BOTTOM} Z`
+    : ''
+
+  const ux = toSvgX(Math.max(xMin, Math.min(xMax, userScore)))
+  const ax = toSvgX(avgScore)
+  const cx = toSvgX(cutoffX)
+
+  const xTicks = [xMin, avgScore, cutoff, userScore, xMax]
+    .filter((v, i, arr) => v >= xMin && v <= xMax && arr.indexOf(v) === i)
+    .sort((a, b) => a - b)
+    .filter((v, i, arr) => i === 0 || Math.abs(toSvgX(v) - toSvgX(arr[i - 1])) > 28)
 
   return (
-    <div className="ea-chart-wrap">
-      <div className="ea-chart-title">Subject Breakdown</div>
-      <div className="ea-donut-body">
-        <svg viewBox="0 0 180 180" className="ea-donut-svg" aria-hidden="true">
-          {/* Background ring */}
-          <circle cx={CX} cy={CY} r={R} fill="none" stroke="#f1f5f9" strokeWidth={SW} />
-          {/* Segments */}
-          {segments.map((seg, i) => (
-            <circle
-              key={i}
-              cx={CX} cy={CY} r={R}
-              fill="none"
-              stroke={seg.color}
-              strokeWidth={SW}
-              strokeDasharray={`${seg.len.toFixed(2)} ${(circ - seg.len).toFixed(2)}`}
-              strokeDashoffset={seg.dashOffset}
-              strokeLinecap="butt"
-              style={{ transform: 'rotate(-90deg)', transformOrigin: `${CX}px ${CY}px` }}
-            />
+    <svg viewBox={`0 0 ${W} ${H}`} className="ea2-dist-svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="ea2-curve-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.18" />
+          <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.02" />
+        </linearGradient>
+        <linearGradient id="ea2-shade-fill" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="#22c55e" stopOpacity="0.22" />
+          <stop offset="100%" stopColor="#22c55e" stopOpacity="0.04" />
+        </linearGradient>
+      </defs>
+
+      {/* Baseline */}
+      <line x1={PAD.left} y1={BOTTOM} x2={W - PAD.right} y2={BOTTOM} stroke="#e2e8f0" strokeWidth={1} />
+
+      {/* X-axis ticks */}
+      {xTicks.map(v => (
+        <g key={v}>
+          <line x1={toSvgX(v)} y1={BOTTOM} x2={toSvgX(v)} y2={BOTTOM + 4} stroke="#cbd5e1" strokeWidth={1} />
+          <text x={toSvgX(v)} y={BOTTOM + 14} textAnchor="middle" fontSize={8.5} fill="#94a3b8">
+            {Math.round(v)}
+          </text>
+        </g>
+      ))}
+
+      {/* Bell curve area */}
+      <path d={areaD} fill="url(#ea2-curve-fill)" />
+      <path d={curveD} fill="none" stroke="#94a3b8" strokeWidth={1.5} />
+
+      {/* Above-cutoff shaded zone */}
+      {shadeD && <path d={shadeD} fill="url(#ea2-shade-fill)" />}
+
+      {/* Cutoff marker */}
+      <line x1={cx} y1={PAD.top - 4} x2={cx} y2={BOTTOM} stroke="#ef4444" strokeWidth={1.5} strokeDasharray="4 3" />
+      <text x={cx} y={PAD.top - 7} textAnchor="middle" fontSize={8.5} fill="#ef4444" fontWeight={700}>
+        {cutoffLabel} {Math.round(cutoff)}
+      </text>
+
+      {/* Average marker */}
+      <line x1={ax} y1={PAD.top - 4} x2={ax} y2={BOTTOM} stroke="#f59e0b" strokeWidth={1.5} strokeDasharray="4 3" />
+      <text x={ax} y={PAD.top - 7} textAnchor="middle" fontSize={8.5} fill="#f59e0b" fontWeight={600}>
+        Avg {Math.round(avgScore)}
+      </text>
+
+      {/* User marker */}
+      <line x1={ux} y1={PAD.top - 4} x2={ux} y2={BOTTOM} stroke="#3b82f6" strokeWidth={2} />
+      <circle cx={ux} cy={PAD.top - 4} r={3.5} fill="#3b82f6" />
+      <text x={ux} y={PAD.top - 10} textAnchor="middle" fontSize={8.5} fill="#3b82f6" fontWeight={800}>
+        You {Math.round(userScore)}
+      </text>
+    </svg>
+  )
+}
+
+// ── Leaderboard panel ─────────────────────────────────────────────────────
+
+const MEDALS = ['🥇', '🥈', '🥉']
+
+function LeaderboardPanel({
+  top10, userRank, userName,
+}: { top10: LeaderboardEntry[]; userRank: number; userName: string }) {
+  const userInTop10 = top10.some(e => e.isMe)
+  const pool = 0
+
+  return (
+    <div className="ea2-lb-panel">
+      <div className="ea2-lb-header">
+        <Medal size={15} />
+        <span>Leaderboard</span>
+      </div>
+
+      {top10.length === 0 ? (
+        <div className="ea2-lb-empty">No attempts yet</div>
+      ) : (
+        <ol className="ea2-lb-list">
+          {top10.map((entry) => (
+            <li
+              key={entry.userId}
+              className={`ea2-lb-row${entry.isMe ? ' ea2-lb-row--me' : ''}`}
+            >
+              <span className="ea2-lb-rank">
+                {entry.rank <= 3 ? MEDALS[entry.rank - 1] : entry.rank}
+              </span>
+              <span className="ea2-lb-name" title={entry.name}>{entry.name}</span>
+              <span className="ea2-lb-score">{entry.scorePct}%</span>
+              {entry.isMe && <span className="ea2-lb-you">You</span>}
+            </li>
           ))}
-          {/* Center text */}
-          <text x={CX} y={CY - 6} textAnchor="middle" fontSize={22} fontWeight={800} fill="#111827">
-            {overall}%
-          </text>
-          <text x={CX} y={CY + 12} textAnchor="middle" fontSize={10} fill="#9ca3af">
-            Overall
-          </text>
-        </svg>
+        </ol>
+      )}
 
-        <div className="ea-donut-legend">
-          {legendItems.map((sub, i) => {
-            const pct = sub.total > 0 ? Math.round((sub.correct / sub.total) * 100) : 0
-            return (
-              <div className="ea-legend-row" key={sub.name}>
-                <span className="ea-legend-dot" style={{ background: COLORS[i % COLORS.length] }} />
-                <span className="ea-legend-name" title={sub.name}>{sub.name}</span>
-                <span className="ea-legend-pct" style={{ color: scoreColor(pct) }}>{pct}%</span>
-              </div>
-            )
-          })}
-          {hasMore && (
-            <div className="ea-legend-row ea-legend-more">
-              <span className="ea-legend-dot" style={{ background: '#d1d5db' }} />
-              <span className="ea-legend-name">+{subjects.length - 6} more</span>
-            </div>
-          )}
-        </div>
-      </div>
+      {!userInTop10 && userRank > 0 && (
+        <>
+          <div className="ea2-lb-sep" />
+          <div className="ea2-lb-row ea2-lb-row--me ea2-lb-row--user">
+            <span className="ea2-lb-rank">{userRank.toLocaleString('en-IN')}</span>
+            <span className="ea2-lb-name" title={userName}>{userName}</span>
+            <span className="ea2-lb-you">You</span>
+          </div>
+        </>
+      )}
+
+      {pool > 0 && userRank > 0 && (
+        <p className="ea2-lb-pool">
+          Rank {userRank.toLocaleString('en-IN')} of ~{(pool / 100000).toFixed(0)}L candidates
+        </p>
+      )}
     </div>
   )
 }
 
-// ── SVG: Percentile gauge bar ─────────────────────────────────────────────
+// ── Attempt history row ───────────────────────────────────────────────────
 
-function PercentileGauge({ percentile, examSlug }: { percentile: number; examSlug: string }) {
-  if (percentile <= 0) return null
-
-  const W = 400, H = 90
-  const BAR = { x: 40, y: 34, w: 320, h: 18 }
-  const markerX = BAR.x + (percentile / 100) * BAR.w
-  // Clamp text anchor so label doesn't overflow
-  const textAnchor = markerX > BAR.x + BAR.w * 0.8 ? 'end' : markerX < BAR.x + BAR.w * 0.2 ? 'start' : 'middle'
-
-  const pool = POOL[examSlug] ?? 100000
-  const rank = Math.max(1, Math.round(((100 - percentile) / 100) * pool))
-  const poolLabel = pool >= 1000000
-    ? `${(pool / 100000).toFixed(0)}L`
-    : `${(pool / 1000).toFixed(0)}K`
-
+function HistoryCard({ r, examSlug }: {
+  r: ReturnType<typeof readAllResults>[0]
+  examSlug: string
+}) {
+  const pct = r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0
+  const pctile = estimatePercentile(r.correct, r.totalQuestions, examSlug)
   return (
-    <div className="ea-chart-wrap">
-      <div className="ea-chart-title">Estimated Percentile</div>
-      <svg viewBox={`0 0 ${W} ${H}`} className="ea-svg" aria-hidden="true">
-        <defs>
-          <linearGradient id="ea-gauge-grad" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#dc2626" />
-            <stop offset="45%" stopColor="#d97706" />
-            <stop offset="100%" stopColor="#16a34a" />
-          </linearGradient>
-        </defs>
-
-        {/* Track */}
-        <rect
-          x={BAR.x} y={BAR.y} width={BAR.w} height={BAR.h}
-          rx={BAR.h / 2} fill="#f1f5f9"
-        />
-        {/* Gradient fill to percentile */}
-        <rect
-          x={BAR.x} y={BAR.y}
-          width={(percentile / 100) * BAR.w} height={BAR.h}
-          rx={BAR.h / 2} fill="url(#ea-gauge-grad)"
-        />
-        {/* Marker */}
-        <line
-          x1={markerX} y1={BAR.y - 6} x2={markerX} y2={BAR.y + BAR.h + 6}
-          stroke="#111827" strokeWidth={2.5} strokeLinecap="round"
-        />
-        {/* Percentile label */}
-        <text
-          x={markerX} y={BAR.y - 11}
-          textAnchor={textAnchor} fontSize={12} fontWeight={800} fill="#111827"
-        >
-          ~{percentile}th
-        </text>
-        {/* Scale labels */}
-        <text x={BAR.x} y={BAR.y + BAR.h + 16} textAnchor="start" fontSize={9} fill="#94a3b8">0</text>
-        <text x={BAR.x + BAR.w / 2} y={BAR.y + BAR.h + 16} textAnchor="middle" fontSize={9} fill="#94a3b8">50th</text>
-        <text x={BAR.x + BAR.w} y={BAR.y + BAR.h + 16} textAnchor="end" fontSize={9} fill="#94a3b8">99th</text>
-      </svg>
-      <div className="ea-gauge-stats">
-        <span>~{percentile}th percentile</span>
-        <span>Est. rank <strong>~{rank.toLocaleString('en-IN')}</strong> / {poolLabel} candidates</span>
+    <div className="ea2-hist-card">
+      <div className="ea2-hist-card-top">
+        <span className={`ea2-hist-score ${scoreClass(pct)}`}>{pct}%</span>
+        {pctile > 0 && <span className="ea2-hist-pctile">~{pctile}th</span>}
       </div>
-    </div>
-  )
-}
-
-// ── Cutoff comparison bars ────────────────────────────────────────────────
-
-function CutoffBars({
-  apiCutoffs, examSlug, userScore,
-}: { apiCutoffs: ExamCutoffSet[] | null; examSlug: string; userScore: number }) {
-  // Prefer API data (most recent set); fall back to static bundle
-  const cut: { stage: string; year: string; totalMarks: number; cutoffs: Array<{ category: string; marks: number }> } | null =
-    apiCutoffs && apiCutoffs.length > 0
-      ? apiCutoffs[0]
-      : examCutoffs[examSlug]
-        ? {
-            stage: examCutoffs[examSlug].stage,
-            year: examCutoffs[examSlug].year,
-            totalMarks: examCutoffs[examSlug].totalMarks,
-            cutoffs: examCutoffs[examSlug].cutoffs,
-          }
-        : null
-
-  if (!cut) return null
-
-  const maxVal = cut.totalMarks
-  const userPct = Math.min(100, (userScore / maxVal) * 100)
-  const isFromApi = apiCutoffs && apiCutoffs.length > 0
-
-  return (
-    <div className="ea-chart-wrap">
-      <div className="ea-chart-title">
-        Cutoff Comparison
-        <span className="ea-chart-sub">{cut.stage} · {cut.year}</span>
-        {isFromApi && <span className="ea-chart-sub" style={{ background: '#dcfce7', color: '#15803d' }}>Official</span>}
+      <strong className="ea2-hist-card-title">{r.title}</strong>
+      <span className="ea2-hist-card-meta">
+        {r.type === 'mock' ? 'Mock Test' : 'PYQ Paper'}
+        {' · '}
+        {new Date(r.attemptedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+      </span>
+      <div className="ea2-hist-card-stats">
+        <span className="ea2-hist-cs ea2-hist-cs--c">{r.correct} Correct</span>
+        <span className="ea2-hist-cs ea2-hist-cs--w">{r.wrong} Wrong</span>
+        <span className="ea2-hist-cs ea2-hist-cs--s">{r.skipped} Skipped</span>
       </div>
-
-      {/* User avg row */}
-      <div className="ea-cutoff-row ea-cutoff-row--user">
-        <span className="ea-cutoff-cat">Your Avg</span>
-        <div className="ea-cutoff-track-wrap">
-          <div className="ea-cutoff-track">
-            <div className="ea-cutoff-fill user" style={{ width: `${userPct}%` }} />
-          </div>
-        </div>
-        <span className="ea-cutoff-val user">{Math.round(userScore * 10) / 10}</span>
-      </div>
-
-      {/* Category rows */}
-      {cut.cutoffs.map((c) => {
-        const cleared = userScore >= c.marks
-        const catPct = (c.marks / maxVal) * 100
-        return (
-          <div className="ea-cutoff-row" key={c.category}>
-            <span className="ea-cutoff-cat">{c.category}</span>
-            <div className="ea-cutoff-track-wrap">
-              <div className="ea-cutoff-track">
-                <div
-                  className={`ea-cutoff-fill ${cleared ? 'cleared' : 'missed'}`}
-                  style={{ width: `${catPct}%` }}
-                />
-              </div>
-              {userScore > 0 && (
-                <div
-                  className="ea-cutoff-marker"
-                  style={{ left: `${userPct}%` }}
-                  title={`Your avg: ${Math.round(userScore * 10) / 10}`}
-                />
-              )}
-            </div>
-            <span className={`ea-cutoff-val ${cleared ? 'pass' : 'fail'}`}>
-              {cleared ? '✓' : '✗'} {c.marks}
-            </span>
-          </div>
-        )
-      })}
-
-      <p className="ea-cutoff-note">
-        Your average scaled score: {Math.round(userScore * 10) / 10} / {maxVal}
-      </p>
     </div>
   )
 }
@@ -367,202 +233,233 @@ function CutoffBars({
 
 export function ExamAnalyticsPage() {
   const { examSlug = '' } = useParams<{ examSlug: string }>()
+  const { user } = useAuth()
 
-  // All hooks must run before any conditional returns
-  const results = useMemo(
-    () => examSlug ? readAllResults(examSlug) : [],
-    [examSlug],
-  )
+  const results = useMemo(() => examSlug ? readAllResults(examSlug) : [], [examSlug])
+  const examName = results[0]?.examName ?? examSlug
 
   const [apiCutoffs, setApiCutoffs] = useState<ExamCutoffSet[] | null>(null)
+  const [leaderboard, setLeaderboard] = useState<{ top10: LeaderboardEntry[]; userRank: number } | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string>('General')
+
   useEffect(() => {
     if (!examSlug) return
-    fetchExamCutoffs(examSlug)
-      .then(setApiCutoffs)
-      .catch(() => setApiCutoffs([]))
+    fetchExamCutoffs(examSlug).then(setApiCutoffs).catch(() => setApiCutoffs([]))
+    fetchLeaderboard(examSlug).then(setLeaderboard).catch(() => setLeaderboard({ top10: [], userRank: -1 }))
   }, [examSlug])
-
-  const examName = results[0]?.examName ?? examSlug
 
   const recentFirst = useMemo(
     () => [...results].sort((a, b) => new Date(b.attemptedAt).getTime() - new Date(a.attemptedAt).getTime()),
     [results],
   )
 
-  const subjects = useMemo<SubjectStat[]>(() => {
-    const map = new Map<string, SubjectStat>()
-    for (const r of results) {
-      for (const s of r.subjects) {
-        const prev = map.get(s.subject) ?? { name: s.subject, total: 0, correct: 0 }
-        map.set(s.subject, {
-          name: s.subject,
-          total: prev.total + s.total,
-          correct: prev.correct + s.correct,
-        })
-      }
-    }
-    return Array.from(map.values()).sort((a, b) => b.total - a.total)
-  }, [results])
-
   const summary = useMemo(() => {
-    if (results.length === 0) return null
+    if (!results.length) return null
     const totalTime = results.reduce((s, r) => s + r.timeTakenSeconds, 0)
-    const avgAccPct = Math.round(
-      results.reduce((s, r) => s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * 100 : 0), 0)
-      / results.length,
-    )
-    const bestPct = Math.max(...results.map(r =>
-      r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0
-    ))
+    const avgAccPct = Math.round(results.reduce((s, r) => s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * 100 : 0), 0) / results.length)
+    const bestPct = Math.max(...results.map(r => r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0))
     const cut = examCutoffs[examSlug]
     const avgScaledScore = cut
-      ? results.reduce((s, r) =>
-          s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * cut.totalMarks : 0), 0
-        ) / results.length
+      ? results.reduce((s, r) => s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * cut.totalMarks : 0), 0) / results.length
       : 0
-    const percentiles = results
-      .map(r => estimatePercentile(r.correct, r.totalQuestions, examSlug))
-      .filter(p => p > 0)
-    const avgPercentile = percentiles.length > 0
-      ? Math.round(percentiles.reduce((s, p) => s + p, 0) / percentiles.length)
-      : 0
+    const percentiles = results.map(r => estimatePercentile(r.correct, r.totalQuestions, examSlug)).filter(p => p > 0)
+    const avgPercentile = percentiles.length ? Math.round(percentiles.reduce((s, p) => s + p, 0) / percentiles.length) : 0
     return { totalTime, avgAccPct, bestPct, avgScaledScore, avgPercentile }
   }, [results, examSlug])
 
+  // Merge API + static cutoffs
+  const activeCutoff = useMemo(() => {
+    if (apiCutoffs && apiCutoffs.length > 0) {
+      const set = apiCutoffs[0]
+      return {
+        stage: set.stage,
+        year: set.year,
+        totalMarks: set.totalMarks,
+        avgScore: set.avgScore ?? examCutoffs[examSlug]?.avgScore ?? 50,
+        stdDev: set.stdDev ?? examCutoffs[examSlug]?.stdDev ?? 12,
+        cutoffs: set.cutoffs,
+      }
+    }
+    const st = examCutoffs[examSlug]
+    if (!st) return null
+    return { stage: st.stage, year: st.year, totalMarks: st.totalMarks, avgScore: st.avgScore, stdDev: st.stdDev, cutoffs: st.cutoffs }
+  }, [apiCutoffs, examSlug])
+
+  const categories = useMemo(() => activeCutoff?.cutoffs.map(c => c.category) ?? [], [activeCutoff])
+
+  useEffect(() => {
+    if (categories.length && !categories.includes(selectedCategory)) {
+      setSelectedCategory(categories[0])
+    }
+  }, [categories, selectedCategory])
+
+  const selectedCutoffVal = activeCutoff?.cutoffs.find(c => c.category === selectedCategory)?.marks ?? 0
+
   usePageMeta({
-    title: `${examName} Analytics | Ministry of Papers`,
-    description: `Your ${examName} performance — scores, subject mastery, percentile, and cutoff comparison.`,
+    title: analyticsSeoTitle({ examName }),
+    description: analyticsSeoDescription({ examName, attempts: results.length, avgAccPct: summary?.avgAccPct }),
     canonicalPath: `/analytics/${examSlug}`,
   })
 
-  // Guards after all hooks
   if (!examSlug) return <Navigate to="/analytics" replace />
-  if (results.length === 0 || !summary) return <Navigate to={`/exam/${examSlug}`} replace />
+  if (!results.length || !summary) return <Navigate to={`/exam/${examSlug}`} replace />
+
+  const pool = POOL[examSlug] ?? 0
+  const poolLabel = pool >= 1000000 ? `${(pool / 100000).toFixed(0)}L` : pool >= 1000 ? `${(pool / 1000).toFixed(0)}K` : ''
 
   return (
-    <section className="ea-page workspace-page">
+    <section className="ea2-page workspace-page">
 
-      {/* ── Header ──────────────────────────────── */}
-      <header className="ea-header">
-        <Link to={`/exam/${examSlug}`} className="ea-back-btn">
-          <ArrowLeft size={14} /> {examName}
+      {/* ── Header ─────────────────────────────────── */}
+      <header className="ea2-header">
+        <Link to="/analytics" className="ea2-back">
+          <ArrowLeft size={14} /> Analytics
         </Link>
-        <div>
-          <small>Exam Analytics</small>
+        <div className="ea2-header-body">
           <h1>{examName}</h1>
-          <p>{results.length} attempt{results.length !== 1 ? 's' : ''} recorded</p>
+          <p>{results.length} attempt{results.length !== 1 ? 's' : ''} · {activeCutoff?.stage ?? ''} {activeCutoff?.year ?? ''}</p>
         </div>
       </header>
 
-      {/* ── Summary strip ───────────────────────── */}
-      <div className="ea-summary-strip">
-        <div className="ea-summary-card">
-          <span className="ea-summary-icon"><Target size={15} /></span>
-          <strong>{summary.avgAccPct}%</strong>
+      {/* ── Summary strip ──────────────────────────── */}
+      <div className="ea2-strip">
+        <div className="ea2-strip-card">
+          <span className="ea2-strip-icon"><Target size={14} /></span>
+          <strong className={scoreClass(summary.avgAccPct)}>{summary.avgAccPct}%</strong>
           <span>Avg Accuracy</span>
         </div>
-        <div className="ea-summary-card">
-          <span className="ea-summary-icon"><TrendingUp size={15} /></span>
-          <strong>{summary.bestPct}%</strong>
+        <div className="ea2-strip-card">
+          <span className="ea2-strip-icon"><TrendingUp size={14} /></span>
+          <strong className={scoreClass(summary.bestPct)}>{summary.bestPct}%</strong>
           <span>Best Score</span>
         </div>
-        <div className="ea-summary-card">
-          <span className="ea-summary-icon"><BarChart3 size={15} /></span>
+        <div className="ea2-strip-card">
+          <span className="ea2-strip-icon"><Medal size={14} /></span>
           <strong>{summary.avgPercentile > 0 ? `~${summary.avgPercentile}th` : '—'}</strong>
           <span>Avg Percentile</span>
         </div>
-        <div className="ea-summary-card">
-          <span className="ea-summary-icon"><Clock3 size={15} /></span>
+        <div className="ea2-strip-card">
+          <span className="ea2-strip-icon"><Clock3 size={14} /></span>
           <strong>{fmtTime(summary.totalTime)}</strong>
           <span>Total Time</span>
         </div>
       </div>
 
-      {/* ── Chart row 1: Trend + Donut ───────────── */}
-      <div className="ea-charts-row ea-charts-2-1">
-        <ScoreTrendChart results={results} />
-        {subjects.length > 0 && <DonutChart subjects={subjects} />}
-      </div>
+      {/* ── Main content: chart + leaderboard ──────── */}
+      <div className="ea2-main-row">
 
-      {/* ── Chart row 2: Gauge + Cutoff ──────────── */}
-      {(summary.avgPercentile > 0 || ((apiCutoffs?.length || examCutoffs[examSlug]) && summary.avgScaledScore > 0)) && (
-        <div className="ea-charts-row ea-charts-even">
-          {summary.avgPercentile > 0 && (
-            <PercentileGauge percentile={summary.avgPercentile} examSlug={examSlug} />
-          )}
-          {(apiCutoffs?.length || examCutoffs[examSlug]) && summary.avgScaledScore > 0 && (
-            <CutoffBars apiCutoffs={apiCutoffs} examSlug={examSlug} userScore={summary.avgScaledScore} />
-          )}
-        </div>
-      )}
-
-      {/* ── Attempt history ─────────────────────── */}
-      <div className="ea-history-panel">
-        <h2>Attempt History</h2>
-        <div className="ea-history-list">
-          {recentFirst.map((r, i) => {
-            const pct = r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0
-            const pctile = estimatePercentile(r.correct, r.totalQuestions, examSlug)
-            return (
-              <div
-                className="ea-history-row"
-                key={`${r.type}-${r.slug}-${r.attemptedAt}`}
-              >
-                <span className="ea-hist-num">#{recentFirst.length - i}</span>
-                <div className="ea-hist-info">
-                  <strong>{r.title}</strong>
-                  <span>
-                    {r.type === 'mock' ? 'Mock Test' : 'PYQ Paper'}
-                    {' · '}
-                    {new Date(r.attemptedAt).toLocaleDateString('en-IN', {
-                      day: 'numeric', month: 'short', year: 'numeric',
-                    })}
-                  </span>
-                </div>
-                <div className="ea-hist-stats">
-                  <span className={`ea-hist-score ${scoreClass(pct)}`}>{pct}%</span>
-                  <span className="ea-hist-detail">
-                    <CheckCircle2 size={10} /> {r.correct}
-                    <XCircle size={10} style={{ marginLeft: 6 }} /> {r.wrong}
-                  </span>
-                  {pctile > 0 && (
-                    <span className="ea-hist-pctile">~{pctile}th pct.</span>
-                  )}
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      </div>
-
-      {/* ── Subject mastery ─────────────────────── */}
-      {subjects.length > 0 && (
-        <div className="ea-mastery-panel">
-          <h2>Subject Mastery</h2>
-          <p>Aggregated across all {results.length} attempt{results.length !== 1 ? 's' : ''}</p>
-          <div className="ea-mastery-grid">
-            {subjects.map((s, i) => {
-              const pct = s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0
-              const color = COLORS[i % COLORS.length]
-              return (
-                <div className="ea-mastery-card" key={s.name}>
-                  <div className="ea-mastery-head">
-                    <span className="ea-mastery-dot" style={{ background: color }} />
-                    <span className="ea-mastery-name" title={s.name}>{s.name}</span>
-                    <span className={`ea-mastery-pct ${scoreClass(pct)}`}>{pct}%</span>
-                  </div>
-                  <div className="ea-mastery-bar">
-                    <div className="ea-mastery-fill" style={{ width: `${pct}%`, background: color }} />
-                  </div>
-                  <span className="ea-mastery-detail">
-                    {s.correct}✓ · {s.total - s.correct - 0}✗ / {s.total} total
-                  </span>
-                </div>
-              )
-            })}
+        {/* Centre: position chart */}
+        <div className="ea2-chart-panel">
+          <div className="ea2-chart-heading">
+            <div>
+              <h2>Score Position</h2>
+              <p>Where you stand relative to the average and cutoff</p>
+            </div>
+            {activeCutoff && (
+              <span className="ea2-chart-meta">{activeCutoff.stage} · {activeCutoff.year}</span>
+            )}
           </div>
+
+          {/* Category tabs */}
+          {categories.length > 0 && (
+            <div className="ea2-cat-tabs">
+              {categories.map(cat => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`ea2-cat-tab${selectedCategory === cat ? ' active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Bell curve */}
+          {activeCutoff && summary.avgScaledScore > 0 ? (
+            <ScoreDistChart
+              userScore={summary.avgScaledScore}
+              totalMarks={activeCutoff.totalMarks}
+              avgScore={activeCutoff.avgScore}
+              stdDev={activeCutoff.stdDev}
+              cutoff={selectedCutoffVal}
+              cutoffLabel={selectedCategory}
+            />
+          ) : (
+            <div className="ea2-chart-placeholder">
+              No cutoff data available for this exam yet.
+            </div>
+          )}
+
+          {/* Legend */}
+          {activeCutoff && (
+            <div className="ea2-legend">
+              <span className="ea2-legend-item ea2-legend--you">
+                <span className="ea2-legend-line" />
+                Your avg score
+              </span>
+              <span className="ea2-legend-item ea2-legend--avg">
+                <span className="ea2-legend-line" />
+                Average score
+              </span>
+              <span className="ea2-legend-item ea2-legend--cut">
+                <span className="ea2-legend-line ea2-legend-line--dash" />
+                {selectedCategory} cutoff
+              </span>
+              <span className="ea2-legend-item ea2-legend--zone">
+                <span className="ea2-legend-dot-fill" />
+                Above cutoff zone
+              </span>
+            </div>
+          )}
+
+          {/* User vs cutoff callout */}
+          {activeCutoff && summary.avgScaledScore > 0 && selectedCutoffVal > 0 && (
+            <div className={`ea2-verdict ${summary.avgScaledScore >= selectedCutoffVal ? 'pass' : 'fail'}`}>
+              {summary.avgScaledScore >= selectedCutoffVal ? '✓' : '✗'}
+              {' '}Your avg score <strong>{Math.round(summary.avgScaledScore * 10) / 10}</strong>
+              {' '}{summary.avgScaledScore >= selectedCutoffVal ? 'clears' : 'misses'} the{' '}
+              <strong>{selectedCategory}</strong> cutoff of <strong>{selectedCutoffVal}</strong>
+              {' '}/ {activeCutoff.totalMarks}
+            </div>
+          )}
+
+          {/* Percentile + rank estimate */}
+          {summary.avgPercentile > 0 && (
+            <div className="ea2-rank-estimate">
+              <span>~{summary.avgPercentile}th percentile</span>
+              {pool > 0 && (
+                <span>
+                  Est. rank <strong>~{Math.max(1, Math.round(((100 - summary.avgPercentile) / 100) * pool)).toLocaleString('en-IN')}</strong>
+                  {' '}/ {poolLabel}
+                </span>
+              )}
+            </div>
+          )}
         </div>
-      )}
+
+        {/* Right: leaderboard */}
+        <LeaderboardPanel
+          top10={leaderboard?.top10 ?? []}
+          userRank={leaderboard?.userRank ?? -1}
+          userName={user?.name ?? 'You'}
+        />
+      </div>
+
+      {/* ── Attempt history ─────────────────────────── */}
+      <div className="ea2-history">
+        <h2>Attempt History</h2>
+        <div className="ea2-hist-list">
+          {recentFirst.map((r) => (
+            <HistoryCard
+              key={`${r.type}-${r.slug}-${r.attemptedAt}`}
+              r={r}
+              examSlug={examSlug}
+            />
+          ))}
+        </div>
+      </div>
 
     </section>
   )

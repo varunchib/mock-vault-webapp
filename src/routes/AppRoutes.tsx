@@ -14,13 +14,13 @@ import { PyqPaperPage }      from '../pages/PyqPaperPage'
 import { MockDetailPage }    from '../pages/MockSeoPage'
 import { PrivacyPolicyPage } from '../pages/PrivacyPolicyPage'
 import { TermsPage }         from '../pages/TermsPage'
+import { AboutPage }         from '../pages/AboutPage'
 
 // Lazy — auth-gated or heavy pages not needed on initial load
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
 const AdminDashboardPage  = lazy(() => import('../pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
 const AnalyticsPage       = lazy(() => import('../pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
 const ExamAnalyticsPage   = lazy(() => import('../pages/ExamAnalyticsPage').then(m => ({ default: m.ExamAnalyticsPage })))
-const TestsPage           = lazy(() => import('../pages/TestsPage').then(m => ({ default: m.TestsPage })))
 const MockAttemptPage     = lazy(() => import('../pages/MockAttemptPage').then(m => ({ default: m.MockAttemptPage })))
 const PaperAttemptPage    = lazy(() => import('../pages/PaperAttemptPage').then(m => ({ default: m.PaperAttemptPage })))
 
@@ -68,7 +68,6 @@ export function AppRoutes() {
       <Route path="/admin"              element={<ProtectedAdmin />} />
       <Route path="/exams"              element={<ExamCatalogPage />} />
       <Route path="/exam/:slug"         element={<ExamPage />} />
-      <Route path="/tests"              element={<ProtectedPage><Lazy><TestsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/question/:slug"     element={<QuestionPage />} />
@@ -78,11 +77,13 @@ export function AppRoutes() {
       <Route path="/paper-attempt/:slug" element={<ProtectedPage><Lazy><PaperAttemptPage /></Lazy></ProtectedPage>} />
       <Route path="/privacy"      element={<PrivacyPolicyPage />} />
       <Route path="/terms"        element={<TermsPage />} />
+      <Route path="/about"        element={<AboutPage />} />
       {/* Legacy redirects */}
       <Route path="/exam"        element={<Navigate to="/exams" replace />} />
-      <Route path="/mock-test"   element={<Navigate to="/tests" replace />} />
-      <Route path="/pyq-papers"  element={<Navigate to="/tests?tab=papers" replace />} />
-      <Route path="/pdf-library" element={<Navigate to="/tests?tab=papers" replace />} />
+      <Route path="/mock-test"   element={<Navigate to="/exams" replace />} />
+      <Route path="/pyq-papers"  element={<Navigate to="/exams" replace />} />
+      <Route path="/pdf-library" element={<Navigate to="/exams" replace />} />
+      <Route path="/tests"       element={<Navigate to="/exams" replace />} />
       <Route path="/practice"    element={<Navigate to="/exams" replace />} />
       <Route path="/attempted"   element={<Navigate to="/analytics" replace />} />
       <Route path="*"            element={<Navigate to="/" replace />} />

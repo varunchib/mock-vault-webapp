@@ -1,10 +1,12 @@
-import { ClipboardList, FileText, PlusCircle } from 'lucide-react'
+import { ArrowRight, ClipboardList, FileText, PlusCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   APIError,
+  fetchActiveLiveAttempts,
   fetchDashboardBootstrap,
   refreshAuthSession,
+  type ActiveAttempt,
   type Exam,
   type MockItem,
   type RecentAttempt,
@@ -93,6 +95,14 @@ export function groupExamsByCategory(exams: Exam[]): ExamCategoryGroup[] {
     })
 }
 
+function formatRemainingTime(seconds: number): string {
+  if (seconds <= 0) return '0:00'
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  if (h > 0) return `${h}h ${m}m`
+  return `${m}m`
+}
+
 function getGreeting(): string {
   const hour = new Date().getHours()
   if (hour < 12) return 'Good morning'
@@ -104,12 +114,14 @@ export function DashboardPage() {
   const { user } = useAuth()
   const firstName = user?.name?.split(' ')[0] ?? 'there'
 
-  const [exams, setExams] = useState<Exam[]>([])
   const [mocks, setMocks] = useState<MockItem[]>([])
   const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
+  const [activeAttempts, setActiveAttempts] = useState<ActiveAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [, forceTimerTick] = useState(0)
+  const attemptsFetchedAtMs = useRef(0)
 
   usePageMeta({
     title: 'Dashboard | Ministry of Papers',
@@ -121,7 +133,6 @@ export function DashboardPage() {
     let cancelled = false
     const load = async () => {
       const applyData = (data: Awaited<ReturnType<typeof fetchDashboardBootstrap>>) => {
-        setExams(data.exams ?? [])
         setMocks(data.mocks ?? [])
         setEnrolledExams(data.enrolledExams ?? [])
         setRecentAttempts(data.recentAttempts ?? [])
@@ -130,16 +141,28 @@ export function DashboardPage() {
       try {
         setLoading(true)
         setError(null)
-        const data = await fetchDashboardBootstrap()
+        const [data, liveAttempts] = await Promise.all([
+          fetchDashboardBootstrap(),
+          fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
+        ])
         if (cancelled) return
         applyData(data)
+        attemptsFetchedAtMs.current = Date.now()
+        setActiveAttempts(liveAttempts)
       } catch (err) {
         if (cancelled) return
         if (err instanceof APIError && err.status === 401) {
           try {
             await refreshAuthSession()
-            const retried = await fetchDashboardBootstrap()
-            if (!cancelled) applyData(retried)
+            const [retried, liveAttempts] = await Promise.all([
+              fetchDashboardBootstrap(),
+              fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
+            ])
+            if (!cancelled) {
+              applyData(retried)
+              attemptsFetchedAtMs.current = Date.now()
+              setActiveAttempts(liveAttempts)
+            }
             return
           } catch {
             // refresh failed — fall through to error state
@@ -155,6 +178,17 @@ export function DashboardPage() {
   }, [])
 
   const recentlyViewed = useMemo(() => readRecentlyViewed(), [])
+
+  useEffect(() => {
+    if (!activeAttempts.length) return
+    const id = window.setInterval(() => forceTimerTick((n) => n + 1), 1000)
+    return () => window.clearInterval(id)
+  }, [activeAttempts.length])
+
+  const getLiveRemaining = (attempt: ActiveAttempt): number => {
+    const elapsed = Math.floor((Date.now() - attemptsFetchedAtMs.current) / 1000)
+    return Math.max(0, attempt.remainingSeconds - elapsed)
+  }
 
   if (loading) return <HaloLoader label="Loading dashboard" />
 
@@ -195,6 +229,43 @@ export function DashboardPage() {
         </div>
       </header>
 
+      {/* ── In-progress tests ──────────────────────── */}
+      {activeAttempts.length > 0 && (
+        <section className="db-section db-ip-section">
+          <div className="db-section-head">
+            <div className="db-ip-heading">
+              <span className="db-live-dot" aria-hidden="true" />
+              <span className="db-ip-heading-label">In Progress</span>
+              <span className="db-ip-heading-count">
+                {activeAttempts.length} active
+              </span>
+            </div>
+          </div>
+          <div className="db-ip-list">
+            {activeAttempts.map((attempt) => (
+              <div className="db-ip-card" key={attempt.paperSlug}>
+                <div className="db-ip-accent" />
+                <div className="db-ip-info">
+                  <strong>{attempt.paperTitle}</strong>
+                  <small>{attempt.examName}</small>
+                </div>
+                <div className="db-ip-stat">
+                  <strong>{attempt.answeredCount}<em>/{attempt.totalQuestions}</em></strong>
+                  <small>answered</small>
+                </div>
+                <div className="db-ip-timer">
+                  <strong>{formatRemainingTime(getLiveRemaining(attempt))}</strong>
+                  <small>remaining</small>
+                </div>
+                <Link className="db-ip-btn" to={`/paper-attempt/${attempt.paperSlug}`}>
+                  Resume <ArrowRight size={14} />
+                </Link>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* ── Enrolled exams ──────────────────────────── */}
       <section className="db-section">
         <div className="db-section-head">
@@ -222,9 +293,9 @@ export function DashboardPage() {
                 <div>
                   <strong>{exam.shortName}</strong>
                   <small>
-                    {parseInt(exam.mocks) > 0 ? `${exam.mocks} mocks` : ''}
-                    {parseInt(exam.mocks) > 0 && parseInt(exam.papers) > 0 ? ' · ' : ''}
-                    {parseInt(exam.papers) > 0 ? `${exam.papers} papers` : ''}
+                    {exam.mocks > 0 ? `${exam.mocks} mocks` : ''}
+                    {exam.mocks > 0 && exam.papers > 0 ? ' · ' : ''}
+                    {exam.papers > 0 ? `${exam.papers} papers` : ''}
                   </small>
                 </div>
               </Link>
@@ -264,17 +335,17 @@ export function DashboardPage() {
             <small>Activity</small>
             <h2>Recently attempted</h2>
           </div>
-          <Link className="db-section-link" to="/tests">All tests →</Link>
+          <Link className="db-section-link" to="/exams">All tests →</Link>
         </div>
 
         {recentAttempts.length === 0 ? (
           <div className="db-attempts-empty">
             <p>No attempts yet — start a mock test or open a PYQ paper.</p>
-            <Link className="db-enroll-btn" to="/tests">Browse Tests</Link>
+            <Link className="db-enroll-btn" to="/exams">Browse Tests</Link>
           </div>
         ) : (
           <div className="db-attempt-list">
-            {recentAttempts.map((attempt) => {
+            {[...new Map(recentAttempts.map((a) => [`${a.type}-${a.slug}`, a])).values()].map((attempt) => {
               const href = attempt.type === 'paper'
                 ? `/pyq/${attempt.slug}`
                 : `/mock-test/${attempt.examSlug}`

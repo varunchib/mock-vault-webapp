@@ -10,18 +10,20 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
+  Moon,
   Pencil,
   Plus,
   RefreshCw,
   Save,
   Search,
+  Sun,
   Trash2,
   UploadCloud,
   Users,
   X,
   XCircle,
 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { useAuth } from '../context/useAuth'
@@ -42,6 +44,8 @@ import {
   saveAdminMock,
   saveAdminPaper,
   updateAdminQuestion,
+  refreshAuthSession,
+  APIError,
   type AdminExamPayload,
   type AdminMockPayload,
   type AdminMockQuestionPayload,
@@ -127,12 +131,6 @@ function asStringList(value: unknown) {
 function normalizeAnswer(value: unknown) {
   const a = asString(value, 'A').toUpperCase()
   return ['A', 'B', 'C', 'D'].includes(a) ? a : 'A'
-}
-
-function normalizeDifficulty(value: unknown): AdminMockDraft['difficulty'] {
-  const d = asString(value, 'Moderate')
-  if (d === 'Beginner' || d === 'Moderate' || d === 'Advanced') return d
-  return 'Moderate'
 }
 
 function normalizeOptions(value: unknown): QuestionOption[] {
@@ -297,6 +295,13 @@ export function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState<Tab>('overview')
   const [statusMsg, setStatusMsg] = useState<StatusMsg | null>(null)
   const [saving, setSaving] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === '1')
+
+  const toggleDark = () => setDarkMode((d) => {
+    const next = !d
+    localStorage.setItem('admin-dark', next ? '1' : '0')
+    return next
+  })
 
   // Mock draft
   const [draft, setDraft] = useState<AdminMockDraft>(emptyDraft())
@@ -349,11 +354,23 @@ export function AdminDashboardPage() {
   // ── Load data ───────────────────────────────────────────────
 
   const loadData = useCallback(async () => {
-    const [summaryData, mockData, paperData] = await Promise.all([fetchAdminSummary(), fetchMockCatalog(), fetchPaperCatalog()])
-    setSummary(summaryData)
-    setMocks(mockData ?? [])
-    setPapers(paperData ?? [])
-    setDraft((cur) => cur.examSlug ? cur : emptyDraft(summaryData.exams[0]?.slug ?? ''))
+    const run = async () => {
+      const [summaryData, mockData, paperData] = await Promise.all([fetchAdminSummary(), fetchMockCatalog(), fetchPaperCatalog()])
+      setSummary(summaryData)
+      setMocks(mockData ?? [])
+      setPapers(paperData ?? [])
+      setDraft((cur) => cur.examSlug ? cur : emptyDraft(summaryData.exams[0]?.slug ?? ''))
+    }
+    try {
+      await run()
+    } catch (err) {
+      if (err instanceof APIError && err.status === 401) {
+        await refreshAuthSession()
+        await run()
+      } else {
+        throw err
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -698,9 +715,23 @@ export function AdminDashboardPage() {
   // ── Load reports ─────────────────────────────────────────────
 
   useEffect(() => {
-    void fetchAdminReports()
-      .then((data) => { setReports(data.reports); setReportCount(data.count) })
-      .catch(() => {})
+    const loadReports = async () => {
+      try {
+        const data = await fetchAdminReports()
+        setReports(data.reports)
+        setReportCount(data.count)
+      } catch (err) {
+        if (err instanceof APIError && err.status === 401) {
+          try {
+            await refreshAuthSession()
+            const data = await fetchAdminReports()
+            setReports(data.reports)
+            setReportCount(data.count)
+          } catch { /* silent */ }
+        }
+      }
+    }
+    void loadReports()
   }, [])
 
   // ── Filtered lists ────────────────────────────────────────────
@@ -730,7 +761,7 @@ export function AdminDashboardPage() {
   if (loading) return <HaloLoader label="Loading admin" />
 
   return (
-    <section className="admin-workspace">
+    <section className={`admin-workspace${darkMode ? ' admin-dark' : ''}`}>
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside className="admin-rail">
@@ -763,6 +794,10 @@ export function AdminDashboardPage() {
           })}
           <div className="admin-rail-divider" />
           <Link className="admin-nav-btn" to="/exams"><Home size={17} /> App home</Link>
+          <button type="button" className="admin-dark-toggle" onClick={toggleDark}>
+            {darkMode ? <Sun size={17} /> : <Moon size={17} />}
+            {darkMode ? 'Light mode' : 'Dark mode'}
+          </button>
         </nav>
 
         <button className="admin-rail-logout" type="button" onClick={() => void logout().then(() => navigate('/'))}>
