@@ -128,7 +128,6 @@ export function PaperAttemptPage() {
   const [startingExam, setStartingExam] = useState(false)
 
   const [attemptId, setAttemptId] = useState<string | null>(null)
-  const [resumed, setResumed] = useState(false)
   const [resumeDetected, setResumeDetected] = useState(false)
   const [existingAttempt, setExistingAttempt] = useState<ActiveAttempt | null>(null)
 
@@ -241,7 +240,6 @@ export function PaperAttemptPage() {
           return
         }
         setRemainingSeconds(liveState.remainingSeconds)
-        setResumed(true)
       } else {
         setRemainingSeconds(durationSeconds)
       }
@@ -291,7 +289,6 @@ export function PaperAttemptPage() {
           return
         }
         setRemainingSeconds(liveState.remainingSeconds)
-        setResumed(true)
       } else {
         setRemainingSeconds(durationSeconds)
       }

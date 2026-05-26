@@ -25,10 +25,6 @@ function fmtTime(s: number) {
   return `${s}s`
 }
 
-function scoreColor(pct: number) {
-  return pct >= 70 ? '#16a34a' : pct >= 50 ? '#d97706' : '#dc2626'
-}
-
 function scoreClass(pct: number): 'good' | 'mid' | 'bad' {
   return pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'bad'
 }
@@ -206,10 +202,8 @@ function LeaderboardPanel({
 
 // ── Attempt history row ───────────────────────────────────────────────────
 
-function HistoryCard({ r, index, total, examSlug }: {
+function HistoryCard({ r, examSlug }: {
   r: ReturnType<typeof readAllResults>[0]
-  index: number
-  total: number
   examSlug: string
 }) {
   const pct = r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0
@@ -457,12 +451,10 @@ export function ExamAnalyticsPage() {
       <div className="ea2-history">
         <h2>Attempt History</h2>
         <div className="ea2-hist-list">
-          {recentFirst.map((r, i) => (
+          {recentFirst.map((r) => (
             <HistoryCard
               key={`${r.type}-${r.slug}-${r.attemptedAt}`}
               r={r}
-              index={i}
-              total={recentFirst.length}
               examSlug={examSlug}
             />
           ))}
