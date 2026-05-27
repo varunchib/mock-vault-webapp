@@ -7586,6 +7586,23 @@ footer {
 }
 .ep-gate-btn:hover { background: #1f2937; }
 
+/* FAQ accordion */
+.ep-faq { margin-top: 40px; border-top: 1.5px solid #f3f4f6; padding-top: 28px; }
+.ep-faq-title { font-size: 15px; font-weight: 700; color: #111827; margin: 0 0 14px; }
+.ep-faq-list { margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ep-faq-item { border: 1.5px solid #f3f4f6; border-radius: 10px; overflow: hidden; background: #fff; }
+.ep-faq-item.open { border-color: #e5e7eb; }
+.ep-faq-q {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  width: 100%; padding: 13px 16px; background: none; border: none;
+  text-align: left; font-size: 13.5px; font-weight: 600; color: #1f2937; cursor: pointer; line-height: 1.45;
+}
+.ep-faq-q:hover { color: #1d4ed8; }
+.ep-faq-chevron { flex-shrink: 0; color: #9ca3af; transition: transform .18s; }
+.ep-faq-item.open .ep-faq-chevron { transform: rotate(180deg); }
+.ep-faq-a { margin: 0; padding: 0 16px 14px; font-size: 13px; color: #4b5563; line-height: 1.6; border-top: 1px solid #f3f4f6; }
+
+
 /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    SCROLLBAR â€” stable gutter + thin custom scrollbar
    Prevents layout shift when content height changes
