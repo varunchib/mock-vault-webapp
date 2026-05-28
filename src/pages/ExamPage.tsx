@@ -1,5 +1,6 @@
 import {
   BookOpen,
+  ChevronDown,
   ChevronRight,
   ClipboardList,
   FileText,
@@ -31,6 +32,7 @@ import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
 import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
+import { examFaqs, type FaqItem } from '../data/examFaq'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
@@ -88,6 +90,33 @@ function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagCli
   )
 }
 
+function FaqAccordion({ items }: { items: FaqItem[] }) {
+  const [open, setOpen] = useState<number | null>(null)
+  return (
+    <section className="ep-faq" aria-label="Frequently Asked Questions">
+      <h2 className="ep-faq-title">Frequently Asked Questions</h2>
+      <dl className="ep-faq-list">
+        {items.map((item, i) => (
+          <div className={`ep-faq-item${open === i ? ' open' : ''}`} key={i}>
+            <dt>
+              <button
+                type="button"
+                className="ep-faq-q"
+                aria-expanded={open === i}
+                onClick={() => setOpen(open === i ? null : i)}
+              >
+                {item.q}
+                <ChevronDown size={15} className="ep-faq-chevron" />
+              </button>
+            </dt>
+            {open === i && <dd className="ep-faq-a">{item.a}</dd>}
+          </div>
+        ))}
+      </dl>
+    </section>
+  )
+}
+
 export function ExamPage() {
   const { slug } = useParams()
   const [searchParams] = useSearchParams()
@@ -132,15 +161,14 @@ export function ExamPage() {
       fetchMockCatalog(),
       fetchExamQuestions(slug),
       isAuthenticated ? fetchEnrolledSlugs().catch(() => null) : Promise.resolve(null),
-    ])
-      .then(([examData, paperData, mockData, questionData, enrollData]) => {
-        setExam(examData)
-        setPapers(paperData ?? [])
-        setAllMocks(mockData ?? [])
-        setExamQuestions(questionData ?? [])
-        if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
-        recordExamView(examData)
-      })
+    ]).then(([examData, paperData, mockData, questionData, enrollData]) => {
+      setExam(examData)
+      setPapers(paperData ?? [])
+      setAllMocks(mockData ?? [])
+      setExamQuestions(questionData ?? [])
+      if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
+      recordExamView(examData)
+    })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [slug, isAuthenticated, retryCount, searchParams])
@@ -236,6 +264,8 @@ export function ExamPage() {
     ? examHubSeoDescription({ shortName: exam.shortName, papers: exam.papers, mocks: exam.mocks, description: exam.description })
     : 'Browse solved papers, mock tests, and subjects.'
 
+  const faqs = exam ? (examFaqs[exam.slug] ?? null) : null
+
   usePageMeta({
     title: seoTitle,
     description: seoDesc,
@@ -257,6 +287,16 @@ export function ExamPage() {
               { '@type': 'ListItem', position: 3, name: exam.shortName, item: `https://ministryofpapers.com/exam/${exam.slug}` },
             ],
           },
+          ...(faqs && {
+            mainEntity: {
+              '@type': 'FAQPage',
+              mainEntity: faqs.map((f) => ({
+                '@type': 'Question',
+                name: f.q,
+                acceptedAnswer: { '@type': 'Answer', text: f.a },
+              })),
+            },
+          }),
         }
       : undefined,
   })
@@ -333,6 +373,7 @@ export function ExamPage() {
                 </span>
               )}
             </div>
+
           </div>
         </div>
 
@@ -448,6 +489,8 @@ export function ExamPage() {
               ))}
             </div>
           )}
+
+          {faqs && <FaqAccordion items={faqs} />}
         </div>
       )}
 
@@ -620,4 +663,3 @@ export function ExamPage() {
     </>
   )
 }
-

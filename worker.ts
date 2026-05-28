@@ -66,12 +66,21 @@ const STATIC_META: Record<string, PageMeta> = {
   },
 }
 
+const API_TIMEOUT_MS = 4000
+
+function apiFetch(url: string, cacheTtl: number): Promise<Response> {
+  return fetch(url, {
+    signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    cf: { cacheEverything: true, cacheTtl },
+  } as RequestInit)
+}
+
 async function fetchMeta(pathname: string): Promise<PageMeta | null> {
   try {
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
-      const r = await fetch(`${API}/api/v1/exams/${slug}`, { cf: { cacheEverything: true, cacheTtl: 3600 } } as RequestInit)
+      const r = await apiFetch(`${API}/api/v1/exams/${slug}`, 3600)
       if (!r.ok) return null
       const e = await r.json() as { shortName: string; name: string; description: string }
       return {
@@ -99,7 +108,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const mockMatch = pathname.match(/^\/mock-test\/([^/]+)$/)
     if (mockMatch) {
       const slug = mockMatch[1]
-      const r = await fetch(`${API}/api/v1/exams/${slug}`, { cf: { cacheEverything: true, cacheTtl: 3600 } } as RequestInit)
+      const r = await apiFetch(`${API}/api/v1/exams/${slug}`, 3600)
       if (!r.ok) return null
       const e = await r.json() as { shortName: string; name: string }
       return {
@@ -130,7 +139,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const paperMatch = pathname.match(/^\/pyq\/([^/]+)$/)
     if (paperMatch) {
       const slug = paperMatch[1]
-      const r = await fetch(`${API}/api/v1/papers/${slug}`, { cf: { cacheEverything: true, cacheTtl: 3600 } } as RequestInit)
+      const r = await apiFetch(`${API}/api/v1/papers/${slug}`, 3600)
       if (!r.ok) return null
       const p = await r.json() as { title: string; description: string; examSlug: string; examName: string }
       return {
@@ -161,7 +170,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const questionMatch = pathname.match(/^\/question\/([^/]+)$/)
     if (questionMatch) {
       const slug = questionMatch[1]
-      const r = await fetch(`${API}/api/v1/questions/${slug}`, { cf: { cacheEverything: true, cacheTtl: 86400 } } as RequestInit)
+      const r = await apiFetch(`${API}/api/v1/questions/${slug}`, 86400)
       if (!r.ok) return null
       const q = await r.json() as {
         question: string; examName: string; examSlug: string; year: string
@@ -271,19 +280,23 @@ export default {
     }
 
     // Bot → inject real meta + JSON-LD then serve
-    const [baseRes, meta] = await Promise.all([
-      env.ASSETS.fetch(new Request(`${url.origin}/`, { headers: request.headers })),
-      fetchMeta(path),
-    ])
+    try {
+      const [baseRes, meta] = await Promise.all([
+        env.ASSETS.fetch(new Request(`${url.origin}/`, { headers: request.headers })),
+        fetchMeta(path),
+      ])
 
-    if (!meta || !baseRes.ok) return env.ASSETS.fetch(request)
+      if (!meta || !baseRes.ok) return env.ASSETS.fetch(request)
 
-    const html     = await baseRes.text()
-    const enhanced = injectMeta(html, meta, path)
-    const headers  = new Headers(baseRes.headers)
-    headers.set('content-type', 'text/html; charset=UTF-8')
-    headers.delete('content-length')
+      const html     = await baseRes.text()
+      const enhanced = injectMeta(html, meta, path)
+      const headers  = new Headers(baseRes.headers)
+      headers.set('content-type', 'text/html; charset=UTF-8')
+      headers.delete('content-length')
 
-    return new Response(enhanced, { status: 200, headers })
+      return new Response(enhanced, { status: 200, headers })
+    } catch {
+      return env.ASSETS.fetch(request)
+    }
   },
 }

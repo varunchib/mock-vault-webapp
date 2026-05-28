@@ -3,7 +3,6 @@ import { Link, Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
 import { HaloLoader } from "../components/common/HaloLoader";
-import { examPreviousPapersPath } from "../lib/routes";
 import { fetchQuestionBySlug, type Question } from "../lib/api";
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from "../lib/questionLanguage";
 import { useAuth } from "../context/useAuth";
@@ -135,7 +134,7 @@ export function QuestionPage() {
         <nav className="crumbs" aria-label="Breadcrumb">
           <Link to={homeHref}>Home</Link>
           <span>/</span>
-          <Link to={examPreviousPapersPath(question.examSlug)}>
+          <Link to={`/exam/${question.examSlug}`}>
             {question.examName} Papers
           </Link>
           <span>/</span>

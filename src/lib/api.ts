@@ -211,6 +211,7 @@ export function fetchExamPapers(slug: string): Promise<Paper[]> {
   return requestJson<Paper[]>(`/api/v1/exams/${encodeURIComponent(slug)}/papers`);
 }
 
+
 export function fetchExamQuestions(slug: string): Promise<Question[]> {
   return requestJson<Question[]>(`/api/v1/exams/${encodeURIComponent(slug)}/questions`);
 }
