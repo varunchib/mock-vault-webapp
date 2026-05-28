@@ -261,7 +261,8 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
-    const indexRequest = new Request(`${url.origin}/`)
+    // Clone original request pointing at / — preserves CF internal context that ASSETS binding needs
+    const indexRequest = new Request(`${url.origin}/`, request)
 
     // Static assets (.js, .css, .png, .svg, .woff2, etc.) → pass through
     const lastSeg = path.split('/').pop() ?? ''
