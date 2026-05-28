@@ -282,7 +282,7 @@ export default {
     // Bot → inject real meta + JSON-LD then serve
     try {
       const [baseRes, meta] = await Promise.all([
-        env.ASSETS.fetch(new Request(`${url.origin}/`, { headers: request.headers })),
+        env.ASSETS.fetch(new Request(`${url.origin}/`)),
         fetchMeta(path),
       ])
 
