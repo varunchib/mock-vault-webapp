@@ -261,6 +261,9 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
+    // DEBUG: confirm worker runs for this path
+    if (path === '/debug-worker') return new Response(`worker ok path=${path}`, { status: 200 })
+
     // Clone original request pointing at / — preserves CF internal context that ASSETS binding needs
     const indexRequest = new Request(`${url.origin}/`, request)
 
