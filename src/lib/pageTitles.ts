@@ -203,6 +203,24 @@ export function analyticsSeoDescription(a: AnalyticsMeta): string {
   return truncate(d, 160)
 }
 
+// ── Exam Overview page ─────────────────────────────────────────────────────
+
+type ExamInfoMeta = {
+  shortName: string
+}
+
+/** JKSSB Overview – Exam Pattern, Eligibility & Previous Year Papers | Ministry of Papers */
+export function examInfoSeoTitle(e: ExamInfoMeta): string {
+  return `${e.shortName} Overview – Exam Pattern, Eligibility & Previous Year Papers | ${BRAND}`
+}
+
+export function examInfoSeoDescription(e: ExamInfoMeta): string {
+  return truncate(
+    `${e.shortName} overview — exam pattern, eligibility criteria, selection process, salary, recruitment details, and free previous year papers with explanations on ${BRAND}.`,
+    160,
+  )
+}
+
 // ── Paper attempt (exam hall) ──────────────────────────────────────────────
 
 /** IBPS PO 2025 Attempt – 1st Shift | Ministry of Papers */

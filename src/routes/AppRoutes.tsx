@@ -9,6 +9,7 @@ import { HaloLoader } from '../components/common/HaloLoader'
 import { LandingPage }       from '../pages/LandingPage'
 import { ExamCatalogPage }   from '../pages/ExamCatalogPage'
 import { ExamPage }          from '../pages/ExamPage'
+import { ExamInfoPage }      from '../pages/ExamInfoPage'
 import { QuestionPage }      from '../pages/QuestionPage'
 import { PyqPaperPage }      from '../pages/PyqPaperPage'
 import { MockDetailPage }    from '../pages/MockSeoPage'
@@ -33,6 +34,7 @@ const Loader = () => (
 function Lazy({ children }: { children: ReactNode }) {
   return <Suspense fallback={<Loader />}>{children}</Suspense>
 }
+
 
 function RootRoute() {
   const { user, isAuthenticated, isLoading } = useAuth()
@@ -67,7 +69,8 @@ export function AppRoutes() {
       <Route path="/dashboard"          element={<ProtectedDashboard />} />
       <Route path="/admin"              element={<ProtectedAdmin />} />
       <Route path="/exams"              element={<ExamCatalogPage />} />
-      <Route path="/exam/:slug"         element={<ExamPage />} />
+      <Route path="/exam/:slug"          element={<ExamPage />} />
+      <Route path="/exam/:slug/overview" element={<ExamInfoPage />} />
       <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/question/:slug"     element={<QuestionPage />} />

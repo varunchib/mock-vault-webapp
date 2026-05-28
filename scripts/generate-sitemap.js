@@ -9,6 +9,9 @@ const API   = 'https://api.ministryofpapers.com'
 const BASE  = 'https://ministryofpapers.com'
 const TODAY = new Date().toISOString().split('T')[0]
 
+// Exams that have a dedicated /exam/:slug/info page (add slug here when data is added to examInfo.ts)
+const EXAM_INFO_SLUGS = new Set(['jkssb'])
+
 async function fetchSlugs(path) {
   const res = await fetch(`${API}${path}`, { signal: AbortSignal.timeout(10000) })
   if (!res.ok) throw new Error(`${path} → ${res.status}`)
@@ -53,6 +56,7 @@ async function generate() {
     ...examSlugs.flatMap(slug => [
       url(`${BASE}/exam/${slug}`,      '0.9'),
       url(`${BASE}/mock-test/${slug}`, '0.8'),
+      ...(EXAM_INFO_SLUGS.has(slug) ? [url(`${BASE}/exam/${slug}/overview`, '0.9', 'monthly')] : []),
     ]),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...questionSlugs.map(slug => url(`${BASE}/question/${slug}`, '0.7', 'monthly')),

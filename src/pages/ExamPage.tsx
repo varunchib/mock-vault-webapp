@@ -1,16 +1,12 @@
 import {
-  Bell,
   BookOpen,
   ChevronDown,
   ChevronRight,
   ClipboardList,
   FileText,
-  Globe,
-  Info,
   Lock,
   Search,
   Timer,
-  TrendingUp,
   X,
 } from 'lucide-react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
@@ -37,9 +33,8 @@ import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { examFaqs, type FaqItem } from '../data/examFaq'
-import { examInfo } from '../data/examInfo'
 
-type Tab = 'papers' | 'mocks' | 'subjects' | 'info'
+type Tab = 'papers' | 'mocks' | 'subjects'
 
 const FREE_QUESTION_LIMIT = 10
 const PAGE_SIZE = 15
@@ -122,49 +117,6 @@ function FaqAccordion({ items }: { items: FaqItem[] }) {
   )
 }
 
-function SyllabusPanel({ data }: { data: { post: string; sections: { subject: string; topics: string[] }[] }[] }) {
-  const [selPost, setSelPost] = useState(data[0]?.post ?? '')
-  const [openIdx, setOpenIdx] = useState<number | null>(0)
-  const sections = data.find((d) => d.post === selPost)?.sections ?? []
-  return (
-    <>
-      {data.length > 1 && (
-        <div className="ep-syllabus-posts">
-          {data.map((d) => (
-            <button
-              key={d.post}
-              type="button"
-              className={`ep-syllabus-post-btn${selPost === d.post ? ' active' : ''}`}
-              onClick={() => { setSelPost(d.post); setOpenIdx(0) }}
-            >
-              {d.post}
-            </button>
-          ))}
-        </div>
-      )}
-      <div className="ep-syllabus-accordion">
-        {sections.map((sec, i) => (
-          <div className={`ep-syllabus-item${openIdx === i ? ' open' : ''}`} key={sec.subject}>
-            <button
-              type="button"
-              className="ep-syllabus-subject-btn"
-              onClick={() => setOpenIdx(openIdx === i ? null : i)}
-            >
-              <span>{sec.subject}</span>
-              <ChevronDown size={14} className="ep-faq-chevron" />
-            </button>
-            {openIdx === i && (
-              <div className="ep-syllabus-topics">
-                {sec.topics.map((t) => <span className="ep-syllabus-topic" key={t}>{t}</span>)}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </>
-  )
-}
-
 export function ExamPage() {
   const { slug } = useParams()
   const [searchParams] = useSearchParams()
@@ -209,15 +161,14 @@ export function ExamPage() {
       fetchMockCatalog(),
       fetchExamQuestions(slug),
       isAuthenticated ? fetchEnrolledSlugs().catch(() => null) : Promise.resolve(null),
-    ])
-      .then(([examData, paperData, mockData, questionData, enrollData]) => {
-        setExam(examData)
-        setPapers(paperData ?? [])
-        setAllMocks(mockData ?? [])
-        setExamQuestions(questionData ?? [])
-        if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
-        recordExamView(examData)
-      })
+    ]).then(([examData, paperData, mockData, questionData, enrollData]) => {
+      setExam(examData)
+      setPapers(paperData ?? [])
+      setAllMocks(mockData ?? [])
+      setExamQuestions(questionData ?? [])
+      if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
+      recordExamView(examData)
+    })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [slug, isAuthenticated, retryCount, searchParams])
@@ -314,7 +265,6 @@ export function ExamPage() {
     : 'Browse solved papers, mock tests, and subjects.'
 
   const faqs = exam ? (examFaqs[exam.slug] ?? null) : null
-  const info = exam ? (examInfo[exam.slug] ?? null) : null
 
   usePageMeta({
     title: seoTitle,
@@ -423,6 +373,7 @@ export function ExamPage() {
                 </span>
               )}
             </div>
+
           </div>
         </div>
 
@@ -469,16 +420,6 @@ export function ExamPage() {
           Subjects
           {computedSubjects.length > 0 && <span className="ep-tab-count">{computedSubjects.length}</span>}
         </button>
-        {info && (
-          <button
-            className={`ep-tab${activeTab === 'info' ? ' active' : ''}`}
-            type="button"
-            onClick={() => { setActiveTab('info'); setSelectedSubject(null); setTopicFilter(null) }}
-          >
-            <Info size={14} />
-            Exam Info
-          </button>
-        )}
       </div>
 
       {/* ── PYQ Papers ─────────────────────────────── */}
@@ -637,136 +578,6 @@ export function ExamPage() {
         </div>
       )}
 
-      {/* ── Exam Info ──────────────────────────────── */}
-      {activeTab === 'info' && (
-        <div className="ep-tab-body">
-          {info ? (
-            <div className="ep-info">
-
-              {/* About */}
-              <section className="ep-info-section">
-                <h2 className="ep-info-h"><Info size={16} /> About {exam.shortName}</h2>
-                <div className="ep-info-meta-grid">
-                  <div className="ep-info-kv">
-                    <span className="ep-info-k">Conducting Body</span>
-                    <span className="ep-info-v">{info.conductingBody}</span>
-                  </div>
-                  <div className="ep-info-kv">
-                    <span className="ep-info-k">Exam Level</span>
-                    <span className="ep-info-v">{info.examLevel}</span>
-                  </div>
-                  <div className="ep-info-kv">
-                    <span className="ep-info-k">Exam Mode</span>
-                    <span className="ep-info-v">{info.examMode}</span>
-                  </div>
-                  <div className="ep-info-kv">
-                    <span className="ep-info-k">Official Website</span>
-                    <a className="ep-info-link" href={info.officialWebsite} target="_blank" rel="noopener noreferrer">
-                      <Globe size={12} /> {info.officialWebsite.replace('https://', '')}
-                    </a>
-                  </div>
-                </div>
-                <p className="ep-info-about">{info.about}</p>
-              </section>
-
-              {/* Exam Pattern */}
-              {info.patterns.length > 0 && (
-                <section className="ep-info-section">
-                  <h2 className="ep-info-h"><ClipboardList size={16} /> Exam Pattern</h2>
-                  <div className="ep-pattern-grid">
-                    {info.patterns.map((p) => (
-                      <div className="ep-pattern-card" key={p.post}>
-                        <div className="ep-pattern-post">{p.post}</div>
-                        <div className="ep-pattern-stats">
-                          <div className="ep-pattern-stat"><span className="ep-ps-val">{p.totalQuestions}</span><span className="ep-ps-lbl">Questions</span></div>
-                          <div className="ep-pattern-stat"><span className="ep-ps-val">{p.totalMarks}</span><span className="ep-ps-lbl">Marks</span></div>
-                          <div className="ep-pattern-stat"><span className="ep-ps-val">{p.durationMinutes}</span><span className="ep-ps-lbl">Minutes</span></div>
-                          <div className="ep-pattern-stat">
-                            <span className="ep-ps-val">{p.negativeMarking != null ? `−${p.negativeMarking}` : '—'}</span>
-                            <span className="ep-ps-lbl">Neg. Mark</span>
-                          </div>
-                        </div>
-                        <div className="ep-pattern-subjects">
-                          {p.subjects.map((s) => (
-                            <div className="ep-pattern-sub-row" key={s.name}>
-                              <span className="ep-pattern-sub-name">{s.name}</span>
-                              {s.questions != null && <span className="ep-pattern-sub-qs">{s.questions} Qs</span>}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Syllabus */}
-              {info.syllabus.length > 0 && (
-                <section className="ep-info-section">
-                  <h2 className="ep-info-h"><BookOpen size={16} /> Syllabus</h2>
-                  <SyllabusPanel data={info.syllabus} />
-                </section>
-              )}
-
-              {/* Cut-offs */}
-              {info.cutoffs.length > 0 && (
-                <section className="ep-info-section">
-                  <h2 className="ep-info-h"><TrendingUp size={16} /> Cut-off Marks</h2>
-                  <div className="ep-cutoffs">
-                    {Array.from(
-                      info.cutoffs.reduce<Map<string, { year: string; post: string }>>(
-                        (m, r) => { const k = `${r.year}|${r.post}`; if (!m.has(k)) m.set(k, { year: r.year, post: r.post }); return m },
-                        new Map()
-                      ).values()
-                    ).map(({ year, post }) => (
-                      <div className="ep-cutoff-group" key={`${year}|${post}`}>
-                        <div className="ep-cutoff-group-hd">
-                          <span>{post}</span>
-                          <span className="ep-cutoff-yr">{year}</span>
-                        </div>
-                        {info.cutoffs.filter((r) => r.year === year && r.post === post).map((row) => (
-                          <div className="ep-cutoff-row" key={row.category}>
-                            <span className="ep-cutoff-cat">{row.category}</span>
-                            <div className="ep-cutoff-bar-wrap">
-                              <div className="ep-cutoff-bar" style={{ width: `${Math.round((row.marks / row.totalMarks) * 100)}%` }} />
-                            </div>
-                            <span className="ep-cutoff-marks">{row.marks}<small>/{row.totalMarks}</small></span>
-                          </div>
-                        ))}
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              )}
-
-              {/* Notifications */}
-              {info.notifications.length > 0 && (
-                <section className="ep-info-section">
-                  <h2 className="ep-info-h"><Bell size={16} /> Recent Notifications</h2>
-                  <ul className="ep-notif-list">
-                    {info.notifications.map((n, i) => (
-                      <li className="ep-notif-item" key={i}>
-                        <span className={`ep-notif-badge ep-notif-${n.type}`}>{n.type.replace(/-/g, ' ')}</span>
-                        <div className="ep-notif-body">
-                          {n.link
-                            ? <a className="ep-notif-title" href={n.link} target="_blank" rel="noopener noreferrer">{n.title}</a>
-                            : <span className="ep-notif-title">{n.title}</span>
-                          }
-                          <span className="ep-notif-date">{new Date(n.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )}
-
-            </div>
-          ) : (
-            <p className="ep-empty">No information available for this exam yet.</p>
-          )}
-        </div>
-      )}
-
       {/* ── Subject drill-down ─────────────────────── */}
       {activeTab === 'subjects' && selectedSubject && (
         <div className="ep-tab-body">
@@ -852,4 +663,3 @@ export function ExamPage() {
     </>
   )
 }
-
