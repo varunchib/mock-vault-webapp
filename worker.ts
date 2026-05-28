@@ -261,32 +261,48 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
+    const indexRequest = new Request(`${url.origin}/`)
+
     // Static assets (.js, .css, .png, .svg, .woff2, etc.) → pass through
     const lastSeg = path.split('/').pop() ?? ''
     if (lastSeg.includes('.') && !lastSeg.endsWith('.html')) {
-      const res = await env.ASSETS.fetch(request)
-      if (path === '/llms.txt') {
-        const headers = new Headers(res.headers)
-        headers.set('content-type', 'text/plain; charset=UTF-8')
-        headers.set('x-robots-tag', 'all')
-        return new Response(res.body, { status: res.status, headers })
+      try {
+        const res = await env.ASSETS.fetch(request)
+        if (path === '/llms.txt') {
+          const headers = new Headers(res.headers)
+          headers.set('content-type', 'text/plain; charset=UTF-8')
+          headers.set('x-robots-tag', 'all')
+          return new Response(res.body, { status: res.status, headers })
+        }
+        return res
+      } catch {
+        return new Response('Not Found', { status: 404 })
       }
-      return res
     }
 
-    // Non-bot → serve SPA directly
+    // Non-bot → serve SPA (index.html) for all routes
     if (!BOT_UA.test(ua)) {
-      return env.ASSETS.fetch(request)
+      try {
+        return await env.ASSETS.fetch(request)
+      } catch {
+        return env.ASSETS.fetch(indexRequest)
+      }
     }
 
     // Bot → inject real meta + JSON-LD then serve
     try {
       const [baseRes, meta] = await Promise.all([
-        env.ASSETS.fetch(new Request(`${url.origin}/`)),
+        env.ASSETS.fetch(indexRequest),
         fetchMeta(path),
       ])
 
-      if (!meta || !baseRes.ok) return env.ASSETS.fetch(request)
+      if (!meta || !baseRes.ok) {
+        try {
+          return await env.ASSETS.fetch(request)
+        } catch {
+          return env.ASSETS.fetch(indexRequest)
+        }
+      }
 
       const html     = await baseRes.text()
       const enhanced = injectMeta(html, meta, path)
@@ -296,7 +312,7 @@ export default {
 
       return new Response(enhanced, { status: 200, headers })
     } catch {
-      return env.ASSETS.fetch(request)
+      return env.ASSETS.fetch(indexRequest)
     }
   },
 }
