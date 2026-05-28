@@ -18,6 +18,7 @@ type CombinedResult = {
   correct: number
   wrong: number
   skipped: number
+  rawScore?: number
   timeTakenSeconds: number
   subjects: SubjectResult[]
 }
@@ -48,8 +49,9 @@ function accuracyClass(pct: number) {
 
 // ── Single attempt card (square) ─────────────────────────────────────────
 function AttemptCard({ result }: { result: CombinedResult }) {
+  const displayScore = result.rawScore ?? result.correct
   const accuracy = result.totalQuestions > 0
-    ? Math.round((result.correct / result.totalQuestions) * 100)
+    ? Math.round((Math.max(0, displayScore) / result.totalQuestions) * 100)
     : 0
   const pctClass = accuracyClass(accuracy)
   const percentile = estimatePercentile(result.correct, result.totalQuestions, result.examSlug)
@@ -57,7 +59,9 @@ function AttemptCard({ result }: { result: CombinedResult }) {
   return (
     <div className="an-attempt-card">
       <div className="an-card-top">
-        <span className={`an-card-score ${pctClass}`}>{accuracy}%</span>
+        <span className={`an-card-score ${displayScore < 0 ? 'bad' : pctClass}`}>
+          {displayScore < 0 ? displayScore : `${accuracy}%`}
+        </span>
         {percentile > 0 && <span className="an-card-pctile"><TrendingUp size={10} /> ~{percentile}th</span>}
       </div>
       <strong className="an-card-title">{result.title}</strong>
@@ -75,6 +79,9 @@ function AttemptCard({ result }: { result: CombinedResult }) {
         <span className="an-chip an-chip--c">{result.correct} Correct</span>
         <span className="an-chip an-chip--w">{result.wrong} Wrong</span>
         <span className="an-chip an-chip--s">{result.skipped} Skipped</span>
+        {result.rawScore !== undefined && result.rawScore >= 0 && (
+          <span className="an-chip an-chip--c">Raw: {result.rawScore}</span>
+        )}
       </div>
     </div>
   )
@@ -103,6 +110,7 @@ export function AnalyticsPage() {
       correct: r.correct,
       wrong: r.wrong,
       skipped: r.skipped,
+      rawScore: r.rawScore,
       timeTakenSeconds: r.timeTakenSeconds,
       subjects: r.subjects,
     }))
@@ -118,6 +126,7 @@ export function AnalyticsPage() {
       correct: r.correct,
       wrong: r.wrong,
       skipped: r.skipped,
+      rawScore: r.rawScore,
       timeTakenSeconds: r.timeTakenSeconds,
       subjects: r.subjects,
     }))
@@ -132,7 +141,10 @@ export function AnalyticsPage() {
     if (allResults.length === 0) return null
     const totalTime = allResults.reduce((s, r) => s + r.timeTakenSeconds, 0)
     const avgAcc = Math.round(
-      allResults.reduce((s, r) => s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * 100 : 0), 0)
+      allResults.reduce((s, r) => {
+        const score = r.rawScore ?? r.correct
+        return s + (r.totalQuestions > 0 ? (Math.max(0, score) / r.totalQuestions) * 100 : 0)
+      }, 0)
       / allResults.length
     )
     const percentiles = allResults
