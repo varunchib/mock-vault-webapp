@@ -264,6 +264,27 @@ export default {
     // DEBUG: confirm worker runs for this path
     if (path === '/debug-worker') return new Response(`worker ok path=${path}`, { status: 200 })
 
+    // DEBUG: test new Request creation
+    if (path === '/debug-req') {
+      try {
+        const r = new Request(`${url.origin}/`, request)
+        return new Response(`req ok: ${r.url}`, { status: 200 })
+      } catch (e) {
+        return new Response(`req error: ${e}`, { status: 200 })
+      }
+    }
+
+    // DEBUG: test env.ASSETS.fetch with cloned request
+    if (path === '/debug-assets') {
+      try {
+        const r = new Request(`${url.origin}/`, request)
+        const res = await env.ASSETS.fetch(r)
+        return new Response(`assets ok: ${res.status}`, { status: 200 })
+      } catch (e) {
+        return new Response(`assets error: ${e}`, { status: 200 })
+      }
+    }
+
     // Clone original request pointing at / — preserves CF internal context that ASSETS binding needs
     const indexRequest = new Request(`${url.origin}/`, request)
 
