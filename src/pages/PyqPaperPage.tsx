@@ -1,6 +1,4 @@
 import { ChevronRight, Download, Lock, Play } from 'lucide-react'
-import { ExamNavStrip } from '../components/common/ExamNavStrip'
-import { examInfo } from '../data/examInfo'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
@@ -138,12 +136,6 @@ export function PyqPaperPage() {
 
   const content = (
     <div className="pyq-page">
-      <ExamNavStrip
-        examSlug={paper.examSlug}
-        examName={paper.examName}
-        hasInfo={Boolean(examInfo[paper.examSlug])}
-        active="papers"
-      />
       <nav className="ep-breadcrumb" aria-label="Breadcrumb">
         <Link to={homeHref}>{isAuthenticated ? 'Dashboard' : 'Home'}</Link>
         <ChevronRight size={13} />
