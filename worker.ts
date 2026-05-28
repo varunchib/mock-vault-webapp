@@ -280,13 +280,9 @@ export default {
       }
     }
 
-    // Non-bot → serve SPA (index.html) for all routes
+    // Non-bot → always serve index.html; React Router handles client-side routing
     if (!BOT_UA.test(ua)) {
-      try {
-        return await env.ASSETS.fetch(request)
-      } catch {
-        return env.ASSETS.fetch(indexRequest)
-      }
+      return env.ASSETS.fetch(indexRequest)
     }
 
     // Bot → inject real meta + JSON-LD then serve
@@ -296,13 +292,7 @@ export default {
         fetchMeta(path),
       ])
 
-      if (!meta || !baseRes.ok) {
-        try {
-          return await env.ASSETS.fetch(request)
-        } catch {
-          return env.ASSETS.fetch(indexRequest)
-        }
-      }
+      if (!meta || !baseRes.ok) return env.ASSETS.fetch(indexRequest)
 
       const html     = await baseRes.text()
       const enhanced = injectMeta(html, meta, path)
@@ -312,7 +302,7 @@ export default {
 
       return new Response(enhanced, { status: 200, headers })
     } catch {
-      return env.ASSETS.fetch(indexRequest)
+      return env.ASSETS.fetch(indexRequest)  // always safe — index.html always exists
     }
   },
 }
