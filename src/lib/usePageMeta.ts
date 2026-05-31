@@ -8,6 +8,7 @@ export type PageMeta = {
   description: string
   canonicalPath?: string
   ogType?: 'website' | 'article'
+  ogImage?: string
   jsonLd?: Record<string, unknown>
 }
 
@@ -36,7 +37,7 @@ function setProperty(property: string, content: string) {
   }, content)
 }
 
-export function usePageMeta({ title, description, canonicalPath, ogType = 'website', jsonLd }: PageMeta) {
+export function usePageMeta({ title, description, canonicalPath, ogType = 'website', ogImage, jsonLd }: PageMeta) {
   useEffect(() => {
     document.title = title
 
@@ -50,12 +51,19 @@ export function usePageMeta({ title, description, canonicalPath, ogType = 'websi
     if (canonicalPath) {
       setProperty('og:url', `${SITE_ORIGIN}${canonicalPath}`)
     }
+    if (ogImage) {
+      setProperty('og:image', ogImage)
+      setProperty('og:image:alt', title)
+    }
 
     // Twitter / X Cards
     setMeta('twitter:card', 'summary_large_image')
     setMeta('twitter:title', title)
     setMeta('twitter:description', description)
     setMeta('twitter:site', '@ministryofpapers')
+    if (ogImage) {
+      setMeta('twitter:image', ogImage)
+    }
 
     // Canonical
     if (canonicalPath) {
@@ -78,5 +86,5 @@ export function usePageMeta({ title, description, canonicalPath, ogType = 'websi
       script.textContent = JSON.stringify(jsonLd)
       document.head.appendChild(script)
     }
-  }, [title, description, canonicalPath, ogType, jsonLd])
+  }, [title, description, canonicalPath, ogType, ogImage, jsonLd])
 }

@@ -33,6 +33,7 @@ import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { examFaqs, type FaqItem } from '../data/examFaq'
+import { postGuides } from '../data/postGuides'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
@@ -133,7 +134,7 @@ export function ExamPage() {
   const [error, setError] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
-  const [paperSearch, setPaperSearch] = useState('')
+  const [paperSearch, setPaperSearch] = useState(() => searchParams.get('s') ?? '')
   const [diffFilter, setDiffFilter] = useState('All')
   const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject)
   const [topicFilter, setTopicFilter] = useState<string | null>(null)
@@ -491,6 +492,23 @@ export function ExamPage() {
           )}
 
           {faqs && <FaqAccordion items={faqs} />}
+
+          {/* Exam Guides — links to post-specific guide pages */}
+          {(() => {
+            const guides = Object.entries(postGuides).filter(([, g]) => g.examSlug === exam.slug)
+            if (guides.length === 0) return null
+            return (
+              <div className="ep-guides-strip">
+                <span className="ep-guides-label">Exam Guides</span>
+                {guides.map(([slug, g]) => (
+                  <Link key={slug} className="ep-guide-chip" to={`/guide/${slug}`}>
+                    {g.shortName} — Syllabus &amp; Pattern
+                    <ChevronRight size={12} />
+                  </Link>
+                ))}
+              </div>
+            )
+          })()}
         </div>
       )}
 
@@ -651,6 +669,7 @@ export function ExamPage() {
           )}
         </div>
       )}
+
     </div>
   )
 

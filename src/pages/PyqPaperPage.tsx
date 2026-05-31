@@ -1,4 +1,4 @@
-import { ChevronRight, Download, Lock, Play } from 'lucide-react'
+import { BookOpen, ChevronRight, Download, Lock, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
@@ -14,6 +14,7 @@ import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
+import { paperGuideMap } from '../data/postGuides'
 
 const FREE_LIMIT = 10
 
@@ -186,6 +187,14 @@ export function PyqPaperPage() {
             >
               <Download size={14} /> Download PDF
             </a>
+          )}
+          {paper && paperGuideMap[paper.slug] && (
+            <Link
+              className="pyq-action-btn"
+              to={`/guide/${paperGuideMap[paper.slug]}`}
+            >
+              <BookOpen size={14} /> Exam Guide
+            </Link>
           )}
         </div>
       </header>

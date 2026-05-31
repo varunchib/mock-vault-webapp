@@ -180,6 +180,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="vault-workspace">
           <header className="vault-topbar-new">
             <div className="vault-tb-left">
+              <Link className="vault-tb-logo" to={homePathForUser(user)} aria-label="Home">
+                <svg viewBox="0 0 40 40" fill="none" width="24" height="24" aria-hidden="true">
+                  <rect width="40" height="40" rx="10" fill="rgba(253,224,71,0.15)" />
+                  <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="#FDE047" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </Link>
               <span className="vault-tb-title">{pageTitle}</span>
             </div>
 
@@ -251,6 +257,22 @@ export function AppShell({ children }: { children: ReactNode }) {
             {children}
           </main>
         </div>
+
+        {/* Mobile bottom nav — only visible at ≤768px */}
+        <nav className="vault-bottom-nav" aria-label="Main navigation">
+          {primaryNav.map((item) => (
+            <button
+              className={`vault-bottom-nav-item${isNavActive(item.href, location.pathname) ? ' active' : ''}`}
+              type="button"
+              key={item.label}
+              onClick={() => handleNavigate(item.href)}
+              aria-label={item.label}
+            >
+              <item.icon size={20} />
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
       </section>
     </>
   )
