@@ -6654,7 +6654,13 @@ footer {
   flex: 1;
   display: flex;
   align-items: center;
+  gap: 8px;
   min-width: 0;
+}
+
+.vault-tb-logo {
+  display: none;
+  flex-shrink: 0;
 }
 
 .vault-tb-title {
@@ -6969,6 +6975,48 @@ footer {
 
 /* papers */
 .ep-papers-list { display: grid; gap: 28px; }
+
+/* Exam Guides strip — links to post-specific guide pages */
+.ep-guides-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: #fafaf7;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-top: 4px;
+}
+
+.ep-guides-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--ink4);
+  white-space: nowrap;
+}
+
+.ep-guide-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  background: #fff;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 5px 12px;
+  text-decoration: none;
+  transition: border-color .13s, background .13s;
+}
+
+.ep-guide-chip:hover {
+  border-color: var(--ink3);
+  background: #f8f8f8;
+}
 .ep-year-group { display: grid; gap: 10px; }
 .ep-year-label {
   font-size: 12px;
@@ -10096,6 +10144,550 @@ html {
     justify-content: center;
     padding: 9px 0;
   }
+}
+
+/* ── Mobile bottom navigation bar ─────────────────────────────────────── */
+.vault-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: #fff;
+  border-top: 1px solid var(--line);
+  z-index: 60;
+  padding-bottom: env(safe-area-inset-bottom);
+  -webkit-tap-highlight-color: transparent;
+}
+.vault-bottom-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink4);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  padding: 6px 4px;
+  transition: color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.vault-bottom-nav-item.active {
+  color: var(--ink);
+}
+.vault-bottom-nav-item.active svg {
+  color: #ca8a04;
+}
+.vault-bottom-nav-item:active { opacity: 0.65; }
+
+/* ── Mobile layout ≤ 768px ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Show bottom nav */
+  .vault-bottom-nav { display: flex; }
+
+  /* Hide sidebar */
+  .vault-sidebar-simple { display: none !important; }
+
+  /* Full-width single-column layout */
+  .vault-app-simple {
+    grid-template-columns: 1fr;
+  }
+
+  /* Topbar: show logo + title, compact padding */
+  .vault-tb-left {
+    display: flex !important;
+    flex-shrink: 0;
+  }
+  .vault-tb-logo { display: flex; }
+  .vault-topbar-new {
+    padding: 0 12px;
+    gap: 8px;
+  }
+  .vault-topbar-new .vault-search-wrap {
+    flex: 1;
+    max-width: none;
+    min-width: 0;
+  }
+
+  /* Main content: extra bottom padding so content clears the bottom nav */
+  .vault-main-new {
+    padding: 14px 12px calc(56px + env(safe-area-inset-bottom) + 16px);
+  }
+
+  /* Prevent horizontal overflow — root container + content area */
+  .vault-app-simple,
+  .vault-workspace, .vault-main-new {
+    overflow-x: hidden;
+  }
+
+  /* Profile btn: only avatar on mobile */
+  .vault-profile-btn span,
+  .vault-profile-btn svg:last-child {
+    display: none;
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   POST GUIDE PAGE  (pg-*)
+   Static exam-post guide — syllabus, pattern, papers
+   ══════════════════════════════════════════════════════ */
+
+.pg-page {
+  display: grid;
+  gap: 20px;
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+/* Two-column layout: main + sidebar */
+.pg-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 280px;
+  gap: 24px;
+  align-items: start;
+}
+
+/* ── Header ─────────────────────────────────────────── */
+.pg-header {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 28px;
+  margin-bottom: 4px;
+}
+
+.pg-header h1 {
+  font-size: clamp(18px, 2.4vw, 24px);
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -.025em;
+  line-height: 1.25;
+  margin: 8px 0 8px;
+}
+
+.pg-tagline {
+  font-size: 13.5px;
+  color: var(--ink3);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.pg-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  font-size: 12.5px;
+  color: var(--ink3);
+}
+
+.pg-meta-item strong {
+  color: var(--ink2);
+  font-weight: 600;
+}
+
+.pg-meta-sep { color: var(--line); }
+
+/* ── Content Sections ───────────────────────────────── */
+.pg-main {
+  display: grid;
+  gap: 16px;
+}
+
+.pg-section {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 26px;
+}
+
+.pg-section h2 {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.015em;
+  margin: 0 0 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line2);
+}
+
+.pg-section p {
+  font-size: 14px;
+  line-height: 1.75;
+  color: #374151;
+  margin: 0 0 12px;
+}
+
+.pg-section p:last-child { margin-bottom: 0; }
+
+.pg-note {
+  font-size: 13px;
+  color: var(--ink3);
+  background: var(--line2);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 14px !important;
+  line-height: 1.5;
+}
+
+.pg-note-warning {
+  background: #fef9c3;
+  color: #854d0e;
+  border-left: 3px solid #eab308;
+}
+
+/* ── Table ──────────────────────────────────────────── */
+.pg-table-wrap {
+  overflow-x: auto;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.pg-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.pg-table th {
+  background: var(--line2);
+  font-weight: 700;
+  color: var(--ink2);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+.pg-table td {
+  padding: 11px 14px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line2);
+  line-height: 1.4;
+}
+
+.pg-table tr:last-child td { border-bottom: none; }
+
+.pg-table-total td {
+  font-weight: 700;
+  background: var(--line2);
+  color: var(--ink);
+}
+
+/* ── Syllabus ───────────────────────────────────────── */
+.pg-syllabus {
+  display: grid;
+  gap: 16px;
+}
+
+.pg-syllabus-block {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.pg-syllabus-block h3 {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--line2);
+  padding: 10px 16px;
+  margin: 0;
+  border-bottom: 1px solid var(--line);
+  letter-spacing: -.01em;
+}
+
+.pg-syllabus-block ul {
+  margin: 0;
+  padding: 12px 16px 12px 32px;
+  display: grid;
+  gap: 5px;
+}
+
+.pg-syllabus-block li {
+  font-size: 13px;
+  line-height: 1.55;
+  color: #374151;
+}
+
+/* ── Eligibility DL ─────────────────────────────────── */
+.pg-dl {
+  display: grid;
+  gap: 10px;
+}
+
+.pg-dl-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+  align-items: baseline;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line2);
+}
+
+.pg-dl-row:last-child { border-bottom: none; padding-bottom: 0; }
+
+.pg-dl-row dt {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ink4);
+  padding-top: 2px;
+}
+
+.pg-dl-row dd {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* ── Selection Steps ────────────────────────────────── */
+.pg-steps {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  counter-reset: none;
+}
+
+.pg-steps li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.pg-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Tips ───────────────────────────────────────────── */
+.pg-tips {
+  display: grid;
+  gap: 12px;
+  padding-left: 20px;
+  margin: 0;
+}
+
+.pg-tips li {
+  font-size: 13.5px;
+  line-height: 1.7;
+  color: #374151;
+}
+
+/* ── Sidebar ────────────────────────────────────────── */
+.pg-sidebar {
+  position: sticky;
+  top: 74px;
+  display: grid;
+  gap: 14px;
+}
+
+.pg-sidebar-card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+  display: grid;
+  gap: 12px;
+}
+
+.pg-sidebar-card-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ink);
+}
+
+.pg-sidebar-card-head strong {
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.pg-sidebar-card-head svg { color: var(--ink3); }
+
+/* Papers list in sidebar */
+.pg-papers-list {
+  display: grid;
+  gap: 6px;
+}
+
+.pg-paper-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-decoration: none;
+  background: #fafafa;
+  transition: border-color .13s, background .13s;
+}
+
+.pg-paper-row:hover {
+  border-color: var(--ink3);
+  background: #fff;
+}
+
+.pg-paper-info {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.pg-paper-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.3;
+}
+
+.pg-paper-meta {
+  font-size: 11px;
+  color: var(--ink3);
+  font-weight: 500;
+}
+
+.pg-paper-arrow { color: var(--ink4); flex-shrink: 0; }
+
+.pg-all-papers-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: opacity .13s;
+}
+
+.pg-all-papers-btn:hover { opacity: .88; }
+
+/* Quick facts in sidebar */
+.pg-quick-facts {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.pg-quick-facts > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line2);
+}
+
+.pg-quick-facts > div:last-child { border-bottom: none; padding-bottom: 0; }
+
+.pg-quick-facts dt {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--ink4);
+  white-space: nowrap;
+}
+
+.pg-quick-facts dd {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: right;
+  margin: 0;
+}
+
+.pg-official-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink3);
+  text-decoration: none;
+  transition: color .13s;
+}
+
+.pg-official-link:hover { color: var(--ink); }
+
+/* ── Responsive ─────────────────────────────────────── */
+@media (max-width: 860px) {
+  .pg-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pg-sidebar {
+    position: static;
+    order: -1;
+  }
+
+  .pg-sidebar {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 580px) {
+  .pg-sidebar { grid-template-columns: 1fr; }
+  .pg-section { padding: 18px 16px; }
+  .pg-header { padding: 20px; }
+  .pg-dl-row { grid-template-columns: 1fr; gap: 4px; }
+}
+
+/* ── Post-login page polish: 540px ──────────────────────────────────────── */
+@media (max-width: 540px) {
+  /* Mock filter chips wrap instead of overflowing */
+  .ep-filter-bar { flex-wrap: wrap; }
+
+  /* Tighter padding on exam hero card */
+  .ep-hero { padding: 16px; gap: 12px; }
+
+  /* PYQ question cards: reduce padding */
+  .pyq-question-card { padding: 14px 12px; }
+
+  /* Paper card inner: stack on very small screens */
+  .ep-paper-card-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .ep-paper-card-right { flex-direction: row; align-items: center; gap: 10px; }
+}
+
+/* ── Very narrow (≤ 380px): maximise usable topbar width ────────────────── */
+@media (max-width: 380px) {
+  .vault-tb-title { display: none; }
+  .vault-topbar-new { padding: 0 8px; gap: 6px; }
+  .vault-bottom-nav-item { font-size: 9px; gap: 1px; }
 }
 
 /* ── Legal pages (Privacy / Terms) ──────────────────────────────────────── */
