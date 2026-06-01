@@ -9,7 +9,7 @@
     "typecheck": "tsc -b --pretty",
     "lint": "eslint .",
     "start": "next start",
-    "deploy:cloudflare": "npx @cloudflare/next-on-pages && wrangler pages deploy .vercel/output/static"
+    "deploy": "npm run build && wrangler versions upload"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
