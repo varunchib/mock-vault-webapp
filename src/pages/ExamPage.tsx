@@ -55,6 +55,16 @@ function fmtHeldOn(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+// Best available display date: heldOn → date extracted from shift → year
+function getDisplayDate(paper: { heldOn?: string; shift: string; year: string }): string | null {
+  if (paper.heldOn) return fmtHeldOn(paper.heldOn)
+  if (paper.shift) {
+    const m = paper.shift.match(/(\d{1,2}\s+)?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}/i)
+    if (m) return m[0].replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*/gi, (s) => s.slice(0, 3))
+  }
+  return paper.year || null
+}
+
 const FREE_QUESTION_LIMIT = 10
 const PAGE_SIZE = 15
 
@@ -474,8 +484,14 @@ export function ExamPage() {
                           <div className="ep-paper-card-main">
                             <strong>{paper.title}</strong>
                             <div className="ep-paper-meta">
-                              {extractShiftLabel(paper.shift) && <small>{extractShiftLabel(paper.shift)}</small>}
-                              {paper.heldOn && <small className="ep-paper-date">{fmtHeldOn(paper.heldOn)}</small>}
+                              {(() => {
+                                const label = extractShiftLabel(paper.shift)
+                                const date = getDisplayDate(paper)
+                                return (<>
+                                  {label && <small>{label}</small>}
+                                  {date && <small className="ep-paper-date">{date}</small>}
+                                </>)
+                              })()}
                             </div>
                           </div>
                           <div className="ep-paper-card-right">
