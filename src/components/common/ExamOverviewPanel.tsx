@@ -11,7 +11,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import type { Exam } from '../../lib/api'
 import type { ExamInfoData } from '../../data/examInfo'
 import type { FaqItem } from '../../data/examFaq'
@@ -273,7 +273,7 @@ export function ExamOverviewPanel({ exam, info, faqs, onViewPapers }: Props) {
                 <nav className="ov-links" aria-label="Important links">
                   {info.importantLinks.map((l, i) =>
                     l.internal ? (
-                      <Link key={i} to={l.url} className="ov-link">
+                      <Link key={i} href={l.url} className="ov-link">
                         {l.label}
                         <ExternalLink size={11} className="ov-link-ext" />
                       </Link>
@@ -298,7 +298,7 @@ export function ExamOverviewPanel({ exam, info, faqs, onViewPapers }: Props) {
                 View Papers
               </button>
             ) : (
-              <Link to={`/exam/${exam.slug}`} className="ov-sidebar-cta-btn">
+              <Link href={`/exam/${exam.slug}`} className="ov-sidebar-cta-btn">
                 View Papers
               </Link>
             )}

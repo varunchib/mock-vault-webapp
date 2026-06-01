@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 import { Logo } from '../ui/Logo'
 
 const footerColumns = [
@@ -48,7 +48,7 @@ export function Footer() {
                 <li key={link.label}>
                   {'external' in link && link.external
                     ? <a href={link.href}>{link.label}</a>
-                    : <Link to={link.href}>{link.label}</Link>
+                    : <Link href={link.href}>{link.label}</Link>
                   }
                 </li>
               ))}
@@ -59,9 +59,9 @@ export function Footer() {
       <div className="footer-bot">
         <p>© 2026 Ministry of Papers · Made for India&apos;s aspirants</p>
         <p>
-          <Link to="/privacy">Privacy</Link>
+          <Link href="/privacy">Privacy</Link>
           {' · '}
-          <Link to="/terms">Terms</Link>
+          <Link href="/terms">Terms</Link>
           {' · '}
           UPSC · SSC · IBPS · State PSCs · NEET · JEE
         </p>

@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { LoginModal } from '../auth/LoginModal'
 import { Logo } from '../ui/Logo'
 import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 
 export function Navbar() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [loginOpen, setLoginOpen] = useState(false)
   const { user, isAuthenticated, logout } = useAuth()
 
   const goToDashboardOrLogin = () => {
     if (isAuthenticated) {
-      navigate(homePathForUser(user))
+      router.push(homePathForUser(user))
       return
     }
     setLoginOpen(true)
@@ -20,7 +21,7 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await logout()
-    navigate('/')
+    router.push('/')
   }
 
   return (
@@ -28,7 +29,7 @@ export function Navbar() {
       <nav className="site-nav">
         <Logo />
         <ul className="nav-mid" aria-label="Primary navigation">
-          <li><Link to="/exams">Exams</Link></li>
+          <li><Link href="/exams">Exams</Link></li>
           <li><a href="/#how">How it works</a></li>
           <li><a href="/#pricing">Pricing</a></li>
         </ul>

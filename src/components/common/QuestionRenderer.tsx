@@ -1,4 +1,92 @@
 import React from 'react'
+import katex from 'katex'
+import 'katex/dist/katex.min.css'
+
+// ── KaTeX math renderer ───────────────────────────────────────────────────────
+//
+// Supported delimiters (same as Khan Academy / JKPSC / UPSC digital papers):
+//   $$...$$   display-mode math (centred block)
+//   $...$     inline math
+//   \[...\]   display-mode (alternate)
+//   \(...\)   inline (alternate)
+//
+// Any delimiter that fails to parse is returned as its raw source string
+// rather than throwing, so a bad LaTeX expression never breaks the UI.
+
+type MathSegment =
+  | { type: 'text';    value: string }
+  | { type: 'inline';  latex: string }
+  | { type: 'display'; latex: string }
+
+const MATH_RE = /(\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\$(?!\$)[^$\n]+?\$|\\\([\s\S]*?\\\))/g
+
+function parseMathSegments(text: string): MathSegment[] {
+  const segments: MathSegment[] = []
+  let last = 0
+
+  for (const match of text.matchAll(MATH_RE)) {
+    const start = match.index!
+    if (start > last) segments.push({ type: 'text', value: text.slice(last, start) })
+
+    const raw = match[0]
+    if (raw.startsWith('$$') || raw.startsWith('\\[')) {
+      const latex = raw.startsWith('$$')
+        ? raw.slice(2, -2)
+        : raw.slice(2, -2)   // \[...\]
+      segments.push({ type: 'display', latex: latex.trim() })
+    } else {
+      const latex = raw.startsWith('$')
+        ? raw.slice(1, -1)
+        : raw.slice(2, -2)   // \(...\)
+      segments.push({ type: 'inline', latex: latex.trim() })
+    }
+
+    last = start + raw.length
+  }
+
+  if (last < text.length) segments.push({ type: 'text', value: text.slice(last) })
+  return segments
+}
+
+function renderKatex(latex: string, displayMode: boolean): string {
+  try {
+    return katex.renderToString(latex, {
+      displayMode,
+      throwOnError: false,
+      strict: false,
+      trust: false,
+    })
+  } catch {
+    return latex   // raw fallback — never crash the UI
+  }
+}
+
+function MathText({ text, className }: { text: string; className?: string }) {
+  const segments = parseMathSegments(text)
+
+  // Fast path: no math found — avoid creating React fragments unnecessarily
+  if (segments.length === 1 && segments[0].type === 'text') {
+    return <p className={className}>{segments[0].value}</p>
+  }
+
+  return (
+    <p className={className}>
+      {segments.map((seg, i) => {
+        if (seg.type === 'text') return <React.Fragment key={i}>{seg.value}</React.Fragment>
+
+        const html = renderKatex(seg.latex, seg.type === 'display')
+        return (
+          <span
+            key={i}
+            className={seg.type === 'display' ? 'math-display' : 'math-inline'}
+            // Safe: KaTeX output is sanitised — it only emits its own DOM.
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
+        )
+      })}
+    </p>
+  )
+}
 
 // ── Match-the-following parsers ───────────────────────────────────────────────
 
@@ -12,11 +100,10 @@ type MatchData = {
 
 const ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x']
 
-// Format 1: "Match ...: (i) A  (ii) B | 1. X  2. Y"
 function parsePipeMatch(text: string): MatchData | null {
   const pipeIdx = text.indexOf(' | ')
   if (pipeIdx === -1) return null
-  const left = text.slice(0, pipeIdx)
+  const left  = text.slice(0, pipeIdx)
   const right = text.slice(pipeIdx + 3)
   if (!/\(i\)/i.test(left)) return null
 
@@ -40,17 +127,16 @@ function parsePipeMatch(text: string): MatchData | null {
   return { intro, listILabel: 'List I', listIILabel: 'List II', listI, listII }
 }
 
-// Format 2: "Match ...\ni. X — a. Y\nii. ..."
 function parseNewlineMatch(text: string): MatchData | null {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+  const lines    = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   if (lines.length < 3) return null
 
   const dashLine = /^[ivx]+\.\s+(.*?)\s+—\s+[a-e]\.\s+(.*)$/i
   const matchLines = lines.filter(l => dashLine.test(l))
   if (matchLines.length < 2) return null
 
-  const intro = lines[0]
-  const listI: string[] = []
+  const intro    = lines[0]
+  const listI: string[]  = []
   const listII: string[] = []
   for (const line of matchLines) {
     const m = line.match(dashLine)
@@ -58,11 +144,10 @@ function parseNewlineMatch(text: string): MatchData | null {
   }
   if (listI.length < 2) return null
 
-  // Extract List I / List II labels from intro if present
   const labelMatch = intro.match(/List[- ]?I\s*\(([^)]+)\).*?List[- ]?II\s*\(([^)]+)\)/i)
   return {
     intro,
-    listILabel: labelMatch ? `List I — ${labelMatch[1]}` : 'List I',
+    listILabel:  labelMatch ? `List I — ${labelMatch[1]}`  : 'List I',
     listIILabel: labelMatch ? `List II — ${labelMatch[2]}` : 'List II',
     listI,
     listII,
@@ -102,15 +187,16 @@ function MatchTable({ data }: { data: MatchData }) {
 function MultilineText({ text, className }: { text: string; className?: string }) {
   const lines = text.split(/\r?\n/)
   const cls = ['qr-text', className].filter(Boolean).join(' ')
+  // Render each line through MathText so inline math works in multi-line questions
   return (
-    <p className={cls}>
+    <div className={cls}>
       {lines.map((line, i) => (
         <React.Fragment key={i}>
-          {line}
+          <MathText text={line} />
           {i < lines.length - 1 && <br />}
         </React.Fragment>
       ))}
-    </p>
+    </div>
   )
 }
 
@@ -124,5 +210,5 @@ export function QuestionRenderer({ text, className }: { text: string; className?
     return <MultilineText text={text} className={className} />
   }
 
-  return <p className={className}>{text}</p>
+  return <MathText text={text} className={className} />
 }

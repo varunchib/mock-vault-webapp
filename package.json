@@ -4,12 +4,12 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "node scripts/generate-sitemap.js && vite build",
+    "dev": "next dev",
+    "build": "node scripts/generate-sitemap.js && next build",
     "typecheck": "tsc -b --pretty",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "deploy": "npm run build && wrangler deploy"
+    "start": "next start",
+    "deploy:cloudflare": "npx @cloudflare/next-on-pages && wrangler pages deploy .vercel/output/static"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
@@ -18,24 +18,20 @@
     "jwt-decode": "^4.0.0",
     "katex": "^0.16.47",
     "lucide-react": "^1.8.0",
+    "next": "^15.5.18",
     "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-router-dom": "^7.14.2"
+    "react-dom": "^19.2.5"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.32.3",
     "@eslint/js": "^9.39.4",
     "@types/node": "^25.6.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^6.0.1",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.1.1",
-    "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.5.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.2",
-    "vite": "^8.0.9",
     "wrangler": "^4.83.0"
   }
 }

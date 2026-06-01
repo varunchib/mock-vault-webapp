@@ -1,5 +1,5 @@
 import { FileText, LayoutDashboard } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import Link from 'next/link'
 
 type Props = {
   examSlug: string
@@ -12,7 +12,7 @@ export function ExamNavStrip({ examSlug, examName, hasInfo, active }: Props) {
   return (
     <nav className="enb" aria-label={`${examName} sections`}>
       <Link
-        to={`/exam/${examSlug}`}
+        href={`/exam/${examSlug}`}
         className={`enb-tab${active === 'papers' ? ' active' : ''}`}
       >
         <FileText size={14} />
@@ -20,7 +20,7 @@ export function ExamNavStrip({ examSlug, examName, hasInfo, active }: Props) {
       </Link>
       {hasInfo && (
         <Link
-          to={`/exam/${examSlug}/overview`}
+          href={`/exam/${examSlug}/overview`}
           className={`enb-tab${active === 'overview' ? ' active' : ''}`}
         >
           <LayoutDashboard size={14} />

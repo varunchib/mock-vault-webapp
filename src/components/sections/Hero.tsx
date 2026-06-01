@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
 import { motion, type Variants } from 'framer-motion'
-import { useNavigate } from 'react-router-dom'
+import { useRouter } from 'next/navigation'
 import { quickTags } from '../../data/landing'
 
 const stagger: Variants = {
@@ -19,16 +19,16 @@ const item: Variants = {
 }
 
 export function Hero() {
-  const navigate = useNavigate()
+  const router = useRouter()
   const [query, setQuery] = useState('')
 
   const runSearch = (value = query) => {
     const trimmed = value.trim()
     if (!trimmed) {
-      navigate('/exams')
+      router.push('/exams')
       return
     }
-    navigate(`/exams?q=${encodeURIComponent(trimmed)}`)
+    router.push(`/exams?q=${encodeURIComponent(trimmed)}`)
   }
 
   return (

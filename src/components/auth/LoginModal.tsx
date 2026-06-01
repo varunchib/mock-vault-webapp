@@ -1,8 +1,6 @@
 import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
 import { X } from 'lucide-react'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 import { env } from '../../lib/env'
 
@@ -12,7 +10,6 @@ type LoginModalProps = {
 }
 
 export function LoginModal({ open, onClose }: LoginModalProps) {
-  const navigate = useNavigate()
   const { loginWithGoogleCredential } = useAuth()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -25,9 +22,10 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
     setIsSubmitting(true)
 
     try {
-      const user = await loginWithGoogleCredential(response.credential)
+      await loginWithGoogleCredential(response.credential)
       onClose()
-      navigate(homePathForUser(user))
+      // AppChrome detects isAuthenticated=true on landing and redirects to the
+      // user's home screen — no explicit router.push needed here.
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Login failed. Please try again.'
       setErrorMessage(message)
@@ -74,7 +72,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           </div>
         ) : (
           <div className="auth-config-warning">
-            Add <code>VITE_GOOGLE_CLIENT_ID</code> in <code>.env</code> to enable Google login.
+            Add <code>NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> in <code>.env</code> to enable Google login.
           </div>
         )}
 

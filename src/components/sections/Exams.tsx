@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom'
+﻿import Link from 'next/link'
 import { examCatalog } from '../../data/catalog'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
@@ -13,7 +13,7 @@ export function Exams() {
       />
       <div className="exam-grid">
         {examCatalog.map((exam) => (
-          <Link className="exam-card" to={`/exam/${exam.slug}`} key={exam.name}>
+          <Link className="exam-card" href={`/exam/${exam.slug}`} key={exam.name}>
             <div className="ec-icon">{exam.icon}</div>
             <h3 className="ec-name">{exam.shortName}</h3>
             <div className="ec-sub">{exam.totalQuestions} questions</div>

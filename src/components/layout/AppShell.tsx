@@ -8,7 +8,8 @@ import {
   LogOut,
   Search,
 } from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 import { fetchExamCatalog, type Exam } from '../../lib/api'
@@ -57,8 +58,8 @@ function LogoutOverlay() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const location = useLocation()
-  const navigate = useNavigate()
+  const pathname = usePathname()
+  const router = useRouter()
   const { user, logout } = useAuth()
   const firstName = user?.name.split(' ')[0] ?? 'Aspirant'
   const avatarInitial = firstName.charAt(0).toUpperCase()
@@ -80,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     setSearchQuery('')
     setProfileOpen(false)
-  }, [location.pathname])
+  }, [pathname])
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
@@ -109,17 +110,18 @@ export function AppShell({ children }: { children: ReactNode }) {
     setIsLoggingOut(true)
     try {
       await logout()
-      navigate('/')
+      // AppChrome detects !isAuthenticated on a protected route and redirects
+      // to '/' — no explicit router.push needed here.
     } catch {
       setIsLoggingOut(false)
     }
   }
 
   const handleNavigate = (href: string) => {
-    navigate(href === '/dashboard' ? homePathForUser(user) : href)
+    router.push(href === '/dashboard' ? homePathForUser(user) : href)
   }
 
-  const pageTitle = getPageTitle(location.pathname)
+  const pageTitle = getPageTitle(pathname)
 
   return (
     <>
@@ -127,7 +129,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <section className="vault-app vault-app-simple">
         <aside className="vault-sidebar vault-sidebar-simple">
           {/* Logo */}
-          <Link className="vault-logo" to={homePathForUser(user)}>
+          <Link className="vault-logo" href={homePathForUser(user)}>
             <span className="vault-logo-mark">
               <svg viewBox="0 0 40 40" fill="none" width="32" height="32" aria-hidden="true">
                 <rect width="40" height="40" rx="10" fill="rgba(253,224,71,0.15)" />
@@ -145,7 +147,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             <p className="vault-nav-label">Menu</p>
             {primaryNav.map((item) => (
               <button
-                className={`vault-nav-item${isNavActive(item.href, location.pathname) ? ' active' : ''}`}
+                className={`vault-nav-item${isNavActive(item.href, pathname) ? ' active' : ''}`}
                 type="button"
                 key={item.label}
                 onClick={() => handleNavigate(item.href)}
@@ -180,7 +182,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="vault-workspace">
           <header className="vault-topbar-new">
             <div className="vault-tb-left">
-              <Link className="vault-tb-logo" to={homePathForUser(user)} aria-label="Home">
+              <Link className="vault-tb-logo" href={homePathForUser(user)} aria-label="Home">
                 <svg viewBox="0 0 40 40" fill="none" width="24" height="24" aria-hidden="true">
                   <rect width="40" height="40" rx="10" fill="rgba(253,224,71,0.15)" />
                   <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="#FDE047" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
@@ -207,7 +209,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                         className="vault-search-result"
                         type="button"
                         key={exam.slug}
-                        onClick={() => navigate(`/exam/${exam.slug}`)}
+                        onClick={() => router.push(`/exam/${exam.slug}`)}
                       >
                         <span>{exam.icon}</span>
                         <div>
@@ -262,7 +264,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <nav className="vault-bottom-nav" aria-label="Main navigation">
           {primaryNav.map((item) => (
             <button
-              className={`vault-bottom-nav-item${isNavActive(item.href, location.pathname) ? ' active' : ''}`}
+              className={`vault-bottom-nav-item${isNavActive(item.href, pathname) ? ' active' : ''}`}
               type="button"
               key={item.label}
               onClick={() => handleNavigate(item.href)}

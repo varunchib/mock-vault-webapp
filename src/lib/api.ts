@@ -156,7 +156,7 @@ export class APIError extends Error {
 }
 
 function normalizeBaseUrl() {
-  const baseUrl = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+  const baseUrl = (process.env.NEXT_PUBLIC_API_BASE_URL ?? '')?.trim();
   if (!baseUrl) return "";
 
   let normalized = baseUrl.replace(/\/+$/, "");

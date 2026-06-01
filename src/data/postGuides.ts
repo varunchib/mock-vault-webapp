@@ -77,7 +77,7 @@ export const paperGuideMap: Record<string, string> = {
   'jkssb-finance-accounts-2024-paper': 'jkssb-faa',
   'jkssb-wildlife-guard-2026-may-10':  'jkssb-wildlife-guard',
   'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb',
-  'ssc-cgl-2023-tier-1-all-shifts':    'ssc-cgl',
+  'ssc-cgl-2025-sep12-shift1':         'ssc-cgl',
   'upsc-cse-prelims-2026-gs1':         'upsc-cse',
   'upsc-cse-prelims-2025-gs1':         'upsc-cse',
   'upsc-cse-prelims-2025-gs2':         'upsc-cse',
@@ -90,7 +90,7 @@ export const postGuides: Record<string, PostGuideData> = {
   // Source: JKSSB Syllabus Notice No. JKSSB-COE0EXAM(UT)/47/2023-03 dated 26.12.2024
   // Advertisement Notification 02 of 2024 dated 22.11.2024
   jkpsi: {
-    title: 'JKSSB Sub Inspector of Police (PSI) — Official Syllabus & Exam Pattern 2024',
+    title: 'JKSSB Sub Inspector of Police (PSI) Previous Year Papers, Syllabus & Exam Pattern 2024',
     shortName: 'JKPSI',
     tagline: 'Official syllabus for JKSSB Sub Inspector (J&K Police) — Adv. 02/2024. 100 questions, 200 marks, 6 sections. Solved previous year papers included.',
 
@@ -242,7 +242,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── UPSC CSE ────────────────────────────────────────────────────────────────
   'upsc-cse': {
-    title: 'UPSC Civil Services Examination (CSE) — Complete Syllabus & Exam Pattern',
+    title: 'UPSC CSE Previous Year Papers, Syllabus & Exam Pattern',
     shortName: 'UPSC CSE',
     tagline: 'UPSC IAS/IPS/IFS exam — Prelims syllabus, GS Paper I & CSAT pattern, Mains overview, and previous year solved papers.',
 
@@ -396,7 +396,7 @@ export const postGuides: Record<string, PostGuideData> = {
     examSlug: 'ssc-cgl',
 
     papers: [
-      { slug: 'ssc-cgl-2023-tier-1-all-shifts', title: 'SSC CGL 2023 Tier I — All Shifts Combined', year: '2023', questions: 100 },
+      { slug: 'ssc-cgl-2025-sep12-shift1', title: 'SSC CGL 2025 Tier I — 12 Sep 2025 (Shift 1)', year: '2025', questions: 100 },
     ],
 
     conductingBody: 'Staff Selection Commission (SSC)',
@@ -520,7 +520,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── BPSC CCE ────────────────────────────────────────────────────────────────
   bpsc: {
-    title: 'BPSC Combined Competitive Examination (CCE) — Syllabus & Exam Pattern',
+    title: 'BPSC CCE Previous Year Papers, Syllabus & Exam Pattern',
     shortName: 'BPSC CCE',
     tagline: 'Bihar Public Service Commission CCE — Prelims syllabus, 150 GS questions, no negative marking. Previous year papers with solutions.',
 
@@ -646,7 +646,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── IBPS PO ─────────────────────────────────────────────────────────────────
   'ibps-po': {
-    title: 'IBPS PO — Complete Syllabus & Exam Pattern 2025',
+    title: 'IBPS PO Previous Year Papers, Syllabus & Exam Pattern 2025',
     shortName: 'IBPS PO',
     tagline: 'IBPS Probationary Officer exam — Prelims & Mains syllabus, section-wise pattern, Banking Awareness topics, previous year papers.',
 
@@ -906,7 +906,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── RSSB (Rajasthan Patwari) ────────────────────────────────────────────────
   rssb: {
-    title: 'RSSB Patwari — Official Syllabus & Exam Pattern 2025',
+    title: 'RSSB Patwari Previous Year Papers, Syllabus & Exam Pattern 2025',
     shortName: 'RSSB Patwari',
     tagline: 'Rajasthan Staff Selection Board Patwari exam — 150 questions, 300 marks, −0.67 negative marking. Official syllabus, Rajasthan GK topics, and solved 2025 paper.',
 
@@ -1299,9 +1299,9 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── JKSSB Patwari ───────────────────────────────────────────────────────────
   'jkssb-patwari': {
-    title: 'JKSSB Patwari — Syllabus, Revenue Laws & Exam Pattern',
+    title: 'JKSSB Patwari Previous Year Papers, Syllabus & Exam Pattern',
     shortName: 'JKSSB Patwari',
-    tagline: 'JKSSB Patwari exam — Revenue Laws syllabus, J&K Land Records, 120 MCQs, −0.25 negative marking. 2024 solved paper included.',
+    tagline: 'JKSSB Patwari previous year papers with solutions, complete syllabus, exam pattern. Two-part exam: Urdu qualifying + 120-mark MCQ. 1 Sep 2024 paper solved free.',
 
     examSlug: 'jkssb',
     paperSearchTerm: 'patwari',
@@ -1316,94 +1316,100 @@ export const postGuides: Record<string, PostGuideData> = {
     examMode: 'OMR-based Written Test',
 
     about: [
-      'The JKSSB Patwari is a Group C post in the J&K Revenue Department. Patwaris are the first point of contact for land-related matters at the village level — they maintain Khasra and Khatauni land records, register mutations (transfers and inheritances), conduct Girdawari (crop inspection) twice a year, assist in land acquisition proceedings, and prepare revenue reports for Tehsildars. With 1,200 vacancies in the 2024 batch, it is one of JKSSB\'s most recruited posts.',
-      'The written examination has 120 objective-type questions, 120 marks, 2-hour duration, and −0.25 negative marking per wrong answer. The paper is split across General Knowledge & J&K Current Affairs, Revenue Laws & Land Records (the post-specific section), Arithmetic, Reasoning, and English. Revenue Laws is the distinguishing section — candidates who prepare this thoroughly have a significant scoring advantage over others.',
-      'The 2024 JKSSB Patwari exam was held on 1 September 2024. Set A of the paper, with all 120 questions solved and explained, is available on Ministry of Papers. The revenue law questions in the 2024 paper heavily tested the J&K Land Revenue Act, mutation procedures, and Girdawari registers.',
+      'The JKSSB Patwari is a Group C post in the J&K Revenue Department. Patwaris maintain Khasra and Khatauni land records, register mutations, conduct Girdawari (crop inspection) twice a year, and prepare revenue reports for Tehsildars. The 2021 notification (No. 02 of 2021) advertised 142 vacancies. Applications opened in April 2021; the exam was held in 2024 after a long administrative delay.',
+      'The examination is in two parts. Part I is a qualifying Urdu test — descriptive, 50 marks, 1 hour — candidates must score at least 40% overall (35% for reserved categories) with at least 33% in each of the Reading and Writing sections to be considered qualified. Part II is the merit-based MCQ paper: 120 questions, 120 marks, 2 hours, −0.25 negative marking per wrong answer.',
+      'Part II covers five sections: General Knowledge & Current Affairs (36 marks), General Knowledge with special reference to J&K UT (24 marks), General English (24 marks), Knowledge of Computers (18 marks), and Mental Ability & Reasoning (18 marks). The Urdu Part I (Paper I) was held on 31 March 2024; Part II (Paper II, 120 MCQs) was held on 1 September 2024. Set A of Part II, fully solved, is available on Ministry of Papers.',
     ],
 
-    patternNotification: 'Based on the 2024 JKSSB Patwari examination (1 September 2024, 1,200 vacancies). Pattern may vary in future notifications.',
+    patternNotification: 'Based on JKSSB Notification No. 02 of 2021 (142 vacancies). Part II (MCQ) exam held on 1 September 2024.',
 
     quickFacts: [
-      { label: 'Questions', value: '120 MCQs' },
-      { label: 'Total Marks', value: '120 (1 mark each)' },
-      { label: 'Duration', value: '2 hours' },
-      { label: 'Neg. Marking', value: '−0.25 per wrong answer' },
-      { label: 'Key Subject', value: 'Revenue Laws & Land Records' },
-      { label: 'Vacancies (2024)', value: '1,200 posts' },
+      { label: 'Notification', value: 'No. 02 of 2021' },
+      { label: 'Vacancies', value: '142 posts' },
+      { label: 'Part I (Urdu)', value: '50 marks, 1 hr, qualifying only' },
+      { label: 'Part II (MCQ)', value: '120 questions, 120 marks, 2 hrs' },
+      { label: 'Neg. Marking', value: '−0.25 per wrong answer (Part II)' },
       { label: 'Qualification', value: 'Graduation' },
       { label: 'Domicile', value: 'J&K Domicile mandatory' },
     ],
 
     syllabus: [
       {
-        subject: 'Revenue Laws & Land Records (25–30 Qs) — Post-specific',
+        subject: 'General Knowledge & Current Affairs (36 Qs)',
         topics: [
-          'J&K Land Revenue Act, 1954 — Revenue hierarchy (Patwari → Girdawar → Naib Tehsildar → Tehsildar → SDO → DM), powers and duties',
-          'J&K Agrarian Reforms Act, 1976 — Ceiling on landholding, vesting of surplus land',
-          'Alienation of Land Act — Restrictions on transfer of agricultural land',
-          'J&K Consolidation of Holdings Act — Purpose, process, Consolidation Officer powers',
-          'Girdawari (crop inspection) — Procedure, Rabi and Kharif seasons, Girdawari register entries',
-          'Jamabandi — Annual record of rights, preparation, attestation',
-          'Khasra — Field register, field numbers, area measurement, crop entries',
-          'Khatauni — Holder-wise compilation of Khasra entries',
-          'Mutation (Nakal/Intkal) — Types (inheritance, sale, gift, mortgage), process, Fard entries',
-          'Land measurement units — Kanal, Marla, Gunta, Bigha in J&K context',
-          'Revenue courts — Jurisdiction of Tehsildar, Collector in land disputes',
-          'Nazul land, Shamilat Deh, Khud Kasht vs Sir land definitions',
+          'Current Events of National and International importance',
+          'Science & Technology',
+          'Environment, Ecology & Bio-diversity',
+          'Indian National Movement',
+          'Political & Physical divisions of world & India',
+          'Indian Economy',
+          'Indian Culture & Heritage',
+          'Climate & Crops in India',
+          'Transport & Communication',
+          'Demography',
+          'Important Rivers & Lakes in India',
         ],
       },
       {
-        subject: 'General Knowledge & J&K Current Affairs (30–35 Qs)',
+        subject: 'General Knowledge — J&K UT (Special Reference) (24 Qs)',
         topics: [
-          'J&K History — Dogra rule, 1947 Accession, Article 370 abrogation, UT status',
-          'J&K Geography — Rivers (Jhelum, Chenab, Tawi, Ravi), passes, lakes, 20 districts',
-          'J&K Administration — Lt. Governor, Divisional Commissioners, District administration',
-          'J&K Current Affairs — State government orders, schemes, appointments (last 12 months)',
-          'National GK — Indian History, Polity, Economy, Science basics',
-          'National Current Affairs — Major events, awards, sports (last 6 months)',
+          'History, Economy, and Culture of J&K UT',
+          'Geography — Weather, Climate, Crops, Soils',
+          'Means of Transport in J&K',
+          'Flora and Fauna of J&K',
+          'Rivers and Lakes of J&K',
+          'Important Tourist Destinations in J&K',
+          'J&K Reorganisation Act, 2019',
         ],
       },
       {
-        subject: 'Arithmetic & Quantitative Aptitude (20–25 Qs)',
+        subject: 'General English (24 Qs)',
         topics: [
-          'Number System, Simplification, HCF & LCM',
-          'Percentage, Profit & Loss, Discount',
-          'Simple & Compound Interest',
-          'Ratio & Proportion, Mixture & Alligation',
-          'Time-Speed-Distance, Time & Work',
-          'Area & Perimeter of basic shapes (relevant to land measurement)',
+          'Tenses, Narration, Modals',
+          'Articles, Prepositions, Clauses',
+          'Rearranging jumbled sentences',
+          'Comprehension with fill-in-the-blanks (Phrases, Pronouns, Homonyms)',
+          'Synonyms and Antonyms',
+          'Pairs of words and their use in sentences',
+          'Idioms and Phrases',
+          'Active & Passive Voice',
         ],
       },
       {
-        subject: 'Reasoning Ability (15–20 Qs)',
+        subject: 'Knowledge of Computers (18 Qs)',
         topics: [
-          'Analogy, Series (Number, Letter, Mixed)',
-          'Coding-Decoding, Direction Sense',
-          'Blood Relations, Ranking & Arrangement',
-          'Syllogisms, Statement-Conclusion',
-          'Non-Verbal — Mirror Images, Embedded Figures',
+          'Introduction — Basic Applications, Objectives, Components',
+          'Fundamentals of Computer Science',
+          'Hardware & Software; Concept of Open Source Technologies',
+          'Input & Output Devices',
+          'MS Word, MS Excel, MS Access, MS PowerPoint',
+          'PDF handling, Internet and Email',
+          'Concept of Computer Virus and Anti-Virus',
         ],
       },
       {
-        subject: 'English Language (10–15 Qs)',
+        subject: 'Mental Ability & Reasoning (18 Qs)',
         topics: [
-          'Grammar — Tenses, Subject-Verb Agreement, Articles, Prepositions',
-          'Vocabulary — Synonyms, Antonyms, One-Word Substitution, Idioms',
-          'Sentence Correction, Error Detection',
-          'Fill in the Blanks',
+          'Number Series, Letter Series',
+          'Coding-Decoding',
+          'Direction Sense',
+          'Blood Relations',
+          'Statements and Conclusions',
+          'Logical Reasoning',
+          'Mental Reasoning',
         ],
       },
     ],
 
     examPattern: [
-      { section: 'Revenue Laws & Land Records', questions: '25–30', marks: '25–30', note: '−0.25 per wrong' },
-      { section: 'General Knowledge & J&K Current Affairs', questions: '30–35', marks: '30–35', note: '−0.25 per wrong' },
-      { section: 'Arithmetic & Quantitative Aptitude', questions: '20–25', marks: '20–25', note: '−0.25 per wrong' },
-      { section: 'Reasoning Ability', questions: '15–20', marks: '15–20', note: '−0.25 per wrong' },
-      { section: 'English Language', questions: '10–15', marks: '10–15', note: '−0.25 per wrong' },
-      { section: 'Total', questions: 120, marks: 120, isTotal: true },
+      { section: 'General Knowledge & Current Affairs', questions: 36, marks: 36, note: '−0.25 per wrong' },
+      { section: 'General Knowledge — J&K UT (special reference)', questions: 24, marks: 24, note: '−0.25 per wrong' },
+      { section: 'General English', questions: 24, marks: 24, note: '−0.25 per wrong' },
+      { section: 'Knowledge of Computers', questions: 18, marks: 18, note: '−0.25 per wrong' },
+      { section: 'Mental Ability & Reasoning', questions: 18, marks: 18, note: '−0.25 per wrong' },
+      { section: 'Total (Part II)', questions: 120, marks: 120, isTotal: true },
     ],
-    examPatternNote: 'Duration: 2 hours. 1 mark per question. −0.25 per wrong answer.',
+    examPatternNote: 'Part II only. Duration: 2 hours. 1 mark per question. −0.25 per wrong answer. Part I (Urdu, 50 marks, qualifying) is separate.',
 
     eligibility: {
       age: '18–40 years (General). SC/ST: +5 years. OBC: +3 years. PwD: +10 years.',
@@ -1412,9 +1418,10 @@ export const postGuides: Record<string, PostGuideData> = {
     },
 
     selectionProcess: [
-      'Written Examination — 120 MCQs, 2 hours, OMR-based',
+      'Part I — Urdu (qualifying): 50 marks, 1 hour, descriptive. Minimum 40% overall + 33% in each section (General); 35% overall for reserved categories.',
+      'Part II — MCQ: 120 questions, 120 marks, 2 hours, OMR-based, −0.25 negative marking',
       'Document Verification — Domicile, educational, category certificates',
-      'Final Merit List — Written exam marks only (no interview)',
+      'Final Merit List — Part II marks only (Part I is qualifying; no interview)',
     ],
 
     salary: [
@@ -1422,17 +1429,17 @@ export const postGuides: Record<string, PostGuideData> = {
     ],
 
     preparationTips: [
-      'Revenue Laws is the post-specific section that most candidates underestimate. Study the J&K Land Revenue Act chapter by chapter — know the hierarchy of revenue officers, the process for mutation recording, and Girdawari procedures. 25–30 questions from this section alone can be secured with focused preparation.',
-      'Land measurement units are frequently asked: 1 Kanal = 20 Marla = 506.7 sq. yards in J&K. Know the relationship between Kanal, Marla, Bigha, and Acre. Also study the difference between Khud Kasht and Sir land.',
-      'The 2024 Patwari paper (Set A) on Ministry of Papers shows the exact difficulty and topic split. Solve it under timed conditions to identify your weak areas in Revenue Laws.',
-      'J&K current affairs questions in Patwari exams focus on local events — district-level news, JKSSB notifications, J&K government orders. Follow local newspapers like Greater Kashmir or Daily Excelsior.',
-      'Arithmetic in the Patwari exam is straightforward Class 8–10 level. Invest minimum time here but ensure you get 15+ correct out of 20–25. Time saved on Arithmetic can be used for Revenue Law questions.',
+      'GK & Current Affairs is the largest section (60 marks combined — 36 national + 24 J&K). Split your preparation: cover J&K geography, history, and the Reorganisation Act 2019 for the J&K-specific section, and national current affairs for the general section. Together they form 50% of Part II marks.',
+      'Computer Knowledge (18 marks) is often underestimated by Patwari aspirants. The syllabus explicitly names MS Word, MS Excel, MS Access, MS PowerPoint, Internet, Email, and virus/anti-virus concepts. Scoring full marks here requires hands-on practice, not just theory reading.',
+      'The Urdu Part I is qualifying — you must clear it to have your MCQ paper evaluated. Minimum 40% overall (33% in each of Reading and Writing) for General category; 35% overall for reserved. Do not ignore it assuming it is easy.',
+      'J&K-specific questions in the 2024 paper focused on post-2019 UT reorganisation, Lt. Governor administration, J&K districts, and local rivers. Study the J&K Reorganisation Act 2019 in detail — questions from it appear in nearly every JKSSB exam.',
+      'Solve the 1 Sep 2024 Part II paper (Set A) on Ministry of Papers to understand the exact difficulty, section-wise question count, and how the Computer and Reasoning questions are framed.',
     ],
   },
 
   // ─── JKSSB Junior Assistant ───────────────────────────────────────────────────
   'jkssb-junior-assistant': {
-    title: 'JKSSB Junior Assistant — Syllabus, Computer Knowledge & Exam Pattern',
+    title: 'JKSSB Junior Assistant Previous Year Papers, Syllabus & Exam Pattern',
     shortName: 'JKSSB Junior Assistant',
     tagline: 'JKSSB Junior Assistant exam — Computer Knowledge syllabus, GK, Reasoning, English. 80 questions, −0.25 negative marking. 2026 solved paper.',
 
@@ -1566,7 +1573,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── JKSSB Finance Account Assistant ─────────────────────────────────────────
   'jkssb-faa': {
-    title: 'JKSSB Finance Account Assistant (FAA) — Syllabus & Exam Pattern',
+    title: 'JKSSB Finance Account Assistant Previous Year Papers, Syllabus & Exam Pattern',
     shortName: 'JKSSB FAA',
     tagline: 'JKSSB Finance Account Assistant exam — J&K Financial Code, Treasury Code, Government Accounting. 120 MCQs, −0.25 negative marking. 2024 solved paper.',
 
@@ -1698,7 +1705,7 @@ export const postGuides: Record<string, PostGuideData> = {
   // Source: JKSSB Syllabus Notice No. JKSSB-COEOEXAM(UT)/47/2023-03 dated 09.04.2025
   // Advertisements 03/2021 and 04/2022 — Forest, Ecology & Environment Department
   'jkssb-wildlife-guard': {
-    title: 'JKSSB Wildlife Guard — Official Syllabus & Exam Pattern (Forest Dept.)',
+    title: 'JKSSB Wildlife Guard Previous Year Papers, Syllabus & Exam Pattern',
     shortName: 'JKSSB Wildlife Guard',
     tagline: 'Official syllabus for JKSSB Wildlife Guard (Forest, Ecology & Environment) — 4 sections, 120 marks. Mathematics, Reasoning, English, General Awareness + Forest & Wildlife. 2026 solved paper.',
 
