@@ -1,12 +1,11 @@
 import type { NextConfig } from 'next'
 
+const isProd = process.env.NODE_ENV === 'production'
+
 const nextConfig: NextConfig = {
-  // Static export → outputs to out/ for Cloudflare Worker (worker.ts serves it).
-  // Dynamic routes use empty generateStaticParams — the worker's SPA fallback
-  // (not_found_handling: single-page-application) handles client-side routing,
-  // and the worker's bot-detection injects per-page metadata for crawlers.
-  output: 'export',
-  trailingSlash: true,
+  // Static export only for production builds (Cloudflare Workers deployment).
+  // Dev mode skips it so `npm run dev` works with dynamic routes normally.
+  ...(isProd ? { output: 'export', trailingSlash: true } : {}),
   images: { unoptimized: true },
   eslint: { ignoreDuringBuilds: true },
 }
