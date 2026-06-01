@@ -37,6 +37,34 @@ import { postGuides } from '../data/postGuides'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
+// Return only a meaningful shift label (e.g. "Set A", "Shift 1"), stripping any date fragments.
+// Returns null when the shift string is purely a date like "10 May 2026" or "Jan 2024".
+function extractShiftLabel(shift: string): string | null {
+  if (!shift) return null
+  const cleaned = shift
+    .replace(/\d{1,2}\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4}/gi, '')
+    .replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4}/gi, '')
+    .replace(/\b\d{4}\b/g, '')
+    .replace(/\s*[-–]\s*/g, ' ')
+    .replace(/[()]/g, '')
+    .trim()
+  return cleaned || null
+}
+
+function fmtHeldOn(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+// Best available display date: heldOn → date extracted from shift → year
+function getDisplayDate(paper: { heldOn?: string; shift: string; year: string }): string | null {
+  if (paper.heldOn) return fmtHeldOn(paper.heldOn)
+  if (paper.shift) {
+    const m = paper.shift.match(/(\d{1,2}\s+)?(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s+\d{4}/i)
+    if (m) return m[0].replace(/(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*/gi, (s) => s.slice(0, 3))
+  }
+  return paper.year || null
+}
+
 const FREE_QUESTION_LIMIT = 10
 const PAGE_SIZE = 15
 
@@ -456,8 +484,14 @@ export function ExamPage() {
                           <div className="ep-paper-card-main">
                             <strong>{paper.title}</strong>
                             <div className="ep-paper-meta">
-                              {paper.shift && <small>{paper.shift}</small>}
-                              {paper.heldOn && <small className="ep-paper-date">{new Date(paper.heldOn).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</small>}
+                              {(() => {
+                                const label = extractShiftLabel(paper.shift)
+                                const date = getDisplayDate(paper)
+                                return (<>
+                                  {label && <small>{label}</small>}
+                                  {date && <small className="ep-paper-date">{date}</small>}
+                                </>)
+                              })()}
                             </div>
                           </div>
                           <div className="ep-paper-card-right">

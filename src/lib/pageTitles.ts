@@ -43,8 +43,8 @@ type PaperMeta = {
 }
 
 /**
- * IBPS PO 2025 Question Paper – 1st Shift | Ministry of Papers
- * UPSC CSE Prelims 2024 – GS Paper 1 | Ministry of Papers
+ * IBPS PO 2025 PYQ Paper – 1st Shift | Ministry of Papers
+ * UPSC CSE Prelims 2024 PYQ Paper – GS Paper 1 | Ministry of Papers
  */
 export function paperSeoTitle(p: PaperMeta): string {
   const exam = p.examName.trim()
@@ -53,7 +53,7 @@ export function paperSeoTitle(p: PaperMeta): string {
 
   let core = exam
   if (year) core += ` ${year}`
-  core += ' Question Paper'
+  core += ' PYQ Paper'
   if (shift) core += ` – ${shift}`
   return `${core} | ${BRAND}`
 }
@@ -77,7 +77,7 @@ export function paperSeoDescription(p: PaperMeta): string {
   if (year) d += ` ${year}`
   if (shift) d += ` (${shift})`
   if (date && !d.includes(date)) d += ` held on ${date}`
-  d += ' previous year paper'
+  d += ' PYQ – previous year question paper'
   if (subs) d += ` – ${subs}`
   d += `. Detailed answers and explanations, free on ${BRAND}.`
   return truncate(d, 160)
@@ -93,9 +93,9 @@ type ExamHubMeta = {
   description?: string
 }
 
-/** IBPS PO – Previous Year Papers & Mock Tests | Ministry of Papers */
+/** IBPS PO PYQ – Previous Year Papers & Mock Tests | Ministry of Papers */
 export function examHubSeoTitle(e: ExamHubMeta): string {
-  return `${e.shortName} – Previous Year Papers & Mock Tests | ${BRAND}`
+  return `${e.shortName} PYQ – Previous Year Papers & Mock Tests | ${BRAND}`
 }
 
 export function examHubSeoDescription(e: ExamHubMeta): string {
@@ -105,7 +105,7 @@ export function examHubSeoDescription(e: ExamHubMeta): string {
   const p = Number(e.papers ?? 0)
   const m = Number(e.mocks ?? 0)
   let d = `Practice ${e.shortName} with`
-  if (p > 0) d += ` ${p} solved previous year papers`
+  if (p > 0) d += ` ${p} solved PYQ papers`
   if (p > 0 && m > 0) d += ' and'
   if (m > 0) d += ` ${m} full-length mock tests`
   d += `. Detailed answers, subject analysis, and cutoff comparison – free on ${BRAND}.`
