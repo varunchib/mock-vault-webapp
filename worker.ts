@@ -264,32 +264,62 @@ export default {
     // Clone original request pointing at / for SPA fallback
     const indexRequest = new Request(`${url.origin}/`, request)
 
+    // For dynamic routes like /exam/jkssb or /pyq/upsc-cse-2024, Next.js static
+    // export only generates files for the placeholder slug (_). Swap the real slug
+    // with _ so the RSC payload (.txt) and pre-rendered HTML (.html) are found.
+    // The dynamic segment is always the 3rd path part: /base/[SLUG]/rest
+    function withPlaceholderSlug(p: string): string | null {
+      const parts = p.split('/')
+      // ['', 'exam', 'jkssb', 'index.txt'] → replace parts[2] with '_'
+      if (parts.length >= 4 && parts[2] !== '_' && !parts[2].includes('.')) {
+        const clone = [...parts]
+        clone[2] = '_'
+        return clone.join('/')
+      }
+      return null
+    }
+
+    async function fetchWithPlaceholderFallback(req: Request, reqPath: string): Promise<Response | null> {
+      try {
+        const res = await env.ASSETS.fetch(req)
+        if (res.status < 400) return res
+      } catch { /* continue */ }
+      const fallback = withPlaceholderSlug(reqPath)
+      if (!fallback) return null
+      try {
+        const res = await env.ASSETS.fetch(new Request(`${url.origin}${fallback}`, req))
+        if (res.status < 400) return res
+      } catch { /* continue */ }
+      return null
+    }
+
     // Static assets (.js, .css, .png, .svg, .woff2, etc.) → pass through
+    // RSC payload files (.txt) also use the placeholder fallback for dynamic routes.
     const lastSeg = path.split('/').pop() ?? ''
     if (lastSeg.includes('.') && !lastSeg.endsWith('.html')) {
-      try {
-        const res = await env.ASSETS.fetch(request)
-        if (path === '/llms.txt') {
+      if (path === '/llms.txt') {
+        try {
+          const res = await env.ASSETS.fetch(request)
           const headers = new Headers(res.headers)
           headers.set('content-type', 'text/plain; charset=UTF-8')
           headers.set('x-robots-tag', 'all')
           return new Response(res.body, { status: res.status, headers })
-        }
-        return res
-      } catch {
-        return new Response('Not Found', { status: 404 })
+        } catch { return new Response('Not Found', { status: 404 }) }
       }
+      // For RSC payloads (.txt), try placeholder fallback; for others, direct only.
+      if (lastSeg.endsWith('.txt')) {
+        const res = await fetchWithPlaceholderFallback(request, path)
+        return res ?? new Response('Not Found', { status: 404 })
+      }
+      try { return await env.ASSETS.fetch(request) }
+      catch { return new Response('Not Found', { status: 404 }) }
     }
 
-    // Non-bot → serve the route's own pre-rendered HTML when it exists
-    // (Next.js static export generates /exams/index.html, /about/index.html, etc.)
-    // Fall back to / only for dynamic routes that have no static file.
+    // Non-bot → serve the route's own pre-rendered HTML, then placeholder HTML,
+    // then root index.html as final fallback.
     if (!BOT_UA.test(ua)) {
-      try {
-        const res = await env.ASSETS.fetch(request)
-        if (res.status < 400) return res
-      } catch { /* fall through to index.html */ }
-      return env.ASSETS.fetch(indexRequest)
+      const res = await fetchWithPlaceholderFallback(request, path)
+      return res ?? env.ASSETS.fetch(indexRequest)
     }
 
     // Bot → inject real meta + JSON-LD then serve
