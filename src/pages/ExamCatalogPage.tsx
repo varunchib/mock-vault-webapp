@@ -55,7 +55,13 @@ export function ExamCatalogPage() {
     setError(false)
     Promise.all([fetchExamCatalog(), fetchEnrolledSlugs().catch(() => ({ slugs: [] as string[] }))])
       .then(([catalog, enrolled]) => {
-        setExams(catalog ?? [])
+        const all = catalog ?? []
+        const slugs = new Set(all.map((e) => e.slug))
+        // Keep only top-level boards — a sub-exam slug starts with another exam's slug + '-'
+        const boards = all.filter(
+          (e) => !all.some((other) => other.slug !== e.slug && e.slug.startsWith(other.slug + '-') && slugs.has(other.slug))
+        )
+        setExams(boards)
         setEnrolledSlugs(new Set(enrolled.slugs))
       })
       .catch(() => setError(true))
@@ -124,7 +130,7 @@ export function ExamCatalogPage() {
         <div className="ec-header-stats">
           <div className="ec-stat">
             <strong>{exams.length}</strong>
-            <span>Exams</span>
+            <span>Boards</span>
           </div>
           <div className="ec-stat">
             <strong>{enrolledCount}</strong>
@@ -164,7 +170,7 @@ export function ExamCatalogPage() {
 
       {/* ── Results count ───────────────────────────── */}
       <div className="ec-results-bar">
-        <span>{filtered.length} exam{filtered.length !== 1 ? 's' : ''}</span>
+        <span>{filtered.length} board{filtered.length !== 1 ? 's' : ''}</span>
         {(activeCategory !== ALL || query) && (
           <button type="button" className="ec-clear-btn" onClick={() => { setActiveCategory(ALL); setQuery('') }}>
             Clear filters
@@ -174,7 +180,7 @@ export function ExamCatalogPage() {
 
       {/* ── Grid ────────────────────────────────────── */}
       {filtered.length === 0 ? (
-        <p className="ec-empty">No exams matched your filters.</p>
+        <p className="ec-empty">No boards matched your filters.</p>
       ) : (
         <div className="ec-grid">
           {filtered.map((exam) => {
