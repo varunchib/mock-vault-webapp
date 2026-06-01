@@ -281,8 +281,14 @@ export default {
       }
     }
 
-    // Non-bot → always serve index.html; React Router handles client-side routing
+    // Non-bot → serve the route's own pre-rendered HTML when it exists
+    // (Next.js static export generates /exams/index.html, /about/index.html, etc.)
+    // Fall back to / only for dynamic routes that have no static file.
     if (!BOT_UA.test(ua)) {
+      try {
+        const res = await env.ASSETS.fetch(request)
+        if (res.status < 400) return res
+      } catch { /* fall through to index.html */ }
       return env.ASSETS.fetch(indexRequest)
     }
 
