@@ -26,6 +26,7 @@ import {
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { Logo } from '../components/ui/Logo'
 import { useAuth } from '../context/useAuth'
 import {
   clearAdminReports,
@@ -35,6 +36,8 @@ import {
   deleteAdminQuestion,
   fetchAdminReports,
   fetchAdminSummary,
+  fetchAdminActiveCount,
+  fetchAdminUsers,
   fetchMockCatalog,
   fetchMockQuestions,
   fetchPaperCatalog,
@@ -44,6 +47,7 @@ import {
   saveAdminMock,
   saveAdminPaper,
   updateAdminQuestion,
+  updateAdminUserStatus,
   refreshAuthSession,
   APIError,
   type AdminExamPayload,
@@ -52,6 +56,7 @@ import {
   type AdminPaperPayload,
   type AdminPaperQuestionPayload,
   type AdminSummary,
+  type AdminUser,
   type MockItem,
   type Paper,
   type Question,
@@ -335,6 +340,18 @@ export function AdminDashboardPage() {
   // Reports
   const [reports, setReports] = useState<QuestionReport[]>([])
   const [reportCount, setReportCount] = useState(0)
+
+  // Active users (real-time, polled every 30s)
+  const [activeCount, setActiveCount] = useState<number | null>(null)
+
+  // Users
+  const [users, setUsers] = useState<AdminUser[]>([])
+  const [usersTotal, setUsersTotal] = useState(0)
+  const [usersOffset, setUsersOffset] = useState(0)
+  const [usersLoading, setUsersLoading] = useState(false)
+  const [userSearch, setUserSearch] = useState('')
+  const [userSearchInput, setUserSearchInput] = useState('')
+  const [togglingUserId, setTogglingUserId] = useState<string | null>(null)
 
   // New question (manual entry in Papers tab)
   const [newQDraft, setNewQDraft] = useState<AdminQuestionDraft>(emptyQuestion)
@@ -752,6 +769,57 @@ export function AdminDashboardPage() {
     )
   }, [papers, paperSearch])
 
+  // ── Active-users polling (30s, overview tab only) ───────────────
+
+  useEffect(() => {
+    const poll = () => { void fetchAdminActiveCount().then((r) => setActiveCount(r.count)).catch(() => setActiveCount(0)) }
+    poll()
+    const id = setInterval(poll, 30_000)
+    return () => clearInterval(id)
+  }, [])
+
+  // ── Users handlers ──────────────────────────────────────────────
+
+  const loadUsers = async (offset = 0, q = userSearch, replace = true) => {
+    setUsersLoading(true)
+    try {
+      const res = await fetchAdminUsers({ limit: 10, offset, q })
+      setUsers((cur) => replace ? res.users : [...cur, ...res.users])
+      setUsersTotal(res.total)
+      setUsersOffset(offset)
+    } catch {
+      toast('error', 'Unable to load users.')
+    } finally {
+      setUsersLoading(false)
+    }
+  }
+
+  const handleUserSearch = () => {
+    setUserSearch(userSearchInput)
+    setUsers([])
+    void loadUsers(0, userSearchInput)
+  }
+
+  const handleClearUserSearch = () => {
+    setUserSearchInput('')
+    setUserSearch('')
+    setUsers([])
+    void loadUsers(0, '')
+  }
+
+  const toggleUserStatus = async (user: AdminUser) => {
+    setTogglingUserId(user.id)
+    try {
+      await updateAdminUserStatus(user.id, !user.isActive)
+      setUsers((cur) => cur.map((u) => u.id === user.id ? { ...u, isActive: !u.isActive } : u))
+      toast('success', `${user.name} ${!user.isActive ? 'activated' : 'deactivated'}.`)
+    } catch {
+      toast('error', 'Failed to update user status.')
+    } finally {
+      setTogglingUserId(null)
+    }
+  }
+
   // ── Tab labels ─────────────────────────────────────────────────
 
   const tabLabel: Record<Tab, string> = {
@@ -765,15 +833,7 @@ export function AdminDashboardPage() {
 
       {/* ── Sidebar ─────────────────────────────────────────── */}
       <aside className="admin-rail">
-        <Link className="vault-logo" to="/admin">
-          <span>
-            <svg viewBox="0 0 40 40" fill="none" width="40" height="40" aria-hidden="true">
-              <rect width="40" height="40" rx="11" fill="currentColor" />
-              <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="white" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </span>
-          <strong>Ministry of Papers</strong>
-        </Link>
+        <Logo />
 
         <nav className="admin-rail-nav">
           {(['overview', 'exams', 'mocks', 'papers'] as Tab[]).map((tab) => {
@@ -856,6 +916,11 @@ export function AdminDashboardPage() {
               )}
             </div>
           )}
+
+          <div className="admin-active-pill">
+            <span className={`admin-active-dot${activeCount !== null && activeCount > 0 ? ' live' : ''}`} />
+            <span>{activeCount ?? 0} active</span>
+          </div>
         </header>
 
         {/* Status banner */}
@@ -967,6 +1032,95 @@ export function AdminDashboardPage() {
                 </div>
               </div>
             )}
+
+            {/* ── Users section ────────────────────────────────── */}
+            <div className="ov-users-section">
+              <div className="ov-users-head">
+                <h2>
+                  Registered Users
+                  {usersTotal > 0 && <small>{usersTotal} total</small>}
+                </h2>
+                <div className="ov-users-search">
+                  <input
+                    value={userSearchInput}
+                    onChange={(e) => setUserSearchInput(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleUserSearch() }}
+                    placeholder="Search name or email…"
+                  />
+                  {userSearchInput && (
+                    <button type="button" onClick={handleClearUserSearch} aria-label="Clear" className="ov-search-clear"><X size={12} /></button>
+                  )}
+                  <button
+                    type="button"
+                    className="ov-search-go"
+                    onClick={handleUserSearch}
+                    disabled={usersLoading}
+                    aria-label="Search"
+                  >
+                    <Search size={14} />
+                  </button>
+                </div>
+              </div>
+
+              {usersLoading && users.length === 0 && (
+                <div className="ov-users-loading"><HaloLoader label="Fetching users" /></div>
+              )}
+
+              {users.length > 0 && (
+                <>
+                  <div className="ov-user-list-header">
+                    <span>Name</span>
+                    <span>Email</span>
+                    <span>Role</span>
+                    <span>Status</span>
+                    <span>Last login</span>
+                    <span></span>
+                  </div>
+                  <div className="ov-user-list">
+                    {users.map((user) => (
+                      <div className="ov-user-row" key={user.id}>
+                        <div className="ov-user-identity">
+                          <span className="ov-user-initial">{user.name.charAt(0).toUpperCase()}</span>
+                          <span className="ov-user-name-text">{user.name}</span>
+                        </div>
+                        <span className="ov-user-email-text">{user.email}</span>
+                        <span className="ov-user-role-tag">{user.role}</span>
+                        <span className={`ov-user-dot ${user.isActive ? 'active' : 'banned'}`}>
+                          {user.isActive ? 'Active' : 'Banned'}
+                        </span>
+                        <span className="ov-user-login-text">
+                          {new Date(user.lastLogin).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </span>
+                        <button
+                          type="button"
+                          className={`ov-user-action-btn ${user.isActive ? 'ban' : 'activate'}`}
+                          onClick={() => void toggleUserStatus(user)}
+                          disabled={togglingUserId === user.id}
+                        >
+                          {togglingUserId === user.id ? '…' : user.isActive ? 'Ban' : 'Activate'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  {users.length < usersTotal && (
+                    <button
+                      type="button"
+                      className="ov-load-more"
+                      onClick={() => void loadUsers(usersOffset + 10, userSearch, false)}
+                      disabled={usersLoading}
+                    >
+                      {usersLoading ? 'Loading…' : `Load more — ${usersTotal - users.length} remaining`}
+                    </button>
+                  )}
+                </>
+              )}
+
+              {!usersLoading && users.length === 0 && userSearch && (
+                <p className="ov-users-empty">No users matched "{userSearch}".</p>
+              )}
+            </div>
+
           </div>
         )}
 

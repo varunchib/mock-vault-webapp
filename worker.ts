@@ -108,9 +108,19 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const mockMatch = pathname.match(/^\/mock-test\/([^/]+)$/)
     if (mockMatch) {
       const slug = mockMatch[1]
-      const r = await apiFetch(`${API}/api/v1/exams/${slug}`, 3600)
-      if (!r.ok) return null
-      const e = await r.json() as { shortName: string; name: string }
+      // slug may be an exam slug (ssc-cgl) or a mock slug (ssc-cgl-tier-1-reasoning-sprint)
+      let examSlug = slug
+      let examR = await apiFetch(`${API}/api/v1/exams/${slug}`, 3600)
+      if (!examR.ok) {
+        // not an exam slug — resolve via mock to find its exam
+        const mockR = await apiFetch(`${API}/api/v1/mocks/${slug}`, 3600)
+        if (!mockR.ok) return null
+        const m = await mockR.json() as { examSlug: string }
+        examSlug = m.examSlug
+        examR = await apiFetch(`${API}/api/v1/exams/${examSlug}`, 3600)
+        if (!examR.ok) return null
+      }
+      const e = await examR.json() as { shortName: string; name: string }
       return {
         title: `${e.shortName} Mock Tests — Free Full-Length Practice | Ministry of Papers`,
         description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
@@ -119,7 +129,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
           '@type': 'LearningResource',
           name: `${e.shortName} Mock Tests — Free Full-Length Practice`,
           description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
-          url: `${BASE}/mock-test/${slug}`,
+          url: `${BASE}/mock-test/${examSlug}`,
           learningResourceType: 'Practice Test',
           educationalUse: 'Practice',
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
@@ -128,8 +138,8 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
               { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
-              { '@type': 'ListItem', position: 3, name: e.shortName, item: `${BASE}/exam/${slug}` },
-              { '@type': 'ListItem', position: 4, name: 'Mock Tests', item: `${BASE}/mock-test/${slug}` },
+              { '@type': 'ListItem', position: 3, name: e.shortName, item: `${BASE}/exam/${examSlug}` },
+              { '@type': 'ListItem', position: 4, name: 'Mock Tests', item: `${BASE}/mock-test/${examSlug}` },
             ],
           },
         },

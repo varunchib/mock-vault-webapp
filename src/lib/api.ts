@@ -525,6 +525,35 @@ export function fetchLeaderboard(examSlug: string): Promise<{ top10: Leaderboard
   return requestJson(`/api/v1/analytics/leaderboard?examSlug=${encodeURIComponent(examSlug)}`)
 }
 
+export type AdminUser = {
+  id: string
+  email: string
+  name: string
+  role: string
+  isActive: boolean
+  createdAt: string
+  lastLogin: string
+}
+
+export function fetchAdminActiveCount(): Promise<{ count: number }> {
+  return requestJson('/api/v1/admin/active-count')
+}
+
+export function fetchAdminUsers(params: { limit?: number; offset?: number; q?: string } = {}): Promise<{ users: AdminUser[]; total: number; limit: number; offset: number }> {
+  const qs = new URLSearchParams()
+  if (params.limit) qs.set('limit', String(params.limit))
+  if (params.offset) qs.set('offset', String(params.offset))
+  if (params.q) qs.set('q', params.q)
+  return requestJson(`/api/v1/admin/users?${qs.toString()}`)
+}
+
+export function updateAdminUserStatus(id: string, isActive: boolean): Promise<{ message: string }> {
+  return requestJson(`/api/v1/admin/users/${encodeURIComponent(id)}/status`, {
+    method: 'PATCH',
+    body: JSON.stringify({ isActive }),
+  })
+}
+
 export function adminUpsertCutoff(payload: {
   examSlug: string; stage: string; year: string; category: string;
   marks: number; totalMarks: number; avgScore: number; stdDev: number; source?: string;
