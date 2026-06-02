@@ -1,3 +1,4 @@
+import { MathText } from '../components/common/MathText'
 import { BookOpen, ChevronRight, Download, Lock, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -261,7 +262,7 @@ export function PyqPaperPage() {
                           disabled={isRevealed}
                         >
                           <span className="pyq-opt-key">{label}</span>
-                          <span>{opt.text}</span>
+                          <MathText text={opt.text} />
                         </button>
                       )
                     })}
