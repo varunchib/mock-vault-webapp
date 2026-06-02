@@ -1,4 +1,116 @@
 import React from 'react'
+import { MathText } from './MathText'
+
+// Convenience wrapper — renders text with KaTeX math + bold support
+function renderInline(text: string): React.ReactNode {
+  return <MathText text={text} />
+}
+
+// ── Markdown table parser ─────────────────────────────────────────────────────
+// Detects lines of the form | cell | cell | and the separator |---|---|
+
+type TableData = { headers: string[]; rows: string[][] }
+
+function parseRow(line: string): string[] {
+  return line.split('|').map(c => c.trim()).filter((_, i, arr) => i > 0 && i < arr.length - 1)
+}
+
+function parseMarkdownTable(lines: string[]): { table: TableData; before: string[]; after: string[] } | null {
+  // Find first table line
+  const startIdx = lines.findIndex(l => l.startsWith('|') && l.endsWith('|'))
+  if (startIdx === -1) return null
+
+  // Find separator line (|---|) starting from startIdx+1
+  const sepIdx = lines.findIndex((l, i) => i > startIdx && /^\|[\s\-:| ]+\|$/.test(l))
+  if (sepIdx === -1 || sepIdx !== startIdx + 1) return null
+
+  // Collect data rows after separator
+  let endIdx = sepIdx + 1
+  while (endIdx < lines.length && lines[endIdx].startsWith('|') && lines[endIdx].endsWith('|')) {
+    endIdx++
+  }
+
+  const headers = parseRow(lines[startIdx])
+  const rows = lines.slice(sepIdx + 1, endIdx).map(parseRow)
+  if (headers.length < 2) return null
+
+  return {
+    table: { headers, rows },
+    before: lines.slice(0, startIdx),
+    after: lines.slice(endIdx),
+  }
+}
+
+function MarkdownTable({ table }: { table: TableData }) {
+  return (
+    <div className="qr-table-wrap">
+      <table className="qr-table">
+        <thead>
+          <tr>
+            {table.headers.map((h, i) => <th key={i}>{h}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, i) => (
+            <tr key={i}>
+              {row.map((cell, j) => <td key={j}>{cell}</td>)}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+// ── Analogy renderer ──────────────────────────────────────────────────────────
+// Detects "WORD : WORD :: WORD : ?" pattern and renders it visually
+
+const ANALOGY_RE = /\b([A-Za-z0-9]+)\s*:\s*([A-Za-z0-9]+)\s*::\s*([A-Za-z0-9]+)\s*:\s*([A-Za-z0-9?]+)/
+
+function AnalogyDisplay({ analogy }: { analogy: string }) {
+  const m = analogy.match(ANALOGY_RE)
+  if (!m) return <span className="qr-analogy-raw">{analogy}</span>
+  const [, a, b, c, d] = m
+  const isQuestion = d === '?'
+  return (
+    <span className="qr-analogy">
+      <span className="qr-analogy-word">{a}</span>
+      <span className="qr-analogy-colon">:</span>
+      <span className="qr-analogy-word">{b}</span>
+      <span className="qr-analogy-sep">::</span>
+      <span className="qr-analogy-word">{c}</span>
+      <span className="qr-analogy-colon">:</span>
+      <span className={isQuestion ? 'qr-analogy-blank' : 'qr-analogy-word'}>{d}</span>
+    </span>
+  )
+}
+
+// ── Error-sentence segment renderer ──────────────────────────────────────────
+// "text (1)/ text (2)/ text (3)/ text. (4)"
+
+function ErrorSentence({ text }: { text: string }) {
+  const parts = text.split(/\s*\/\s*/).filter(Boolean)
+  return (
+    <div className="qr-segments">
+      {parts.map((part, i) => {
+        const m = part.match(/^([\s\S]+?)(\s*\(\d+\))\s*$/)
+        if (m) {
+          return (
+            <div key={i} className="qr-segment">
+              <span className="qr-segment-text">{renderInline(m[1].trim())}</span>
+              <span className="qr-segment-num">{m[2].trim()}</span>
+            </div>
+          )
+        }
+        return (
+          <div key={i} className="qr-segment">
+            <span className="qr-segment-text">{renderInline(part.trim())}</span>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
 
 // ── Match-the-following parsers ───────────────────────────────────────────────
 
@@ -12,7 +124,6 @@ type MatchData = {
 
 const ROMAN = ['i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x']
 
-// Format 1: "Match ...: (i) A  (ii) B | 1. X  2. Y"
 function parsePipeMatch(text: string): MatchData | null {
   const pipeIdx = text.indexOf(' | ')
   if (pipeIdx === -1) return null
@@ -40,7 +151,6 @@ function parsePipeMatch(text: string): MatchData | null {
   return { intro, listILabel: 'List I', listIILabel: 'List II', listI, listII }
 }
 
-// Format 2: "Match ...\ni. X — a. Y\nii. ..."
 function parseNewlineMatch(text: string): MatchData | null {
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
   if (lines.length < 3) return null
@@ -58,7 +168,6 @@ function parseNewlineMatch(text: string): MatchData | null {
   }
   if (listI.length < 2) return null
 
-  // Extract List I / List II labels from intro if present
   const labelMatch = intro.match(/List[- ]?I\s*\(([^)]+)\).*?List[- ]?II\s*\(([^)]+)\)/i)
   return {
     intro,
@@ -99,30 +208,94 @@ function MatchTable({ data }: { data: MatchData }) {
   )
 }
 
+const INSTRUCTION_RE = /^(find|select|identify|choose|read|mark|arrange|rearrange|spot|convert|change|fill|what|which|who|how|where|when|complete|rewrite|pick|determine|from|in the following|using)/i
+
+function isInstructionLine(line: string): boolean {
+  return (line.endsWith(':') || INSTRUCTION_RE.test(line.trim())) && !line.includes('/')
+}
+
+function isErrorSentence(line: string): boolean {
+  return /\(\d+\)/.test(line) && line.includes('/')
+}
+
+// Extract analogy from a single-line text (e.g. at the end of an instruction sentence)
+function extractAnalogy(text: string): { pre: string; analogy: string } | null {
+  const m = text.match(ANALOGY_RE)
+  if (!m) return null
+  const analogyStart = text.lastIndexOf(m[0])
+  const pre = text.slice(0, analogyStart).replace(/\.\s*$/, '').trim()
+  return { pre, analogy: m[0] }
+}
+
 function MultilineText({ text, className }: { text: string; className?: string }) {
-  const lines = text.split(/\r?\n/)
-  const cls = ['qr-text', className].filter(Boolean).join(' ')
+  const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
+
+  // Check for markdown table within the lines
+  const tableResult = parseMarkdownTable(rawLines)
+  if (tableResult) {
+    return (
+      <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
+        {tableResult.before.map((line, i) => (
+          <p key={`b${i}`} className={isInstructionLine(line) ? 'qr-instruction' : 'qr-text'}>
+            {renderInline(line)}
+          </p>
+        ))}
+        <MarkdownTable table={tableResult.table} />
+        {tableResult.after.map((line, i) => (
+          <p key={`a${i}`} className="qr-text">{renderInline(line)}</p>
+        ))}
+      </div>
+    )
+  }
+
+  const hasInstruction = rawLines.length > 1 && isInstructionLine(rawLines[0])
+
   return (
-    <p className={cls}>
-      {lines.map((line, i) => (
-        <React.Fragment key={i}>
-          {line}
-          {i < lines.length - 1 && <br />}
-        </React.Fragment>
-      ))}
-    </p>
+    <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
+      {rawLines.map((line, i) => {
+        if (i === 0 && hasInstruction) {
+          return <p key={i} className="qr-instruction">{renderInline(line)}</p>
+        }
+        if (isErrorSentence(line)) {
+          return <ErrorSentence key={i} text={line} />
+        }
+        // Analogy line within multi-line question
+        if (ANALOGY_RE.test(line)) {
+          return <AnalogyDisplay key={i} analogy={line} />
+        }
+        return (
+          <p key={i} className="qr-text">{renderInline(line)}</p>
+        )
+      })}
+    </div>
   )
 }
 
 // ── Public component ──────────────────────────────────────────────────────────
 
 export function QuestionRenderer({ text, className }: { text: string; className?: string }) {
+  // Match-the-following table formats
   const match = parsePipeMatch(text) ?? parseNewlineMatch(text)
   if (match) return <MatchTable data={match} />
 
+  // Multi-line questions (handle table, analogy, error-sentence, bold)
   if (text.includes('\n') || text.includes('\r')) {
     return <MultilineText text={text} className={className} />
   }
 
-  return <p className={className}>{text}</p>
+  // Single-line: error sentence
+  if (isErrorSentence(text)) return <ErrorSentence text={text} />
+
+  // Single-line: analogy embedded in instruction text (e.g. Q14)
+  const extracted = extractAnalogy(text)
+  if (extracted) {
+    return (
+      <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
+        {extracted.pre && <p className="qr-instruction">{renderInline(extracted.pre)}</p>}
+        <AnalogyDisplay analogy={extracted.analogy} />
+      </div>
+    )
+  }
+
+  return <p className={className}>{renderInline(text)}</p>
 }

@@ -12589,11 +12589,191 @@ html {
   }
 }
 
-/* ── QuestionRenderer: match-the-following ──────────────────────────────── */
+/* ── QuestionRenderer ───────────────────────────────────────────────────── */
+
+.qr-multiline {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Instruction line: "Find the part...", "Select the sentence..." */
+.qr-instruction {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink2);
+  font-style: italic;
+  line-height: 1.5;
+}
 
 .qr-text {
   white-space: pre-wrap;
+  line-height: 1.6;
 }
+
+/* Highlighted / bold keyword in question text (**word**) */
+.qr-highlight {
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
+  border-radius: 3px;
+  padding: 1px 4px;
+  font-weight: 700;
+  color: var(--hl-dark);
+  font-style: normal;
+}
+
+/* Error-detection segmented sentence */
+.qr-segments {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 0 4px;
+}
+
+.qr-segment {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 5px 10px;
+  background: var(--line2);
+  border-left: 3px solid var(--line);
+  border-radius: 0 4px 4px 0;
+  line-height: 1.55;
+}
+
+.qr-segment-text {
+  flex: 1;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.qr-segment-num {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--ink3);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 1px 5px;
+  letter-spacing: 0.02em;
+}
+
+/* ── KaTeX math rendering ───────────────────────────────────────────────── */
+
+.math-inline .katex {
+  font-size: 1em;
+}
+
+.math-block {
+  display: block;
+  overflow-x: auto;
+  padding: 6px 0;
+}
+
+.math-block .katex-display {
+  margin: 0;
+}
+
+/* ── QuestionRenderer: analogy display ─────────────────────────────────── */
+
+.qr-analogy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex-wrap: nowrap;
+  padding: 3px 10px;
+  background: var(--line2);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.qr-analogy-word {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.qr-analogy-colon {
+  font-weight: 500;
+  color: var(--ink3);
+}
+
+.qr-analogy-sep {
+  font-weight: 700;
+  color: var(--ink3);
+  padding: 0 2px;
+}
+
+.qr-analogy-blank {
+  font-weight: 800;
+  color: var(--accent, #2563eb);
+  border-bottom: 2px solid currentColor;
+  padding: 0 5px;
+  min-width: 22px;
+  display: inline-block;
+  text-align: center;
+}
+
+.qr-analogy-raw {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ── QuestionRenderer: data table ───────────────────────────────────────── */
+
+.qr-table-wrap {
+  overflow-x: auto;
+  margin: 6px 0 4px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+}
+
+.qr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.qr-table thead tr {
+  background: var(--line2);
+}
+
+.qr-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink2);
+  font-size: 0.8rem;
+  letter-spacing: 0.02em;
+  border-bottom: 2px solid var(--line);
+  white-space: nowrap;
+}
+
+.qr-table td {
+  padding: 7px 12px;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line2);
+  line-height: 1.4;
+}
+
+.qr-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.qr-table tbody tr:hover {
+  background: var(--line2);
+}
+
+.qr-table td:last-child,
+.qr-table th:last-child {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── QuestionRenderer: match-the-following ──────────────────────────────── */
 
 .qr-match {
   display: flex;
