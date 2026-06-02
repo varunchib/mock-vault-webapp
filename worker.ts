@@ -153,13 +153,13 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       if (!r.ok) return null
       const p = await r.json() as { title: string; description: string; examSlug: string; examName: string }
       return {
-        title: `${p.title} — Solved Questions & Answers | Ministry of Papers`,
-        description: p.description || 'Solved previous year question paper with answers and explanations.',
+        title: `${p.title} PYQ — Solved Questions & Answers | Ministry of Papers`,
+        description: p.description || `${p.examName} PYQ — solved previous year question paper with answers and detailed explanations, free on Ministry of Papers.`,
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'LearningResource',
-          name: `${p.title} — Solved Questions & Answers`,
-          description: p.description || 'Solved previous year question paper with answers and explanations.',
+          name: `${p.title} PYQ — Solved Questions & Answers`,
+          description: p.description || `${p.examName} PYQ — solved previous year question paper with answers and detailed explanations.`,
           url: `${BASE}/pyq/${slug}`,
           learningResourceType: 'Practice Test',
           educationalUse: 'Practice',

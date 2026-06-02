@@ -73,13 +73,14 @@ export function paperSeoDescription(p: PaperMeta): string {
   const date = fmtDate(p.heldOn)
   const subs = (p.subjects ?? []).slice(0, 3).join(', ')
 
-  let d = `Solve ${n > 0 ? `all ${n} ` : ''}questions from ${exam}`
+  let d = `${exam}`
   if (year) d += ` ${year}`
   if (shift) d += ` (${shift})`
+  d += ` PYQ`
   if (date && !d.includes(date)) d += ` held on ${date}`
-  d += ' PYQ – previous year question paper'
-  if (subs) d += ` – ${subs}`
-  d += `. Detailed answers and explanations, free on ${BRAND}.`
+  if (n > 0) d += ` — ${n} questions`
+  if (subs) d += `, ${subs}`
+  d += `. Solved with answers and explanations, free on ${BRAND}.`
   return truncate(d, 160)
 }
 
@@ -211,14 +212,14 @@ type ExamInfoMeta = {
   shortName: string
 }
 
-/** JKSSB Overview – Exam Pattern, Eligibility & Previous Year Papers | Ministry of Papers */
+/** JKSSB Overview – Exam Pattern, Eligibility & PYQ | Ministry of Papers */
 export function examInfoSeoTitle(e: ExamInfoMeta): string {
-  return `${e.shortName} Overview – Exam Pattern, Eligibility & Previous Year Papers | ${BRAND}`
+  return `${e.shortName} Overview – Exam Pattern, Eligibility & PYQ | ${BRAND}`
 }
 
 export function examInfoSeoDescription(e: ExamInfoMeta): string {
   return truncate(
-    `${e.shortName} overview — exam pattern, eligibility criteria, selection process, salary, recruitment details, and free previous year papers with explanations on ${BRAND}.`,
+    `${e.shortName} overview — exam pattern, eligibility criteria, selection process, salary, and free PYQ with detailed explanations on ${BRAND}.`,
     160,
   )
 }
