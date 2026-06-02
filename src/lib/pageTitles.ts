@@ -93,18 +93,20 @@ type ExamHubMeta = {
   description?: string
 }
 
-/** IBPS PO PYQ – Previous Year Papers & Mock Tests | Ministry of Papers */
+/** JKSSB Junior Assistant PYQ – Previous Year Papers & Mock Tests | Ministry of Papers */
 export function examHubSeoTitle(e: ExamHubMeta): string {
-  return `${e.shortName} PYQ – Previous Year Papers & Mock Tests | ${BRAND}`
+  const label = e.name?.trim() || e.shortName
+  return `${label} PYQ – Previous Year Papers & Mock Tests | ${BRAND}`
 }
 
 export function examHubSeoDescription(e: ExamHubMeta): string {
   const db = e.description?.trim() ?? ''
   if (db.length > 40) return truncate(db, 160)
 
+  const label = e.name?.trim() || e.shortName
   const p = Number(e.papers ?? 0)
   const m = Number(e.mocks ?? 0)
-  let d = `Practice ${e.shortName} with`
+  let d = `Practice ${label} with`
   if (p > 0) d += ` ${p} solved PYQ papers`
   if (p > 0 && m > 0) d += ' and'
   if (m > 0) d += ` ${m} full-length mock tests`

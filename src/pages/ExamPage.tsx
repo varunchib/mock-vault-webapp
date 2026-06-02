@@ -287,10 +287,10 @@ export function ExamPage() {
   const isGated = !isAuthenticated && filteredSubjectQuestions.length > FREE_QUESTION_LIMIT
 
   const seoTitle = exam
-    ? examHubSeoTitle({ shortName: exam.shortName })
+    ? examHubSeoTitle({ shortName: exam.shortName, name: exam.name })
     : 'Exam Hub | Ministry of Papers'
   const seoDesc = exam
-    ? examHubSeoDescription({ shortName: exam.shortName, papers: exam.papers, mocks: exam.mocks, description: exam.description })
+    ? examHubSeoDescription({ shortName: exam.shortName, name: exam.name, papers: exam.papers, mocks: exam.mocks, description: exam.description })
     : 'Browse solved papers, mock tests, and subjects.'
 
   const faqs = exam ? (examFaqs[exam.slug] ?? null) : null
