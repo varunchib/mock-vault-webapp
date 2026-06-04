@@ -1,4 +1,5 @@
 import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react'
+import { InboxWidget } from '../common/InboxWidget'
 import {
   BarChart3,
   BookOpen,
@@ -257,6 +258,11 @@ export function AppShell({ children }: { children: ReactNode }) {
             {children}
           </main>
         </div>
+
+        {/* Floating inbox widget — logged-in users only */}
+        <InboxWidget
+          searchTerm={searchQuery.trim() && searchResults.length === 0 ? searchQuery.trim() : undefined}
+        />
 
         {/* Mobile bottom nav — only visible at ≤768px */}
         <nav className="vault-bottom-nav" aria-label="Main navigation">
