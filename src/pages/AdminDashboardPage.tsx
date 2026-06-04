@@ -8,6 +8,7 @@ import {
   FileText,
   GraduationCap,
   Home,
+  Inbox,
   LayoutDashboard,
   LogOut,
   Moon,
@@ -16,6 +17,7 @@ import {
   RefreshCw,
   Save,
   Search,
+  Send,
   Sun,
   Trash2,
   UploadCloud,
@@ -38,6 +40,9 @@ import {
   fetchAdminSummary,
   fetchAdminActiveCount,
   fetchAdminUsers,
+  fetchAdminInbox,
+  adminInboxReply,
+  adminInboxDelete,
   fetchMockCatalog,
   fetchMockQuestions,
   fetchPaperCatalog,
@@ -57,6 +62,7 @@ import {
   type AdminPaperQuestionPayload,
   type AdminSummary,
   type AdminUser,
+  type InboxThread,
   type MockItem,
   type Paper,
   type Question,
@@ -67,7 +73,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 
 // ─── Types ────────────────────────────────────────────────────
 
-type Tab = 'overview' | 'exams' | 'mocks' | 'papers'
+type Tab = 'overview' | 'exams' | 'mocks' | 'papers' | 'inbox'
 
 type StatusMsg = { kind: 'success' | 'error'; text: string }
 
@@ -352,6 +358,14 @@ export function AdminDashboardPage() {
   const [userSearch, setUserSearch] = useState('')
   const [userSearchInput, setUserSearchInput] = useState('')
   const [togglingUserId, setTogglingUserId] = useState<string | null>(null)
+
+  // Inbox
+  const [inboxThreads, setInboxThreads] = useState<InboxThread[]>([])
+  const [inboxLoading, setInboxLoading] = useState(false)
+  const [activeInboxThread, setActiveInboxThread] = useState<InboxThread | null>(null)
+  const [inboxReplyText, setInboxReplyText] = useState('')
+  const [inboxReplying, setInboxReplying] = useState(false)
+  const [inboxUnread, setInboxUnread] = useState(0)
 
   // New question (manual entry in Papers tab)
   const [newQDraft, setNewQDraft] = useState<AdminQuestionDraft>(emptyQuestion)
@@ -822,8 +836,48 @@ export function AdminDashboardPage() {
 
   // ── Tab labels ─────────────────────────────────────────────────
 
+  const loadInbox = async () => {
+    setInboxLoading(true)
+    try {
+      const data = await fetchAdminInbox()
+      setInboxThreads(data)
+      setInboxUnread(data.filter(t => t.status === 'open').length)
+      if (activeInboxThread) {
+        const updated = data.find(t => t.id === activeInboxThread.id)
+        if (updated) setActiveInboxThread(updated)
+      }
+    } catch { /* silent */ } finally {
+      setInboxLoading(false)
+    }
+  }
+
+  const handleInboxReply = async () => {
+    if (!activeInboxThread || !inboxReplyText.trim() || inboxReplying) return
+    setInboxReplying(true)
+    try {
+      await adminInboxReply(activeInboxThread.id, inboxReplyText.trim())
+      setInboxReplyText('')
+      await loadInbox()
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to reply')
+    } finally {
+      setInboxReplying(false)
+    }
+  }
+
+  const handleInboxDelete = async (threadId: string) => {
+    try {
+      await adminInboxDelete(threadId)
+      if (activeInboxThread?.id === threadId) setActiveInboxThread(null)
+      await loadInbox()
+      toast('success', 'Thread deleted.')
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to delete')
+    }
+  }
+
   const tabLabel: Record<Tab, string> = {
-    overview: 'Overview', exams: 'Exams', mocks: 'Mock Builder', papers: 'Papers',
+    overview: 'Overview', exams: 'Exams', mocks: 'Mock Builder', papers: 'Papers', inbox: 'Inbox',
   }
 
   if (loading) return <HaloLoader label="Loading admin" />
@@ -836,9 +890,9 @@ export function AdminDashboardPage() {
         <Logo />
 
         <nav className="admin-rail-nav">
-          {(['overview', 'exams', 'mocks', 'papers'] as Tab[]).map((tab) => {
+          {(['overview', 'exams', 'mocks', 'papers', 'inbox'] as Tab[]).map((tab) => {
             const icons: Record<Tab, typeof Home> = {
-              overview: LayoutDashboard, exams: GraduationCap, mocks: ClipboardList, papers: FileText,
+              overview: LayoutDashboard, exams: GraduationCap, mocks: ClipboardList, papers: FileText, inbox: Inbox,
             }
             const Icon = icons[tab]
             return (
@@ -846,9 +900,12 @@ export function AdminDashboardPage() {
                 key={tab}
                 type="button"
                 className={`admin-nav-btn${activeTab === tab ? ' active' : ''}`}
-                onClick={() => setActiveTab(tab)}
+                onClick={() => { setActiveTab(tab); if (tab === 'inbox') void loadInbox() }}
               >
                 <Icon size={17} /> {tabLabel[tab]}
+                {tab === 'inbox' && inboxUnread > 0 && (
+                  <span className="admin-inbox-badge">{inboxUnread}</span>
+                )}
               </button>
             )
           })}
@@ -1787,6 +1844,141 @@ export function AdminDashboardPage() {
                 </div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Inbox tab ────────────────────────────────────────── */}
+        {activeTab === 'inbox' && (
+          <div className="admin-inbox-tab">
+            <div className="admin-inbox-layout">
+
+              {/* Left: thread list */}
+              <div className="admin-inbox-list">
+                <div className="admin-inbox-list-head">
+                  <div className="admin-inbox-list-head-meta">
+                    <h2>Suggestions</h2>
+                    <button type="button" className="admin-inbox-refresh" onClick={() => void loadInbox()} disabled={inboxLoading} title="Refresh">
+                      <RefreshCw size={13} className={inboxLoading ? 'admin-inbox-spin' : ''} />
+                    </button>
+                  </div>
+                  <span className="admin-inbox-count">{inboxThreads.length} thread{inboxThreads.length !== 1 ? 's' : ''} · auto-delete in 2 days</span>
+                </div>
+
+                <div className="admin-inbox-thread-list">
+                  {inboxThreads.length === 0 && !inboxLoading && (
+                    <div className="admin-inbox-empty-list">
+                      <Inbox size={28} strokeWidth={1.5} />
+                      <p>No suggestions yet</p>
+                    </div>
+                  )}
+                  {inboxThreads.map(t => (
+                    <div
+                      key={t.id}
+                      className={`admin-inbox-row${activeInboxThread?.id === t.id ? ' active' : ''}${t.status === 'open' ? ' admin-inbox-row--open' : ''}`}
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setActiveInboxThread(t)}
+                      onKeyDown={e => { if (e.key === 'Enter') setActiveInboxThread(t) }}
+                    >
+                      <div className="admin-inbox-avatar">
+                        {t.userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="admin-inbox-row-body">
+                        <div className="admin-inbox-row-top">
+                          <span className="admin-inbox-user">{t.userName}</span>
+                          <span className="admin-inbox-time">
+                            {new Date(t.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}
+                          </span>
+                        </div>
+                        {(t.examName || t.searchTerm) && (
+                          <span className="admin-inbox-context-tag">📌 {t.examName || t.searchTerm}</span>
+                        )}
+                        <p className="admin-inbox-preview">{t.messages[t.messages.length - 1]?.text}</p>
+                        <span className={`admin-inbox-status-pill ${t.status}`}>
+                          {t.status === 'open' ? '● Open' : '✓ Replied'}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        className="admin-inbox-del"
+                        onClick={e => { e.stopPropagation(); void handleInboxDelete(t.id) }}
+                        aria-label="Delete thread"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Right: conversation */}
+              <div className="admin-inbox-convo">
+                {!activeInboxThread ? (
+                  <div className="admin-inbox-convo-empty">
+                    <Inbox size={40} strokeWidth={1.2} />
+                    <p>Select a thread to read and reply</p>
+                  </div>
+                ) : (
+                  <>
+                    {/* Header */}
+                    <div className="admin-inbox-convo-head">
+                      <div className="admin-inbox-convo-avatar">
+                        {activeInboxThread.userName.charAt(0).toUpperCase()}
+                      </div>
+                      <div className="admin-inbox-convo-info">
+                        <strong>{activeInboxThread.userName}</strong>
+                        <small>{activeInboxThread.userEmail}</small>
+                      </div>
+                      {(activeInboxThread.examName || activeInboxThread.searchTerm) && (
+                        <span className="admin-inbox-convo-tag">
+                          Re: {activeInboxThread.examName || activeInboxThread.searchTerm}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Messages */}
+                    <div className="admin-inbox-messages">
+                      {activeInboxThread.messages.map(m => (
+                        <div key={m.id} className={`admin-inbox-msg admin-inbox-msg--${m.from}`}>
+                          <span className="admin-inbox-msg-who">
+                            {m.from === 'admin' ? 'You' : activeInboxThread.userName}
+                          </span>
+                          <p className="admin-inbox-msg-text">{m.text}</p>
+                          <span className="admin-inbox-msg-time">
+                            {new Date(m.createdAt).toLocaleString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Reply box */}
+                    <div className="admin-inbox-reply">
+                      <div className="admin-inbox-reply-inner">
+                        <textarea
+                          value={inboxReplyText}
+                          onChange={e => setInboxReplyText(e.target.value)}
+                          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void handleInboxReply() } }}
+                          placeholder="Write a reply…"
+                          maxLength={500}
+                          rows={2}
+                        />
+                        <button
+                          type="button"
+                          className="admin-inbox-reply-send"
+                          onClick={() => void handleInboxReply()}
+                          disabled={inboxReplying || !inboxReplyText.trim()}
+                          title="Send reply"
+                        >
+                          <Send size={15} />
+                        </button>
+                      </div>
+                      <p className="admin-inbox-reply-hint">Enter to send · Shift+Enter for new line · max 500 chars</p>
+                    </div>
+                  </>
+                )}
+              </div>
+
+            </div>
           </div>
         )}
 

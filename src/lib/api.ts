@@ -565,3 +565,60 @@ export function adminUpsertCutoff(payload: {
     body: JSON.stringify(payload),
   })
 }
+
+// ── Inbox ─────────────────────────────────────────────────────────────────────
+
+export type InboxMessage = {
+  id: string
+  from: 'user' | 'admin'
+  text: string
+  createdAt: string
+}
+
+export type InboxThread = {
+  id: string
+  userId: string
+  userName: string
+  userEmail: string
+  examSlug?: string
+  examName?: string
+  searchTerm?: string
+  messages: InboxMessage[]
+  createdAt: string
+  status: 'open' | 'replied'
+}
+
+export function createInboxThread(payload: {
+  text: string
+  examSlug?: string
+  examName?: string
+  searchTerm?: string
+}): Promise<{ threadId: string }> {
+  return requestJson('/api/v1/inbox', { method: 'POST', body: JSON.stringify(payload) })
+}
+
+export function fetchMyInboxThreads(): Promise<InboxThread[]> {
+  return requestJson('/api/v1/inbox/me')
+}
+
+export function sendInboxMessage(threadId: string, text: string): Promise<{ ok: boolean }> {
+  return requestJson(`/api/v1/inbox/${encodeURIComponent(threadId)}/message`, {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  })
+}
+
+export function fetchAdminInbox(): Promise<InboxThread[]> {
+  return requestJson('/api/v1/admin/inbox')
+}
+
+export function adminInboxReply(threadId: string, text: string): Promise<{ ok: boolean }> {
+  return requestJson(`/api/v1/admin/inbox/${encodeURIComponent(threadId)}/reply`, {
+    method: 'POST',
+    body: JSON.stringify({ text }),
+  })
+}
+
+export function adminInboxDelete(threadId: string): Promise<{ ok: boolean }> {
+  return requestJson(`/api/v1/admin/inbox/${encodeURIComponent(threadId)}`, { method: 'DELETE' })
+}
