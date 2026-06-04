@@ -38,6 +38,7 @@ export type Question = {
   answer: string;
   explanation: string;
   tags: string[];
+  images?: string[];
   translations?: Partial<Record<"en" | "hi", QuestionTranslation>>;
 };
 
@@ -533,6 +534,7 @@ export type AdminUser = {
   isActive: boolean
   createdAt: string
   lastLogin: string
+  city?: string
 }
 
 export function fetchAdminActiveCount(): Promise<{ count: number }> {

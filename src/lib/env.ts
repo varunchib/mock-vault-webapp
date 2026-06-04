@@ -6,4 +6,7 @@
       ?.split(",")
       .map((email) => email.trim().toLowerCase())
       .filter(Boolean) ?? [],
+  assetsBaseUrl:
+    (import.meta.env.VITE_ASSETS_BASE_URL as string | undefined) ??
+    "https://assets.ministryofpapers.com",
 };

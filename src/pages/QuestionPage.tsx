@@ -1,4 +1,5 @@
 import { CheckCircle2, Lock, Play, Share2 } from "lucide-react";
+import { env } from "../lib/env";
 import { Link, Navigate, useParams } from "react-router-dom";
 import { useEffect, useMemo, useState, Fragment } from "react";
 import { LoginModal } from "../components/auth/LoginModal";
@@ -65,7 +66,7 @@ export function QuestionPage() {
             ...(question.year ? { datePublished: question.year } : {}),
             acceptedAnswer: {
               "@type": "Answer",
-              text: question.answer || `Correct answer: ${question.answerKey}. Full explanation on Ministry of Papers.`,
+              text: [question.answer, question.explanation].filter(Boolean).join(' — ').slice(0, 500) || `Correct answer: ${question.answerKey}.`,
               url: `https://ministryofpapers.com/question/${question.slug}`,
               author: { "@type": "Organization", name: "Ministry of Papers", url: "https://ministryofpapers.com" },
             },
@@ -171,6 +172,14 @@ export function QuestionPage() {
                   <p>{localized.passage}</p>
                 </div>
               </section>
+            )}
+
+            {question.images && question.images.length > 0 && (
+              <div className="pyq-q-images">
+                {question.images.map((src, i) => (
+                  <img key={i} src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`} alt={`Question ${question.questionNo} figure`} className="pyq-q-img" />
+                ))}
+              </div>
             )}
 
             {isDeleted ? (

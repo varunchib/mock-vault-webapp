@@ -9,8 +9,8 @@ const API   = 'https://api.ministryofpapers.com'
 const BASE  = 'https://ministryofpapers.com'
 const TODAY = new Date().toISOString().split('T')[0]
 
-// Exams that have a dedicated /exam/:slug/info page (add slug here when data is added to examInfo.ts)
-const EXAM_INFO_SLUGS = new Set(['jkssb'])
+// Exams that have a dedicated /exam/:slug/overview page — keep in sync with examFaq.ts keys
+const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bpsc', 'rssb', 'jkpsc', 'jkpsi'])
 
 async function fetchSlugs(path) {
   const res = await fetch(`${API}${path}`, { signal: AbortSignal.timeout(10000) })

@@ -4260,6 +4260,25 @@ footer {
 
 .pyq-q-subject:hover { background: #fef3c7; }
 
+.pyq-q-images {
+  margin: 8px 0 12px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.pyq-q-img {
+  max-width: 100%;
+  max-height: 300px;
+  width: auto;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: #fff;
+  display: block;
+}
+
 .pyq-q-text {
   font-size: 14.5px;
   line-height: 1.65;
@@ -7884,6 +7903,45 @@ footer {
   transition: all .14s;
 }
 .sq-load-btn:hover { border-color: #1d4ed8; color: #1d4ed8; background: #eff6ff; }
+
+/* Answer key summary */
+.pyq-answer-key {
+  margin: 24px 0 8px;
+  padding: 20px;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.pyq-answer-key h2 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 14px;
+}
+
+.pyq-ak-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pyq-ak-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--line2);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  color: var(--ink3);
+}
+
+.pyq-ak-item strong {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
+}
 
 /* Auth gate */
 .ep-gate {

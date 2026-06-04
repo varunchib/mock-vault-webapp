@@ -77,6 +77,35 @@ function apiFetch(url: string, cacheTtl: number): Promise<Response> {
 
 async function fetchMeta(pathname: string): Promise<PageMeta | null> {
   try {
+    const overviewMatch = pathname.match(/^\/exam\/([^/]+)\/overview$/)
+    if (overviewMatch) {
+      const slug = overviewMatch[1]
+      const r = await apiFetch(`${API}/api/v1/exams/${slug}`, 3600)
+      if (!r.ok) return null
+      const e = await r.json() as { shortName: string; name: string; description: string }
+      return {
+        title: `${e.shortName} Overview – Exam Pattern, Eligibility & PYQ | Ministry of Papers`,
+        description: `${e.shortName} overview — exam pattern, eligibility criteria, selection process, salary, and free PYQ with detailed explanations on Ministry of Papers.`,
+        jsonLd: {
+          '@context': 'https://schema.org',
+          '@type': 'Course',
+          name: `${e.shortName} Exam Overview`,
+          description: e.description || `${e.name} exam pattern, eligibility, selection process, and free PYQ.`,
+          url: `${BASE}/exam/${slug}/overview`,
+          provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+              { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
+              { '@type': 'ListItem', position: 3, name: e.shortName, item: `${BASE}/exam/${slug}` },
+              { '@type': 'ListItem', position: 4, name: 'Overview', item: `${BASE}/exam/${slug}/overview` },
+            ],
+          },
+        },
+      }
+    }
+
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
@@ -153,13 +182,13 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       if (!r.ok) return null
       const p = await r.json() as { title: string; description: string; examSlug: string; examName: string }
       return {
-        title: `${p.title} — Solved Questions & Answers | Ministry of Papers`,
-        description: p.description || 'Solved previous year question paper with answers and explanations.',
+        title: `${p.title} PYQ — Solved Questions & Answers | Ministry of Papers`,
+        description: p.description || `${p.examName} PYQ — solved previous year question paper with answers and detailed explanations, free on Ministry of Papers.`,
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'LearningResource',
-          name: `${p.title} — Solved Questions & Answers`,
-          description: p.description || 'Solved previous year question paper with answers and explanations.',
+          name: `${p.title} PYQ — Solved Questions & Answers`,
+          description: p.description || `${p.examName} PYQ — solved previous year question paper with answers and detailed explanations.`,
           url: `${BASE}/pyq/${slug}`,
           learningResourceType: 'Practice Test',
           educationalUse: 'Practice',
