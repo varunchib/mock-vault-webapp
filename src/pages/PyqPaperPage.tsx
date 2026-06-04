@@ -1,4 +1,5 @@
 import { MathText } from '../components/common/MathText'
+import { env } from '../lib/env'
 import { BookOpen, ChevronRight, Download, Lock, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
@@ -230,6 +231,14 @@ export function PyqPaperPage() {
                 </div>
               )}
 
+              {q.images && q.images.length > 0 && (
+                <div className="pyq-q-images">
+                  {q.images.map((src, i) => (
+                    <img key={i} src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`} alt={`Question ${index + 1} figure`} className="pyq-q-img" />
+                  ))}
+                </div>
+              )}
+
               <QuestionRenderer className="pyq-q-text" text={localized.question} />
 
               {isDeleted ? (
@@ -316,6 +325,7 @@ export function PyqPaperPage() {
           )
         })}
       </div>
+
 
       {isGated && (
         <div className="ep-gate">

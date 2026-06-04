@@ -1081,7 +1081,10 @@ export function AdminDashboardPage() {
                       <div className="ov-user-row" key={user.id}>
                         <div className="ov-user-identity">
                           <span className="ov-user-initial">{user.name.charAt(0).toUpperCase()}</span>
-                          <span className="ov-user-name-text">{user.name}</span>
+                          <div>
+                            <span className="ov-user-name-text">{user.name}</span>
+                            {user.city && <small className="ov-user-city">{user.city}</small>}
+                          </div>
                         </div>
                         <span className="ov-user-email-text">{user.email}</span>
                         <span className="ov-user-role-tag">{user.role}</span>
