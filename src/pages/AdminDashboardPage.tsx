@@ -892,7 +892,7 @@ export function AdminDashboardPage() {
         <button type="button" className="admin-hamburger" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
           <Menu size={22} />
         </button>
-        <span className="admin-mobile-title">{tabLabel[activeTab]}</span>
+        <span className="admin-mobile-title">Admin · {tabLabel[activeTab]}</span>
         <div className="admin-active-pill admin-active-pill--mobile">
           <span className={`admin-active-dot${activeCount !== null && activeCount > 0 ? ' live' : ''}`} />
           <span>{activeCount ?? 0}</span>
