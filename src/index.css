@@ -6082,9 +6082,9 @@ footer {
     flex-wrap: wrap;
   }
 
-  .admin-active-pill {
-    margin-left: 0;
-    order: -1;
+  /* active pill in work-head is hidden on mobile — topbar shows it instead */
+  .admin-work-head .admin-active-pill {
+    display: none;
   }
 
   .analytics-stat-grid,
@@ -7391,8 +7391,9 @@ footer {
   .admin-dark .admin-mobile-title { color: #e5e7eb; }
 
   .admin-active-pill--mobile {
-    margin-left: 0;
+    margin-left: auto; /* push to right corner */
     font-size: 11px;
+    flex-shrink: 0;
   }
 
   /* Overlay */
