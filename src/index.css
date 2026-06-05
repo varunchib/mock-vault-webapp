@@ -28,6 +28,9 @@
   --shadow: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, .07), 0 2px 4px -2px rgba(0, 0, 0, .05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, .08), 0 4px 6px -4px rgba(0, 0, 0, .05);
+  /* Shared surface tokens — used by inbox widget and admin inbox */
+  --surface: #ffffff;
+  --bg: #f7f8fa;
 }
 
 html {
@@ -6719,19 +6722,19 @@ footer {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: var(--hl);
-  color: #fff;
+  background: #111827;
+  color: #ffffff;
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 14px rgba(0,0,0,.18);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
   position: relative;
-  transition: transform .15s;
+  transition: transform .15s, box-shadow .15s;
 }
-.inbox-bubble:hover { transform: scale(1.07); }
-.inbox-bubble--unread { background: var(--hl); }
+.inbox-bubble:hover { transform: scale(1.07); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.inbox-bubble--unread { background: #111827; }
 
 .inbox-badge {
   position: absolute;
@@ -6744,10 +6747,10 @@ footer {
 
 .inbox-panel {
   width: 320px;
-  background: var(--surface);
-  border: 1px solid var(--line);
+  background: #ffffff;
+  border: 1px solid #e4e4e7;
   border-radius: 14px;
-  box-shadow: 0 8px 32px rgba(0,0,0,.14);
+  box-shadow: 0 8px 32px rgba(0,0,0,.16);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -6759,10 +6762,11 @@ footer {
   align-items: center;
   gap: 8px;
   padding: 12px 14px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #e4e4e7;
   font-size: 13px;
   font-weight: 600;
-  color: var(--ink);
+  color: #18181b;
+  background: #ffffff;
 }
 .inbox-panel-head span { flex: 1; }
 .inbox-back, .inbox-close {
@@ -6778,6 +6782,7 @@ footer {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  background: #ffffff;
 }
 
 .inbox-empty {
@@ -6790,15 +6795,15 @@ footer {
 .inbox-thread-row {
   width: 100%;
   background: none;
-  border: 1px solid var(--line);
+  border: 1px solid #e4e4e7;
   border-radius: 8px;
   padding: 10px 12px;
   text-align: left;
   cursor: pointer;
   transition: background .1s;
 }
-.inbox-thread-row:hover { background: var(--line2); }
-.inbox-thread-row--replied { border-color: var(--hl); }
+.inbox-thread-row:hover { background: #f4f4f5; }
+.inbox-thread-row--replied { border-color: #111827; }
 
 .inbox-thread-meta {
   display: flex;
@@ -6827,24 +6832,25 @@ footer {
 
 .inbox-new-btn {
   background: none;
-  border: 1px dashed var(--line);
+  border: 1px dashed #e4e4e7;
   border-radius: 8px;
   padding: 10px;
   font-size: 12px;
-  color: var(--ink2);
+  color: #71717a;
   cursor: pointer;
   width: 100%;
   text-align: center;
   margin-top: 4px;
   transition: background .1s, color .1s;
 }
-.inbox-new-btn:hover { background: var(--line2); color: var(--ink); }
+.inbox-new-btn:hover { background: #f4f4f5; color: #18181b; }
 
 .inbox-thread-view {
   display: flex;
   flex-direction: column;
   flex: 1;
   overflow: hidden;
+  background: #ffffff;
 }
 
 .inbox-messages {
@@ -6871,8 +6877,8 @@ footer {
   word-break: break-word;
   line-height: 1.4;
 }
-.inbox-msg--user .inbox-msg-text { background: var(--hl); color: #fff; }
-.inbox-msg--admin .inbox-msg-text { background: var(--line2); color: var(--ink); }
+.inbox-msg--user .inbox-msg-text { background: #111827; color: #fff; }
+.inbox-msg--admin .inbox-msg-text { background: #f4f4f5; color: #18181b; border: 1px solid #e4e4e7; }
 .inbox-msg-time { font-size: 10px; color: var(--ink2); }
 
 .inbox-context-pill {
@@ -6887,24 +6893,25 @@ footer {
   display: flex;
   gap: 8px;
   padding: 10px;
-  border-top: 1px solid var(--line);
+  border-top: 1px solid #e4e4e7;
   align-items: flex-end;
+  background: #ffffff;
 }
 .inbox-compose textarea {
   flex: 1;
   font-size: 13px;
-  border: 1px solid var(--line);
+  border: 1px solid #e4e4e7;
   border-radius: 8px;
   padding: 8px 10px;
   resize: none;
-  background: var(--bg);
-  color: var(--ink);
+  background: #f7f8fa;
+  color: #18181b;
   font-family: inherit;
   outline: none;
 }
-.inbox-compose textarea:focus { border-color: var(--hl); }
+.inbox-compose textarea:focus { border-color: #111827; }
 .inbox-compose button {
-  background: var(--hl);
+  background: #111827;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -6915,8 +6922,9 @@ footer {
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
+  transition: opacity .15s;
 }
-.inbox-compose button:disabled { opacity: .4; cursor: not-allowed; }
+.inbox-compose button:disabled { opacity: .35; cursor: not-allowed; }
 
 .inbox-error {
   font-size: 12px;
@@ -7277,6 +7285,170 @@ footer {
   font-size: 10px;
   color: var(--ink2);
   margin: 6px 0 0;
+}
+
+/* ── Inbox Widget — mobile overhaul ───────────────────────────────────────── */
+
+/* Better bubble: solid background, no transparency, works everywhere */
+.inbox-bubble {
+  background: #111827;
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+}
+.inbox-bubble svg { color: #ffffff; }
+
+@media (max-width: 540px) {
+  /* Widget container: anchor to bottom of screen */
+  .inbox-widget {
+    bottom: 72px; /* above mobile bottom nav */
+    right: 16px;
+  }
+
+  /* Panel becomes a bottom sheet */
+  .inbox-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 75vh;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -4px 32px rgba(0,0,0,.18);
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+  }
+
+  .inbox-bubble {
+    position: fixed;
+    bottom: 76px;
+    right: 16px;
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* ── Admin panel — mobile ─────────────────────────────────────────────────── */
+
+@media (max-width: 980px) {
+  /* Rail becomes horizontal scrollable top bar */
+  .admin-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+  }
+
+  .admin-rail {
+    position: sticky;
+    top: 0;
+    height: auto;
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0;
+    padding: 10px 12px;
+    border-right: none;
+    border-bottom: 1px solid #e5e7eb;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .admin-rail::-webkit-scrollbar { display: none; }
+
+  .admin-rail .logo,
+  .admin-rail > a:first-child { flex-shrink: 0; margin-right: 8px; }
+
+  .admin-rail-nav {
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+    flex: 1;
+  }
+
+  .admin-nav-btn {
+    white-space: nowrap;
+    padding: 7px 12px;
+    font-size: 12px;
+    flex-shrink: 0;
+  }
+
+  .admin-rail-divider { display: none; }
+
+  .admin-rail-logout {
+    flex-shrink: 0;
+    margin-left: 8px;
+    padding: 7px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .admin-dark-toggle {
+    display: none; /* hide in horizontal rail to save space */
+  }
+
+  /* Inbox layout: stack on mobile */
+  .admin-inbox-tab { height: auto; min-height: calc(100vh - 56px); }
+  .admin-inbox-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    height: auto;
+    min-height: calc(100vh - 56px);
+    border-radius: 12px;
+  }
+
+  .admin-inbox-list {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    max-height: 340px;
+  }
+
+  .admin-inbox-convo {
+    min-height: 400px;
+  }
+
+  /* Two-col layouts stack */
+  .admin-two-col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  /* Users list: simplified columns on small screens */
+  .ov-user-list-header {
+    grid-template-columns: 1fr 80px 70px 80px;
+    gap: 8px;
+  }
+  .ov-user-list-header span:nth-child(2),
+  .ov-user-list-header span:nth-child(5) { display: none; }
+
+  .ov-user-row {
+    grid-template-columns: 1fr 80px 70px 80px;
+    gap: 8px;
+  }
+  .ov-user-email-text { display: none; }
+  .ov-user-login-text { display: none; }
+
+  /* Admin stat row: 2 per row */
+  .admin-stat-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Work main padding */
+  .admin-work-main {
+    padding: 12px;
+  }
+  .admin-work-head { padding: 12px 12px 0; }
+
+  /* Tool panel padding */
+  .admin-tool-panel { padding: 14px; }
+
+  /* Paper/mock search bar */
+  .admin-search-bar { margin-bottom: 10px; }
+
+  /* Form stack gap */
+  .admin-form-stack { gap: 10px; }
+  .admin-form-row { grid-template-columns: 1fr; }
+
+  /* Inbox bottom sheet: narrower thread list */
+  .admin-inbox-list { max-height: 280px; }
+  .admin-inbox-msg-text { max-width: 90%; }
 }
 
 .ov-user-dot::before {
@@ -13787,6 +13959,12 @@ html {
 .admin-workspace.admin-dark {
   background: #0f1117;
   color: #e5e7eb;
+  --surface: #161b22;
+  --bg: #0f1117;
+  --line: #30363d;
+  --line2: #21262d;
+  --ink: #e5e7eb;
+  --ink2: #9ca3af;
 }
 
 /* Sidebar */
