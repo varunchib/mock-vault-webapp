@@ -11,6 +11,7 @@ import {
   Inbox,
   LayoutDashboard,
   LogOut,
+  Menu,
   Moon,
   Pencil,
   Plus,
@@ -307,6 +308,7 @@ export function AdminDashboardPage() {
   const [statusMsg, setStatusMsg] = useState<StatusMsg | null>(null)
   const [saving, setSaving] = useState(false)
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === '1')
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   const toggleDark = () => setDarkMode((d) => {
     const next = !d
@@ -885,9 +887,29 @@ export function AdminDashboardPage() {
   return (
     <section className={`admin-workspace${darkMode ? ' admin-dark' : ''}`}>
 
-      {/* ── Sidebar ─────────────────────────────────────────── */}
-      <aside className="admin-rail">
-        <Logo />
+      {/* ── Mobile top bar ───────────────────────────────────── */}
+      <div className="admin-mobile-topbar">
+        <button type="button" className="admin-hamburger" onClick={() => setDrawerOpen(true)} aria-label="Open menu">
+          <Menu size={22} />
+        </button>
+        <span className="admin-mobile-title">{tabLabel[activeTab]}</span>
+        <div className="admin-active-pill admin-active-pill--mobile">
+          <span className={`admin-active-dot${activeCount !== null && activeCount > 0 ? ' live' : ''}`} />
+          <span>{activeCount ?? 0}</span>
+        </div>
+      </div>
+
+      {/* ── Drawer overlay ───────────────────────────────────── */}
+      {drawerOpen && (
+        <div className="admin-drawer-overlay" onClick={() => setDrawerOpen(false)} />
+      )}
+      <aside className={`admin-rail${drawerOpen ? ' admin-rail--open' : ''}`}>
+        <div className="admin-rail-header">
+          <Logo />
+          <button type="button" className="admin-drawer-close" onClick={() => setDrawerOpen(false)} aria-label="Close menu">
+            <X size={18} />
+          </button>
+        </div>
 
         <nav className="admin-rail-nav">
           {(['overview', 'exams', 'mocks', 'papers', 'inbox'] as Tab[]).map((tab) => {
@@ -900,7 +922,7 @@ export function AdminDashboardPage() {
                 key={tab}
                 type="button"
                 className={`admin-nav-btn${activeTab === tab ? ' active' : ''}`}
-                onClick={() => { setActiveTab(tab); if (tab === 'inbox') void loadInbox() }}
+                onClick={() => { setActiveTab(tab); if (tab === 'inbox') void loadInbox(); setDrawerOpen(false) }}
               >
                 <Icon size={17} /> {tabLabel[tab]}
                 {tab === 'inbox' && inboxUnread > 0 && (
@@ -910,7 +932,7 @@ export function AdminDashboardPage() {
             )
           })}
           <div className="admin-rail-divider" />
-          <Link className="admin-nav-btn" to="/exams"><Home size={17} /> App home</Link>
+          <Link className="admin-nav-btn" to="/exams" onClick={() => setDrawerOpen(false)}><Home size={17} /> App home</Link>
           <button type="button" className="admin-dark-toggle" onClick={toggleDark}>
             {darkMode ? <Sun size={17} /> : <Moon size={17} />}
             {darkMode ? 'Light mode' : 'Dark mode'}
