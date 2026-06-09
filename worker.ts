@@ -300,6 +300,13 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
+    // Trailing slash redirect: /exam/jkssb/ → /exam/jkssb (except root /)
+    if (path !== '/' && path.endsWith('/')) {
+      const dest = new URL(request.url)
+      dest.pathname = path.slice(0, -1)
+      return Response.redirect(dest.toString(), 301)
+    }
+
     // Clone original request pointing at / for SPA fallback
     const indexRequest = new Request(`${url.origin}/`, request)
 
