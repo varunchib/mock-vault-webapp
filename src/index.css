@@ -4794,8 +4794,14 @@ footer {
   font-family: 'DM Sans', sans-serif !important;
 }
 
+.subpage-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .subpage-layout main {
-  min-height: calc(100vh - 64px);
+  flex: 1;
 }
 
 .halo-loader-shell {
