@@ -319,6 +319,21 @@ export default {
     // Clone original request pointing at / for SPA fallback
     const indexRequest = new Request(`${url.origin}/`, request)
 
+    // Sitemap — proxy to API so it stays in sync with the DB (never stale)
+    if (path === '/sitemap.xml') {
+      try {
+        const res = await apiFetch(`${API}/sitemap.xml`, 3600)
+        if (res.ok) {
+          const headers = new Headers(res.headers)
+          headers.set('content-type', 'application/xml; charset=UTF-8')
+          headers.set('cache-control', 'public, max-age=3600')
+          return new Response(res.body, { status: 200, headers })
+        }
+      } catch {
+        // fall through to static file if API is unreachable
+      }
+    }
+
     // Static assets (.js, .css, .png, .svg, .woff2, etc.) → pass through
     const lastSeg = path.split('/').pop() ?? ''
     if (lastSeg.includes('.') && !lastSeg.endsWith('.html')) {
