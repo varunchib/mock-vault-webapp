@@ -50,12 +50,16 @@ export function paperSeoTitle(p: PaperMeta): string {
   const exam = p.examName.trim()
   const year = p.year?.trim() ?? ''
   const shift = p.shift?.trim() ?? ''
+  const brand = ` | ${BRAND}`
+  const budget = 70 - brand.length  // 49 chars for core
 
-  let core = exam
-  if (year) core += ` ${year}`
-  core += ' PYQ Paper'
-  if (shift) core += ` – ${shift}`
-  return `${core} | ${BRAND}`
+  let core = `${exam}${year ? ` ${year}` : ''} PYQ Paper`
+  if (shift) {
+    const withShift = `${core} – ${shift}`
+    if (withShift.length <= budget) core = withShift
+    // shift omitted if it would push over 70; it appears in description instead
+  }
+  return `${truncate(core, budget)}${brand}`
 }
 
 /**
@@ -170,12 +174,19 @@ type QuestionMeta = {
 
 /**
  * IBPS PO 2025 Q.12: Which of the following… | Ministry of Papers
- * (kept under 65 chars before the brand)
+ * Falls back to truncated prefix when exam name is too long for a snippet.
  */
 export function questionSeoTitle(q: QuestionMeta): string {
+  const brand = ` | ${BRAND}`
+  const budget = 70 - brand.length  // 49 chars for core
   const prefix = `${q.examName}${q.year ? ` ${q.year}` : ''}${q.questionNo ? ` Q.${q.questionNo}` : ''}`
-  const snippet = truncate(strip(q.question), 60 - prefix.length - 2)
-  return `${prefix}: ${snippet} | ${BRAND}`
+  const snippetBudget = budget - prefix.length - 2  // -2 for ": "
+  if (snippetBudget >= 10) {
+    const snippet = truncate(strip(q.question), snippetBudget)
+    return `${prefix}: ${snippet}${brand}`
+  }
+  // Exam name too long for a snippet — just show truncated prefix
+  return `${truncate(prefix, budget)}${brand}`
 }
 
 export function questionSeoDescription(q: QuestionMeta): string {

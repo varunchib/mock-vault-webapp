@@ -182,7 +182,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       if (!r.ok) return null
       const p = await r.json() as { title: string; description: string; examSlug: string; examName: string }
       return {
-        title: `${p.title} PYQ — Solved Questions & Answers | Ministry of Papers`,
+        title: titleFit(`${p.title} PYQ — Solved Questions & Answers`),
         description: p.description || `${p.examName} PYQ — solved previous year question paper with answers and detailed explanations, free on Ministry of Papers.`,
         jsonLd: {
           '@context': 'https://schema.org',
@@ -224,7 +224,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
           : [{ '@type': 'ListItem', position: 3, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
       ]
       return {
-        title: `${q.examName} ${q.year} — Q${q.questionNo} Solved | Ministry of Papers`,
+        title: titleFit(`${q.examName} ${q.year} — Q${q.questionNo} Solved`),
         description: `${q.question.slice(0, 145)}… — Solved with explanation on Ministry of Papers.`,
         jsonLd: [
           {
@@ -254,6 +254,15 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
   }
 
   return STATIC_META[pathname] ?? null
+}
+
+// Fits a title within 70 chars while always preserving " | Ministry of Papers"
+function titleFit(core: string): string {
+  const brand = ' | Ministry of Papers'
+  const full = `${core}${brand}`
+  if (full.length <= 70) return full
+  const budget = 70 - brand.length  // 49
+  return `${core.slice(0, budget - 1).trimEnd()}…${brand}`
 }
 
 function esc(s: string): string {
