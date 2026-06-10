@@ -124,18 +124,40 @@ export function QuestionPage() {
             <span>Q.{question.questionNo}</span>
           </nav>
 
-          {/* Page heading — h1 for SEO */}
+          {/* Page heading — category tag + H1 + actions, no repeated chips */}
           <div className="qpage-head">
-            <span className="ep-category-tag">{question.examName} · {question.year}</span>
-            <h1 className="qpage-h1">{question.examName} {question.year} — Q.{question.questionNo}</h1>
-            <div className="qpage-head-meta">
-              {question.subject && <span className="pyq-q-subject" style={{ cursor: 'default' }}>{question.subject}</span>}
-              {question.paper && <span className="pyq-q-subject" style={{ cursor: 'default', background: 'var(--line2)', color: 'var(--ink3)' }}>{question.paper}</span>}
+            <div className="qpage-head-left">
+              <span className="ep-category-tag">{question.examName} · {question.year}</span>
+              <h1 className="qpage-h1">{question.examName} {question.year} — Q.{question.questionNo}</h1>
+            </div>
+            <div className="qpage-head-actions">
+              {question.paperSlug && (
+                <Link to={`/pyq/${question.paperSlug}`} className="pyq-action-btn">
+                  <BookOpen size={14} /> Full Paper
+                </Link>
+              )}
+              <Link to={`/exam/${question.examSlug}`} className="pyq-action-btn">
+                <Play size={14} /> Exam Hub
+              </Link>
             </div>
           </div>
 
-          {/* Question card */}
-          <article className="pyq-question-card qpage-q-card">
+          {/* Question card — mirrors pyq-question-card from paper page */}
+          <article className="pyq-question-card">
+
+            {/* Q.N · Subject row — identical to paper page header row */}
+            <div className="pyq-q-header">
+              <span className="pyq-q-num">Q.{question.questionNo}</span>
+              {question.subject && (
+                <Link
+                  className="pyq-q-subject pyq-q-subject-link"
+                  to={`/exam/${question.examSlug}?tab=subjects&subject=${encodeURIComponent(question.subject)}`}
+                  title={`All ${question.examName} ${question.subject} questions`}
+                >
+                  {question.subject}
+                </Link>
+              )}
+            </div>
 
             {hasHindiVersion && (
               <div className="pyq-language-toggle" aria-label="Question language">
@@ -164,7 +186,7 @@ export function QuestionPage() {
               </div>
             )}
 
-            <QuestionRenderer className="pyq-q-text qpage-q-text" text={localized.question} />
+            <QuestionRenderer className="pyq-q-text" text={localized.question} />
 
             {isDeleted ? (
               <div className="pyq-deleted-notice">
@@ -240,32 +262,9 @@ export function QuestionPage() {
                     <p>{question.explanation}</p>
                   </div>
                 )}
-
               </>
             )}
           </article>
-
-          {/* Context strip — paper + exam navigation */}
-          <div className="qpage-context">
-            {question.paperSlug && (
-              <Link to={`/pyq/${question.paperSlug}`} className="qpage-ctx-card">
-                <BookOpen size={16} className="qpage-ctx-icon" />
-                <div className="qpage-ctx-body">
-                  <strong>Full Paper</strong>
-                  <span>{question.paper}</span>
-                </div>
-                <ChevronRight size={14} className="qpage-ctx-arrow" />
-              </Link>
-            )}
-            <Link to={`/exam/${question.examSlug}`} className="qpage-ctx-card">
-              <Play size={16} className="qpage-ctx-icon" />
-              <div className="qpage-ctx-body">
-                <strong>Exam Hub</strong>
-                <span>{question.examName} — papers &amp; mock tests</span>
-              </div>
-              <ChevronRight size={14} className="qpage-ctx-arrow" />
-            </Link>
-          </div>
 
         </div>
       </section>
