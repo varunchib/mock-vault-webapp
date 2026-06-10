@@ -653,10 +653,15 @@ export function PaperAttemptPage() {
   // ── Submission summary ─────────────────────────────────────────
   if (submitted && !reviewMode) {
     const activeCount = activeQuestions.length
-    const scorePercent = activeCount > 0 ? Math.round((results.correct / activeCount) * 100) : 0
     const negMark = paper.negativeMarking ?? 0
-    const rawScore = negMark > 0 ? parseFloat((results.correct - results.wrong * negMark).toFixed(2)) : null
+    const maxMarks = paper.maxMarks > 0 ? paper.maxMarks : activeCount
+    const marksPerQ = parseFloat((maxMarks / activeCount).toFixed(4))
+    const earnedMarks = parseFloat((results.correct * marksPerQ).toFixed(2))
+    const lostMarks = parseFloat((results.wrong * negMark).toFixed(2))
+    const netMarks = parseFloat((earnedMarks - lostMarks).toFixed(2))
     const deletedCount = questions.length - activeCount
+    const subjectMarks = (s: { correct: number; wrong: number }) =>
+      parseFloat((s.correct * marksPerQ - s.wrong * negMark).toFixed(2))
     return (
       <div className="pa-result-page">
         <header className="pa-result-header">
@@ -670,25 +675,34 @@ export function PaperAttemptPage() {
         <div className="pa-result-body">
           <section className="pa-score-panel">
             <div className="pa-score-ring">
-              <strong>{rawScore !== null ? rawScore : results.correct}</strong>
-              <span>/ {activeCount}</span>
+              <strong className={netMarks < 0 ? 'pa-score-neg' : ''}>{netMarks}</strong>
+              <span>/ {maxMarks}</span>
             </div>
-            <p className="pa-score-pct">{scorePercent}%</p>
-            <p className="pa-score-label">correct</p>
+            <p className="pa-score-label">marks scored</p>
 
             <div className="pa-score-stats">
-              <div className="pa-stat pa-stat--c"><span>{results.correct}</span><small>Correct</small></div>
-              <div className="pa-stat pa-stat--w"><span>{results.wrong}</span><small>Wrong</small></div>
-              <div className="pa-stat pa-stat--s"><span>{results.skipped}</span><small>Skipped</small></div>
+              <div className="pa-stat pa-stat--c">
+                <span>+{earnedMarks}</span>
+                <small>Earned</small>
+                <em>{results.correct} correct</em>
+              </div>
+              <div className="pa-stat pa-stat--w">
+                <span>{lostMarks > 0 ? `−${lostMarks}` : '0'}</span>
+                <small>Deducted</small>
+                <em>{results.wrong} wrong</em>
+              </div>
+              <div className="pa-stat pa-stat--s">
+                <span>{results.skipped}</span>
+                <small>Skipped</small>
+                <em>&nbsp;</em>
+              </div>
             </div>
 
             <div className="pa-score-meta">
               <p className="pa-time-taken">Time: {formatTime(timeTaken)}</p>
-              {rawScore !== null && (
-                <p className="pa-negmark-note">−{negMark}/wrong · Raw: {rawScore}</p>
-              )}
+              <p className="pa-negmark-note">+{marksPerQ}/correct{negMark > 0 ? ` · −${negMark}/wrong` : ''}</p>
               {deletedCount > 0 && (
-                <p className="pa-negmark-note">{deletedCount} Q deleted</p>
+                <p className="pa-negmark-note">{deletedCount} Q deleted (excluded)</p>
               )}
             </div>
           </section>
@@ -697,19 +711,22 @@ export function PaperAttemptPage() {
             {results.subjectScores.length > 0 ? (
               <table className="pa-subject-table">
                 <thead>
-                  <tr><th>Subject</th><th>Qs</th><th>✓</th><th>✗</th><th>—</th><th>%</th></tr>
+                  <tr><th>Subject</th><th>Qs</th><th>✓</th><th>✗</th><th>—</th><th>Marks</th></tr>
                 </thead>
                 <tbody>
-                  {results.subjectScores.map((s) => (
-                    <tr key={s.subject}>
-                      <td>{s.subject}</td>
-                      <td>{s.total}</td>
-                      <td className="correct">{s.correct}</td>
-                      <td className="wrong">{s.wrong}</td>
-                      <td className="skipped">{s.skipped}</td>
-                      <td>{s.total > 0 ? Math.round((s.correct / s.total) * 100) : 0}%</td>
-                    </tr>
-                  ))}
+                  {results.subjectScores.map((s) => {
+                    const sm = subjectMarks(s)
+                    return (
+                      <tr key={s.subject}>
+                        <td>{s.subject}</td>
+                        <td>{s.total}</td>
+                        <td className="correct">{s.correct}</td>
+                        <td className="wrong">{s.wrong}</td>
+                        <td className="skipped">{s.skipped}</td>
+                        <td className={sm < 0 ? 'wrong' : sm > 0 ? 'correct' : ''}>{sm}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
               </table>
             ) : (
