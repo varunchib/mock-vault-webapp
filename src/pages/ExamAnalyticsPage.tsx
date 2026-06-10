@@ -219,12 +219,19 @@ function HistoryCard({ r, examSlug }: {
   r: ReturnType<typeof readAllResults>[0]
   examSlug: string
 }) {
-  const pct = r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0
+  const maxMarks = (r.maxMarks ?? 0) > 0 ? r.maxMarks! : r.totalQuestions
+  const marksPerQ = maxMarks / r.totalQuestions
+  const negMark = r.negativeMarking ?? 0
+  const netMarks = r.rawScore ?? parseFloat((r.correct * marksPerQ - r.wrong * negMark).toFixed(2))
+  const scorePct = maxMarks > 0 ? Math.round((netMarks / maxMarks) * 100) : 0
   const pctile = estimatePercentile(r.correct, r.totalQuestions, examSlug)
   return (
     <div className="ea2-hist-card">
       <div className="ea2-hist-card-top">
-        <span className={`ea2-hist-score ${scoreClass(pct)}`}>{pct}%</span>
+        <span className={`ea2-hist-score ${scoreClass(Math.max(0, scorePct))}${netMarks < 0 ? ' bad' : ''}`}>
+          {netMarks}
+        </span>
+        <span className="ea2-hist-outof">/ {maxMarks}</span>
         {pctile > 0 && <span className="ea2-hist-pctile">~{pctile}th</span>}
       </div>
       <strong className="ea2-hist-card-title">{r.title}</strong>
@@ -269,15 +276,26 @@ export function ExamAnalyticsPage() {
   const summary = useMemo(() => {
     if (!results.length) return null
     const totalTime = results.reduce((s, r) => s + r.timeTakenSeconds, 0)
-    const avgAccPct = Math.round(results.reduce((s, r) => s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * 100 : 0), 0) / results.length)
-    const bestPct = Math.max(...results.map(r => r.totalQuestions > 0 ? Math.round((r.correct / r.totalQuestions) * 100) : 0))
+    const marksData = results.map(r => {
+      const maxM = (r.maxMarks ?? 0) > 0 ? r.maxMarks! : r.totalQuestions
+      const marksPerQ = maxM / r.totalQuestions
+      const negM = r.negativeMarking ?? 0
+      const net = r.rawScore ?? parseFloat((r.correct * marksPerQ - r.wrong * negM).toFixed(2))
+      return { net, max: maxM }
+    })
+    const bestScore = parseFloat(Math.max(...marksData.map(m => m.net)).toFixed(2))
+    const avgScore = parseFloat((marksData.reduce((s, m) => s + m.net, 0) / marksData.length).toFixed(2))
+    const bestMax = marksData.find(m => m.net === bestScore)?.max ?? 1
+    const avgMax = marksData.reduce((s, m) => s + m.max, 0) / marksData.length
+    const bestPct = Math.round((Math.max(0, bestScore) / bestMax) * 100)
+    const avgAccPct = Math.round((Math.max(0, avgScore) / avgMax) * 100)
     const cut = examCutoffs[examSlug]
     const avgScaledScore = cut
-      ? results.reduce((s, r) => s + (r.totalQuestions > 0 ? (r.correct / r.totalQuestions) * cut.totalMarks : 0), 0) / results.length
+      ? marksData.reduce((s, m) => s + (m.max > 0 ? (m.net / m.max) * cut.totalMarks : 0), 0) / marksData.length
       : 0
     const percentiles = results.map(r => estimatePercentile(r.correct, r.totalQuestions, examSlug)).filter(p => p > 0)
     const avgPercentile = percentiles.length ? Math.round(percentiles.reduce((s, p) => s + p, 0) / percentiles.length) : 0
-    return { totalTime, avgAccPct, bestPct, avgScaledScore, avgPercentile }
+    return { totalTime, avgScore, bestScore, avgAccPct, bestPct, avgScaledScore, avgPercentile }
   }, [results, examSlug])
 
   // Merge API + static cutoffs
@@ -338,12 +356,12 @@ export function ExamAnalyticsPage() {
       <div className="ea2-strip">
         <div className="ea2-strip-card">
           <span className="ea2-strip-icon"><Target size={14} /></span>
-          <strong className={scoreClass(summary.avgAccPct)}>{summary.avgAccPct}%</strong>
-          <span>Avg Accuracy</span>
+          <strong className={scoreClass(summary.avgAccPct)}>{summary.avgScore}</strong>
+          <span>Avg Score</span>
         </div>
         <div className="ea2-strip-card">
           <span className="ea2-strip-icon"><TrendingUp size={14} /></span>
-          <strong className={scoreClass(summary.bestPct)}>{summary.bestPct}%</strong>
+          <strong className={scoreClass(summary.bestPct)}>{summary.bestScore}</strong>
           <span>Best Score</span>
         </div>
         <div className="ea2-strip-card">

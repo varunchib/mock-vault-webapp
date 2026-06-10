@@ -13657,8 +13657,10 @@ html {
 }
 .ea2-hist-card-top {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  gap: 4px;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 .ea2-hist-score {
   font-size: 22px;
@@ -13669,6 +13671,7 @@ html {
 .ea2-hist-score.good { color: #15803d; }
 .ea2-hist-score.mid  { color: #92400e; }
 .ea2-hist-score.bad  { color: #b91c1c; }
+.ea2-hist-outof { font-size: 13px; color: #9ca3af; margin-right: auto; }
 .ea2-hist-pctile {
   font-size: 11px;
   font-weight: 600;
@@ -15087,6 +15090,7 @@ html {
   font-weight: 800;
   line-height: 1;
 }
+.an-exam-best em { font-size: 13px; font-style: normal; font-weight: 500; color: #9ca3af; }
 .an-exam-best.good { color: #22c55e; }
 .an-exam-best.mid  { color: #f59e0b; }
 .an-exam-best.bad  { color: #ef4444; }

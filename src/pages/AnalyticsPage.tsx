@@ -51,12 +51,19 @@ function scoreClass(pct: number) {
 }
 
 function ExamCard({ examSlug, examName, results }: ExamGroup) {
-  const scores = results.map(r => {
-    const s = r.rawScore ?? r.correct
-    return r.totalQuestions > 0 ? (Math.max(0, s) / r.totalQuestions) * 100 : 0
+  const marksData = results.map(r => {
+    const maxM = (r.maxMarks ?? 0) > 0 ? r.maxMarks! : r.totalQuestions
+    const marksPerQ = maxM / r.totalQuestions
+    const negM = r.negativeMarking ?? 0
+    const net = r.rawScore ?? parseFloat((r.correct * marksPerQ - r.wrong * negM).toFixed(2))
+    return { net, max: maxM }
   })
-  const best = Math.round(Math.max(...scores))
-  const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+  const bestNet = parseFloat(Math.max(...marksData.map(m => m.net)).toFixed(2))
+  const avgNet = parseFloat((marksData.reduce((s, m) => s + m.net, 0) / marksData.length).toFixed(2))
+  const bestMax = marksData.find(m => m.net === bestNet)?.max ?? 1
+  const avgMax = marksData.reduce((s, m) => s + m.max, 0) / marksData.length
+  const bestPct = Math.round((Math.max(0, bestNet) / bestMax) * 100)
+  const avgPct = Math.round((Math.max(0, avgNet) / avgMax) * 100)
   const totalTime = results.reduce((s, r) => s + r.timeTakenSeconds, 0)
   const mockCount = results.filter(r => r.type === 'mock').length
   const paperCount = results.filter(r => r.type === 'paper').length
@@ -65,7 +72,7 @@ function ExamCard({ examSlug, examName, results }: ExamGroup) {
   return (
     <Link to={`/analytics/${examSlug}`} className="an-exam-card">
       <div className="an-exam-card-top">
-        <span className={`an-exam-best ${scoreClass(best)}`}>{best}%</span>
+        <span className={`an-exam-best ${scoreClass(bestPct)}`}>{bestNet}<em>/{bestMax}</em></span>
         <span className="an-exam-date">{relativeDate(lastAttempt)}</span>
       </div>
       <strong className="an-exam-name">{examName}</strong>
@@ -76,9 +83,9 @@ function ExamCard({ examSlug, examName, results }: ExamGroup) {
       </div>
       <div className="an-exam-progress">
         <div className="an-exam-progress-track">
-          <div className="an-exam-progress-fill" style={{ width: `${avg}%` }} />
+          <div className="an-exam-progress-fill" style={{ width: `${avgPct}%` }} />
         </div>
-        <span className="an-exam-avg">Avg {avg}%</span>
+        <span className="an-exam-avg">Avg {avgNet}</span>
       </div>
       <span className="an-exam-cta">View analytics <ChevronRight size={13} /></span>
     </Link>

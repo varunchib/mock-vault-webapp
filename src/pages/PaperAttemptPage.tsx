@@ -404,7 +404,9 @@ export function PaperAttemptPage() {
     const { correct, wrong, skipped, subjectScores } = computeResults(questions, answers)
     const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000)
     const negMark = paper.negativeMarking ?? 0
-    const rawScore = negMark > 0 ? parseFloat((correct - wrong * negMark).toFixed(2)) : undefined
+    const savedMaxMarks = paper.maxMarks > 0 ? paper.maxMarks : questions.length
+    const marksPerQSave = savedMaxMarks / questions.length
+    const rawScore = parseFloat((correct * marksPerQSave - wrong * negMark).toFixed(2))
 
     if (attemptId) {
       const submitPayload = { attemptId, paperSlug: paper.slug, correct, wrong, skipped, timeTakenSeconds: timeTaken, answers }
@@ -427,6 +429,8 @@ export function PaperAttemptPage() {
       wrong,
       skipped,
       rawScore,
+      maxMarks: paper.maxMarks > 0 ? paper.maxMarks : undefined,
+      negativeMarking: negMark > 0 ? negMark : undefined,
       timeTakenSeconds: timeTaken,
       subjects: subjectScores,
     })
