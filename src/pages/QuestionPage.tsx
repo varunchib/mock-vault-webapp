@@ -1,283 +1,276 @@
-import { CheckCircle2, Lock, Play, Share2 } from "lucide-react";
-import { env } from "../lib/env";
-import { Link, Navigate, useParams } from "react-router-dom";
-import { useEffect, useMemo, useState, Fragment } from "react";
-import { LoginModal } from "../components/auth/LoginModal";
-import { HaloLoader } from "../components/common/HaloLoader";
-import { fetchQuestionBySlug, type Question } from "../lib/api";
-import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from "../lib/questionLanguage";
-import { useAuth } from "../context/useAuth";
-import { usePageMeta } from "../lib/usePageMeta";
-import { questionSeoTitle, questionSeoDescription } from "../lib/pageTitles";
+import { BookOpen, ChevronRight, Copy, Play } from 'lucide-react'
+import { Link, Navigate, useParams } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { LoginModal } from '../components/auth/LoginModal'
+import { HaloLoader } from '../components/common/HaloLoader'
+import { QuestionRenderer } from '../components/common/QuestionRenderer'
+import { fetchQuestionBySlug, type Question } from '../lib/api'
+import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
+import { useAuth } from '../context/useAuth'
+import { usePageMeta } from '../lib/usePageMeta'
+import { questionSeoTitle, questionSeoDescription } from '../lib/pageTitles'
+import { env } from '../lib/env'
 
 export function QuestionPage() {
-  const { slug } = useParams();
-  const [question, setQuestion] = useState<Question | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const { isAuthenticated } = useAuth();
-  const [selected, setSelected] = useState<string | null>(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
-  const [language, setLanguage] = useState<QuestionLanguage>("en");
+  const { slug } = useParams()
+  const [question, setQuestion] = useState<Question | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const { isAuthenticated } = useAuth()
+  const [selected, setSelected] = useState<string | null>(null)
+  const [submitted, setSubmitted] = useState(false)
+  const [explOpen, setExplOpen] = useState(false)
+  const [loginOpen, setLoginOpen] = useState(false)
+  const [language, setLanguage] = useState<QuestionLanguage>('en')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
-    if (!slug) return;
-
-    queueMicrotask(() => {
-      setLoading(true);
-      setError(false);
-      setSelected(null);
-      setSubmitted(false);
-    });
-
+    if (!slug) return
+    setLoading(true)
+    setError(false)
+    setSelected(null)
+    setSubmitted(false)
+    setExplOpen(false)
     fetchQuestionBySlug(slug)
       .then(setQuestion)
       .catch(() => setError(true))
-      .finally(() => setLoading(false));
-  }, [slug]);
+      .finally(() => setLoading(false))
+  }, [slug])
 
   const seoTitle = question
     ? questionSeoTitle({ examName: question.examName, year: question.year, questionNo: question.questionNo, question: question.question })
-    : "Solved Exam Question | Ministry of Papers";
+    : 'Solved Exam Question | Ministry of Papers'
   const seoDesc = question
     ? questionSeoDescription({ examName: question.examName, year: question.year, questionNo: question.questionNo, question: question.question, answer: question.answer })
-    : "Read solved exam questions with answers and explanations on Ministry of Papers.";
+    : 'Read solved exam questions with answers and explanations on Ministry of Papers.'
 
   usePageMeta({
     title: seoTitle,
     description: seoDesc,
-    canonicalPath: question ? `/question/${question.slug}` : "/question",
-    ogType: "article",
-    jsonLd: question
-      ? {
-          "@context": "https://schema.org",
-          "@type": "QAPage",
-          name: seoTitle.replace(" | Ministry of Papers", ""),
-          description: seoDesc,
+    canonicalPath: question ? `/question/${question.slug}` : '/question',
+    ogType: 'article',
+    jsonLd: question ? {
+      '@context': 'https://schema.org',
+      '@type': 'QAPage',
+      name: seoTitle.replace(' | Ministry of Papers', ''),
+      description: seoDesc,
+      url: `https://ministryofpapers.com/question/${question.slug}`,
+      mainEntity: {
+        '@type': 'Question',
+        name: question.question.replace(/\*\*/g, '').replace(/\n/g, ' ').slice(0, 200),
+        text: question.question.replace(/\*\*/g, '').replace(/\n/g, ' '),
+        answerCount: 1,
+        educationalLevel: 'Competitive Exam Preparation',
+        about: { '@type': 'Thing', name: question.examName },
+        ...(question.year ? { datePublished: question.year } : {}),
+        acceptedAnswer: {
+          '@type': 'Answer',
+          text: [question.answer, question.explanation].filter(Boolean).join(' — ').slice(0, 500) || `Correct answer: ${question.answerKey}.`,
           url: `https://ministryofpapers.com/question/${question.slug}`,
-          mainEntity: {
-            "@type": "Question",
-            name: question.question.replace(/<[^>]+>/g, "").slice(0, 200),
-            text: question.question.replace(/<[^>]+>/g, ""),
-            answerCount: 1,
-            educationalLevel: "Competitive Exam Preparation",
-            about: { "@type": "Thing", name: question.examName },
-            ...(question.year ? { datePublished: question.year } : {}),
-            acceptedAnswer: {
-              "@type": "Answer",
-              text: [question.answer, question.explanation].filter(Boolean).join(' — ').slice(0, 500) || `Correct answer: ${question.answerKey}.`,
-              url: `https://ministryofpapers.com/question/${question.slug}`,
-              author: { "@type": "Organization", name: "Ministry of Papers", url: "https://ministryofpapers.com" },
-            },
-          },
-          breadcrumb: {
-            "@type": "BreadcrumbList",
-            itemListElement: [
-              { "@type": "ListItem", position: 1, name: "Home", item: "https://ministryofpapers.com" },
-              { "@type": "ListItem", position: 2, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug ?? ""}` },
-              { "@type": "ListItem", position: 3, name: `${question.examName} ${question.year} Papers`, item: `https://ministryofpapers.com/exam/${question.examSlug ?? ""}` },
-              { "@type": "ListItem", position: 4, name: `Q.${question.questionNo}`, item: `https://ministryofpapers.com/question/${question.slug}` },
-            ],
-          },
-        }
-      : undefined,
-  });
+          author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+        },
+      },
+      breadcrumb: {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+          { '@type': 'ListItem', position: 2, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug}` },
+          { '@type': 'ListItem', position: 3, name: `Q.${question.questionNo}`, item: `https://ministryofpapers.com/question/${question.slug}` },
+        ],
+      },
+    } : undefined,
+  })
 
-  const optionState = useMemo(() => {
-    if (!submitted || !question) return new Map<string, string>();
+  const isCorrect = useMemo(() => submitted && selected === question?.answerKey, [submitted, selected, question])
 
-    return new Map(
-      question.options.map((option) => {
-        if (option.key === question.answerKey) return [option.key, "correct"];
-        if (option.key === selected) return [option.key, "incorrect"];
-        return [option.key, ""];
-      }),
-    );
-  }, [question, selected, submitted]);
+  if (!slug) return <Navigate to="/" replace />
 
-  if (!slug) return <Navigate to="/" replace />;
+  if (loading) return (
+    <section className="public-page">
+      <div className="public-shell narrow"><HaloLoader label="Loading question…" /></div>
+    </section>
+  )
 
-  if (loading) {
-    return (
-      <section className="pyq-reader-page">
-        <div className="pyq-reader-shell">
-          <HaloLoader label="Loading question" />
-        </div>
-      </section>
-    );
+  if (error || !question) return <Navigate to="/" replace />
+
+  const isDeleted = question.answerKey === 'Deleted'
+  const homeHref = isAuthenticated ? '/dashboard' : '/'
+  const localized = getLocalizedQuestion(question, language)
+  const hasHindiVersion = hasHindi(question)
+
+  const copyLink = () => {
+    void navigator.clipboard?.writeText(window.location.href)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 1800)
   }
 
-  if (error || !question) return <Navigate to="/" replace />;
-  const isDeleted = question.answerKey === 'Deleted';
-  const homeHref = isAuthenticated ? "/dashboard" : "/";
-  const localized = getLocalizedQuestion(question, language);
-
-  const submitAttempt = () => {
-    if (!selected) return;
-    if (!isAuthenticated) {
-      setLoginOpen(true);
-      return;
-    }
-    setSubmitted(true);
-  };
-
-  const gateAction = () => {
-    if (isAuthenticated) {
-      return;
-    }
-    setLoginOpen(true);
-  };
-
   return (
-    <section className="pyq-reader-page">
-      <div className="pyq-reader-shell">
-        <nav className="crumbs" aria-label="Breadcrumb">
-          <Link to={homeHref}>Home</Link>
-          <span>/</span>
-          <Link to={`/exam/${question.examSlug}`}>
-            {question.examName} Papers
-          </Link>
-          <span>/</span>
-          <span>Q{question.questionNo}</span>
-        </nav>
+    <>
+      <section className="public-page">
+        <div className="public-shell narrow">
 
-        <div className="pyq-reader-layout">
-          <main className="pyq-reader-main">
-            <header className="pyq-reader-header">
-              <div className="pyq-reader-meta">
-                <span>{question.examName}</span>
-                <span>{question.year}</span>
-                <span>{question.paper}</span>
-                <span>{question.subject}</span>
+          {/* Breadcrumb */}
+          <nav className="ep-breadcrumb" aria-label="Breadcrumb">
+            <Link to={homeHref}>Home</Link>
+            <ChevronRight size={13} />
+            <Link to={`/exam/${question.examSlug}`}>{question.examName}</Link>
+            {question.paperSlug && (
+              <>
+                <ChevronRight size={13} />
+                <Link to={`/pyq/${question.paperSlug}`}>{question.paper}</Link>
+              </>
+            )}
+            <ChevronRight size={13} />
+            <span>Q.{question.questionNo}</span>
+          </nav>
+
+          {/* Page heading — h1 for SEO */}
+          <div className="qpage-head">
+            <span className="ep-category-tag">{question.examName} · {question.year}</span>
+            <h1 className="qpage-h1">{question.examName} {question.year} — Q.{question.questionNo}</h1>
+            <div className="qpage-head-meta">
+              {question.subject && <span className="pyq-q-subject" style={{ cursor: 'default' }}>{question.subject}</span>}
+              {question.paper && <span className="pyq-q-subject" style={{ cursor: 'default', background: 'var(--line2)', color: 'var(--ink3)' }}>{question.paper}</span>}
+            </div>
+          </div>
+
+          {/* Question card */}
+          <article className="pyq-question-card qpage-q-card">
+
+            {hasHindiVersion && (
+              <div className="pyq-language-toggle" aria-label="Question language">
+                <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
+                <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
               </div>
-              <h1>
-                Q{question.questionNo}.{' '}
-                {localized.question.split('\n').map((line, i, arr) => (
-                  <Fragment key={i}>{line}{i < arr.length - 1 && <br />}</Fragment>
-                ))}
-              </h1>
-              {hasHindi(question) && (
-                <div className="pyq-language-toggle" aria-label="Question language">
-                  <button type="button" className={language === "en" ? "active" : ""} onClick={() => setLanguage("en")}>English</button>
-                  <button type="button" className={language === "hi" ? "active" : ""} onClick={() => setLanguage("hi")}>हिन्दी</button>
-                </div>
-              )}
-            </header>
+            )}
 
             {localized.passage && (
-              <section className="pyq-reader-card">
-                <div className="pyq-passage">
-                  <strong>{language === "hi" ? "अनुच्छेद" : "Passage"}</strong>
-                  <p>{localized.passage}</p>
-                </div>
-              </section>
+              <div className="pyq-passage">
+                <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
+                <QuestionRenderer text={localized.passage} />
+              </div>
             )}
 
             {question.images && question.images.length > 0 && (
               <div className="pyq-q-images">
                 {question.images.map((src, i) => (
-                  <img key={i} src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`} alt={`Question ${question.questionNo} figure`} className="pyq-q-img" />
+                  <img
+                    key={i}
+                    src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`}
+                    alt={`Question ${question.questionNo} diagram`}
+                    className="pyq-q-img"
+                  />
                 ))}
               </div>
             )}
 
+            <QuestionRenderer className="pyq-q-text qpage-q-text" text={localized.question} />
+
             {isDeleted ? (
-              <section className="pyq-reader-card pyq-reader-deleted">
-                <div className="pyq-deleted-badge-lg">Deleted Question</div>
-                <p className="pyq-deleted-reason">{question.explanation}</p>
-                <div className="q-actions">
-                  <button className="qa-btn ghost" type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
-                    <Share2 size={16} /> Copy Link
-                  </button>
-                </div>
-              </section>
+              <div className="pyq-deleted-notice">
+                <strong>This question was officially deleted</strong>
+                {question.explanation && <p>{question.explanation}</p>}
+              </div>
             ) : (
               <>
-                <section className="pyq-reader-card">
-                  <h2>Choose your answer</h2>
-                  <div className="pyq-option-list">
-                    {localized.options.map((option) => {
-                      const isSelected = selected === option.key;
-                      const stateClass = optionState.get(option.key) ?? "";
+                <div className="pyq-options">
+                  {localized.options.map(opt => {
+                    let cls = 'pyq-option'
+                    if (submitted) {
+                      if (opt.key === question.answerKey) cls += ' correct'
+                      else if (opt.key === selected) cls += ' wrong'
+                    } else if (selected === opt.key) {
+                      cls += ' chosen'
+                    }
+                    return (
+                      <button
+                        key={opt.key}
+                        type="button"
+                        className={cls}
+                        onClick={() => !submitted && setSelected(opt.key)}
+                        disabled={submitted}
+                      >
+                        <span className="pyq-opt-key">{opt.key}</span>
+                        <span>{opt.text}</span>
+                      </button>
+                    )
+                  })}
+                </div>
 
-                      return (
+                {question.tags.length > 0 && (
+                  <div className="pyq-q-tags">
+                    {question.tags.map(t => <span key={t} className="pyq-q-tag">{t}</span>)}
+                  </div>
+                )}
+
+                <div className="pyq-q-actions">
+                  {!submitted ? (
+                    <button
+                      type="button"
+                      className="pyq-reveal-btn"
+                      onClick={() => selected && setSubmitted(true)}
+                      disabled={!selected}
+                    >
+                      Check Answer
+                    </button>
+                  ) : (
+                    <>
+                      <div className={`pyq-result ${isCorrect ? 'correct' : 'wrong'}`}>
+                        {isCorrect ? '✓ Correct' : `✗ Correct answer: ${question.answerKey}`}
+                      </div>
+                      {question.explanation && (
                         <button
-                          className={`${isSelected ? "selected" : ""} ${stateClass}`.trim()}
                           type="button"
-                          key={option.key}
-                          onClick={() => setSelected(option.key)}
+                          className={`pyq-expl-btn${explOpen ? ' open' : ''}`}
+                          onClick={() => setExplOpen(v => !v)}
                         >
-                          <span>{option.key}</span>
-                          <strong>{option.text}</strong>
+                          📖 {explOpen ? 'Hide' : 'Explanation'}
                         </button>
-                      );
-                    })}
-                  </div>
-                  <div className="q-actions">
-                    <button className="qa-btn primary" type="button" onClick={submitAttempt} disabled={!selected}>
-                      Submit answer
-                    </button>
-                    <button className="qa-btn ghost" type="button" onClick={() => void navigator.clipboard?.writeText(window.location.href)}>
-                      <Share2 size={16} /> Copy Link
-                    </button>
-                  </div>
-                  {!isAuthenticated ? (
-                    <div className="pyq-login-note">
-                      <Lock size={14} /> You can open and attempt the question freely. Login is required when you submit.
-                    </div>
-                  ) : null}
-                </section>
+                      )}
+                      <button type="button" className="pyq-expl-btn" onClick={copyLink}>
+                        <Copy size={12} /> {copied ? 'Copied!' : 'Share'}
+                      </button>
+                    </>
+                  )}
+                </div>
 
-                {submitted ? (
-                  <section className="pyq-reader-card explanation-card">
-                    <div className="answer-line">
-                      <CheckCircle2 size={18} /> Correct answer:
-                      <strong>{question.answer}</strong>
-                    </div>
+                {submitted && explOpen && question.explanation && (
+                  <div className="pyq-explanation">
+                    <strong>Explanation</strong>
                     <p>{question.explanation}</p>
-                    <div className="pyq-tag-list">
-                      {question.tags.map((tag) => (
-                        <span key={tag}>{tag}</span>
-                      ))}
-                    </div>
-                  </section>
-                ) : null}
+                  </div>
+                )}
+
               </>
             )}
-          </main>
+          </article>
 
-          <aside className="pyq-reader-side">
-            <div className="pyq-action-card">
-              <h2>{isAuthenticated ? 'More from this exam' : 'Sign in free'}</h2>
-              <p>{isAuthenticated
-                ? 'Submit answers, save your progress, and track your performance across all exams.'
-                : 'Login is required to submit answers, save scores, and download PDFs. It\'s free.'
-              }</p>
-              {!isAuthenticated && (
-                <>
-                  <button className="primary" type="button" onClick={gateAction}>
-                    <Play size={16} /> Sign in with Google
-                  </button>
-                  <div className="pyq-login-note">
-                    <Lock size={14} /> Free to sign in — no credit card needed.
-                  </div>
-                </>
-              )}
-              {isAuthenticated && question.paperSlug && (
-                <Link
-                  className="primary"
-                  to={`/pyq/${question.paperSlug}`}
-                  style={{ display: 'inline-flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
-                >
-                  <Play size={16} /> View full paper
-                </Link>
-              )}
-            </div>
-          </aside>
+          {/* Context strip — paper + exam navigation */}
+          <div className="qpage-context">
+            {question.paperSlug && (
+              <Link to={`/pyq/${question.paperSlug}`} className="qpage-ctx-card">
+                <BookOpen size={16} className="qpage-ctx-icon" />
+                <div className="qpage-ctx-body">
+                  <strong>Full Paper</strong>
+                  <span>{question.paper}</span>
+                </div>
+                <ChevronRight size={14} className="qpage-ctx-arrow" />
+              </Link>
+            )}
+            <Link to={`/exam/${question.examSlug}`} className="qpage-ctx-card">
+              <Play size={16} className="qpage-ctx-icon" />
+              <div className="qpage-ctx-body">
+                <strong>Exam Hub</strong>
+                <span>{question.examName} — papers &amp; mock tests</span>
+              </div>
+              <ChevronRight size={14} className="qpage-ctx-arrow" />
+            </Link>
+          </div>
+
         </div>
-      </div>
+      </section>
+
       <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
-    </section>
-  );
+    </>
+  )
 }

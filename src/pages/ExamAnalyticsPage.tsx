@@ -42,9 +42,10 @@ type DistChartProps = {
   stdDev: number
   cutoff: number
   cutoffLabel: string
+  topperScore?: number
 }
 
-function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutoffLabel }: DistChartProps) {
+function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutoffLabel, topperScore }: DistChartProps) {
   const W = 560, H = 200
   const PAD = { left: 36, right: 16, top: 20, bottom: 36 }
   const pw = W - PAD.left - PAD.right
@@ -82,6 +83,7 @@ function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutof
   const ux = toSvgX(Math.max(xMin, Math.min(xMax, userScore)))
   const ax = toSvgX(avgScore)
   const cx = toSvgX(cutoffX)
+  const tx = topperScore != null ? toSvgX(Math.max(xMin, Math.min(xMax, topperScore))) : null
 
   const xTicks = [xMin, avgScore, cutoff, userScore, xMax]
     .filter((v, i, arr) => v >= xMin && v <= xMax && arr.indexOf(v) === i)
@@ -132,6 +134,17 @@ function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutof
       <text x={ax} y={PAD.top - 7} textAnchor="middle" fontSize={8.5} fill="#f59e0b" fontWeight={600}>
         Avg {Math.round(avgScore)}
       </text>
+
+      {/* Topper marker */}
+      {tx != null && topperScore != null && (
+        <>
+          <line x1={tx} y1={PAD.top - 4} x2={tx} y2={BOTTOM} stroke="#10b981" strokeWidth={1.5} strokeDasharray="4 3" />
+          <circle cx={tx} cy={PAD.top - 4} r={3} fill="#10b981" />
+          <text x={tx} y={PAD.top - 10} textAnchor="middle" fontSize={8.5} fill="#10b981" fontWeight={700}>
+            Top {Math.round(topperScore)}
+          </text>
+        </>
+      )}
 
       {/* User marker */}
       <line x1={ux} y1={PAD.top - 4} x2={ux} y2={BOTTOM} stroke="#3b82f6" strokeWidth={2} />
@@ -385,6 +398,11 @@ export function ExamAnalyticsPage() {
               stdDev={activeCutoff.stdDev}
               cutoff={selectedCutoffVal}
               cutoffLabel={selectedCategory}
+              topperScore={
+                leaderboard?.top10?.length
+                  ? (leaderboard.top10[0].scorePct / 100) * activeCutoff.totalMarks
+                  : undefined
+              }
             />
           ) : (
             <div className="ea2-chart-placeholder">
@@ -411,6 +429,12 @@ export function ExamAnalyticsPage() {
                 <span className="ea2-legend-dot-fill" />
                 Above cutoff zone
               </span>
+              {leaderboard?.top10?.length ? (
+                <span className="ea2-legend-item ea2-legend--topper">
+                  <span className="ea2-legend-line" />
+                  Topper score
+                </span>
+              ) : null}
             </div>
           )}
 

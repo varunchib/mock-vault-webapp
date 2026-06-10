@@ -1,11 +1,10 @@
-import { BarChart3, BookOpen, Clock3, FileText, LayoutGrid, Target, TrendingUp } from 'lucide-react'
+import { BarChart3, BookOpen, ChevronRight, Clock3, FileText, LayoutGrid, Target, TrendingUp } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
 import { readAttemptResults, readPaperResults, type SubjectResult } from '../lib/mockActivity'
 import { estimatePercentile } from '../data/examCutoffs'
 
-// ── Unified shape ─────────────────────────────────────────────────────────
 type CombinedResult = {
   type: 'mock' | 'paper'
   slug: string
@@ -23,14 +22,18 @@ type CombinedResult = {
   subjects: SubjectResult[]
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────────
+type ExamGroup = {
+  examSlug: string
+  examName: string
+  results: CombinedResult[]
+}
+
 function formatTime(seconds: number) {
   const h = Math.floor(seconds / 3600)
   const m = Math.floor((seconds % 3600) / 60)
-  const s = seconds % 60
   if (h > 0) return `${h}h ${m}m`
-  if (m > 0) return `${m}m ${s}s`
-  return `${s}s`
+  if (m > 0) return `${m}m`
+  return `${seconds}s`
 }
 
 function relativeDate(iso: string) {
@@ -38,56 +41,50 @@ function relativeDate(iso: string) {
   const days = Math.floor(diff / 86400000)
   if (days === 0) return 'Today'
   if (days === 1) return 'Yesterday'
-  if (days < 7) return `${days} days ago`
+  if (days < 7) return `${days}d ago`
   if (days < 30) return `${Math.floor(days / 7)}w ago`
-  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
 }
 
-function accuracyClass(pct: number) {
+function scoreClass(pct: number) {
   return pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'bad'
 }
 
-// ── Single attempt card (square) ─────────────────────────────────────────
-function AttemptCard({ result }: { result: CombinedResult }) {
-  const displayScore = result.rawScore ?? result.correct
-  const accuracy = result.totalQuestions > 0
-    ? Math.round((Math.max(0, displayScore) / result.totalQuestions) * 100)
-    : 0
-  const pctClass = accuracyClass(accuracy)
-  const percentile = estimatePercentile(result.correct, result.totalQuestions, result.examSlug)
+function ExamCard({ examSlug, examName, results }: ExamGroup) {
+  const scores = results.map(r => {
+    const s = r.rawScore ?? r.correct
+    return r.totalQuestions > 0 ? (Math.max(0, s) / r.totalQuestions) * 100 : 0
+  })
+  const best = Math.round(Math.max(...scores))
+  const avg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+  const totalTime = results.reduce((s, r) => s + r.timeTakenSeconds, 0)
+  const mockCount = results.filter(r => r.type === 'mock').length
+  const paperCount = results.filter(r => r.type === 'paper').length
+  const lastAttempt = results[0].attemptedAt
 
   return (
-    <div className="an-attempt-card">
-      <div className="an-card-top">
-        <span className={`an-card-score ${displayScore < 0 ? 'bad' : pctClass}`}>
-          {displayScore < 0 ? displayScore : `${accuracy}%`}
-        </span>
-        {percentile > 0 && <span className="an-card-pctile"><TrendingUp size={10} /> ~{percentile}th</span>}
+    <Link to={`/analytics/${examSlug}`} className="an-exam-card">
+      <div className="an-exam-card-top">
+        <span className={`an-exam-best ${scoreClass(best)}`}>{best}%</span>
+        <span className="an-exam-date">{relativeDate(lastAttempt)}</span>
       </div>
-      <strong className="an-card-title">{result.title}</strong>
-      <span className="an-card-meta">
-        {result.type === 'mock' ? 'Mock Test' : 'PYQ Paper'}
-        {' · '}
-        {result.examName}
-      </span>
-      <span className="an-card-date">
-        <Clock3 size={10} /> {formatTime(result.timeTakenSeconds)}
-        {' · '}
-        {relativeDate(result.attemptedAt)}
-      </span>
-      <div className="an-card-chips">
-        <span className="an-chip an-chip--c">{result.correct} Correct</span>
-        <span className="an-chip an-chip--w">{result.wrong} Wrong</span>
-        <span className="an-chip an-chip--s">{result.skipped} Skipped</span>
-        {result.rawScore !== undefined && result.rawScore >= 0 && (
-          <span className="an-chip an-chip--c">Raw: {result.rawScore}</span>
-        )}
+      <strong className="an-exam-name">{examName}</strong>
+      <div className="an-exam-chips">
+        {mockCount > 0 && <span className="an-exam-chip">{mockCount} mock{mockCount !== 1 ? 's' : ''}</span>}
+        {paperCount > 0 && <span className="an-exam-chip">{paperCount} paper{paperCount !== 1 ? 's' : ''}</span>}
+        <span className="an-exam-chip"><Clock3 size={10} /> {formatTime(totalTime)}</span>
       </div>
-    </div>
+      <div className="an-exam-progress">
+        <div className="an-exam-progress-track">
+          <div className="an-exam-progress-fill" style={{ width: `${avg}%` }} />
+        </div>
+        <span className="an-exam-avg">Avg {avg}%</span>
+      </div>
+      <span className="an-exam-cta">View analytics <ChevronRight size={13} /></span>
+    </Link>
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────────────
 export function AnalyticsPage() {
   usePageMeta({
     title: 'Analytics | Ministry of Papers',
@@ -95,68 +92,50 @@ export function AnalyticsPage() {
     canonicalPath: '/analytics',
   })
 
-  const [filter, setFilter] = useState<'all' | 'mock' | 'paper'>('all')
-
   const allResults = useMemo<CombinedResult[]>(() => {
-    const mocks: CombinedResult[] = readAttemptResults().map((r) => ({
-      type: 'mock',
-      slug: r.mockSlug,
-      examSlug: r.examSlug,
-      examName: r.examName,
-      title: r.mockTitle,
-      totalQuestions: r.totalQuestions,
-      attemptedAt: r.attemptedAt,
-      answered: r.answered,
-      correct: r.correct,
-      wrong: r.wrong,
-      skipped: r.skipped,
-      rawScore: r.rawScore,
-      timeTakenSeconds: r.timeTakenSeconds,
-      subjects: r.subjects,
+    const mocks: CombinedResult[] = readAttemptResults().map(r => ({
+      type: 'mock', slug: r.mockSlug, examSlug: r.examSlug, examName: r.examName,
+      title: r.mockTitle, totalQuestions: r.totalQuestions, attemptedAt: r.attemptedAt,
+      answered: r.answered, correct: r.correct, wrong: r.wrong, skipped: r.skipped,
+      rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
     }))
-    const papers: CombinedResult[] = readPaperResults().map((r) => ({
-      type: 'paper',
-      slug: r.paperSlug,
-      examSlug: r.examSlug,
-      examName: r.examName,
-      title: r.paperTitle,
-      totalQuestions: r.totalQuestions,
-      attemptedAt: r.attemptedAt,
-      answered: r.answered,
-      correct: r.correct,
-      wrong: r.wrong,
-      skipped: r.skipped,
-      rawScore: r.rawScore,
-      timeTakenSeconds: r.timeTakenSeconds,
-      subjects: r.subjects,
+    const papers: CombinedResult[] = readPaperResults().map(r => ({
+      type: 'paper', slug: r.paperSlug, examSlug: r.examSlug, examName: r.examName,
+      title: r.paperTitle, totalQuestions: r.totalQuestions, attemptedAt: r.attemptedAt,
+      answered: r.answered, correct: r.correct, wrong: r.wrong, skipped: r.skipped,
+      rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
     }))
     return [...mocks, ...papers].sort(
       (a, b) => new Date(b.attemptedAt).getTime() - new Date(a.attemptedAt).getTime()
     )
   }, [])
 
-  const visibleResults = filter === 'all' ? allResults : allResults.filter((r) => r.type === filter)
+  const examGroups = useMemo<ExamGroup[]>(() => {
+    const map = new Map<string, ExamGroup>()
+    for (const r of allResults) {
+      if (!map.has(r.examSlug)) map.set(r.examSlug, { examSlug: r.examSlug, examName: r.examName, results: [] })
+      map.get(r.examSlug)!.results.push(r)
+    }
+    return [...map.values()]
+  }, [allResults])
 
   const summary = useMemo(() => {
-    if (allResults.length === 0) return null
+    if (!allResults.length) return null
     const totalTime = allResults.reduce((s, r) => s + r.timeTakenSeconds, 0)
     const avgAcc = Math.round(
       allResults.reduce((s, r) => {
         const score = r.rawScore ?? r.correct
         return s + (r.totalQuestions > 0 ? (Math.max(0, score) / r.totalQuestions) * 100 : 0)
-      }, 0)
-      / allResults.length
+      }, 0) / allResults.length
     )
     const percentiles = allResults
-      .map((r) => estimatePercentile(r.correct, r.totalQuestions, r.examSlug))
-      .filter((p) => p > 0)
-    const avgPercentile = percentiles.length > 0
+      .map(r => estimatePercentile(r.correct, r.totalQuestions, r.examSlug))
+      .filter(p => p > 0)
+    const avgPercentile = percentiles.length
       ? Math.round(percentiles.reduce((s, p) => s + p, 0) / percentiles.length)
       : 0
-    const mockCount  = allResults.filter((r) => r.type === 'mock').length
-    const paperCount = allResults.filter((r) => r.type === 'paper').length
-    return { totalTime, avgAcc, avgPercentile, mockCount, paperCount }
-  }, [allResults])
+    return { totalTime, avgAcc, avgPercentile, examCount: examGroups.length, attemptCount: allResults.length }
+  }, [allResults, examGroups])
 
   return (
     <section className="an-page workspace-page">
@@ -164,22 +143,21 @@ export function AnalyticsPage() {
         <div className="an-header-left">
           <small>Analytics</small>
           <h1>Performance Report</h1>
-          <p>Mock tests and PYQ papers — scores, subject breakdown, and cutoff comparison.</p>
+          <p>Click an exam to see your score position, cutoff comparison, and leaderboard.</p>
         </div>
       </header>
 
-      {/* Summary strip */}
       {summary && (
         <div className="an-summary-strip">
           <div className="an-summary-card">
             <span className="an-summary-icon"><LayoutGrid size={16} /></span>
-            <strong>{summary.mockCount}</strong>
-            <span>Mock Tests</span>
+            <strong>{summary.examCount}</strong>
+            <span>Exams</span>
           </div>
           <div className="an-summary-card">
             <span className="an-summary-icon"><FileText size={16} /></span>
-            <strong>{summary.paperCount}</strong>
-            <span>PYQ Papers</span>
+            <strong>{summary.attemptCount}</strong>
+            <span>Attempts</span>
           </div>
           <div className="an-summary-card">
             <span className="an-summary-icon"><Target size={16} /></span>
@@ -194,58 +172,22 @@ export function AnalyticsPage() {
         </div>
       )}
 
-      {/* Filter tabs */}
-      {allResults.length > 0 && (
-        <div className="ts-tabs" style={{ width: 'fit-content' }}>
-          {(['all', 'mock', 'paper'] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              className={`ts-tab${filter === f ? ' active' : ''}`}
-              onClick={() => setFilter(f)}
-            >
-              {f === 'all' ? 'All' : f === 'mock' ? 'Mock Tests' : 'PYQ Papers'}
-              <span className="ts-tab-count">
-                {f === 'all' ? allResults.length
-                  : f === 'mock' ? allResults.filter((r) => r.type === 'mock').length
-                  : allResults.filter((r) => r.type === 'paper').length}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Empty state */}
       {allResults.length === 0 && (
         <div className="an-empty">
           <BookOpen size={40} strokeWidth={1.5} />
           <strong>No results yet</strong>
-          <p>
-            Attempt a mock test or a PYQ paper and your score, subject breakdown,
-            and cutoff comparison will appear here.
-          </p>
-          <Link to="/exams" className="an-empty-btn">
-            Browse Tests &amp; Papers
-          </Link>
+          <p>Attempt a mock test or a PYQ paper — your scores, cutoff comparison, and leaderboard will appear here.</p>
+          <Link to="/exams" className="an-empty-btn">Browse Tests &amp; Papers</Link>
         </div>
       )}
 
-      {/* Filtered empty */}
-      {allResults.length > 0 && visibleResults.length === 0 && (
-        <div className="an-empty">
-          <BookOpen size={32} strokeWidth={1.5} />
-          <strong>No {filter === 'mock' ? 'mock test' : 'PYQ paper'} results yet</strong>
-          <p>Switch to "All" or attempt one to see results here.</p>
-        </div>
-      )}
-
-      {/* Attempt cards */}
-      {visibleResults.length > 0 && (
-        <div className="an-attempt-grid">
-          {visibleResults.map((r) => (
-            <AttemptCard key={`${r.type}-${r.slug}-${r.attemptedAt}`} result={r} />
-          ))}
-        </div>
+      {examGroups.length > 0 && (
+        <>
+          <p className="an-section-label"><TrendingUp size={13} /> {examGroups.length} exam{examGroups.length !== 1 ? 's' : ''} attempted</p>
+          <div className="an-exam-grid">
+            {examGroups.map(g => <ExamCard key={g.examSlug} {...g} />)}
+          </div>
+        </>
       )}
     </section>
   )

@@ -20,6 +20,7 @@ import {
   Search,
   Send,
   Sun,
+  Target,
   Trash2,
   UploadCloud,
   Users,
@@ -32,6 +33,7 @@ import { HaloLoader } from '../components/common/HaloLoader'
 import { Logo } from '../components/ui/Logo'
 import { useAuth } from '../context/useAuth'
 import {
+  adminUpsertCutoff,
   clearAdminReports,
   deleteAdminExam,
   deleteAdminMock,
@@ -310,6 +312,123 @@ export function AdminDashboardPage() {
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === '1')
   const [drawerOpen, setDrawerOpen] = useState(false)
 
+  // ── Cutoff form state ──────────────────────────────────────
+  type CutoffRow = { category: string; marks: string }
+  const [cutoffForm, setCutoffForm] = useState({
+    examSlug: '', stage: 'Prelims', year: new Date().getFullYear().toString(),
+    totalMarks: '', avgScore: '', stdDev: '',
+    rows: [
+      { category: 'General', marks: '' },
+      { category: 'OBC',     marks: '' },
+      { category: 'SC',      marks: '' },
+      { category: 'ST',      marks: '' },
+      { category: 'EWS',     marks: '' },
+    ] as CutoffRow[],
+  })
+  const [cutoffSaving, setCutoffSaving] = useState(false)
+  const [cutoffStatus, setCutoffStatus] = useState<StatusMsg | null>(null)
+
+  const handleSaveCutoffs = async () => {
+    const { examSlug, stage, year, totalMarks, avgScore, stdDev, rows } = cutoffForm
+    if (!examSlug.trim() || !stage.trim() || !year.trim() || !totalMarks) {
+      setCutoffStatus({ kind: 'error', text: 'Exam slug, stage, year and total marks are required' })
+      return
+    }
+    const validRows = rows.filter(r => r.category.trim() && r.marks.trim() && Number(r.marks) > 0)
+    if (!validRows.length) {
+      setCutoffStatus({ kind: 'error', text: 'Add at least one category with marks' })
+      return
+    }
+    setCutoffSaving(true)
+    setCutoffStatus(null)
+    try {
+      for (const row of validRows) {
+        await adminUpsertCutoff({
+          examSlug: examSlug.trim(), stage: stage.trim(), year: year.trim(),
+          category: row.category.trim(), marks: Number(row.marks),
+          totalMarks: Number(totalMarks), avgScore: Number(avgScore) || 0,
+          stdDev: Number(stdDev) || 0, source: 'official',
+        })
+      }
+      setCutoffStatus({ kind: 'success', text: `${validRows.length} cutoff${validRows.length !== 1 ? 's' : ''} saved for ${examSlug.trim()}` })
+    } catch (e) {
+      setCutoffStatus({ kind: 'error', text: e instanceof Error ? e.message : 'Failed to save cutoffs' })
+    } finally {
+      setCutoffSaving(false)
+    }
+  }
+
+  // ── Manual paper builder handlers ───────────────────────────
+  const addManualQuestion = () => {
+    if (!manualQForm.question.trim()) return
+    if (editingManualIdx !== null) {
+      setManualDraft(d => {
+        const questions = [...d.questions]
+        questions[editingManualIdx] = { ...manualQForm }
+        return { ...d, questions }
+      })
+      setEditingManualIdx(null)
+    } else {
+      setManualDraft(d => ({ ...d, questions: [...d.questions, { ...manualQForm, id: crypto.randomUUID() }] }))
+    }
+    setManualQForm(emptyQuestion())
+  }
+
+  const editManualQuestion = (idx: number) => {
+    setManualQForm({ ...manualDraft.questions[idx] })
+    setEditingManualIdx(idx)
+  }
+
+  const removeManualQuestion = (idx: number) => {
+    if (editingManualIdx === idx) { setEditingManualIdx(null); setManualQForm(emptyQuestion()) }
+    setManualDraft(d => ({ ...d, questions: d.questions.filter((_, i) => i !== idx) }))
+  }
+
+  const handleManualFinalSave = async () => {
+    const { slug, examSlug, title, year, shift, description, subjects, questions } = manualDraft
+    if (!slug.trim() || !examSlug.trim() || !title.trim()) {
+      toast('error', 'Slug, exam slug and title are required')
+      return
+    }
+    if (!questions.length) {
+      toast('error', 'Add at least one question before publishing')
+      return
+    }
+    setManualSaving(true)
+    try {
+      const payload: AdminPaperPayload = {
+        slug: slug.trim(), examSlug: examSlug.trim(), title: title.trim(),
+        year: year.trim(), shift: shift.trim(), description: description.trim(),
+        subjects: subjects.split(',').map(s => s.trim()).filter(Boolean),
+        questions: questions.map((q, i) => ({
+          questionNo: String(i + 1),
+          question: q.question.trim(),
+          options: [
+            { key: 'A', text: q.optionA.trim() },
+            { key: 'B', text: q.optionB.trim() },
+            { key: 'C', text: q.optionC.trim() },
+            { key: 'D', text: q.optionD.trim() },
+          ].filter(o => o.text),
+          answerKey: q.answerKey,
+          explanation: q.explanation.trim(),
+          subject: q.subject.trim() || 'General',
+          tags: [],
+        })),
+      }
+      await saveAdminPaper(payload)
+      localStorage.removeItem(PAPER_DRAFT_KEY)
+      setManualDraftState(emptyPaperDraft())
+      setManualQForm(emptyQuestion())
+      setEditingManualIdx(null)
+      toast('success', `"${title.trim()}" published — ${questions.length} questions.`)
+      await loadData()
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to publish paper')
+    } finally {
+      setManualSaving(false)
+    }
+  }
+
   const toggleDark = () => setDarkMode((d) => {
     const next = !d
     localStorage.setItem('admin-dark', next ? '1' : '0')
@@ -345,6 +464,34 @@ export function AdminDashboardPage() {
   const [editDraft, setEditDraft] = useState<AdminQuestionDraft>(emptyQuestion())
   const [editSaving, setEditSaving] = useState(false)
 
+  // Manual paper builder (draft persisted in localStorage)
+  const PAPER_DRAFT_KEY = 'admin:paper-draft'
+  type ManualPaperDraft = {
+    slug: string; examSlug: string; title: string; year: string
+    shift: string; description: string; subjects: string
+    questions: AdminQuestionDraft[]
+  }
+  const emptyPaperDraft = (): ManualPaperDraft => ({
+    slug: '', examSlug: '', title: '', year: new Date().getFullYear().toString(),
+    shift: '', description: '', subjects: '', questions: [],
+  })
+  const [manualDraft, setManualDraftState] = useState<ManualPaperDraft>(() => {
+    try {
+      const s = localStorage.getItem(PAPER_DRAFT_KEY)
+      return s ? (JSON.parse(s) as ManualPaperDraft) : emptyPaperDraft()
+    } catch { return emptyPaperDraft() }
+  })
+  const setManualDraft = useCallback((fn: (prev: ManualPaperDraft) => ManualPaperDraft) => {
+    setManualDraftState(prev => {
+      const next = fn(prev)
+      localStorage.setItem(PAPER_DRAFT_KEY, JSON.stringify(next))
+      return next
+    })
+  }, [])
+  const [manualQForm, setManualQForm] = useState<AdminQuestionDraft>(emptyQuestion())
+  const [editingManualIdx, setEditingManualIdx] = useState<number | null>(null)
+  const [manualSaving, setManualSaving] = useState(false)
+
   // Reports
   const [reports, setReports] = useState<QuestionReport[]>([])
   const [reportCount, setReportCount] = useState(0)
@@ -369,9 +516,6 @@ export function AdminDashboardPage() {
   const [inboxReplying, setInboxReplying] = useState(false)
   const [inboxUnread, setInboxUnread] = useState(0)
 
-  // New question (manual entry in Papers tab)
-  const [newQDraft, setNewQDraft] = useState<AdminQuestionDraft>(emptyQuestion)
-  const [addingQ, setAddingQ] = useState(false)
 
   const exams = summary?.exams ?? []
   const selectedExam = exams.find((e) => e.slug === draft.examSlug) ?? exams[0]
@@ -619,6 +763,20 @@ export function AdminDashboardPage() {
     }
   }
 
+  // Auto-fill cutoff form when a paper is selected
+  useEffect(() => {
+    if (!selectedPaperSlug) return
+    const paper = papers.find(p => p.slug === selectedPaperSlug)
+    if (!paper) return
+    setCutoffForm(f => ({
+      ...f,
+      examSlug: paper.examSlug ?? '',
+      year: paper.year ?? f.year,
+      rows: f.rows.map(r => ({ ...r, marks: '' })),
+    }))
+    setCutoffStatus(null)
+  }, [selectedPaperSlug])
+
   // ── Questions browser handlers ───────────────────────────────
 
   const loadPaperQuestions = async (paperSlug: string) => {
@@ -690,60 +848,6 @@ export function AdminDashboardPage() {
     }
   }
 
-  // ── Add paper question (manual entry) ───────────────────────
-
-  const addPaperQuestion = async () => {
-    if (!selectedPaperSlug || !newQDraft.question.trim()) return
-    const paper = papers.find((p) => p.slug === selectedPaperSlug)
-    if (!paper) return
-    setAddingQ(true)
-    try {
-      const newQ: AdminPaperQuestionPayload = {
-        questionNo: String(paperQuestions.length + 1),
-        question: newQDraft.question.trim(),
-        options: [
-          { key: 'A', text: newQDraft.optionA.trim() },
-          { key: 'B', text: newQDraft.optionB.trim() },
-          { key: 'C', text: newQDraft.optionC.trim() },
-          { key: 'D', text: newQDraft.optionD.trim() },
-        ].filter((o) => o.text),
-        answerKey: newQDraft.answerKey,
-        explanation: newQDraft.explanation.trim(),
-        subject: newQDraft.subject.trim() || 'General',
-        tags: [],
-      }
-      const payload: AdminPaperPayload = {
-        slug: paper.slug,
-        examSlug: paper.examSlug,
-        title: paper.title,
-        year: paper.year ?? '',
-        shift: paper.shift ?? '',
-        description: paper.description ?? '',
-        subjects: paper.subjects ?? [],
-        questions: [
-          ...paperQuestions.map((q) => ({
-            questionNo: q.questionNo,
-            question: q.question,
-            options: q.options,
-            answerKey: q.answerKey,
-            explanation: q.explanation ?? '',
-            subject: q.subject,
-            tags: q.tags ?? [],
-          })),
-          newQ,
-        ],
-      }
-      await saveAdminPaper(payload)
-      await loadPaperQuestions(selectedPaperSlug)
-      setNewQDraft(emptyQuestion())
-      toast('success', 'Question added.')
-      await loadData()
-    } catch (err) {
-      toast('error', err instanceof Error ? err.message : 'Failed to add question.')
-    } finally {
-      setAddingQ(false)
-    }
-  }
 
   // ── Load reports ─────────────────────────────────────────────
 
@@ -1663,6 +1767,168 @@ export function AdminDashboardPage() {
               </div>
             </div>
 
+            {/* Manual paper builder */}
+            <div className="admin-tool-panel">
+              <div className="admin-panel-title">
+                <div>
+                  <small>Manual entry{manualDraft.questions.length > 0 ? ` · ${manualDraft.questions.length}Q in draft` : ''}</small>
+                  <h2>Build paper manually</h2>
+                </div>
+                {manualDraft.questions.length > 0 && (
+                  <button type="button" className="admin-text-btn" style={{ color: 'var(--error)' }}
+                    onClick={() => { if (window.confirm('Discard draft?')) { localStorage.removeItem(PAPER_DRAFT_KEY); setManualDraftState(emptyPaperDraft()); setManualQForm(emptyQuestion()); setEditingManualIdx(null) } }}>
+                    <Trash2 size={13} /> Discard draft
+                  </button>
+                )}
+              </div>
+
+              {/* Paper metadata */}
+              <div className="admin-form-stack">
+                <div className="admin-form-row">
+                  <label className="admin-field">
+                    <span>Title</span>
+                    <input placeholder="JKSSB Patwari 2024 Set A" value={manualDraft.title}
+                      onChange={e => {
+                        const title = e.target.value
+                        setManualDraft(d => ({
+                          ...d, title,
+                          slug: d.slug || slugify(title),
+                        }))
+                      }} />
+                  </label>
+                  <label className="admin-field">
+                    <span>Slug</span>
+                    <input placeholder="jkssb-patwari-2024-set-a" value={manualDraft.slug}
+                      onChange={e => setManualDraft(d => ({ ...d, slug: e.target.value }))} />
+                  </label>
+                </div>
+                <div className="admin-form-row">
+                  <label className="admin-field">
+                    <span>Exam slug</span>
+                    <input placeholder="jkssb-patwari" value={manualDraft.examSlug}
+                      onChange={e => setManualDraft(d => ({ ...d, examSlug: e.target.value }))} />
+                  </label>
+                  <label className="admin-field">
+                    <span>Year</span>
+                    <input placeholder="2024" value={manualDraft.year}
+                      onChange={e => setManualDraft(d => ({ ...d, year: e.target.value }))} />
+                  </label>
+                  <label className="admin-field">
+                    <span>Shift / Set</span>
+                    <input placeholder="Set A" value={manualDraft.shift}
+                      onChange={e => setManualDraft(d => ({ ...d, shift: e.target.value }))} />
+                  </label>
+                </div>
+                <div className="admin-form-row">
+                  <label className="admin-field">
+                    <span>Subjects <small>(comma-separated)</small></span>
+                    <input placeholder="General Knowledge, Mathematics, English" value={manualDraft.subjects}
+                      onChange={e => setManualDraft(d => ({ ...d, subjects: e.target.value }))} />
+                  </label>
+                  <label className="admin-field">
+                    <span>Description <small>(optional)</small></span>
+                    <input placeholder="Official paper…" value={manualDraft.description}
+                      onChange={e => setManualDraft(d => ({ ...d, description: e.target.value }))} />
+                  </label>
+                </div>
+              </div>
+
+              <div className="admin-manual-divider">
+                <span>Add question {editingManualIdx !== null ? `— editing Q${editingManualIdx + 1}` : `— Q${manualDraft.questions.length + 1}`}</span>
+              </div>
+
+              {/* Question form */}
+              <div className="admin-form-stack">
+                <label className="admin-field">
+                  Question text
+                  <textarea rows={3} placeholder="Enter the question…" value={manualQForm.question}
+                    onChange={e => setManualQForm(d => ({ ...d, question: e.target.value }))} />
+                </label>
+                <div className="admin-form-row">
+                  <label className="admin-field"><span>A</span><input value={manualQForm.optionA} onChange={e => setManualQForm(d => ({ ...d, optionA: e.target.value }))} /></label>
+                  <label className="admin-field"><span>B</span><input value={manualQForm.optionB} onChange={e => setManualQForm(d => ({ ...d, optionB: e.target.value }))} /></label>
+                </div>
+                <div className="admin-form-row">
+                  <label className="admin-field"><span>C</span><input value={manualQForm.optionC} onChange={e => setManualQForm(d => ({ ...d, optionC: e.target.value }))} /></label>
+                  <label className="admin-field"><span>D</span><input value={manualQForm.optionD} onChange={e => setManualQForm(d => ({ ...d, optionD: e.target.value }))} /></label>
+                </div>
+                <div className="admin-form-row">
+                  <label className="admin-field">
+                    Correct answer
+                    <select value={manualQForm.answerKey} onChange={e => setManualQForm(d => ({ ...d, answerKey: e.target.value }))}>
+                      <option>A</option><option>B</option><option>C</option><option>D</option>
+                    </select>
+                  </label>
+                  <label className="admin-field">
+                    Subject
+                    <input placeholder="e.g. Mathematics" value={manualQForm.subject}
+                      onChange={e => setManualQForm(d => ({ ...d, subject: e.target.value }))} />
+                  </label>
+                </div>
+                <label className="admin-field">
+                  Explanation
+                  <textarea rows={2} placeholder="Why is this the correct answer?" value={manualQForm.explanation}
+                    onChange={e => setManualQForm(d => ({ ...d, explanation: e.target.value }))} />
+                </label>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  <button type="button" className="admin-save-btn"
+                    onClick={addManualQuestion}
+                    disabled={!manualQForm.question.trim()}>
+                    <Plus size={15} />
+                    {editingManualIdx !== null ? 'Update question' : `Add Q${manualDraft.questions.length + 1} to draft`}
+                  </button>
+                  {editingManualIdx !== null && (
+                    <button type="button" className="admin-ghost-btn"
+                      onClick={() => { setEditingManualIdx(null); setManualQForm(emptyQuestion()) }}>
+                      Cancel edit
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Draft question list */}
+              {manualDraft.questions.length > 0 && (
+                <>
+                  <div className="admin-manual-divider">
+                    <span>Draft — {manualDraft.questions.length} question{manualDraft.questions.length !== 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="admin-manual-qlist">
+                    {manualDraft.questions.map((q, i) => (
+                      <div key={q.id} className={`admin-manual-qrow${editingManualIdx === i ? ' editing' : ''}`}>
+                        <span className="admin-manual-qnum">Q{i + 1}</span>
+                        <div className="admin-manual-qbody">
+                          <strong>{q.question.length > 90 ? q.question.slice(0, 90) + '…' : q.question}</strong>
+                          <div className="admin-manual-qmeta">
+                            <span>{q.subject || 'General'}</span>
+                            <span className="admin-manual-qans">Ans: {q.answerKey}</span>
+                            {q.explanation && <span className="admin-manual-qexp" title={q.explanation}>Has explanation</span>}
+                          </div>
+                          <div className="admin-manual-qopts">
+                            {[['A', q.optionA], ['B', q.optionB], ['C', q.optionC], ['D', q.optionD]].filter(([, t]) => t).map(([k, t]) => (
+                              <span key={k} className={`admin-manual-opt${q.answerKey === k ? ' correct' : ''}`}>{k}: {(t as string).length > 30 ? (t as string).slice(0, 30) + '…' : t}</span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="admin-row-actions">
+                          <button type="button" className="admin-row-action" title="Edit" onClick={() => editManualQuestion(i)}><Pencil size={13} /></button>
+                          <button type="button" className="admin-row-action danger" title="Remove" onClick={() => removeManualQuestion(i)}><Trash2 size={13} /></button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="admin-manual-footer">
+                    <span className="admin-help-text">Draft auto-saved · not published until you click Publish</span>
+                    <button type="button" className="admin-save-btn"
+                      onClick={() => void handleManualFinalSave()}
+                      disabled={manualSaving || !manualDraft.slug.trim() || !manualDraft.examSlug.trim() || !manualDraft.title.trim()}>
+                      <UploadCloud size={15} />
+                      {manualSaving ? 'Publishing…' : `Publish paper — ${manualDraft.questions.length}Q`}
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+
             {/* Published papers */}
             <div className="admin-tool-panel">
               <div className="admin-panel-title">
@@ -1703,48 +1969,86 @@ export function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Add question manually */}
+
+            {/* Cutoff editor — inline with paper */}
             {selectedPaperSlug && (
               <div className="admin-tool-panel">
                 <div className="admin-panel-title">
-                  <div><small>Manual entry · Q{paperQuestions.length + 1}</small><h2>Add question</h2></div>
+                  <div>
+                    <small>Exam analytics</small>
+                    <h2>Set cutoffs · <span style={{ fontWeight: 400, color: 'var(--ink2)' }}>{cutoffForm.examSlug || '—'}</span></h2>
+                  </div>
                 </div>
                 <div className="admin-form-stack">
-                  <label className="admin-field">
-                    Question text
-                    <textarea value={newQDraft.question} onChange={(e) => setNewQDraft((d) => ({ ...d, question: e.target.value }))} rows={3} placeholder="Enter the question…" />
-                  </label>
-                  <div className="admin-form-row">
-                    <label className="admin-field"><span>A</span><input value={newQDraft.optionA} onChange={(e) => setNewQDraft((d) => ({ ...d, optionA: e.target.value }))} /></label>
-                    <label className="admin-field"><span>B</span><input value={newQDraft.optionB} onChange={(e) => setNewQDraft((d) => ({ ...d, optionB: e.target.value }))} /></label>
-                  </div>
-                  <div className="admin-form-row">
-                    <label className="admin-field"><span>C</span><input value={newQDraft.optionC} onChange={(e) => setNewQDraft((d) => ({ ...d, optionC: e.target.value }))} /></label>
-                    <label className="admin-field"><span>D</span><input value={newQDraft.optionD} onChange={(e) => setNewQDraft((d) => ({ ...d, optionD: e.target.value }))} /></label>
-                  </div>
-                  <div className="admin-form-row">
+                  <div className="admin-cutoffs-row3">
                     <label className="admin-field">
-                      Correct answer
-                      <select value={newQDraft.answerKey} onChange={(e) => setNewQDraft((d) => ({ ...d, answerKey: e.target.value }))}>
-                        <option>A</option><option>B</option><option>C</option><option>D</option>
-                      </select>
+                      <span>Exam slug</span>
+                      <input type="text" placeholder="ibps-po" value={cutoffForm.examSlug}
+                        onChange={e => setCutoffForm(f => ({ ...f, examSlug: e.target.value }))} />
                     </label>
                     <label className="admin-field">
-                      Subject
-                      <input value={newQDraft.subject} onChange={(e) => setNewQDraft((d) => ({ ...d, subject: e.target.value }))} placeholder="e.g. Mathematics" />
+                      <span>Stage</span>
+                      <input type="text" placeholder="Prelims" value={cutoffForm.stage}
+                        onChange={e => setCutoffForm(f => ({ ...f, stage: e.target.value }))} />
+                    </label>
+                    <label className="admin-field">
+                      <span>Year</span>
+                      <input type="text" placeholder="2024" value={cutoffForm.year}
+                        onChange={e => setCutoffForm(f => ({ ...f, year: e.target.value }))} />
                     </label>
                   </div>
-                  <label className="admin-field">
-                    Explanation
-                    <textarea value={newQDraft.explanation} onChange={(e) => setNewQDraft((d) => ({ ...d, explanation: e.target.value }))} rows={2} placeholder="Why is this the correct answer?" />
-                  </label>
-                  <button
-                    type="button"
-                    className="admin-save-btn"
-                    onClick={() => void addPaperQuestion()}
-                    disabled={addingQ || !newQDraft.question.trim() || !newQDraft.optionA.trim() || !newQDraft.optionB.trim()}
-                  >
-                    <Plus size={15} /> {addingQ ? 'Adding…' : `Add Q${paperQuestions.length + 1}`}
+                  <div className="admin-cutoffs-row3">
+                    <label className="admin-field">
+                      <span>Total marks</span>
+                      <input type="number" placeholder="100" value={cutoffForm.totalMarks}
+                        onChange={e => setCutoffForm(f => ({ ...f, totalMarks: e.target.value }))} />
+                    </label>
+                    <label className="admin-field">
+                      <span>Avg score <small>(bell curve)</small></span>
+                      <input type="number" placeholder="48" value={cutoffForm.avgScore}
+                        onChange={e => setCutoffForm(f => ({ ...f, avgScore: e.target.value }))} />
+                    </label>
+                    <label className="admin-field">
+                      <span>Std deviation</span>
+                      <input type="number" placeholder="12" value={cutoffForm.stdDev}
+                        onChange={e => setCutoffForm(f => ({ ...f, stdDev: e.target.value }))} />
+                    </label>
+                  </div>
+
+                  <div className="admin-cutoffs-categories">
+                    <div className="admin-cutoffs-cat-head">
+                      <span>Category</span><span>Cutoff marks</span><span />
+                    </div>
+                    {cutoffForm.rows.map((row, i) => (
+                      <div key={i} className="admin-cutoffs-cat-row">
+                        <input type="text" placeholder="General" value={row.category}
+                          onChange={e => setCutoffForm(f => {
+                            const rows = [...f.rows]; rows[i] = { ...rows[i], category: e.target.value }; return { ...f, rows }
+                          })} />
+                        <input type="number" placeholder="0" value={row.marks}
+                          onChange={e => setCutoffForm(f => {
+                            const rows = [...f.rows]; rows[i] = { ...rows[i], marks: e.target.value }; return { ...f, rows }
+                          })} />
+                        <button type="button" className="admin-cutoffs-remove"
+                          onClick={() => setCutoffForm(f => ({ ...f, rows: f.rows.filter((_, j) => j !== i) }))}>
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" className="admin-ghost-btn" style={{ marginTop: 6 }}
+                      onClick={() => setCutoffForm(f => ({ ...f, rows: [...f.rows, { category: '', marks: '' }] }))}>
+                      <Plus size={14} /> Add category
+                    </button>
+                  </div>
+
+                  {cutoffStatus && (
+                    <p className={`admin-cutoffs-status ${cutoffStatus.kind}`}>
+                      {cutoffStatus.kind === 'success' ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+                      {cutoffStatus.text}
+                    </p>
+                  )}
+                  <button type="button" className="admin-save-btn" onClick={() => void handleSaveCutoffs()} disabled={cutoffSaving}>
+                    <Target size={15} /> {cutoffSaving ? 'Saving…' : 'Save cutoffs'}
                   </button>
                 </div>
               </div>
