@@ -273,6 +273,11 @@ function safeJson(obj: unknown): string {
   return JSON.stringify(obj).replace(/<\/script>/gi, '<\\/script>')
 }
 
+function h1Text(title: string): string {
+  // Strip trailing brand to get the meaningful page heading
+  return title.replace(/ \| Ministry of Papers$/, '')
+}
+
 function injectMeta(html: string, meta: PageMeta, pathname: string): string {
   const canonical = `${BASE}${pathname}`
   const t = esc(meta.title), d = esc(meta.description), c = esc(canonical)
@@ -291,6 +296,11 @@ function injectMeta(html: string, meta: PageMeta, pathname: string): string {
     const scripts = lds.map(ld => `  <script type="application/ld+json">${safeJson(ld)}</script>`).join('\n')
     result = result.replace('</head>', `${scripts}\n</head>`)
   }
+
+  // Inject H1 into body — crawlers that don't run JS see this;
+  // React replaces #root content within milliseconds for real users
+  const h1 = esc(h1Text(meta.title))
+  result = result.replace('<div id="root"></div>', `<div id="root"><h1>${h1}</h1></div>`)
 
   return result
 }
@@ -351,12 +361,30 @@ export default {
       }
     }
 
-    // Non-bot → always serve index.html; React Router handles client-side routing
+    // Static pages (/, /exams, /about, etc.) — inject meta for everyone, not just bots.
+    // No API call needed so there's zero latency cost, and all crawlers/audit tools get H1.
+    const staticMeta = STATIC_META[path]
+    if (staticMeta) {
+      try {
+        const baseRes = await env.ASSETS.fetch(indexRequest)
+        if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
+        const html     = await baseRes.text()
+        const enhanced = injectMeta(html, staticMeta, path)
+        const headers  = new Headers(baseRes.headers)
+        headers.set('content-type', 'text/html; charset=UTF-8')
+        headers.delete('content-length')
+        return new Response(enhanced, { status: 200, headers })
+      } catch {
+        return env.ASSETS.fetch(indexRequest)
+      }
+    }
+
+    // Non-bot on dynamic pages → serve index.html directly; React Router handles routing
     if (!BOT_UA.test(ua)) {
       return env.ASSETS.fetch(indexRequest)
     }
 
-    // Bot → inject real meta + JSON-LD then serve
+    // Bot on dynamic pages → fetch meta from API then inject
     try {
       const [baseRes, meta] = await Promise.all([
         env.ASSETS.fetch(indexRequest),
