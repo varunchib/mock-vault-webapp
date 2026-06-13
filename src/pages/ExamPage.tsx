@@ -188,7 +188,7 @@ export function ExamPage() {
       fetchExamBySlug(slug),
       fetchExamPapers(slug),
       fetchMockCatalog(),
-      fetchExamQuestions(slug),
+      fetchExamQuestions(slug).catch(() => []),
       isAuthenticated ? fetchEnrolledSlugs().catch(() => null) : Promise.resolve(null),
     ]).then(([examData, paperData, mockData, questionData, enrollData]) => {
       setExam(examData)
