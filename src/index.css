@@ -4794,8 +4794,14 @@ footer {
   font-family: 'DM Sans', sans-serif !important;
 }
 
+.subpage-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 .subpage-layout main {
-  min-height: calc(100vh - 64px);
+  flex: 1;
 }
 
 .halo-loader-shell {
@@ -10878,9 +10884,9 @@ html {
   gap: 4px;
 }
 .pa-score-ring strong { font-size: 64px; font-weight: 800; color: #111827; line-height: 1; }
+.pa-score-ring strong.pa-score-neg { color: #dc2626; }
 .pa-score-ring span { font-size: 22px; color: #9ca3af; }
-.pa-score-pct { font-size: 28px; font-weight: 800; color: #2563eb; line-height: 1; margin: 0; }
-.pa-score-label { font-size: 12px; color: #9ca3af; margin: -4px 0 4px; }
+.pa-score-label { font-size: 12px; color: #9ca3af; margin: 2px 0 6px; }
 
 .pa-score-stats {
   display: flex;
@@ -10891,13 +10897,14 @@ html {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 1px;
   padding: 8px 14px;
   border-radius: 10px;
-  min-width: 56px;
+  min-width: 64px;
 }
-.pa-stat span { font-size: 22px; font-weight: 800; line-height: 1; }
+.pa-stat span { font-size: 20px; font-weight: 800; line-height: 1; }
 .pa-stat small { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.pa-stat em { font-size: 10px; font-style: normal; opacity: .65; margin-top: 1px; }
 .pa-stat--c { background: #f0fdf4; color: #15803d; }
 .pa-stat--w { background: #fef2f2; color: #b91c1c; }
 .pa-stat--s { background: #fffbeb; color: #92400e; }
@@ -13650,8 +13657,10 @@ html {
 }
 .ea2-hist-card-top {
   display: flex;
-  align-items: center;
+  align-items: baseline;
+  gap: 4px;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 .ea2-hist-score {
   font-size: 22px;
@@ -13662,6 +13671,7 @@ html {
 .ea2-hist-score.good { color: #15803d; }
 .ea2-hist-score.mid  { color: #92400e; }
 .ea2-hist-score.bad  { color: #b91c1c; }
+.ea2-hist-outof { font-size: 13px; color: #9ca3af; margin-right: auto; }
 .ea2-hist-pctile {
   font-size: 11px;
   font-weight: 600;
@@ -15080,6 +15090,7 @@ html {
   font-weight: 800;
   line-height: 1;
 }
+.an-exam-best em { font-size: 13px; font-style: normal; font-weight: 500; color: #9ca3af; }
 .an-exam-best.good { color: #22c55e; }
 .an-exam-best.mid  { color: #f59e0b; }
 .an-exam-best.bad  { color: #ef4444; }

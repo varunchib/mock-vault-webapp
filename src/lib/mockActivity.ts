@@ -30,6 +30,8 @@ export type MockAttemptResult = {
   wrong: number
   skipped: number
   rawScore?: number
+  maxMarks?: number
+  negativeMarking?: number
   timeTakenSeconds: number
   subjects: SubjectResult[]
 }
@@ -82,6 +84,8 @@ export type PaperAttemptResult = {
   wrong: number
   skipped: number
   rawScore?: number
+  maxMarks?: number
+  negativeMarking?: number
   timeTakenSeconds: number
   subjects: SubjectResult[]
 }
@@ -112,6 +116,9 @@ export type CombinedResult = {
   correct: number
   wrong: number
   skipped: number
+  rawScore?: number
+  maxMarks?: number
+  negativeMarking?: number
   timeTakenSeconds: number
   subjects: SubjectResult[]
 }
@@ -149,6 +156,9 @@ export function readAllResults(examSlug?: string): CombinedResult[] {
       correct: r.correct,
       wrong: r.wrong,
       skipped: r.skipped,
+      rawScore: r.rawScore,
+      maxMarks: r.maxMarks,
+      negativeMarking: r.negativeMarking,
       timeTakenSeconds: r.timeTakenSeconds,
       subjects: r.subjects,
     }))
