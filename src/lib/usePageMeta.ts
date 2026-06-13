@@ -9,7 +9,7 @@ export type PageMeta = {
   canonicalPath?: string
   ogType?: 'website' | 'article'
   ogImage?: string
-  jsonLd?: Record<string, unknown>
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[]
 }
 
 function upsertMeta(selector: string, create: () => HTMLMetaElement, content: string) {

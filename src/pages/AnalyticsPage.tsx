@@ -18,6 +18,8 @@ type CombinedResult = {
   wrong: number
   skipped: number
   rawScore?: number
+  maxMarks?: number
+  negativeMarking?: number
   timeTakenSeconds: number
   subjects: SubjectResult[]
 }
