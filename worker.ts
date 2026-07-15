@@ -223,13 +223,36 @@ function richText(s: string | undefined | null): string {
     .join('')
 }
 
-// questionTopic derives a short keyword phrase from the question text for titles,
-// stripping boilerplate stems ("Consider the following statements", etc.).
-function questionTopic(question: string | undefined | null): string {
-  let s = stripMarkdown(String(question ?? ''))
-  s = s.replace(/^(consider the following( statements)?|which (one )?of the following|with reference to|in the context of|arrange the following( segments)?|the following|match list[- ]?i|read the following)[:,\s-]*/i, '')
-  s = s.replace(/[:.?].*$/, '').trim()
-  return s.split(/\s+/).slice(0, 8).join(' ')
+// questionTopic returns the question's primary topic keyword for the title.
+// It uses the curated first tag rather than parsing the question text: exam
+// questions open with boilerplate stems ("Consider the following statements:")
+// and the real topic sits in the body, so text extraction yields broken
+// fragments. No tag => no topic, which is better than a garbled one.
+function questionTopic(q: QuestionData): string {
+  return (q.tags ?? []).map(t => String(t).trim()).filter(Boolean)[0] ?? ''
+}
+
+// questionTitle builds a compact, keyword-first title for a question page.
+// It deliberately omits the " | Ministry of Papers" suffix: 21 chars of brand
+// crowd out the topic keywords that win long-tail queries, and the exam+subject
+// already identify the page. Capped at 65 chars so Google shows it in full.
+function questionTitle(examLabel: string, year: string, subject: string, no: string | number, topic: string): string {
+  const CAP = 65
+  const tail = ' - Solved Answer'
+  const base = `${examLabel}${year ? ' ' + year : ''}${subject ? ' ' + subject : ''} Q${no}`
+  if (!topic) return `${base}${tail}`.slice(0, CAP)
+
+  const full = `${base}: ${topic}${tail}`
+  if (full.length <= CAP) return full
+
+  // Trim the topic on a word boundary so the tail ("- Solved Answer") survives.
+  const room = CAP - base.length - 2 - tail.length
+  if (room < 8) return `${base}${tail}`.slice(0, CAP)
+  let t = topic.slice(0, room)
+  const lastSpace = t.lastIndexOf(' ')
+  if (lastSpace > 8) t = t.slice(0, lastSpace)
+  t = t.replace(/[,;:\-\s]+$/, '')
+  return t ? `${base}: ${t}${tail}` : `${base}${tail}`
 }
 
 function titleFit(core: string): string {
@@ -621,13 +644,18 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             ]
           : [{ '@type': 'ListItem', position: 3, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
       ]
-      const topic = questionTopic(q.question)
+      const topic = questionTopic(q)
+      // questions.exam_name holds the long official name ("UPSC Civil Services
+      // Examination"); the exam record has a compact shortName ("UPSC CSE") that
+      // leaves room for the topic keywords in the title.
+      const exam = await apiJson<ExamData>(`${API}/api/v1/exams/${q.examSlug}`, 86400)
+      const examLabel = exam?.shortName || q.examName
       const answerText = [
         q.answer ? `Correct answer: ${q.answer}.` : `Correct option: ${q.answerKey}.`,
         stripMarkdown(q.explanation ?? ''),
       ].filter(Boolean).join(' ').slice(0, 1000)
       return {
-        title: titleFit(`${q.examName} ${q.year} ${q.subject ? q.subject + ' ' : ''}Q${q.questionNo}${topic ? ' — ' + topic : ''} Solved`),
+        title: questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic),
         description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${stripMarkdown(q.question).slice(0, 120)} — correct answer (${q.answerKey}) with detailed explanation.`,
         contentHtml: renderQuestionContent(q),
         jsonLd: [
