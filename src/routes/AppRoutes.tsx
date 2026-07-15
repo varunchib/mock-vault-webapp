@@ -25,6 +25,8 @@ const AnalyticsPage       = lazy(() => import('../pages/AnalyticsPage').then(m =
 const ExamAnalyticsPage   = lazy(() => import('../pages/ExamAnalyticsPage').then(m => ({ default: m.ExamAnalyticsPage })))
 const MockAttemptPage     = lazy(() => import('../pages/MockAttemptPage').then(m => ({ default: m.MockAttemptPage })))
 const PaperAttemptPage    = lazy(() => import('../pages/PaperAttemptPage').then(m => ({ default: m.PaperAttemptPage })))
+const AdminUserAnalyticsOverview = lazy(() => import('../pages/AdminUserAnalyticsPage').then(m => ({ default: m.AdminUserAnalyticsOverview })))
+const AdminUserExamAnalytics     = lazy(() => import('../pages/AdminUserAnalyticsPage').then(m => ({ default: m.AdminUserExamAnalytics })))
 
 const Loader = () => (
   <section className="public-page">
@@ -63,12 +65,21 @@ function ProtectedAdmin() {
   return isAdminUser(user) ? <Lazy><AdminDashboardPage /></Lazy> : <Navigate to="/dashboard" replace />
 }
 
+function ProtectedAdminPage({ children }: { children: ReactNode }) {
+  const { user, isAuthenticated, isLoading } = useAuth()
+  if (isLoading) return <Loader />
+  if (!isAuthenticated) return <Navigate to="/" replace />
+  return isAdminUser(user) ? <>{children}</> : <Navigate to="/dashboard" replace />
+}
+
 export function AppRoutes() {
   return (
     <Routes>
       <Route path="/"                   element={<RootRoute />} />
       <Route path="/dashboard"          element={<ProtectedDashboard />} />
       <Route path="/admin"              element={<ProtectedAdmin />} />
+      <Route path="/admin/users/:id/analytics"           element={<ProtectedAdminPage><Lazy><AdminUserAnalyticsOverview /></Lazy></ProtectedAdminPage>} />
+      <Route path="/admin/users/:id/analytics/:examSlug" element={<ProtectedAdminPage><Lazy><AdminUserExamAnalytics /></Lazy></ProtectedAdminPage>} />
       <Route path="/exams"              element={<ExamCatalogPage />} />
       <Route path="/exam/:slug"          element={<ExamPage />} />
       <Route path="/exam/:slug/overview" element={<ExamInfoPage />} />

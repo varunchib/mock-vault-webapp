@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { fetchPaperCatalog, type Paper } from '../../lib/api'
+import { paperPath } from '../../lib/paperSeo'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'
 
@@ -24,7 +25,7 @@ export function SeoLinks() {
       />
       <div className="seo-grid">
         {papers.map((paper) => (
-          <Link className="seo-card" to={`/pyq/${paper.slug}`} key={paper.slug}>
+          <Link className="seo-card" to={paperPath(paper.slug)} key={paper.slug}>
             <span className="seo-text">📄 {paper.title}</span>
             <span className="seo-count">{paper.questions} Qs</span>
           </Link>

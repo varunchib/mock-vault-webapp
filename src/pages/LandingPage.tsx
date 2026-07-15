@@ -24,14 +24,6 @@ export function LandingPage() {
         name: 'Ministry of Papers',
         url: 'https://ministryofpapers.com',
         description: '12 lakh+ solved PYQs. 240+ exams. No login. No paywall.',
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: {
-            '@type': 'EntryPoint',
-            urlTemplate: 'https://ministryofpapers.com/exams?q={search_term_string}',
-          },
-          'query-input': 'required name=search_term_string',
-        },
       },
       {
         '@context': 'https://schema.org',

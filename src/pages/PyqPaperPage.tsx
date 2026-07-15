@@ -1,9 +1,8 @@
 import { MathText } from '../components/common/MathText'
 import { env } from '../lib/env'
-import { BookOpen, ChevronRight, Download, Lock, Play } from 'lucide-react'
+import { BookOpen, ChevronRight, Download, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { LoginModal } from '../components/auth/LoginModal'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import {
@@ -17,8 +16,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { paperGuideMap } from '../data/postGuides'
-
-const FREE_LIMIT = 10
+import { apiPaperSlug, paperPath, paperSeoOverride } from '../lib/paperSeo'
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D']
 
@@ -33,7 +31,6 @@ export function PyqPaperPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [explOpen, setExplOpen] = useState<Record<string, boolean>>({})
-  const [loginOpen, setLoginOpen] = useState(false)
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const { isAuthenticated } = useAuth()
 
@@ -42,7 +39,7 @@ export function PyqPaperPage() {
     setLoading(true)
     setError(false)
 
-    fetchPaperBySlug(slug)
+    fetchPaperBySlug(apiPaperSlug(slug))
       .then((paperData) => {
         setPaper(paperData)
         return fetchPaperQuestions(paperData.slug)
@@ -52,42 +49,57 @@ export function PyqPaperPage() {
       .finally(() => setLoading(false))
   }, [slug, retryCount])
 
+  const seoOverride = paperSeoOverride(paper?.slug ?? slug)
+  const canonicalPath = paper ? paperPath(paper.slug) : '/pyq'
   const seoTitle = paper
-    ? paperSeoTitle({ examName: paper.examName, year: paper.year, shift: paper.shift })
+    ? seoOverride?.title ?? paperSeoTitle({ examName: paper.examName, year: paper.year, shift: paper.shift })
     : 'Solved PYQ Paper | Ministry of Papers'
   const seoDesc = paper
-    ? paperSeoDescription({ examName: paper.examName, year: paper.year, shift: paper.shift, heldOn: paper.heldOn, questions: paper.questions, subjects: paper.subjects, description: paper.description })
+    ? seoOverride?.description ?? paperSeoDescription({ examName: paper.examName, year: paper.year, shift: paper.shift, heldOn: paper.heldOn, questions: paper.questions, subjects: paper.subjects, description: paper.description })
     : 'Solved previous year question paper with answers and explanations.'
+  const seoH1 = seoOverride?.h1 ?? paper?.title
 
   usePageMeta({
     title: seoTitle,
     description: seoDesc,
-    canonicalPath: paper ? `/pyq/${paper.slug}` : '/pyq',
+    canonicalPath,
     ogType: 'article',
     jsonLd: paper
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'LearningResource',
-          name: seoTitle.replace(' | Ministry of Papers', ''),
-          description: seoDesc,
-          url: `https://ministryofpapers.com/pyq/${paper.slug}`,
-          educationalLevel: 'Competitive Exam Preparation',
-          learningResourceType: 'Previous Year Question Paper',
-          numberOfQuestions: paper.questions,
-          teaches: paper.subjects?.join(', '),
-          about: { '@type': 'Thing', name: paper.examName },
-          ...(paper.heldOn ? { datePublished: paper.heldOn } : {}),
-          provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
-          breadcrumb: {
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'LearningResource',
+            name: seoTitle.replace(' | Ministry of Papers', ''),
+            description: seoDesc,
+            url: `https://ministryofpapers.com${canonicalPath}`,
+            educationalLevel: 'Competitive Exam Preparation',
+            learningResourceType: 'Previous Year Question Paper',
+            numberOfQuestions: paper.questions,
+            teaches: paper.subjects?.join(', '),
+            about: { '@type': 'Thing', name: paper.examName },
+            ...(paper.heldOn ? { datePublished: paper.heldOn } : {}),
+            provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: seoTitle.replace(' | Ministry of Papers', ''),
+            description: seoDesc,
+            url: `https://ministryofpapers.com${canonicalPath}`,
+            author: { '@type': 'Organization', name: 'Ministry of Papers' },
+            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+          },
+          {
+            '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
               { '@type': 'ListItem', position: 2, name: paper.examName, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
               { '@type': 'ListItem', position: 3, name: `${paper.examName} ${paper.year} Papers`, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
-              { '@type': 'ListItem', position: 4, name: seoTitle.replace(' | Ministry of Papers', ''), item: `https://ministryofpapers.com/pyq/${paper.slug}` },
+              { '@type': 'ListItem', position: 4, name: seoTitle.replace(' | Ministry of Papers', ''), item: `https://ministryofpapers.com${canonicalPath}` },
             ],
           },
-        }
+        ]
       : undefined,
   })
 
@@ -121,8 +133,7 @@ export function PyqPaperPage() {
   }
 
   const firstQuestion = questions[0]
-  const visibleQuestions = isAuthenticated ? questions : questions.slice(0, FREE_LIMIT)
-  const isGated = !isAuthenticated && questions.length > FREE_LIMIT
+  const visibleQuestions = questions
   const hasHindiQuestions = questions.some(hasHindi)
 
   const selectAnswer = (qSlug: string, key: string) => {
@@ -150,10 +161,11 @@ export function PyqPaperPage() {
       <header className="pyq-paper-header">
         <div className="pyq-paper-header-body">
           <span className="ep-category-tag">{paper.examName} · {paper.year}</span>
-          <h1>{paper.title}</h1>
+          <h1>{seoH1}</h1>
           {paper.shift && <p className="pyq-paper-shift">{paper.shift}</p>}
           <div className="pyq-paper-meta-row">
             <span>{paper.questions} questions</span>
+            <span>Answer key included</span>
             {paper.subjects.length > 0 && <span>{paper.subjects.join(' · ')}</span>}
           </div>
         </div>
@@ -172,10 +184,7 @@ export function PyqPaperPage() {
             <button
               className="pyq-action-btn primary"
               type="button"
-              onClick={() => {
-                if (!isAuthenticated) { setLoginOpen(true); return }
-                navigate(`/paper-attempt/${paper.slug}`)
-              }}
+              onClick={() => navigate(`/paper-attempt/${paper.slug}`)}
             >
               <Play size={14} /> Attempt Online
             </button>
@@ -201,6 +210,17 @@ export function PyqPaperPage() {
         </div>
       </header>
 
+      <section className="pyq-paper-seo-intro">
+        <h2>{seoTitle.replace(' | Ministry of Papers', '')}</h2>
+        <p>{seoOverride?.review ?? seoDesc}</p>
+        <div className="pyq-paper-facts">
+          <span>{paper.questions || questions.length} solved questions</span>
+          {paper.heldOn && <span>Held on {paper.heldOn}</span>}
+          {paper.subjects.length > 0 && <span>{paper.subjects.length} subject areas</span>}
+          <span>Free answer key and explanations</span>
+        </div>
+      </section>
+
       <div className="pyq-question-list">
         {visibleQuestions.map((q, index) => {
           const localized = getLocalizedQuestion(q, language)
@@ -217,6 +237,7 @@ export function PyqPaperPage() {
                 <Link
                   className="pyq-q-subject pyq-q-subject-link"
                   to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(q.subject)}`}
+                  rel="nofollow"
                   title={`All ${paper.examName} ${q.subject} questions`}
                 >
                   {q.subject}
@@ -285,6 +306,11 @@ export function PyqPaperPage() {
                     </div>
                   )}
 
+                  <div className="pyq-solution">
+                    <strong>Answer: {q.answerKey}{q.answer ? ` - ${q.answer}` : ''}</strong>
+                    {q.explanation && <p>{q.explanation}</p>}
+                  </div>
+
                   <div className="pyq-q-actions">
                     {!isRevealed ? (
                       <button
@@ -325,24 +351,6 @@ export function PyqPaperPage() {
           )
         })}
       </div>
-
-
-      {isGated && (
-        <div className="ep-gate">
-          <div className="ep-gate-inner">
-            <Lock size={20} />
-            <strong>Sign in to see all {questions.length} questions</strong>
-            <p>You've seen {FREE_LIMIT} of {questions.length} questions. Sign in free to unlock the full paper.</p>
-            <button
-              className="ep-gate-btn"
-              type="button"
-              onClick={() => setLoginOpen(true)}
-            >
-              Sign in with Google
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   )
 
@@ -353,7 +361,6 @@ export function PyqPaperPage() {
           <div className="public-shell">{content}</div>
         </section>
       )}
-      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   )
 }

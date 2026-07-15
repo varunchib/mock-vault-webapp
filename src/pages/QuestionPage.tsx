@@ -10,6 +10,7 @@ import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { questionSeoTitle, questionSeoDescription } from '../lib/pageTitles'
 import { env } from '../lib/env'
+import { paperPath } from '../lib/paperSeo'
 
 export function QuestionPage() {
   const { slug } = useParams()
@@ -117,7 +118,7 @@ export function QuestionPage() {
             {question.paperSlug && (
               <>
                 <ChevronRight size={13} />
-                <Link to={`/pyq/${question.paperSlug}`}>{question.paper}</Link>
+                <Link to={paperPath(question.paperSlug)}>{question.paper}</Link>
               </>
             )}
             <ChevronRight size={13} />
@@ -132,7 +133,7 @@ export function QuestionPage() {
             </div>
             <div className="qpage-head-actions">
               {question.paperSlug && (
-                <Link to={`/pyq/${question.paperSlug}`} className="pyq-action-btn">
+                <Link to={paperPath(question.paperSlug)} className="pyq-action-btn">
                   <BookOpen size={14} /> Full Paper
                 </Link>
               )}
@@ -152,6 +153,7 @@ export function QuestionPage() {
                 <Link
                   className="pyq-q-subject pyq-q-subject-link"
                   to={`/exam/${question.examSlug}?tab=subjects&subject=${encodeURIComponent(question.subject)}`}
+                  rel="nofollow"
                   title={`All ${question.examName} ${question.subject} questions`}
                 >
                   {question.subject}

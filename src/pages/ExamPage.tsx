@@ -29,6 +29,7 @@ import {
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
+import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { recordExamView } from '../lib/examActivity'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
@@ -480,9 +481,9 @@ export function ExamPage() {
                   <div className="ep-paper-grid">
                     {yearPapers.map((paper) => (
                       <div className="ep-paper-card" key={paper.slug}>
-                        <Link className="ep-paper-card-inner" to={`/pyq/${paper.slug}`}>
+                        <Link className="ep-paper-card-inner" to={paperPath(paper.slug)}>
                           <div className="ep-paper-card-main">
-                            <strong>{paper.title}</strong>
+                            <strong>{paperSeoOverride(paper.slug)?.title ?? paper.title}</strong>
                             <div className="ep-paper-meta">
                               {(() => {
                                 const label = extractShiftLabel(paper.shift)

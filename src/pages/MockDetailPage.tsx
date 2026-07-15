@@ -14,6 +14,7 @@ import {
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { mockListingSeoTitle, mockListingSeoDescription } from '../lib/pageTitles'
+import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { normalizeExamCategory } from './DashboardPage'
 
 export function MockDetailPage() {
@@ -145,7 +146,7 @@ export function MockDetailPage() {
     )
   }
 
-  if (error || !exam) return <Navigate to="/tests" replace />
+  if (error || !exam) return <Navigate to="/exams" replace />
 
   const openMock = (mock: MockItem) => {
     if (!isAuthenticated) { setLoginOpen(true); return }
@@ -158,7 +159,7 @@ export function MockDetailPage() {
         <nav className="ep-breadcrumb" aria-label="Breadcrumb">
           <Link to={homeHref}>{isAuthenticated ? 'Dashboard' : 'Home'}</Link>
           <ChevronRight size={13} />
-          <Link to="/tests">Tests</Link>
+          <Link to="/exams">Exams</Link>
           <ChevronRight size={13} />
           <span>{exam.shortName}</span>
         </nav>
@@ -192,7 +193,7 @@ export function MockDetailPage() {
               {examPapers.slice(0, 3).map((p, i) => (
                 <span key={p.slug}>
                   {i > 0 && ', '}
-                  <Link to={`/pyq/${p.slug}`}>{p.title}</Link>
+                  <Link to={paperPath(p.slug)}>{paperSeoOverride(p.slug)?.title ?? p.title}</Link>
                 </span>
               ))}
               {examPapers.length > 3

@@ -43,6 +43,7 @@ import {
   fetchAdminSummary,
   fetchAdminActiveCount,
   fetchAdminUsers,
+  fetchAdminUserDetail,
   fetchAdminInbox,
   adminInboxReply,
   adminInboxDelete,
@@ -65,6 +66,7 @@ import {
   type AdminPaperQuestionPayload,
   type AdminSummary,
   type AdminUser,
+  type AdminUserDetail,
   type InboxThread,
   type MockItem,
   type Paper,
@@ -507,6 +509,29 @@ export function AdminDashboardPage() {
   const [userSearch, setUserSearch] = useState('')
   const [userSearchInput, setUserSearchInput] = useState('')
   const [togglingUserId, setTogglingUserId] = useState<string | null>(null)
+  const [userDetail, setUserDetail] = useState<AdminUserDetail | null>(null)
+  const [userDetailLoading, setUserDetailLoading] = useState(false)
+  const [userDetailOpen, setUserDetailOpen] = useState(false)
+
+  const openUserDetail = useCallback(async (id: string) => {
+    setUserDetailOpen(true)
+    setUserDetail(null)
+    setUserDetailLoading(true)
+    try {
+      const detail = await fetchAdminUserDetail(id)
+      setUserDetail(detail)
+    } catch (err) {
+      toast('error', err instanceof APIError ? err.message : 'Failed to load user')
+      setUserDetailOpen(false)
+    } finally {
+      setUserDetailLoading(false)
+    }
+  }, [])
+
+  const closeUserDetail = useCallback(() => {
+    setUserDetailOpen(false)
+    setUserDetail(null)
+  }, [])
 
   // Inbox
   const [inboxThreads, setInboxThreads] = useState<InboxThread[]>([])
@@ -1003,6 +1028,108 @@ export function AdminDashboardPage() {
         </div>
       </div>
 
+      {/* ── User detail modal ────────────────────────────────── */}
+      {userDetailOpen && (
+        <div className="ov-udetail-overlay" onClick={closeUserDetail}>
+          <div className="ov-udetail" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="ov-udetail-close" onClick={closeUserDetail} aria-label="Close">
+              <X size={18} />
+            </button>
+
+            {userDetailLoading && (
+              <div className="ov-udetail-loading"><HaloLoader label="Loading profile" /></div>
+            )}
+
+            {userDetail && (
+              <>
+                <div className="ov-udetail-head">
+                  <span className="ov-udetail-avatar">{userDetail.user.name.charAt(0).toUpperCase()}</span>
+                  <div className="ov-udetail-head-info">
+                    <h3>{userDetail.user.name}</h3>
+                    <a href={`mailto:${userDetail.user.email}`}>{userDetail.user.email}</a>
+                    <div className="ov-udetail-badges">
+                      <span className="ov-udetail-badge">{userDetail.user.role}</span>
+                      <span className={`ov-udetail-badge ${userDetail.user.isActive ? 'ok' : 'bad'}`}>
+                        {userDetail.user.isActive ? 'Active' : 'Banned'}
+                      </span>
+                      {userDetail.user.city && <span className="ov-udetail-badge">{userDetail.user.city}</span>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="ov-udetail-meta">
+                  <div><small>Joined</small>{new Date(userDetail.user.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  <div><small>Last login</small>{new Date(userDetail.user.lastLogin).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  <div><small>Attempts</small>{userDetail.attempts.length}</div>
+                  <div><small>Ranked exams</small>{userDetail.examRanks.length}</div>
+                </div>
+
+                <button
+                  type="button"
+                  className="ov-udetail-analytics-btn"
+                  onClick={() => { const uid = userDetail.user.id; closeUserDetail(); navigate(`/admin/users/${uid}/analytics`) }}
+                >
+                  <Target size={15} /> Open full analytics page
+                </button>
+
+                {/* Leaderboard standings */}
+                <section className="ov-udetail-section">
+                  <h4>Leaderboard standings</h4>
+                  {userDetail.examRanks.length === 0 ? (
+                    <p className="ov-udetail-empty">No ranked attempts yet (needs at least one scored attempt).</p>
+                  ) : (
+                    <div className="ov-udetail-ranks">
+                      {userDetail.examRanks.map((er) => (
+                        <div className="ov-udetail-rank" key={er.examSlug}>
+                          <span className="ov-udetail-rank-exam">{er.examName || er.examSlug}</span>
+                          <span className="ov-udetail-rank-pos">#{er.rank}<small> / {er.totalRanked}</small></span>
+                          <span className="ov-udetail-rank-score">{er.scorePct}%</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+
+                {/* Recently visited tests & papers */}
+                <section className="ov-udetail-section">
+                  <h4>Recent tests &amp; papers</h4>
+                  {userDetail.attempts.length === 0 ? (
+                    <p className="ov-udetail-empty">No attempts recorded.</p>
+                  ) : (
+                    <div className="ov-udetail-attempts">
+                      {userDetail.attempts.map((a, i) => (
+                        <div className="ov-udetail-attempt" key={`${a.type}-${a.slug}-${i}`}>
+                          <div className="ov-udetail-attempt-main">
+                            <span className={`ov-udetail-type ${a.type}`}>{a.type}</span>
+                            <div>
+                              <span className="ov-udetail-attempt-title">{a.title || a.slug}</span>
+                              <small>{a.examName} · {new Date(a.completedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</small>
+                            </div>
+                          </div>
+                          <div className="ov-udetail-attempt-score">
+                            <strong>{a.scorePct}%</strong>
+                            <small>{a.correct}/{a.total}</small>
+                          </div>
+                          {a.slug && (
+                            <Link
+                              className="ov-udetail-attempt-open"
+                              to={a.type === 'paper' ? `/pyq/${a.slug}` : `/mock-test/${a.examSlug}`}
+                              target="_blank"
+                            >
+                              <ExternalLink size={13} />
+                            </Link>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* ── Drawer overlay ───────────────────────────────────── */}
       {drawerOpen && (
         <div className="admin-drawer-overlay" onClick={() => setDrawerOpen(false)} />
@@ -1262,13 +1389,18 @@ export function AdminDashboardPage() {
                   <div className="ov-user-list">
                     {users.map((user) => (
                       <div className="ov-user-row" key={user.id}>
-                        <div className="ov-user-identity">
+                        <button
+                          type="button"
+                          className="ov-user-identity ov-user-identity--btn"
+                          onClick={() => void openUserDetail(user.id)}
+                          title="View full profile"
+                        >
                           <span className="ov-user-initial">{user.name.charAt(0).toUpperCase()}</span>
                           <div>
                             <span className="ov-user-name-text">{user.name}</span>
                             {user.city && <small className="ov-user-city">{user.city}</small>}
                           </div>
-                        </div>
+                        </button>
                         <span className="ov-user-email-text">{user.email}</span>
                         <span className="ov-user-role-tag">{user.role}</span>
                         <span className={`ov-user-dot ${user.isActive ? 'active' : 'banned'}`}>
@@ -1277,14 +1409,23 @@ export function AdminDashboardPage() {
                         <span className="ov-user-login-text">
                           {new Date(user.lastLogin).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                         </span>
-                        <button
-                          type="button"
-                          className={`ov-user-action-btn ${user.isActive ? 'ban' : 'activate'}`}
-                          onClick={() => void toggleUserStatus(user)}
-                          disabled={togglingUserId === user.id}
-                        >
-                          {togglingUserId === user.id ? '…' : user.isActive ? 'Ban' : 'Activate'}
-                        </button>
+                        <div className="ov-user-actions">
+                          <button
+                            type="button"
+                            className="ov-user-action-btn view"
+                            onClick={() => void openUserDetail(user.id)}
+                          >
+                            View
+                          </button>
+                          <button
+                            type="button"
+                            className={`ov-user-action-btn ${user.isActive ? 'ban' : 'activate'}`}
+                            onClick={() => void toggleUserStatus(user)}
+                            disabled={togglingUserId === user.id}
+                          >
+                            {togglingUserId === user.id ? '…' : user.isActive ? 'Ban' : 'Activate'}
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

@@ -33,6 +33,7 @@ import {
 } from '../lib/api'
 import { savePaperResult } from '../lib/mockActivity'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
+import { paperPath } from '../lib/paperSeo'
 import { usePageMeta } from '../lib/usePageMeta'
 import { paperAttemptSeoTitle } from '../lib/pageTitles'
 
@@ -358,7 +359,7 @@ export function PaperAttemptPage() {
         }
       }
     }
-    navigate(`/pyq/${paper.slug}`)
+    navigate(paperPath(paper.slug))
   }, [paper, attemptId, answers, marked, currentIndex, remainingSeconds, navigate])
 
   // ── Timer countdown ────────────────────────────────────────────
@@ -482,7 +483,7 @@ export function PaperAttemptPage() {
 
   if (!slug || !isAuthenticated) return <Navigate to="/" replace />
   if (loading) return <HaloLoader label="Loading paper" />
-  if (error || !paper) return <Navigate to={`/pyq/${slug}`} replace />
+  if (error || !paper) return <Navigate to={paperPath(slug)} replace />
 
   // ── Pre-exam screen (intro for new, compact resume card for ongoing) ──
   if (!examStarted) {
@@ -527,7 +528,7 @@ export function PaperAttemptPage() {
               {startingExam ? 'Resuming…' : <><Play size={16} /> Continue Exam →</>}
             </button>
 
-            <Link className="pa-intro-back-link" to={`/pyq/${paper.slug}`}>
+            <Link className="pa-intro-back-link" to={paperPath(paper.slug)}>
               ← Exit to paper
             </Link>
           </div>
@@ -603,7 +604,7 @@ export function PaperAttemptPage() {
             {startingExam ? 'Starting…' : 'Start Exam →'}
           </button>
 
-          <Link className="pa-intro-back-link" to={`/pyq/${paper.slug}`}>
+          <Link className="pa-intro-back-link" to={paperPath(paper.slug)}>
             ← Back to paper
           </Link>
         </div>
@@ -743,7 +744,7 @@ export function PaperAttemptPage() {
           <button type="button" className="pa-btn-review" onClick={() => { setReviewMode(true); setReviewIndex(0) }}>
             <BookOpen size={15} /> Review Answers
           </button>
-          <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/pyq/${paper.slug}`)}>
+          <button type="button" className="pa-btn-secondary" onClick={() => navigate(paperPath(paper.slug))}>
             Back to Paper
           </button>
           <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/exam/${paper.examSlug}`)}>
@@ -791,6 +792,7 @@ export function PaperAttemptPage() {
                   <Link
                     className="pa-q-subject pa-q-subject-link"
                     to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(rq.subject)}`}
+                    rel="nofollow"
                   >
                     {rq.subject}
                   </Link>

@@ -2,27 +2,8 @@ import { BarChart3, BookOpen, ChevronRight, Clock3, FileText, LayoutGrid, Target
 import { Link } from 'react-router-dom'
 import { useMemo } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
-import { readAttemptResults, readPaperResults, type SubjectResult } from '../lib/mockActivity'
+import { readAttemptResults, readPaperResults, type CombinedResult } from '../lib/mockActivity'
 import { estimatePercentile } from '../data/examCutoffs'
-
-type CombinedResult = {
-  type: 'mock' | 'paper'
-  slug: string
-  examSlug: string
-  examName: string
-  title: string
-  totalQuestions: number
-  attemptedAt: string
-  answered: number
-  correct: number
-  wrong: number
-  skipped: number
-  rawScore?: number
-  maxMarks?: number
-  negativeMarking?: number
-  timeTakenSeconds: number
-  subjects: SubjectResult[]
-}
 
 type ExamGroup = {
   examSlug: string
@@ -52,7 +33,7 @@ function scoreClass(pct: number) {
   return pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'bad'
 }
 
-function ExamCard({ examSlug, examName, results }: ExamGroup) {
+function ExamCard({ examSlug, examName, results, linkBase }: ExamGroup & { linkBase: string }) {
   const marksData = results.map(r => {
     const maxM = (r.maxMarks ?? 0) > 0 ? r.maxMarks! : r.totalQuestions
     const marksPerQ = maxM / r.totalQuestions
@@ -72,7 +53,7 @@ function ExamCard({ examSlug, examName, results }: ExamGroup) {
   const lastAttempt = results[0].attemptedAt
 
   return (
-    <Link to={`/analytics/${examSlug}`} className="an-exam-card">
+    <Link to={`${linkBase}/${examSlug}`} className="an-exam-card">
       <div className="an-exam-card-top">
         <span className={`an-exam-best ${scoreClass(bestPct)}`}>{bestNet}<em>/{bestMax}</em></span>
         <span className="an-exam-date">{relativeDate(lastAttempt)}</span>
@@ -94,30 +75,42 @@ function ExamCard({ examSlug, examName, results }: ExamGroup) {
   )
 }
 
-export function AnalyticsPage() {
+export type AnalyticsSource = {
+  results: CombinedResult[]
+  linkBase: string
+  header: { eyebrow: string; title: string; subtitle: string }
+}
+
+export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
   usePageMeta({
-    title: 'Analytics | Ministry of Papers',
+    title: source ? 'User Analytics · Admin' : 'Analytics | Ministry of Papers',
     description: 'Your mock test and PYQ paper performance, subject mastery, and exam cutoff comparisons.',
-    canonicalPath: '/analytics',
+    canonicalPath: source ? undefined : '/analytics',
   })
 
+  const linkBase = source?.linkBase ?? '/analytics'
+
   const allResults = useMemo<CombinedResult[]>(() => {
-    const mocks: CombinedResult[] = readAttemptResults().map(r => ({
-      type: 'mock', slug: r.mockSlug, examSlug: r.examSlug, examName: r.examName,
-      title: r.mockTitle, totalQuestions: r.totalQuestions, attemptedAt: r.attemptedAt,
-      answered: r.answered, correct: r.correct, wrong: r.wrong, skipped: r.skipped,
-      rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
-    }))
-    const papers: CombinedResult[] = readPaperResults().map(r => ({
-      type: 'paper', slug: r.paperSlug, examSlug: r.examSlug, examName: r.examName,
-      title: r.paperTitle, totalQuestions: r.totalQuestions, attemptedAt: r.attemptedAt,
-      answered: r.answered, correct: r.correct, wrong: r.wrong, skipped: r.skipped,
-      rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
-    }))
-    return [...mocks, ...papers].sort(
+    const base: CombinedResult[] = source
+      ? source.results
+      : [
+          ...readAttemptResults().map((r): CombinedResult => ({
+            type: 'mock', slug: r.mockSlug, examSlug: r.examSlug, examName: r.examName,
+            title: r.mockTitle, totalQuestions: r.totalQuestions, attemptedAt: r.attemptedAt,
+            answered: r.answered, correct: r.correct, wrong: r.wrong, skipped: r.skipped,
+            rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
+          })),
+          ...readPaperResults().map((r): CombinedResult => ({
+            type: 'paper', slug: r.paperSlug, examSlug: r.examSlug, examName: r.examName,
+            title: r.paperTitle, totalQuestions: r.totalQuestions, attemptedAt: r.attemptedAt,
+            answered: r.answered, correct: r.correct, wrong: r.wrong, skipped: r.skipped,
+            rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
+          })),
+        ]
+    return [...base].sort(
       (a, b) => new Date(b.attemptedAt).getTime() - new Date(a.attemptedAt).getTime()
     )
-  }, [])
+  }, [source])
 
   const examGroups = useMemo<ExamGroup[]>(() => {
     const map = new Map<string, ExamGroup>()
@@ -150,9 +143,9 @@ export function AnalyticsPage() {
     <section className="an-page workspace-page">
       <header className="an-header">
         <div className="an-header-left">
-          <small>Analytics</small>
-          <h1>Performance Report</h1>
-          <p>Click an exam to see your score position, cutoff comparison, and leaderboard.</p>
+          <small>{source?.header.eyebrow ?? 'Analytics'}</small>
+          <h1>{source?.header.title ?? 'Performance Report'}</h1>
+          <p>{source?.header.subtitle ?? 'Click an exam to see your score position, cutoff comparison, and leaderboard.'}</p>
         </div>
       </header>
 
@@ -194,7 +187,7 @@ export function AnalyticsPage() {
         <>
           <p className="an-section-label"><TrendingUp size={13} /> {examGroups.length} exam{examGroups.length !== 1 ? 's' : ''} attempted</p>
           <div className="an-exam-grid">
-            {examGroups.map(g => <ExamCard key={g.examSlug} {...g} />)}
+            {examGroups.map(g => <ExamCard key={g.examSlug} {...g} linkBase={linkBase} />)}
           </div>
         </>
       )}
