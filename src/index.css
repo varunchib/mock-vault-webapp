@@ -101,6 +101,11 @@ img, svg {
   transition: transform 0.2s ease, filter 0.2s ease;
 }
 
+/* The square follows `color`; the glyph follows --logo-glyph. Override both on
+   dark surfaces (see .vault-sidebar-simple) or the square vanishes into the bg. */
+.logo-mark-bg { fill: currentColor; }
+.logo-mark-glyph { stroke: var(--logo-glyph, #fff); }
+
 .logo:hover .logo-mark {
   transform: translateY(-2px) scale(1.05);
   filter: drop-shadow(0 6px 14px rgba(24,24,27,.25));
@@ -1459,10 +1464,102 @@ footer {
   }
 }
 
+/* ── Public site mobile drawer ──────────────────────────────────────────── */
+/* The primary nav links are hidden under 960px; without this drawer anonymous
+   visitors would have no navigation at all. */
+.site-nav-toggle,
+.site-nav-close {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--ink);
+  padding: 8px;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+.site-nav-toggle:active { background: var(--line2); }
+
+.site-nav-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(0, 0, 0, .45);
+  animation: vault-nav-fade .18s ease;
+}
+
+.site-nav-drawer {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 280px;
+  max-width: 84vw;
+  z-index: 130;
+  background: var(--white);
+  border-left: 1px solid var(--line);
+  box-shadow: 0 0 40px rgba(0, 0, 0, .18);
+  padding: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* transform-only animation keeps this off the main thread */
+  transform: translateX(100%);
+  transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+  will-change: transform;
+  flex-direction: column;
+}
+.site-nav-drawer.open { transform: translateX(0); }
+
+.site-nav-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.site-nav-drawer-links {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0;
+  gap: 2px;
+}
+.site-nav-drawer-links a {
+  padding: 13px 10px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+.site-nav-drawer-links a:active { background: var(--line2); }
+
+.site-nav-drawer-foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}
+.site-nav-drawer-foot .n-cta,
+.site-nav-drawer-foot .n-login { width: 100%; justify-content: center; }
+.site-nav-drawer-user { display: flex; flex-direction: column; margin-bottom: 4px; }
+.site-nav-drawer-user strong { font-size: 14px; color: var(--ink); }
+.site-nav-drawer-user small { font-size: 12px; color: var(--ink4); }
+
 @media (max-width: 960px) {
   .nav-mid {
     display: none;
   }
+
+  .site-nav-toggle,
+  .site-nav-close { display: inline-flex; }
+  .site-nav-drawer { display: flex; }
+  /* The topbar CTA/login move into the drawer to free up space */
+  .site-nav .nav-end { display: none; }
 
   .vp-grid,
   .demo-inner,
@@ -1501,7 +1598,9 @@ footer {
     padding: 0 4%;
   }
 
-  .logo-words-sub {
+  /* Scoped to the landing nav: it is a cramped horizontal bar at this width.
+     The app sidebar/drawer has room, so it keeps the full lockup. */
+  .site-nav > .logo .logo-words-sub {
     display: none;
   }
 
@@ -2089,34 +2188,15 @@ footer {
   gap: 18px;
   padding: 20px 16px;
   overflow-y: auto;
-  background: #18181b;
-  color: #d4d4d8;
+  background: #18181B;
+  color: #A1A1AA;
+  border-right: 1px solid #27272A;
 }
 
-.vault-logo {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  color: #fff;
-  text-decoration: none;
-}
-
-.vault-logo span {
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  color: var(--hl);
-}
-
-.vault-logo strong {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: -.2px;
-}
+/* NOTE: .vault-logo is now just a positioning hook on the shared <Logo />.
+   Do not style its spans here — <Logo /> renders .logo-mark / .logo-words and
+   a bare `.vault-logo span` selector outranks them (0,1,1 vs 0,1,0), which
+   silently repaints and resizes the wordmark. */
 
 .admin-rail .logo {
   color: var(--ink);
@@ -2134,8 +2214,10 @@ footer {
   text-transform: uppercase;
 }
 
-.vault-nav-item,
-.vault-logout {
+/* Base layout only — all sidebar colours live in the .vault-sidebar-simple
+   token block. Do not set colours here; they only ever render inside that
+   (dark) sidebar, so a light value here is a latent white-on-dark bug. */
+.vault-nav-item {
   width: 100%;
   display: flex;
   align-items: center;
@@ -2143,46 +2225,13 @@ footer {
   border: 0;
   border-radius: 13px;
   background: transparent;
-  color: #d4d4d8;
   padding: 11px 12px;
   text-align: left;
   font-size: 14px;
   font-weight: 700;
-  transition: all .16s;
+  transition: background .16s, color .16s;
 }
 
-.vault-nav-item:hover,
-.vault-nav-item.active {
-  background: var(--hl);
-  color: var(--ink);
-}
-
-.vault-nav-item em {
-  margin-left: auto;
-  border-radius: 999px;
-  background: rgba(253, 224, 71, .14);
-  color: var(--hl);
-  padding: 3px 7px;
-  font-size: 10px;
-  font-style: normal;
-  font-weight: 900;
-}
-
-.vault-nav-item:hover em,
-.vault-nav-item.active em {
-  background: var(--ink);
-  color: var(--hl);
-}
-
-.vault-logout {
-  margin-top: auto;
-  color: #a1a1aa;
-}
-
-.vault-logout:hover {
-  color: #fff;
-  background: rgba(255, 255, 255, .08);
-}
 
 .vault-workspace {
   min-width: 0;
@@ -2614,8 +2663,7 @@ footer {
   .vault-logo strong,
   .vault-nav-group p,
   .vault-nav-item span,
-  .vault-nav-item em,
-  .vault-logout {
+  .vault-nav-item em {
     display: none;
   }
 
@@ -4215,6 +4263,21 @@ footer {
 .pyq-action-btn.primary:hover { background: #1a1a1a; border-color: #1a1a1a; }
 
 /* ── Question list ──────────────────────────────────── */
+/* Intro copy between the paper header and the question list. Deliberately plain
+   prose rather than a card — it sits between two bordered blocks, and a third
+   border would just add noise. */
+.pyq-paper-seo-intro {
+  margin: 0;
+}
+
+.pyq-paper-seo-intro p {
+  margin: 0;
+  max-width: 78ch;
+  font-size: 14.5px;
+  line-height: 1.75;
+  color: var(--ink2);
+}
+
 .pyq-question-list { display: grid; gap: 12px; }
 
 .pyq-question-card {
@@ -4974,17 +5037,8 @@ footer {
   align-items: center;
 }
 
-.vault-search-wrap,
 .vault-profile-wrap {
   position: relative;
-}
-
-.vault-search-wrap {
-  max-width: 520px;
-}
-
-.vault-search {
-  width: 100%;
 }
 
 .vault-search-results {
@@ -5442,10 +5496,6 @@ footer {
 @media (max-width: 700px) {
   .dashboard-topbar {
     grid-template-columns: 1fr;
-  }
-
-  .vault-search-wrap {
-    max-width: 100%;
   }
 
   .vault-profile-wrap {
@@ -6795,46 +6845,26 @@ footer {
 
 /* ── Inbox Widget (floating, bottom-right) ─────────────────────────────────── */
 
+/* Opened from the sidebar "Inbox" nav item — no floating bubble. */
 .inbox-widget {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 10px;
+  inset: 0;
+  z-index: 1200;
 }
 
-.inbox-bubble {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #111827;
-  color: #ffffff;
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-  position: relative;
-  transition: transform .15s, box-shadow .15s;
-}
-.inbox-bubble:hover { transform: scale(1.07); box-shadow: 0 6px 24px rgba(0,0,0,.3); }
-.inbox-bubble--unread { background: #111827; }
-
-.inbox-badge {
+.inbox-overlay {
   position: absolute;
-  top: 4px; right: 4px;
-  width: 10px; height: 10px;
-  background: #ef4444;
-  border-radius: 50%;
-  border: 2px solid #fff;
+  inset: 0;
+  background: rgba(24, 24, 27, .38);
+  animation: vault-search-fade .12s ease both;
 }
 
 .inbox-panel {
-  width: 320px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(360px, calc(100vw - 32px));
   background: #ffffff;
   border: 1px solid #e4e4e7;
   border-radius: 14px;
@@ -6842,7 +6872,7 @@ footer {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-height: 480px;
+  max-height: min(560px, calc(100vh - 32px));
 }
 
 .inbox-panel-head {
@@ -7377,26 +7407,14 @@ footer {
 
 /* ── Inbox Widget — mobile overhaul ───────────────────────────────────────── */
 
-/* Better bubble: solid background, no transparency, works everywhere */
-.inbox-bubble {
-  background: #111827;
-  box-shadow: 0 4px 20px rgba(0,0,0,.25);
-}
-.inbox-bubble svg { color: #ffffff; }
-
 @media (max-width: 540px) {
-  /* Widget container: anchor to bottom of screen */
-  .inbox-widget {
-    bottom: 72px; /* above mobile bottom nav */
-    right: 16px;
-  }
-
-  /* Panel becomes a bottom sheet */
+  /* Centred dialog becomes a bottom sheet — easier to reach one-handed */
   .inbox-panel {
-    position: fixed;
+    top: auto;
     bottom: 0;
     left: 0;
     right: 0;
+    transform: none;
     width: 100%;
     max-height: 75vh;
     border-radius: 20px 20px 0 0;
@@ -7404,14 +7422,7 @@ footer {
     border-left: none;
     border-right: none;
     border-bottom: none;
-  }
-
-  .inbox-bubble {
-    position: fixed;
-    bottom: 76px;
-    right: 16px;
-    width: 50px;
-    height: 50px;
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }
 
@@ -8180,20 +8191,8 @@ footer {
   box-shadow: 0 0 0 3px rgba(24,24,27,.07);
 }
 
-.vault-sidebar-footer .vault-logout {
-  margin-top: 0;
-}
 
 /* Sidebar footer — user card + logout */
-.vault-sidebar-footer {
-  margin-top: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(255,255,255,.07);
-}
-
 .vault-user-card {
   display: flex;
   align-items: center;
@@ -8263,9 +8262,15 @@ footer {
   min-width: 0;
 }
 
+/* Mark-only logo, shown once the docked sidebar is gone */
 .vault-tb-logo {
   display: none;
   flex-shrink: 0;
+}
+
+.vault-tb-logo .logo-mark {
+  width: 28px;
+  height: 28px;
 }
 
 .vault-tb-title {
@@ -8276,85 +8281,183 @@ footer {
   white-space: nowrap;
 }
 
-.vault-topbar-new .vault-search-wrap {
-  flex: 0 0 340px;
-  max-width: 340px;
-  position: relative;
-}
-
-.vault-topbar-new .vault-search {
-  width: 100%;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 0 13px;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: var(--shadow);
-  color: var(--ink4);
-  transition: border-color .14s, box-shadow .14s;
-}
-
-.vault-topbar-new .vault-search:focus-within {
-  border-color: var(--ink3);
-  box-shadow: 0 0 0 3px rgba(24,24,27,.06);
-}
-
-.vault-topbar-new .vault-search input {
-  width: 100%;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: var(--ink);
-  font-size: 13px;
-}
-
 .vault-tb-right {
   flex: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  gap: 4px;
+}
+
+/* Icon-only topbar action (search). Borderless — the topbar stays quiet. */
+.vault-tb-icon-btn {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--ink3);
+  cursor: pointer;
+  transition: background .14s, color .14s;
+}
+
+.vault-tb-icon-btn:hover {
+  background: var(--line2);
+  color: var(--ink);
 }
 
 .vault-profile-wrap {
   position: relative;
 }
 
-/* Profile button in new topbar */
+/* Avatar only — no border, no name, no chevron. */
 .vault-profile-btn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 36px;
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  padding: 0 10px 0 6px;
-  color: var(--ink);
-  font-size: 13px;
-  font-weight: 700;
-  box-shadow: var(--shadow);
-  transition: border-color .14s;
+  justify-content: center;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  padding: 0;
   cursor: pointer;
+  transition: box-shadow .14s;
 }
 
-.vault-profile-btn:hover {
-  border-color: var(--ink3);
+.vault-profile-btn:hover,
+.vault-profile-btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--line2);
+  outline: none;
 }
 
 .vault-tb-avatar {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
   background: var(--ink);
-  color: var(--hl);
-  font-size: 10px;
+  color: var(--white);
+  font-size: 12px;
   font-weight: 800;
+}
+
+/* ── Search overlay (opened from the topbar magnifier / Ctrl+K) ──────────── */
+.vault-search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 12vh 16px 16px;
+  background: rgba(24, 24, 27, .38);
+  animation: vault-search-fade .12s ease both;
+}
+
+.vault-search-modal {
+  width: min(560px, 100%);
+  max-height: 76vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow-lg);
+  padding: 10px;
+  animation: vault-search-in .14s ease both;
+}
+
+.vault-search-modal .vault-search {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: var(--line2);
+  box-shadow: none;
+  color: var(--ink4);
+  flex-shrink: 0;
+}
+
+.vault-search-modal .vault-search:focus-within {
+  background: var(--white);
+  border-color: var(--ink3);
+}
+
+.vault-search-modal .vault-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.vault-search-modal .vault-search input::placeholder {
+  color: var(--ink4);
+  font-weight: 400;
+}
+
+.vault-search-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink4);
+  padding: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.vault-search-close:hover { color: var(--ink); }
+
+/* In the modal the results sit in flow, not as an absolute dropdown. */
+.vault-search-modal .vault-search-results {
+  position: static;
+  width: auto;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 6px 0 0;
+  margin: 0;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.vault-search-hint {
+  font-size: 12.5px;
+  color: var(--ink4);
+  text-align: center;
+  padding: 18px 0 12px;
+  margin: 0;
+}
+
+@keyframes vault-search-fade {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
+
+@keyframes vault-search-in {
+  from { opacity: 0; transform: translateY(-6px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vault-search-overlay,
+  .vault-search-modal {
+    animation: none;
+  }
 }
 
 /* New main content area */
@@ -8375,29 +8478,11 @@ footer {
     padding: 8px;
   }
 
-  .vault-profile-btn span,
-  .vault-profile-btn svg:last-child {
-    display: none;
-  }
-
-  .vault-topbar-new .vault-search-wrap {
-    flex: 1;
-    max-width: none;
-  }
-
-  .vault-tb-left {
-    display: none;
-  }
 }
 
 @media (max-width: 900px) {
   .vault-topbar-new {
     padding: 0 14px;
-  }
-
-  .vault-topbar-new .vault-search-wrap {
-    flex: 1;
-    max-width: none;
   }
 
   .vault-main-new {
@@ -10352,19 +10437,55 @@ html {
 
 .db-header-stats {
   display: flex;
-  gap: 24px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
+/* Stat tiles: bare numbers floating at the right edge had no visual anchor and
+   collapsed awkwardly on narrow screens. */
 .db-header-stat {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 96px;
+  padding: 11px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--white);
 }
 
-.db-header-stat strong { font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1; }
-.db-header-stat span   { font-size: 11px; color: var(--ink3); white-space: nowrap; }
+.db-header-stat strong { font-size: 20px; font-weight: 800; color: var(--ink); line-height: 1; }
+.db-header-stat span {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--ink4);
+  white-space: nowrap;
+}
+
+/* Dashboard header stacks on phones — it was a space-between flex, so the
+   greeting and the stats fought for the same row. */
+@media (max-width: 720px) {
+  .db-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+  .db-header-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .db-header-stat {
+    min-width: 0;
+    align-items: center;
+    padding: 10px 6px;
+  }
+  .db-header-stat span { font-size: 9.5px; letter-spacing: .04em; }
+  .db-section-head { align-items: flex-start; }
+}
 
 /* Sections */
 .db-section {
@@ -11537,7 +11658,7 @@ html {
 .logout-spinner {
   width: 44px;
   height: 44px;
-  color: #FDE047;
+  color: #fff;
   animation: spin 0.9s linear infinite;
   stroke-dasharray: 90;
   stroke-dashoffset: 60;
@@ -11548,62 +11669,66 @@ html {
 }
 
 /* ── Sidebar revamp ──────────────────────────────────────────────────────── */
+/* Dark sidebar. The whole theme lives in these tokens — swap this block to
+   restyle it; every rule below reads from them rather than hardcoding a hex. */
 .vault-sidebar-simple {
-  background: #111113;
-  border-right: 1px solid rgba(255,255,255,.06);
+  --sb-bg: #18181B;
+  --sb-line: #27272A;
+  --sb-text: #A1A1AA;
+  --sb-text-strong: #FAFAFA;
+  --sb-muted: #52525B;
+  --sb-hover-bg: rgba(255, 255, 255, .06);
+  --sb-active-bg: rgba(255, 255, 255, .10);
+
+  background: var(--sb-bg);
+  border-right: 1px solid var(--sb-line);
+  color: var(--sb-text);
+  /* 18px matches .admin-rail's padding — see .vault-sidebar-head for the
+     logo's resulting top offset. */
   padding: 18px 14px;
   gap: 0;
   display: flex;
   flex-direction: column;
 }
 
-.vault-logo {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #fff;
-  text-decoration: none;
-  padding: 6px 8px 6px 4px;
-  border-radius: 12px;
-  margin-bottom: 28px;
-  transition: background .15s;
+/* Invert the mark: white square, dark glyph. The landing page's black square
+   would disappear against --sb-bg. */
+.vault-sidebar-simple .vault-logo .logo-mark {
+  color: var(--sb-text-strong);
+  --logo-glyph: var(--sb-bg);
 }
 
-.vault-logo:hover {
-  background: rgba(255,255,255,.05);
+.vault-sidebar-simple .vault-logo .logo-words-top { color: var(--sb-text-strong); }
+.vault-sidebar-simple .vault-logo .logo-words-sub { color: var(--sb-text); }
+
+.vault-sidebar-simple .vault-logo:hover .logo-mark {
+  filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .5));
 }
 
-.vault-logo-mark {
-  width: 36px;
-  height: 36px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+/* Uses the shared <Logo /> at its landing-page size and spacing. The wordmark's
+   type scale is tuned for a 40px mark, so resizing one without the other throws
+   the lockup out of alignment — inherit both, override neither.
+   Left padding matches .vault-nav-item so the mark lines up with the nav icons.
+   Hover feedback comes from the landing `.logo:hover .logo-mark` lift. */
+/* Copies .admin-rail-header: a plain flex row, NO fixed height. The logo's top
+   offset comes from padding alone, exactly as on the admin page —
+   18px (.vault-sidebar-simple) + 4px (.vault-logo) = 22px, matching
+   .admin-rail's 18px + .admin-rail .logo's 4px.
+   margin-bottom mirrors .admin-rail's 18px row gap.
+   Also holds the drawer close button, which is mobile-only. */
+.vault-sidebar-head {
   flex-shrink: 0;
-  border-radius: 10px;
-  background: rgba(253,224,71,.1);
-  border: 1px solid rgba(253,224,71,.2);
-}
-
-.vault-logo-text {
   display: flex;
-  flex-direction: column;
-  line-height: 1.1;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 18px;
 }
 
-.vault-logo-text strong {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -.3px;
-  color: #fff;
-}
-
-.vault-logo-text small {
-  font-size: 11px;
-  font-weight: 500;
-  color: #71717a;
-  letter-spacing: .02em;
+/* 4px vertical matches .admin-rail .logo. Left padding matches .vault-nav-item
+   so the mark aligns with the nav icons below. */
+.vault-sidebar-simple .vault-logo {
+  padding: 4px 0 4px 12px;
 }
 
 .vault-nav {
@@ -11618,13 +11743,14 @@ html {
   font-weight: 700;
   letter-spacing: 1.6px;
   text-transform: uppercase;
-  color: #3f3f46;
+  color: var(--sb-muted);
   padding: 0 10px;
   margin: 0 0 8px;
 }
 
 /* Override old nav-item to match new structure */
 .vault-sidebar-simple .vault-nav-item {
+  position: relative;
   width: 100%;
   display: flex;
   align-items: center;
@@ -11632,24 +11758,38 @@ html {
   border: 0;
   border-radius: 10px;
   background: transparent;
-  color: #71717a;
+  color: var(--sb-text);
   padding: 10px 12px;
   text-align: left;
   font-size: 13.5px;
   font-weight: 600;
   letter-spacing: -.01em;
-  transition: all .14s;
+  transition: background .14s, color .14s;
   cursor: pointer;
 }
 
 .vault-sidebar-simple .vault-nav-item:hover {
-  background: rgba(255,255,255,.06);
-  color: #e4e4e7;
+  background: var(--sb-hover-bg);
+  color: var(--sb-text-strong);
 }
 
+/* Active: a lifted tint plus a left accent bar — no brand colour needed. */
 .vault-sidebar-simple .vault-nav-item.active {
-  background: rgba(253,224,71,.13);
-  color: #FDE047;
+  background: var(--sb-active-bg);
+  color: var(--sb-text-strong);
+  font-weight: 700;
+}
+
+.vault-sidebar-simple .vault-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 0 3px 3px 0;
+  background: var(--sb-text-strong);
 }
 
 .vault-nav-icon {
@@ -11659,95 +11799,19 @@ html {
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: rgba(255,255,255,.05);
-  flex-shrink: 0;
-  transition: background .14s;
-}
-
-.vault-sidebar-simple .vault-nav-item:hover .vault-nav-icon {
-  background: rgba(255,255,255,.09);
-}
-
-.vault-sidebar-simple .vault-nav-item.active .vault-nav-icon {
-  background: rgba(253,224,71,.18);
-}
-
-.vault-sidebar-bottom {
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,.07);
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.vault-sidebar-user {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 10px;
-  border-radius: 10px;
-  background: rgba(255,255,255,.04);
-}
-
-.vault-sidebar-avatar {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  background: rgba(253,224,71,.18);
-  color: #FDE047;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: 800;
-  flex-shrink: 0;
-}
-
-.vault-sidebar-user-info {
-  display: flex;
-  flex-direction: column;
-  line-height: 1.1;
-  min-width: 0;
-}
-
-.vault-sidebar-user-info strong {
-  font-size: 13px;
-  font-weight: 700;
-  color: #e4e4e7;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.vault-sidebar-user-info small {
-  font-size: 11px;
-  color: #52525b;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.vault-sidebar-simple .vault-logout {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  border: 0;
-  border-radius: 10px;
   background: transparent;
-  color: #52525b;
-  padding: 9px 12px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .14s;
-  margin-top: 0;
+  flex-shrink: 0;
+  transition: background .14s, color .14s;
 }
 
-.vault-sidebar-simple .vault-logout:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, .09);
+/* Unread dot on the Inbox item — lighter red so it reads against --sb-bg */
+.vault-nav-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #F87171;
+  margin-left: auto;
+  flex-shrink: 0;
 }
 
 /* Collapse sidebar labels/text at narrow width */
@@ -11756,18 +11820,20 @@ html {
     grid-template-columns: 68px minmax(0, 1fr);
   }
 
-  .vault-logo-text,
+  .vault-sidebar-simple .vault-logo .logo-words,
   .vault-nav-label,
-  .vault-sidebar-user-info,
-  .vault-sidebar-simple .vault-nav-item > span:not(.vault-nav-icon),
-  .vault-sidebar-simple .vault-logout > span {
+  .vault-sidebar-simple .vault-nav-item > span:not(.vault-nav-icon) {
     display: none;
   }
 
-  .vault-logo {
+  /* Icon rail: centre the mark, no close button at this width */
+  .vault-sidebar-head {
     justify-content: center;
-    padding: 6px;
     margin-bottom: 20px;
+  }
+
+  .vault-sidebar-simple .vault-logo {
+    padding: 4px 0;
   }
 
   .vault-sidebar-simple .vault-nav-item {
@@ -11780,89 +11846,116 @@ html {
     height: 34px;
   }
 
-  .vault-sidebar-user {
-    justify-content: center;
-    padding: 8px 0;
-  }
-
-  .vault-sidebar-simple .vault-logout {
-    justify-content: center;
-    padding: 9px 0;
-  }
 }
 
-/* ── Mobile bottom navigation bar ─────────────────────────────────────── */
-.vault-bottom-nav {
+/* ── Mobile nav drawer (replaces the old bottom bar) ───────────────────── */
+/* Hamburger lives in the topbar; desktop keeps the sidebar docked so both are
+   hidden above the mobile breakpoint. */
+.vault-nav-toggle,
+.vault-nav-close {
   display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  background: #fff;
-  border-top: 1px solid var(--line);
-  z-index: 60;
-  padding-bottom: env(safe-area-inset-bottom);
-  -webkit-tap-highlight-color: transparent;
-}
-.vault-bottom-nav-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2px;
   background: none;
   border: none;
   cursor: pointer;
-  color: var(--ink4);
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  padding: 6px 4px;
-  transition: color 0.15s;
+  color: var(--ink);
+  padding: 8px;
+  margin-left: -8px;
+  border-radius: 8px;
   -webkit-tap-highlight-color: transparent;
 }
-.vault-bottom-nav-item.active {
-  color: var(--ink);
+.vault-nav-toggle:active { background: var(--line2); }
+
+.vault-nav-overlay {
+  position: fixed;
+  inset: 0;
+  /* Below the search/inbox dialogs (1200), above page content, and below
+     .logout-overlay (9999). */
+  z-index: 1100;
+  background: rgba(0, 0, 0, .45);
+  /* Compositor-only fade — no layout/paint on the main thread */
+  animation: vault-nav-fade .18s ease;
 }
-.vault-bottom-nav-item.active svg {
-  color: #ca8a04;
-}
-.vault-bottom-nav-item:active { opacity: 0.65; }
+@keyframes vault-nav-fade { from { opacity: 0 } to { opacity: 1 } }
 
 /* ── Mobile layout ≤ 768px ─────────────────────────────────────────────── */
 @media (max-width: 768px) {
-  /* Show bottom nav */
-  .vault-bottom-nav { display: flex; }
+  .vault-nav-toggle { display: inline-flex; }
 
-  /* Hide sidebar */
-  .vault-sidebar-simple { display: none !important; }
+  /* Sidebar becomes an off-canvas drawer. It stays mounted and is moved with
+     transform (GPU compositing) rather than display/left, so opening never
+     triggers layout or a re-render. */
+  .vault-sidebar-simple {
+    display: flex !important;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 268px;
+    max-width: 84vw;
+    z-index: 1110;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    transform: translateX(-100%);
+    transition: transform .22s cubic-bezier(.4, 0, .2, 1);
+    will-change: transform;
+    box-shadow: 0 0 40px rgba(0, 0, 0, .18);
+    padding-top: 48px;
+  }
+  .vault-sidebar-simple.open { transform: translateX(0); }
+
+  /* Sits in .vault-sidebar-head, level with the logo — not floating. */
+  .vault-nav-close {
+    display: inline-flex;
+    margin: 0;
+    color: var(--sb-text);
+    flex-shrink: 0;
+  }
+
+  .vault-nav-close:active { background: var(--sb-hover-bg); }
+
+  /* Undo the <=1120px icon-rail collapse — the drawer is wide, show labels */
+  .vault-sidebar-simple .vault-nav-label,
+  .vault-sidebar-simple .vault-nav-item > span:not(.vault-nav-icon) {
+    display: block;
+  }
+  .vault-sidebar-simple .vault-logo .logo-words {
+    display: flex;
+  }
+  /* Drawer is wide: logo back to the left, close button opposite it */
+  .vault-sidebar-head {
+    justify-content: space-between;
+  }
+  .vault-sidebar-simple .vault-logo {
+    justify-content: flex-start;
+    padding: 4px 0 4px 12px;
+  }
+  .vault-sidebar-simple .vault-nav-item {
+    justify-content: flex-start;
+    padding: 11px 12px;
+  }
 
   /* Full-width single-column layout */
   .vault-app-simple {
     grid-template-columns: 1fr;
   }
 
-  /* Topbar: show logo + title, compact padding */
+  /* Topbar: logo replaces the docked sidebar as the brand anchor */
   .vault-tb-left {
-    display: flex !important;
+    display: flex;
     flex-shrink: 0;
+    align-items: center;
+    gap: 4px;
   }
   .vault-tb-logo { display: flex; }
   .vault-topbar-new {
     padding: 0 12px;
     gap: 8px;
   }
-  .vault-topbar-new .vault-search-wrap {
-    flex: 1;
-    max-width: none;
-    min-width: 0;
-  }
-
-  /* Main content: extra bottom padding so content clears the bottom nav */
+  /* No bottom bar any more — content only needs breathing room */
   .vault-main-new {
-    padding: 14px 12px calc(56px + env(safe-area-inset-bottom) + 16px);
+    padding: 14px 12px calc(28px + env(safe-area-inset-bottom));
   }
 
   /* Prevent horizontal overflow — root container + content area */
@@ -11871,9 +11964,9 @@ html {
     overflow-x: hidden;
   }
 
-  /* Profile btn: only avatar on mobile */
-  .vault-profile-btn span,
-  .vault-profile-btn svg:last-child {
+  /* The logo already identifies the page context on mobile; the title just
+     crowds a 360px bar. */
+  .vault-tb-title {
     display: none;
   }
 }
@@ -12332,7 +12425,6 @@ html {
 @media (max-width: 380px) {
   .vault-tb-title { display: none; }
   .vault-topbar-new { padding: 0 8px; gap: 6px; }
-  .vault-bottom-nav-item { font-size: 9px; gap: 1px; }
 }
 
 /* ── Legal pages (Privacy / Terms) ──────────────────────────────────────── */

@@ -3,16 +3,19 @@ import { InboxWidget } from '../common/InboxWidget'
 import {
   BarChart3,
   BookOpen,
-  ChevronDown,
   ChevronRight,
   Home,
+  Inbox,
   LogOut,
+  Menu,
   Search,
+  X,
 } from 'lucide-react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 import { fetchExamCatalog, type Exam } from '../../lib/api'
+import { Logo } from '../ui/Logo'
 
 type NavItem = {
   icon: typeof Home
@@ -21,7 +24,7 @@ type NavItem = {
 }
 
 const primaryNav: NavItem[] = [
-  { icon: Home,      label: 'Dashboard', href: '/dashboard' },
+  { icon: Home,      label: 'Home',      href: '/dashboard' },
   { icon: BookOpen,  label: 'All Exams', href: '/exams' },
   { icon: BarChart3, label: 'Analytics', href: '/analytics' },
 ]
@@ -33,7 +36,7 @@ function isNavActive(href: string, pathname: string): boolean {
 }
 
 function getPageTitle(pathname: string): string {
-  if (pathname === '/dashboard') return 'Dashboard'
+  if (pathname === '/dashboard') return 'Home'
   if (pathname.startsWith('/admin')) return 'Admin'
   if (pathname.startsWith('/mock-attempt/')) return 'Mock Test'
   if (pathname.startsWith('/mock-test')) return 'Tests'
@@ -67,7 +70,13 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [allExams, setAllExams] = useState<Exam[]>([])
   const [profileOpen, setProfileOpen] = useState(false)
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-  const searchRef = useRef<HTMLDivElement | null>(null)
+  // Mobile nav drawer (replaces the old bottom bar at <=768px)
+  const [navOpen, setNavOpen] = useState(false)
+  // Search is an overlay now, opened from the magnifier in the topbar
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [inboxOpen, setInboxOpen] = useState(false)
+  const [inboxUnread, setInboxUnread] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement | null>(null)
   const profileRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -81,12 +90,54 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     setSearchQuery('')
     setProfileOpen(false)
+    setNavOpen(false)
+    setSearchOpen(false)
+    setInboxOpen(false)
   }, [location.pathname])
+
+  // Search overlay: focus the field on open, Escape to close, lock scroll.
+  // Ctrl/Cmd+K opens it from anywhere.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [])
+
+  useEffect(() => {
+    if (!searchOpen) return
+    searchInputRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setSearchOpen(false) }
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [searchOpen])
+
+  // Close the drawer on Escape, and lock body scroll while it is open so the
+  // page behind does not scroll under the overlay on touch devices.
+  useEffect(() => {
+    if (!navOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setNavOpen(false) }
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [navOpen])
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node
-      if (searchRef.current && !searchRef.current.contains(target)) setSearchQuery('')
       if (profileRef.current && !profileRef.current.contains(target)) setProfileOpen(false)
     }
     document.addEventListener('mousedown', handlePointerDown)
@@ -126,20 +177,28 @@ export function AppShell({ children }: { children: ReactNode }) {
     <>
       {isLoggingOut && <LogoutOverlay />}
       <section className="vault-app vault-app-simple">
-        <aside className="vault-sidebar vault-sidebar-simple">
-          {/* Logo */}
-          <Link className="vault-logo" to={homePathForUser(user)}>
-            <span className="vault-logo-mark">
-              <svg viewBox="0 0 40 40" fill="none" width="32" height="32" aria-hidden="true">
-                <rect width="40" height="40" rx="10" fill="rgba(253,224,71,0.15)" />
-                <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="#FDE047" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </span>
-            <div className="vault-logo-text">
-              <strong>Ministry</strong>
-              <small>of Papers</small>
-            </div>
-          </Link>
+        {/* Backdrop for the mobile drawer — desktop keeps the sidebar docked */}
+        {navOpen && (
+          <div className="vault-nav-overlay" onClick={() => setNavOpen(false)} aria-hidden="true" />
+        )}
+
+        <aside
+          className={`vault-sidebar vault-sidebar-simple${navOpen ? ' open' : ''}`}
+          id="vault-nav"
+        >
+          {/* Logo and the drawer close button share one row so they sit level.
+              The close button is mobile-only; on desktop this row is just the logo. */}
+          <div className="vault-sidebar-head">
+            <Logo to={homePathForUser(user)} className="vault-logo" />
+            <button
+              type="button"
+              className="vault-nav-close"
+              onClick={() => setNavOpen(false)}
+              aria-label="Close menu"
+            >
+              <X size={18} />
+            </button>
+          </div>
 
           {/* Nav */}
           <nav className="vault-nav">
@@ -155,49 +214,102 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span>{item.label}</span>
               </button>
             ))}
+
+            {/* Suggestions inbox — opens a panel rather than routing */}
+            <button
+              className={`vault-nav-item${inboxOpen ? ' active' : ''}`}
+              type="button"
+              onClick={() => { setInboxOpen(true); setNavOpen(false) }}
+            >
+              <span className="vault-nav-icon"><Inbox size={16} /></span>
+              <span>Inbox</span>
+              {inboxUnread && <span className="vault-nav-dot" aria-label="Unread reply" />}
+            </button>
           </nav>
 
-          {/* Bottom: user + logout */}
-          <div className="vault-sidebar-bottom">
-            <div className="vault-sidebar-user">
-              <div className="vault-sidebar-avatar">{avatarInitial}</div>
-              <div className="vault-sidebar-user-info">
-                <strong>{firstName}</strong>
-                <small>{user?.email}</small>
-              </div>
-            </div>
-            <button
-              className="vault-logout"
-              type="button"
-              onClick={() => void handleLogout()}
-              aria-label="Logout"
-            >
-              <LogOut size={15} />
-              <span>Logout</span>
-            </button>
-          </div>
         </aside>
 
         <div className="vault-workspace">
           <header className="vault-topbar-new">
             <div className="vault-tb-left">
-              <Link className="vault-tb-logo" to={homePathForUser(user)} aria-label="Home">
-                <svg viewBox="0 0 40 40" fill="none" width="24" height="24" aria-hidden="true">
-                  <rect width="40" height="40" rx="10" fill="rgba(253,224,71,0.15)" />
-                  <path d="M8 30 L8 12 L16 22 L20 13 L24 22 L32 12 L32 30" stroke="#FDE047" strokeWidth="3.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Link>
+              <button
+                type="button"
+                className="vault-nav-toggle"
+                onClick={() => setNavOpen(true)}
+                aria-label="Open menu"
+                aria-expanded={navOpen}
+                aria-controls="vault-nav"
+              >
+                <Menu size={20} />
+              </button>
+              <Logo to={homePathForUser(user)} markOnly className="vault-tb-logo" />
               <span className="vault-tb-title">{pageTitle}</span>
             </div>
 
-            <div className="vault-search-wrap" ref={searchRef}>
+            <div className="vault-tb-right">
+              <button
+                type="button"
+                className="vault-tb-icon-btn"
+                onClick={() => setSearchOpen(true)}
+                aria-label="Search exams"
+              >
+                <Search size={18} />
+              </button>
+
+              <div className="vault-profile-wrap" ref={profileRef}>
+                <button
+                  className="vault-profile-btn"
+                  type="button"
+                  onClick={() => setProfileOpen((open) => !open)}
+                  aria-label="Open profile menu"
+                >
+                  <div className="vault-tb-avatar">{avatarInitial}</div>
+                </button>
+
+                {profileOpen ? (
+                  <div className="vault-profile-menu">
+                    <strong>{user?.name}</strong>
+                    <small>{user?.email}</small>
+                    <button type="button" onClick={() => void handleLogout()}>
+                      <LogOut size={14} /> Logout
+                    </button>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </header>
+
+          <main className="vault-main-new">
+            {children}
+          </main>
+        </div>
+
+        {/* Search overlay — replaces the old always-on topbar input */}
+        {searchOpen && (
+          <div className="vault-search-overlay" onClick={() => setSearchOpen(false)}>
+            <div
+              className="vault-search-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Search exams"
+              onClick={(e) => e.stopPropagation()}
+            >
               <label className="vault-search">
-                <Search size={14} />
+                <Search size={16} />
                 <input
+                  ref={searchInputRef}
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
                   placeholder="Search exams, subjects..."
                 />
+                <button
+                  type="button"
+                  className="vault-search-close"
+                  onClick={() => setSearchOpen(false)}
+                  aria-label="Close search"
+                >
+                  <X size={16} />
+                </button>
               </label>
 
               {searchQuery.trim() ? (
@@ -225,60 +337,21 @@ export function AppShell({ children }: { children: ReactNode }) {
                     </div>
                   )}
                 </div>
-              ) : null}
+              ) : (
+                <p className="vault-search-hint">Start typing to find an exam.</p>
+              )}
             </div>
+          </div>
+        )}
 
-            <div className="vault-tb-right">
-              <div className="vault-profile-wrap" ref={profileRef}>
-                <button
-                  className="vault-profile-btn"
-                  type="button"
-                  onClick={() => setProfileOpen((open) => !open)}
-                  aria-label="Open profile menu"
-                >
-                  <div className="vault-tb-avatar">{avatarInitial}</div>
-                  <span>{firstName}</span>
-                  <ChevronDown size={13} />
-                </button>
-
-                {profileOpen ? (
-                  <div className="vault-profile-menu">
-                    <strong>{user?.name}</strong>
-                    <small>{user?.email}</small>
-                    <button type="button" onClick={() => void handleLogout()}>
-                      <LogOut size={14} /> Logout
-                    </button>
-                  </div>
-                ) : null}
-              </div>
-            </div>
-          </header>
-
-          <main className="vault-main-new">
-            {children}
-          </main>
-        </div>
-
-        {/* Floating inbox widget — logged-in users only */}
+        {/* Suggestions inbox — opened from the sidebar, logged-in users only */}
         <InboxWidget
+          open={inboxOpen}
+          onClose={() => setInboxOpen(false)}
+          onUnreadChange={setInboxUnread}
           searchTerm={searchQuery.trim() && searchResults.length === 0 ? searchQuery.trim() : undefined}
         />
 
-        {/* Mobile bottom nav — only visible at ≤768px */}
-        <nav className="vault-bottom-nav" aria-label="Main navigation">
-          {primaryNav.map((item) => (
-            <button
-              className={`vault-bottom-nav-item${isNavActive(item.href, location.pathname) ? ' active' : ''}`}
-              type="button"
-              key={item.label}
-              onClick={() => handleNavigate(item.href)}
-              aria-label={item.label}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
-            </button>
-          ))}
-        </nav>
       </section>
     </>
   )

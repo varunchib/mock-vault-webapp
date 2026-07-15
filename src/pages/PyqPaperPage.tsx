@@ -17,7 +17,7 @@ import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { paperGuideMap } from '../data/postGuides'
 import { apiPaperSlug, paperPath, paperSeoOverride } from '../lib/paperSeo'
-import { buildPaperFaqs, paperFaqJsonLd } from '../lib/paperFaqs'
+import { buildPaperFaqs, formatHeldOn, paperFaqJsonLd } from '../lib/paperFaqs'
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D']
 
@@ -189,6 +189,7 @@ export function PyqPaperPage() {
           {paper.shift && <p className="pyq-paper-shift">{paper.shift}</p>}
           <div className="pyq-paper-meta-row">
             <span>{paper.questions} questions</span>
+            {paper.heldOn && <span>Held on {formatHeldOn(paper.heldOn)}</span>}
             <span>Answer key included</span>
             {paper.subjects.length > 0 && <span>{paper.subjects.join(' · ')}</span>}
           </div>
@@ -234,15 +235,12 @@ export function PyqPaperPage() {
         </div>
       </header>
 
+      {/* Intro copy: the page's unique descriptive text for search, and the
+          same prose the worker serves bots as `override.review`. The heading and
+          fact chips that used to live here only restated the <h1> and the header
+          meta row above, so they were dropped rather than restyled. */}
       <section className="pyq-paper-seo-intro">
-        <h2>{seoTitle.replace(' | Ministry of Papers', '')}</h2>
         <p>{seoOverride?.review ?? seoDesc}</p>
-        <div className="pyq-paper-facts">
-          <span>{paper.questions || questions.length} solved questions</span>
-          {paper.heldOn && <span>Held on {paper.heldOn}</span>}
-          {paper.subjects.length > 0 && <span>{paper.subjects.length} subject areas</span>}
-          <span>Free answer key and explanations</span>
-        </div>
       </section>
 
       <div className="pyq-question-list">
