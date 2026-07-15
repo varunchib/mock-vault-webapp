@@ -306,11 +306,6 @@ export function PyqPaperPage() {
                     </div>
                   )}
 
-                  <div className="pyq-solution">
-                    <strong>Answer: {q.answerKey}{q.answer ? ` - ${q.answer}` : ''}</strong>
-                    {q.explanation && <p>{q.explanation}</p>}
-                  </div>
-
                   <div className="pyq-q-actions">
                     {!isRevealed ? (
                       <button
@@ -342,7 +337,11 @@ export function PyqPaperPage() {
                   {isRevealed && isExplOpen && q.explanation && (
                     <div className="pyq-explanation">
                       <strong>Explanation</strong>
-                      <p>{q.explanation}</p>
+                      <div className="pyq-solution-body">
+                        {q.explanation.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean).map((line, li) => (
+                          <p key={li}><MathText text={line} /></p>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </>

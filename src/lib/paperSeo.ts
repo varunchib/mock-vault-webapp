@@ -8,6 +8,39 @@ export type PaperSeoOverride = {
 }
 
 export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
+  // UPSC papers: the official DB titles ("Civil Services (Preliminary) Examination …")
+  // are long and omit the key search term "UPSC", so the rendered <title> truncated
+  // without it. canonicalSlug === apiSlug here, so URLs are unchanged (no redirects).
+  'upsc-cse-prelims-2026-gs1': {
+    apiSlug: 'upsc-cse-prelims-2026-gs1',
+    canonicalSlug: 'upsc-cse-prelims-2026-gs1',
+    title: 'UPSC Prelims 2026 GS Paper 1 (Set A) - Solved, Answer Key',
+    h1: 'UPSC CSE Prelims 2026 General Studies Paper I (Set A) - Fully Solved',
+    description:
+      'Fully solved UPSC CSE Prelims 2026 General Studies Paper I (Set A) held on 24 May 2026 - all 100 questions with the official answer key and detailed explanations, free.',
+    review:
+      'The UPSC Civil Services Prelims 2026 General Studies Paper I (Set A) was held on 24 May 2026 with 100 questions for 200 marks in 2 hours, with a penalty of one-third for each wrong answer. Use this fully solved paper to check the official answer key, review the actual difficulty level across History, Polity, Geography, Economy and Environment, and practise every question with a detailed explanation.',
+  },
+  'upsc-cse-prelims-2025-gs1': {
+    apiSlug: 'upsc-cse-prelims-2025-gs1',
+    canonicalSlug: 'upsc-cse-prelims-2025-gs1',
+    title: 'UPSC Prelims 2025 GS Paper 1 - Fully Solved, Answer Key',
+    h1: 'UPSC CSE Prelims 2025 General Studies Paper I - Fully Solved',
+    description:
+      'Fully solved UPSC CSE Prelims 2025 General Studies Paper I - all 100 questions with the official answer key, subject-wise breakdown and detailed explanations, free.',
+    review:
+      'The UPSC Civil Services Prelims 2025 General Studies Paper I carried 100 questions for 200 marks in 2 hours, with negative marking of one-third per wrong answer. This solved paper lets you verify the official answer key and revise every question with a full explanation.',
+  },
+  'upsc-cse-prelims-2025-gs2': {
+    apiSlug: 'upsc-cse-prelims-2025-gs2',
+    canonicalSlug: 'upsc-cse-prelims-2025-gs2',
+    title: 'UPSC Prelims 2025 CSAT Paper 2 - Fully Solved, Answer Key',
+    h1: 'UPSC CSE Prelims 2025 CSAT (General Studies Paper II) - Fully Solved',
+    description:
+      'Fully solved UPSC CSE Prelims 2025 CSAT (General Studies Paper II) - all 80 questions with the answer key and detailed explanations. Qualifying paper: 33% required.',
+    review:
+      'The UPSC Prelims 2025 CSAT (General Studies Paper II) is a qualifying paper requiring a minimum of 33%, with 80 questions for 200 marks covering Reading Comprehension, Logical Reasoning and Quantitative Aptitude. Practise the full solved paper with answers and explanations.',
+  },
   'jkssb-junior-assistant-pyq': {
     apiSlug: 'jkssb-junior-assistant-pyq',
     canonicalSlug: 'jkssb-junior-assistant-question-paper-2026',
