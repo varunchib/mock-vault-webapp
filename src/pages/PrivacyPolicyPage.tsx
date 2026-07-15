@@ -95,6 +95,18 @@ export function PrivacyPolicyPage() {
                   We use <strong>Google Analytics 4</strong> to understand aggregate usage patterns (pages visited,
                   session duration, device type). GA4 data is anonymised and not linked to your Google account data.
                 </li>
+                <li>
+                  We use <strong>Microsoft Clarity</strong> to understand how the site is actually used, so we can
+                  improve it. Clarity captures behavioural metrics and may record a <strong>session replay</strong> of
+                  your interactions — pages viewed, clicks, scrolling and mouse movement. Clarity automatically
+                  masks text input, so what you type (including anything you enter in forms) is not recorded. This
+                  data is aggregated, is not linked to your Google account data, and is never used for advertising or
+                  sold. It is processed by Microsoft under the{' '}
+                  <a href="https://privacy.microsoft.com/privacystatement" target="_blank" rel="noopener noreferrer">
+                    Microsoft Privacy Statement
+                  </a>. You can opt out by enabling{' '}
+                  <strong>Do Not Track</strong> in your browser or by blocking <code>clarity.ms</code>.
+                </li>
               </ul>
               <h3>Infrastructure logs</h3>
               <ul>
@@ -111,8 +123,9 @@ export function PrivacyPolicyPage() {
               <p>We do <strong>not</strong> sell or rent your personal data. We share data only in these limited circumstances:</p>
               <ul>
                 <li>
-                  <strong>Service providers:</strong> We use Cloudflare (CDN/security) and Oracle Cloud (hosting). These
-                  providers process data solely on our behalf and are bound by data processing agreements.
+                  <strong>Service providers:</strong> We use Cloudflare (CDN/security), Oracle Cloud (hosting),
+                  Google (Sign-In and Analytics) and Microsoft (Clarity product analytics). These providers process
+                  data solely on our behalf and are bound by data processing agreements.
                 </li>
                 <li>
                   <strong>Legal requirements:</strong> We may disclose data if required by law, court order, or to
