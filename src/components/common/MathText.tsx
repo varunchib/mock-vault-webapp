@@ -1,5 +1,25 @@
-import React from 'react'
-import katex from 'katex'
+import React, { useEffect, useMemo, useState } from 'react'
+
+// KaTeX (~270 KB JS + its CSS) is only needed when text actually contains math.
+// Most questions (History, Polity, Current Affairs…) have none, so it is loaded
+// on demand instead of shipping in the main bundle. Module-level singleton: the
+// first component that needs it pays the cost, everyone after reuses it.
+type Katex = typeof import('katex').default
+let katexMod: Katex | null = null
+let katexLoading: Promise<void> | null = null
+
+function loadKatex(): Promise<void> {
+  if (katexMod) return Promise.resolve()
+  if (!katexLoading) {
+    katexLoading = Promise.all([
+      import('katex'),
+      import('katex/dist/katex.min.css'),
+    ]).then(([mod]) => {
+      katexMod = mod.default
+    })
+  }
+  return katexLoading
+}
 
 /**
  * Renders a string that may contain:
@@ -78,46 +98,63 @@ function tokenize(text: string): Token[] {
   return tokens
 }
 
-function renderKatex(latex: string, displayMode: boolean): string {
+// Returns rendered HTML, or null when KaTeX has not loaded yet / failed —
+// callers then fall back to showing the raw expression.
+function renderKatex(latex: string, displayMode: boolean): string | null {
+  if (!katexMod) return null
   try {
-    return katex.renderToString(latex.trim(), {
+    return katexMod.renderToString(latex.trim(), {
       displayMode,
       throwOnError: false,
       strict: false,
     })
   } catch {
-    return latex
+    return null
   }
 }
 
 export function MathText({ text, className }: { text: string; className?: string }) {
+  // Hooks must run unconditionally, so all the early-exit decisions are derived
+  // here rather than returning before them.
+  const tokens = useMemo(() => {
+    if (!text) return null
+    if (!(text.includes('$') || text.includes('**'))) return null
+    return tokenize(text)
+  }, [text])
+
+  const hasMath = useMemo(
+    () => !!tokens?.some(t => t.kind === 'inline-math' || t.kind === 'block-math'),
+    [tokens],
+  )
+
+  // Re-render once KaTeX arrives; until then math shows as its raw expression.
+  const [, setKatexReady] = useState(() => katexMod !== null)
+  useEffect(() => {
+    if (!hasMath || katexMod) return
+    let alive = true
+    void loadKatex().then(() => { if (alive) setKatexReady(true) })
+    return () => { alive = false }
+  }, [hasMath])
+
   if (!text) return null
-
-  const hasSpecial = text.includes('$') || text.includes('**')
-  if (!hasSpecial) return <span className={className}>{text}</span>
-
-  const tokens = tokenize(text)
+  if (!tokens) return <span className={className}>{text}</span>
 
   return (
     <span className={className}>
       {tokens.map((tok, i) => {
         switch (tok.kind) {
-          case 'block-math':
-            return (
-              <span
-                key={i}
-                className="math-block"
-                dangerouslySetInnerHTML={{ __html: renderKatex(tok.content, true) }}
-              />
-            )
-          case 'inline-math':
-            return (
-              <span
-                key={i}
-                className="math-inline"
-                dangerouslySetInnerHTML={{ __html: renderKatex(tok.content, false) }}
-              />
-            )
+          case 'block-math': {
+            const html = renderKatex(tok.content, true)
+            return html
+              ? <span key={i} className="math-block" dangerouslySetInnerHTML={{ __html: html }} />
+              : <span key={i} className="math-block">{tok.content}</span>
+          }
+          case 'inline-math': {
+            const html = renderKatex(tok.content, false)
+            return html
+              ? <span key={i} className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />
+              : <span key={i} className="math-inline">{tok.content}</span>
+          }
           case 'bold':
             return (
               <strong key={i} className="qr-highlight">{tok.content}</strong>
