@@ -1,7 +1,8 @@
 import { createRoot } from 'react-dom/client'
 import App from './App'
 import './index.css'
-import 'katex/dist/katex.min.css'
+// katex CSS is intentionally not imported here — MathText loads it together with
+// the KaTeX library only when text actually contains math.
 
 // ── Google Analytics 4 — lazy loaded after page is idle ─────────
 declare global {
