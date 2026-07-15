@@ -3,7 +3,7 @@ import { Link, Navigate, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
 import { analyticsSeoTitle, analyticsSeoDescription } from '../lib/pageTitles'
-import { readAllResults } from '../lib/mockActivity'
+import { readAllResults, type CombinedResult } from '../lib/mockActivity'
 import { examCutoffs, estimatePercentile } from '../data/examCutoffs'
 import { fetchExamCutoffs, fetchLeaderboard, type ExamCutoffSet, type LeaderboardEntry } from '../lib/api'
 import { useAuth } from '../context/useAuth'
@@ -251,12 +251,29 @@ function HistoryCard({ r, examSlug }: {
 
 // ── Main page ─────────────────────────────────────────────────────────────
 
-export function ExamAnalyticsPage() {
-  const { examSlug = '' } = useParams<{ examSlug: string }>()
-  const { user } = useAuth()
+export type ExamAnalyticsSource = {
+  examSlug: string
+  results: CombinedResult[]
+  userName: string
+  backTo: string
+  backLabel: string
+  asUserId: string
+}
 
-  const results = useMemo(() => examSlug ? readAllResults(examSlug) : [], [examSlug])
+export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } = {}) {
+  const params = useParams<{ examSlug: string }>()
+  const { user } = useAuth()
+  const examSlug = source?.examSlug ?? params.examSlug ?? ''
+  const asUserId = source?.asUserId
+
+  const results = useMemo(
+    () => (source ? source.results : (examSlug ? readAllResults(examSlug) : [])),
+    [source, examSlug],
+  )
   const examName = results[0]?.examName ?? examSlug
+  const userName = source?.userName ?? user?.name ?? 'You'
+  const backTo = source?.backTo ?? '/analytics'
+  const backLabel = source?.backLabel ?? 'Analytics'
 
   const [apiCutoffs, setApiCutoffs] = useState<ExamCutoffSet[] | null>(null)
   const [leaderboard, setLeaderboard] = useState<{ top10: LeaderboardEntry[]; userRank: number } | null>(null)
@@ -265,8 +282,8 @@ export function ExamAnalyticsPage() {
   useEffect(() => {
     if (!examSlug) return
     fetchExamCutoffs(examSlug).then(setApiCutoffs).catch(() => setApiCutoffs([]))
-    fetchLeaderboard(examSlug).then(setLeaderboard).catch(() => setLeaderboard({ top10: [], userRank: -1 }))
-  }, [examSlug])
+    fetchLeaderboard(examSlug, asUserId).then(setLeaderboard).catch(() => setLeaderboard({ top10: [], userRank: -1 }))
+  }, [examSlug, asUserId])
 
   const recentFirst = useMemo(
     () => [...results].sort((a, b) => new Date(b.attemptedAt).getTime() - new Date(a.attemptedAt).getTime()),
@@ -332,8 +349,23 @@ export function ExamAnalyticsPage() {
     canonicalPath: `/analytics/${examSlug}`,
   })
 
-  if (!examSlug) return <Navigate to="/analytics" replace />
-  if (!results.length || !summary) return <Navigate to={`/exam/${examSlug}`} replace />
+  if (!examSlug) return source ? null : <Navigate to="/analytics" replace />
+  if (!results.length || !summary) {
+    if (source) {
+      return (
+        <section className="ea2-page workspace-page">
+          <header className="ea2-header">
+            <Link to={backTo} className="ea2-back"><ArrowLeft size={14} /> {backLabel}</Link>
+            <div className="ea2-header-body">
+              <h1>{examName}</h1>
+              <p>No attempts recorded for this exam.</p>
+            </div>
+          </header>
+        </section>
+      )
+    }
+    return <Navigate to={`/exam/${examSlug}`} replace />
+  }
 
   const pool = POOL[examSlug] ?? 0
   const poolLabel = pool >= 1000000 ? `${(pool / 100000).toFixed(0)}L` : pool >= 1000 ? `${(pool / 1000).toFixed(0)}K` : ''
@@ -343,8 +375,8 @@ export function ExamAnalyticsPage() {
 
       {/* ── Header ─────────────────────────────────── */}
       <header className="ea2-header">
-        <Link to="/analytics" className="ea2-back">
-          <ArrowLeft size={14} /> Analytics
+        <Link to={backTo} className="ea2-back">
+          <ArrowLeft size={14} /> {backLabel}
         </Link>
         <div className="ea2-header-body">
           <h1>{examName}</h1>
@@ -485,7 +517,7 @@ export function ExamAnalyticsPage() {
         <LeaderboardPanel
           top10={leaderboard?.top10 ?? []}
           userRank={leaderboard?.userRank ?? -1}
-          userName={user?.name ?? 'You'}
+          userName={userName}
         />
       </div>
 

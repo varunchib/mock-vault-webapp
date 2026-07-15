@@ -3,6 +3,7 @@ import { Link, useParams, Navigate } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useAuth } from '../context/useAuth'
 import { postGuides } from '../data/postGuides'
+import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 
 export function PostGuidePage() {
   const { postSlug } = useParams<{ postSlug: string }>()
@@ -217,9 +218,9 @@ export function PostGuidePage() {
             </div>
             <div className="pg-papers-list">
               {guide.papers.map((paper) => (
-                <Link className="pg-paper-row" key={paper.slug} to={`/pyq/${paper.slug}`}>
+                <Link className="pg-paper-row" key={paper.slug} to={paperPath(paper.slug)}>
                   <div className="pg-paper-info">
-                    <span className="pg-paper-title">{paper.title}</span>
+                    <span className="pg-paper-title">{paperSeoOverride(paper.slug)?.title ?? paper.title}</span>
                     <span className="pg-paper-meta">{paper.questions} questions · {paper.year}</span>
                   </div>
                   <ChevronRight size={13} className="pg-paper-arrow" />

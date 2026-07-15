@@ -14,6 +14,21 @@ const TODAY = new Date().toISOString().split('T')[0]
 // Exams that have a dedicated /exam/:slug/overview page. Keep in sync with examFaq.ts keys.
 const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bpsc', 'rssb', 'jkpsc', 'jkpsi'])
 
+// Editorial /guide/:slug pages. Keep in sync with keys of src/data/postGuides.ts.
+const GUIDE_SLUGS = [
+  'jkpsi', 'upsc-cse', 'ssc-cgl', 'bpsc', 'ibps-po', 'jkpsc', 'rssb', 'jkssb', 'neet-ug',
+  'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
+]
+
+const PAPER_SEO_SLUGS = {
+  'jkssb-junior-assistant-pyq': 'jkssb-junior-assistant-question-paper-2026',
+  'jkssb-lab-attendant-2026-may-10': 'jkssb-laboratory-attendant-question-paper-2026',
+  'jkssb-wildlife-guard-2026-may-10': 'jkssb-wildlife-guard-question-paper-2026',
+  'jkssb-patwari-2024-sep1-set-a': 'jkssb-patwari-question-paper-2024',
+  'jkssb-veterinary-pharmacist-2025': 'jkssb-veterinary-pharmacist-question-paper-2025',
+  'jkssb-finance-accounts-2024-paper': 'jkssb-finance-accounts-assistant-question-paper-2024',
+}
+
 async function fetchData(path) {
   const res = await fetch(`${API}${path}`, { signal: AbortSignal.timeout(10000) })
   if (!res.ok) throw new Error(`${path} -> ${res.status}`)
@@ -38,7 +53,11 @@ async function generate() {
     .map(exam => exam.slug)
 
   const mockExamSlugs = new Set(mocks.map(mock => mock.examSlug).filter(Boolean))
-  const paperSlugs = papers.map(paper => paper.slug).filter(Boolean)
+  // Skip near-empty papers (too thin to index → Soft 404).
+  const paperSlugs = papers
+    .filter(paper => (paper.questions ?? 0) >= 5)
+    .map(paper => PAPER_SEO_SLUGS[paper.slug] ?? paper.slug)
+    .filter(Boolean)
 
   console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers`)
 
@@ -54,6 +73,7 @@ async function generate() {
       .map(slug => url(`${BASE}/exam/${slug}/overview`, '0.9', 'monthly')),
     ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
+    ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`

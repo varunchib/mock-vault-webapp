@@ -15,6 +15,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { useAuth } from '../context/useAuth'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { readRecentlyViewed } from '../lib/examActivity'
+import { paperPath } from '../lib/paperSeo'
 
 export const categoryOrder = [
   'Central',
@@ -347,7 +348,7 @@ export function DashboardPage() {
           <div className="db-attempt-list">
             {[...new Map(recentAttempts.map((a) => [`${a.type}-${a.slug}`, a])).values()].map((attempt) => {
               const href = attempt.type === 'paper'
-                ? `/pyq/${attempt.slug}`
+                ? paperPath(attempt.slug)
                 : `/mock-test/${attempt.examSlug}`
               return (
                 <Link className="db-attempt-row" to={href} key={`${attempt.type}-${attempt.slug}`}>

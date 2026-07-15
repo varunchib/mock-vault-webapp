@@ -2,6 +2,7 @@
 // structured data for public SEO routes while keeping the user-facing SPA fast.
 
 import { postGuides } from './src/data/postGuides'
+import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 
 interface Env {
   ASSETS: { fetch(req: Request): Promise<Response> }
@@ -12,6 +13,7 @@ type PageMeta = {
   description: string
   jsonLd?: unknown
   contentHtml?: string
+  robots?: string
 }
 
 type ExamData = {
@@ -73,6 +75,34 @@ const BOT_UA = /Googlebot|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|C
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 const API_TIMEOUT_MS = 4000
+
+// Content-Security-Policy for the SPA shell. Shipped as Report-Only so it CANNOT
+// break the site — it only logs violations to the browser console. Watch for a few
+// days (Google sign-in, GA, KaTeX, framer-motion), then rename the header to
+// `Content-Security-Policy` to enforce it.
+const CSP = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline' https://accounts.google.com https://apis.google.com https://www.googletagmanager.com https://www.google-analytics.com",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data: https:",
+  "font-src 'self' data:",
+  "connect-src 'self' https://api.ministryofpapers.com https://assets.ministryofpapers.com https://accounts.google.com https://www.google-analytics.com https://region1.google-analytics.com",
+  "frame-src https://accounts.google.com",
+  "frame-ancestors 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+].join('; ')
+
+// withSecurityHeaders adds hardening headers to an HTML response. These are all
+// safe (no behavioural change); CSP is Report-Only (see above).
+function withSecurityHeaders(headers: Headers): Headers {
+  headers.set('X-Content-Type-Options', 'nosniff')
+  headers.set('X-Frame-Options', 'DENY')
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin')
+  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()')
+  headers.set('Content-Security-Policy-Report-Only', CSP)
+  return headers
+}
 
 const LEGACY_REDIRECTS: Record<string, string> = {
   '/exam': '/exams',
@@ -202,7 +232,7 @@ function renderQuestionContent(q: QuestionData): string {
     .map(tag => `<span>${htmlText(tag)}</span>`)
     .join(' ')
   const paperLink = q.paperSlug
-    ? `<p><a href="/pyq/${encodeURIComponent(q.paperSlug)}">View full paper: ${htmlText(q.paper)}</a></p>`
+    ? `<p><a href="${paperPath(q.paperSlug)}">View full paper: ${htmlText(q.paper)}</a></p>`
     : ''
   const images = (q.images ?? [])
     .map((src, i) => `<img src="${esc(src)}" alt="Question ${htmlText(q.questionNo)} figure ${i + 1}" loading="lazy" />`)
@@ -227,15 +257,21 @@ function renderQuestionContent(q: QuestionData): string {
 }
 
 function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
+  const override = paperSeoOverride(p.slug)
   const subjectText = (p.subjects ?? []).filter(Boolean).join(', ')
   const questionItems = questions
-    .slice(0, 50)
-    .map(q => `<li><a href="/question/${encodeURIComponent(q.slug)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 180)}</a>${q.answer ? `<br /><small>Answer: ${htmlText(q.answer)}</small>` : ''}</li>`)
+    .map(q => `<li>
+      <a href="/question/${encodeURIComponent(q.slug)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 220)}</a>
+      <br /><small><strong>Answer:</strong> ${htmlText(q.answerKey)}${q.answer ? ` - ${htmlText(q.answer)}` : ''}</small>
+      ${q.explanation ? `<br /><small>${htmlText(q.explanation).slice(0, 260)}</small>` : ''}
+    </li>`)
     .join('')
-  return renderPageShell(`${p.title} solved PYQ`, `
+  return renderPageShell(override?.h1 ?? `${p.title} solved PYQ`, `
+    ${override ? `<p><strong>${htmlText(override.title)}</strong></p>` : ''}
+    ${override ? paragraph(override.review) : ''}
     ${paragraph(p.description)}
     <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` - ${htmlText(p.year)}` : ''}${p.shift ? ` - ${htmlText(p.shift)}` : ''}</p>
-    <p>${p.questions ?? questions.length} questions${subjectText ? ` - Subjects: ${htmlText(subjectText)}` : ''}</p>
+    <p>${p.questions ?? questions.length} solved questions - Answer key included${subjectText ? ` - Subjects: ${htmlText(subjectText)}` : ''}</p>
     ${questionItems ? `<section><h2>Solved questions</h2><ol>${questionItems}</ol></section>` : ''}
   `)
 }
@@ -243,7 +279,7 @@ function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[]): string {
   const paperLinks = papers
     .slice(0, 30)
-    .map(p => `<li><a href="/pyq/${encodeURIComponent(p.slug)}">${htmlText(p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
+    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.title ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
     .join('')
   const mockLinks = mocks
     .slice(0, 20)
@@ -265,7 +301,7 @@ function renderMockContent(exam: ExamData, mocks: MockData[], papers: PaperData[
     .join('')
   const paperLinks = papers
     .slice(0, 10)
-    .map(p => `<li><a href="/pyq/${encodeURIComponent(p.slug)}">${htmlText(p.title)}</a></li>`)
+    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.title ?? p.title)}</a></li>`)
     .join('')
   return renderPageShell(`${exam.shortName} mock tests`, `
     ${paragraph(exam.description)}
@@ -280,7 +316,7 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string]): s
     .join('')
   const about = guide.about.map(paragraph).join('')
   const papers = guide.papers
-    .map(p => `<li><a href="/pyq/${encodeURIComponent(p.slug)}">${htmlText(p.title)}</a> <small>${htmlText(p.year)} - ${p.questions} questions</small></li>`)
+    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.title ?? p.title)}</a> <small>${htmlText(p.year)} - ${p.questions} questions</small></li>`)
     .join('')
   const syllabus = guide.syllabus
     .slice(0, 10)
@@ -361,9 +397,12 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       ])
       if (!e) return null
       const examMocks = (mocks ?? []).filter(m => m.examSlug === slug)
+      // An exam with no papers and no mocks is a thin page → keep it out of the index.
+      const examEmpty = (e.papers ?? 0) === 0 && (e.mocks ?? 0) === 0
       return {
         title: `${e.shortName} - Mock Tests & PYQ Papers | Ministry of Papers`,
         description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
+        robots: examEmpty ? 'noindex, follow' : undefined,
         contentHtml: renderExamContent(e, papers ?? [], examMocks),
         jsonLd: {
           '@context': 'https://schema.org',
@@ -429,35 +468,54 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
 
     const paperMatch = pathname.match(/^\/pyq\/([^/]+)$/)
     if (paperMatch) {
-      const slug = paperMatch[1]
+      const requestSlug = paperMatch[1]
+      const slug = apiPaperSlug(requestSlug)
       const [p, questions] = await Promise.all([
         apiJson<PaperData>(`${API}/api/v1/papers/${slug}`, 3600),
         apiJson<QuestionData[]>(`${API}/api/v1/papers/${slug}/questions`, 3600),
       ])
       if (!p) return null
+      const override = paperSeoOverride(p.slug)
+      const canonical = `${BASE}${paperPath(p.slug)}`
+      const title = override?.title ?? titleFit(`${p.title} PYQ - Solved Questions & Answers`)
+      const description = override?.description ?? (p.description || `${p.examName} PYQ - solved previous year question paper with answers and detailed explanations, free on Ministry of Papers.`)
       return {
-        title: titleFit(`${p.title} PYQ - Solved Questions & Answers`),
-        description: p.description || `${p.examName} PYQ - solved previous year question paper with answers and detailed explanations, free on Ministry of Papers.`,
+        title,
+        description,
         contentHtml: renderPaperContent(p, questions ?? []),
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'LearningResource',
-          name: `${p.title} PYQ - Solved Questions & Answers`,
-          description: p.description || `${p.examName} PYQ - solved previous year question paper with answers and detailed explanations.`,
-          url: `${BASE}/pyq/${slug}`,
-          learningResourceType: 'Practice Test',
-          educationalUse: 'Practice',
-          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: {
+        jsonLd: [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'LearningResource',
+            name: title.replace(' | Ministry of Papers', ''),
+            description,
+            url: canonical,
+            learningResourceType: 'Previous Year Question Paper',
+            educationalUse: 'Practice',
+            numberOfQuestions: p.questions ?? questions?.length,
+            teaches: (p.subjects ?? []).join(', '),
+            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: title.replace(' | Ministry of Papers', ''),
+            description,
+            url: canonical,
+            author: { '@type': 'Organization', name: 'Ministry of Papers' },
+            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+          },
+          {
+            '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
               { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
               { '@type': 'ListItem', position: 3, name: p.examName, item: `${BASE}/exam/${p.examSlug}` },
-              { '@type': 'ListItem', position: 4, name: p.title, item: `${BASE}/pyq/${slug}` },
+              { '@type': 'ListItem', position: 4, name: title.replace(' | Ministry of Papers', ''), item: canonical },
             ],
           },
-        },
+        ],
       }
     }
 
@@ -471,7 +529,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         { '@type': 'ListItem', position: 2, name: q.examName, item: `${BASE}/exam/${q.examSlug}` },
         ...(q.paperSlug
           ? [
-              { '@type': 'ListItem', position: 3, name: q.paper, item: `${BASE}/pyq/${q.paperSlug}` },
+              { '@type': 'ListItem', position: 3, name: q.paper, item: `${BASE}${paperPath(q.paperSlug)}` },
               { '@type': 'ListItem', position: 4, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` },
             ]
           : [{ '@type': 'ListItem', position: 3, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
@@ -552,6 +610,10 @@ function injectMeta(html: string, meta: PageMeta, pathname: string): string {
     result = result.replace('</head>', `${scripts}\n</head>`)
   }
 
+  if (meta.robots) {
+    result = result.replace('</head>', `  <meta name="robots" content="${esc(meta.robots)}" />\n</head>`)
+  }
+
   const content = meta.contentHtml ?? `<h1>${esc(h1Text(meta.title))}</h1>`
   return result.replace('<div id="root"></div>', `<div id="root">${content}</div>`)
 }
@@ -574,6 +636,25 @@ export default {
       dest.pathname = LEGACY_REDIRECTS[path]
       dest.search = ''
       return Response.redirect(dest.toString(), 301)
+    }
+
+    if (path === '/exams' && url.searchParams.get('q')?.includes('{search_term_string}')) {
+      const dest = new URL(request.url)
+      dest.pathname = '/exams'
+      dest.search = ''
+      return Response.redirect(dest.toString(), 301)
+    }
+
+    const pyqMatch = path.match(/^\/pyq\/([^/]+)$/)
+    if (pyqMatch) {
+      const apiSlug = apiPaperSlug(pyqMatch[1])
+      const canonicalSlug = canonicalPaperSlug(apiSlug)
+      if (pyqMatch[1] !== canonicalSlug) {
+        const dest = new URL(request.url)
+        dest.pathname = `/pyq/${canonicalSlug}`
+        dest.search = ''
+        return Response.redirect(dest.toString(), 301)
+      }
     }
 
     if (path !== '/' && path.endsWith('/')) {
@@ -621,7 +702,7 @@ export default {
         if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
         const html = await baseRes.text()
         const enhanced = injectMeta(html, staticMeta, path)
-        const headers = new Headers(baseRes.headers)
+        const headers = withSecurityHeaders(new Headers(baseRes.headers))
         headers.set('content-type', 'text/html; charset=UTF-8')
         headers.delete('content-length')
         return new Response(enhanced, { status: 200, headers })
@@ -631,7 +712,8 @@ export default {
     }
 
     if (!BOT_UA.test(ua)) {
-      return env.ASSETS.fetch(indexRequest)
+      const res = await env.ASSETS.fetch(indexRequest)
+      return new Response(res.body, { status: res.status, headers: withSecurityHeaders(new Headers(res.headers)) })
     }
 
     try {
@@ -643,11 +725,18 @@ export default {
       if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
       if (!meta) return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()
 
+      // Client-side tab/filter URLs (?tab=…, ?subject=…) are duplicates of the
+      // clean canonical page → keep them out of the index.
+      if (/[?&](tab|subject)=/i.test(url.search)) {
+        meta.robots = 'noindex, follow'
+      }
+
       const html = await baseRes.text()
       const enhanced = injectMeta(html, meta, path)
-      const headers = new Headers(baseRes.headers)
+      const headers = withSecurityHeaders(new Headers(baseRes.headers))
       headers.set('content-type', 'text/html; charset=UTF-8')
       headers.delete('content-length')
+      if (meta.robots) headers.set('X-Robots-Tag', meta.robots)
       return new Response(enhanced, { status: 200, headers })
     } catch {
       return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()

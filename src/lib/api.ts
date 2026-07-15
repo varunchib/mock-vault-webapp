@@ -161,6 +161,11 @@ function normalizeBaseUrl() {
   if (!baseUrl) return "";
 
   let normalized = baseUrl.replace(/\/+$/, "");
+  const hostname = typeof window !== "undefined" ? window.location.hostname : "";
+  const isProductionHost = hostname === "ministryofpapers.com" || hostname === "www.ministryofpapers.com";
+  if (isProductionHost) {
+    normalized = "https://api.ministryofpapers.com";
+  }
 
   if (normalized.endsWith("/api/v1")) {
     normalized = normalized.slice(0, -7);
@@ -522,8 +527,10 @@ export type LeaderboardEntry = {
   isMe: boolean
 }
 
-export function fetchLeaderboard(examSlug: string): Promise<{ top10: LeaderboardEntry[]; userRank: number }> {
-  return requestJson(`/api/v1/analytics/leaderboard?examSlug=${encodeURIComponent(examSlug)}`)
+export function fetchLeaderboard(examSlug: string, asUser?: string): Promise<{ top10: LeaderboardEntry[]; userRank: number }> {
+  const qs = new URLSearchParams({ examSlug })
+  if (asUser) qs.set('asUser', asUser)
+  return requestJson(`/api/v1/analytics/leaderboard?${qs.toString()}`)
 }
 
 export type AdminUser = {
@@ -541,12 +548,93 @@ export function fetchAdminActiveCount(): Promise<{ count: number }> {
   return requestJson('/api/v1/admin/active-count')
 }
 
+export type AuditEntry = {
+  id: number
+  actorId: string
+  actorEmail: string
+  action: string
+  target: string
+  details: Record<string, unknown>
+  ipAddress: string
+  createdAt: string
+}
+
+export function fetchAdminAudit(limit = 100): Promise<{ entries: AuditEntry[]; count: number }> {
+  return requestJson(`/api/v1/admin/audit?limit=${limit}`)
+}
+
 export function fetchAdminUsers(params: { limit?: number; offset?: number; q?: string } = {}): Promise<{ users: AdminUser[]; total: number; limit: number; offset: number }> {
   const qs = new URLSearchParams()
   if (params.limit) qs.set('limit', String(params.limit))
   if (params.offset) qs.set('offset', String(params.offset))
   if (params.q) qs.set('q', params.q)
   return requestJson(`/api/v1/admin/users?${qs.toString()}`)
+}
+
+export type AdminUserAttempt = {
+  type: 'paper' | 'mock'
+  slug: string
+  examSlug: string
+  examName: string
+  title: string
+  correct: number
+  total: number
+  scorePct: number
+  timeTakenSeconds: number
+  completedAt: string
+}
+
+export type AdminUserExamRank = {
+  examSlug: string
+  examName: string
+  scorePct: number
+  rank: number
+  totalRanked: number
+}
+
+export type AdminUserDetail = {
+  user: AdminUser
+  attempts: AdminUserAttempt[]
+  examRanks: AdminUserExamRank[]
+}
+
+export function fetchAdminUserDetail(id: string): Promise<AdminUserDetail> {
+  return requestJson(`/api/v1/admin/users/${encodeURIComponent(id)}/detail`)
+}
+
+export type AdminAnalyticsSubject = {
+  subject: string
+  total: number
+  correct: number
+  wrong: number
+  skipped: number
+}
+
+export type AdminAnalyticsResult = {
+  type: 'mock' | 'paper'
+  slug: string
+  examSlug: string
+  examName: string
+  title: string
+  totalQuestions: number
+  attemptedAt: string
+  answered: number
+  correct: number
+  wrong: number
+  skipped: number
+  maxMarks?: number
+  negativeMarking?: number
+  timeTakenSeconds: number
+  subjects: AdminAnalyticsSubject[]
+}
+
+export type AdminUserAnalytics = {
+  user: AdminUser
+  results: AdminAnalyticsResult[]
+}
+
+export function fetchAdminUserAnalytics(id: string): Promise<AdminUserAnalytics> {
+  return requestJson(`/api/v1/admin/users/${encodeURIComponent(id)}/analytics`)
 }
 
 export function updateAdminUserStatus(id: string, isActive: boolean): Promise<{ message: string }> {
