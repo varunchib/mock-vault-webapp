@@ -32,7 +32,18 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <!-- Loaded non-blocking: media="print" makes the browser fetch it off the
+         critical render path, then onload flips it to apply. The fonts already use
+         display=swap, so text paints immediately in the fallback either way. -->
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+      media="print"
+      onload="this.media='all';this.onload=null"
+    />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" />
+    </noscript>
   </head>
   <body>
     <div id="root"></div>

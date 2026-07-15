@@ -1,4 +1,4 @@
-import { GoogleLogin, type CredentialResponse } from '@react-oauth/google'
+import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from '@react-oauth/google'
 import { X } from 'lucide-react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
@@ -61,17 +61,23 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
         </p>
 
         {env.googleClientId ? (
-          <div className="auth-google-slot">
-            <GoogleLogin
-              onSuccess={handleSuccess}
-              onError={() => setErrorMessage('Google login failed. Please try again.')}
-              useOneTap={false}
-              text="continue_with"
-              shape="pill"
-              size="large"
-              width="320"
-            />
-          </div>
+          // The provider lives here rather than at the app root on purpose: it
+          // injects Google's ~96 KB gsi/client script on mount, and this modal is
+          // the only consumer. Mounting it here means anonymous visitors (most of
+          // our search traffic) never download it.
+          <GoogleOAuthProvider clientId={env.googleClientId}>
+            <div className="auth-google-slot">
+              <GoogleLogin
+                onSuccess={handleSuccess}
+                onError={() => setErrorMessage('Google login failed. Please try again.')}
+                useOneTap={false}
+                text="continue_with"
+                shape="pill"
+                size="large"
+                width="320"
+              />
+            </div>
+          </GoogleOAuthProvider>
         ) : (
           <div className="auth-config-warning">
             Add <code>VITE_GOOGLE_CLIENT_ID</code> in <code>.env</code> to enable Google login.

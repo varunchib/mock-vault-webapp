@@ -1,6 +1,5 @@
 import { BrowserRouter, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { GoogleProvider } from './components/auth/GoogleProvider'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Footer } from './components/layout/Footer'
 import { Navbar } from './components/layout/Navbar'
@@ -53,13 +52,14 @@ function AppChrome() {
 }
 
 export default function App() {
+  // GoogleOAuthProvider is intentionally NOT mounted here — it now lives inside
+  // LoginModal, so Google's gsi/client script loads only when someone opens the
+  // login dialog instead of on every anonymous page view.
   return (
-    <GoogleProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <AppChrome />
-        </BrowserRouter>
-      </AuthProvider>
-    </GoogleProvider>
+    <AuthProvider>
+      <BrowserRouter>
+        <AppChrome />
+      </BrowserRouter>
+    </AuthProvider>
   )
 }
