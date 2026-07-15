@@ -1,4 +1,4 @@
-import { MessageCircle, X, Send, ChevronLeft } from 'lucide-react'
+import { X, Send, ChevronLeft } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import {
   createInboxThread,
@@ -20,30 +20,29 @@ function timeAgo(iso: string) {
   return `${Math.floor(h / 24)}d ago`
 }
 
-export function InboxWidget({ examSlug, examName, searchTerm }: {
+export function InboxWidget({ open, onClose, onUnreadChange, examSlug, examName, searchTerm }: {
+  open: boolean
+  onClose: () => void
+  /** Lets the sidebar nav item show an unread dot. */
+  onUnreadChange?: (hasUnread: boolean) => void
   examSlug?: string
   examName?: string
   searchTerm?: string
 }) {
   const { user } = useAuth()
-  const [open, setOpen] = useState(false)
   const [view, setView] = useState<View>('list')
   const [threads, setThreads] = useState<InboxThread[]>([])
   const [activeThread, setActiveThread] = useState<InboxThread | null>(null)
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const [error, setError] = useState('')
-  const [hasUnread, setHasUnread] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-
-  // Only render for logged-in users
-  if (!user) return null
 
   const load = async () => {
     try {
       const data = await fetchMyInboxThreads()
       setThreads(data)
-      setHasUnread(data.some(t => t.status === 'replied'))
+      onUnreadChange?.(data.some(t => t.status === 'replied'))
       if (activeThread) {
         const updated = data.find(t => t.id === activeThread.id)
         if (updated) setActiveThread(updated)
@@ -51,21 +50,45 @@ export function InboxWidget({ examSlug, examName, searchTerm }: {
     } catch { /* silent */ }
   }
 
+  // Fetch once on mount so the sidebar unread dot is accurate before the panel
+  // is ever opened, then poll only while it is open.
   useEffect(() => {
-    if (!open) return
+    if (!user) return
+    void load()
+  }, [user?.id])
+
+  useEffect(() => {
+    if (!open || !user) return
+    setView('list')
     void load()
     const id = setInterval(load, 30_000)
     return () => clearInterval(id)
-  }, [open])
+  }, [open, user?.id])
+
+  // Escape to close + lock body scroll while the panel is open
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const prevOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open, onClose])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [activeThread?.messages.length])
 
+  // Only render for logged-in users
+  if (!user || !open) return null
+
   const openThread = (t: InboxThread) => {
     setActiveThread(t)
     setView('thread')
-    setHasUnread(threads.filter(x => x.id !== t.id).some(x => x.status === 'replied'))
+    onUnreadChange?.(threads.filter(x => x.id !== t.id).some(x => x.status === 'replied'))
   }
 
   const handleSend = async () => {
@@ -102,19 +125,9 @@ export function InboxWidget({ examSlug, examName, searchTerm }: {
 
   return (
     <div className="inbox-widget">
-      {/* Bubble toggle */}
-      <button
-        className={`inbox-bubble${hasUnread ? ' inbox-bubble--unread' : ''}`}
-        onClick={() => { setOpen(o => !o); if (!open) setView('list') }}
-        aria-label="Suggestions inbox"
-        type="button"
-      >
-        {open ? <X size={20} /> : <MessageCircle size={20} />}
-        {hasUnread && !open && <span className="inbox-badge" />}
-      </button>
+      <div className="inbox-overlay" onClick={onClose} aria-hidden="true" />
 
-      {open && (
-        <div className="inbox-panel">
+      <div className="inbox-panel" role="dialog" aria-modal="true" aria-label="Suggestions inbox">
           {/* Header */}
           <div className="inbox-panel-head">
             {view !== 'list' && (
@@ -123,7 +136,7 @@ export function InboxWidget({ examSlug, examName, searchTerm }: {
               </button>
             )}
             <span>{view === 'thread' ? 'Conversation' : view === 'new' ? 'New Suggestion' : 'My Suggestions'}</span>
-            <button type="button" className="inbox-close" onClick={() => setOpen(false)}><X size={15} /></button>
+            <button type="button" className="inbox-close" onClick={onClose}><X size={15} /></button>
           </div>
 
           {/* List view */}
@@ -206,8 +219,7 @@ export function InboxWidget({ examSlug, examName, searchTerm }: {
               {error && <p className="inbox-error">{error}</p>}
             </div>
           )}
-        </div>
-      )}
+      </div>
     </div>
   )
 }
