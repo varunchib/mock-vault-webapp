@@ -2,7 +2,7 @@ import { MathText } from '../components/common/MathText'
 import { env } from '../lib/env'
 import { BookOpen, ChevronRight, Download, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import {
@@ -17,6 +17,7 @@ import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { paperGuideMap } from '../data/postGuides'
 import { apiPaperSlug, paperPath, paperSeoOverride } from '../lib/paperSeo'
+import { buildPaperFaqs, paperFaqJsonLd } from '../lib/paperFaqs'
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D']
 
@@ -59,6 +60,27 @@ export function PyqPaperPage() {
     : 'Solved previous year question paper with answers and explanations.'
   const seoH1 = seoOverride?.h1 ?? paper?.title
 
+  // Built from the shared helper so the visible FAQ below and the FAQPage
+  // structured data always say exactly the same thing.
+  // NOTE: pass paper.title (not the SEO h1) — worker.ts builds the FAQPage schema
+  // from the same field, and the visible FAQ must match the structured data
+  // word for word.
+  const faqs = useMemo(
+    () => (paper
+      ? buildPaperFaqs({
+          title: paper.title,
+          examName: paper.examName,
+          year: paper.year,
+          questions: paper.questions || questions.length,
+          heldOn: paper.heldOn,
+          negativeMarking: paper.negativeMarking,
+          sourceUrl: paper.sourceUrl,
+          attemptable: questions.length > 0,
+        })
+      : []),
+    [paper, questions.length],
+  )
+
   usePageMeta({
     title: seoTitle,
     description: seoDesc,
@@ -99,6 +121,8 @@ export function PyqPaperPage() {
               { '@type': 'ListItem', position: 4, name: seoTitle.replace(' | Ministry of Papers', ''), item: `https://ministryofpapers.com${canonicalPath}` },
             ],
           },
+          // Matches the visible FAQ rendered at the bottom of this page.
+          ...(faqs.length ? [paperFaqJsonLd(faqs)] : []),
         ]
       : undefined,
   })
@@ -350,6 +374,20 @@ export function PyqPaperPage() {
           )
         })}
       </div>
+
+      {faqs.length > 0 && (
+        <section className="pyq-faq">
+          <h2>Frequently Asked Questions</h2>
+          <div className="pyq-faq-list">
+            {faqs.map((f, i) => (
+              <details key={i} className="pyq-faq-item" open={i === 0}>
+                <summary>{f.q}</summary>
+                <p>{f.a}</p>
+              </details>
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   )
 

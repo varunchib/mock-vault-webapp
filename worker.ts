@@ -3,6 +3,7 @@
 
 import { postGuides } from './src/data/postGuides'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
+import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 
 interface Env {
   ASSETS: { fetch(req: Request): Promise<Response> }
@@ -356,6 +357,15 @@ function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
     ? `<p><strong>Official source:</strong> <a href="${esc(p.sourceUrl)}" rel="nofollow noopener" target="_blank">official question paper &amp; answer key (PDF)</a></p>`
     : ''
 
+  // Rendered visibly because the page also emits FAQPage structured data, and
+  // Google requires that data to match content the user can actually see.
+  const faqs = buildPaperFaqs({ ...p, attemptable: questions.length > 0 })
+  const faqSection = faqs.length
+    ? `<section><h2>Frequently Asked Questions</h2><dl>${faqs
+        .map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`)
+        .join('')}</dl></section>`
+    : ''
+
   return renderPageShell(override?.h1 ?? `${p.title} — Solved PYQ with Answer Key`, `
     ${override ? `<p><strong>${htmlText(override.title)}</strong></p>` : ''}
     ${override ? paragraph(override.review) : ''}
@@ -364,20 +374,8 @@ function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
     <p>${p.questions ?? questions.length} solved questions with answer key and detailed explanations${subjectText ? ` — Subjects: ${htmlText(subjectText)}` : ''}${(p.negativeMarking ?? 0) > 0 ? ` — Negative marking: ${p.negativeMarking}` : ''}</p>
     ${source}
     ${sections}
+    ${faqSection}
   `)
-}
-
-// buildPaperFaqs generates FAQPage Q&A entries from paper metadata (P1 #6).
-function buildPaperFaqs(p: PaperData): Array<{ '@type': 'Question'; name: string; acceptedAnswer: { '@type': 'Answer'; text: string } }> {
-  const yr = p.year ? ` ${p.year}` : ''
-  const faqs: Array<{ q: string; a: string }> = []
-  const n = p.questions ?? 0
-  if (n > 0) faqs.push({ q: `How many questions are in the ${p.title}?`, a: `The ${p.title} has ${n} questions, all solved with the correct answer key and detailed explanations.` })
-  faqs.push({ q: `Are answer keys and explanations provided for ${p.examName}${yr}?`, a: `Yes. Every question in this ${p.examName} paper includes the correct answer and a detailed step-by-step explanation, completely free.` })
-  if (p.heldOn) faqs.push({ q: `When was the ${p.title} held?`, a: `The ${p.title} was held on ${p.heldOn}.` })
-  if ((p.negativeMarking ?? 0) > 0) faqs.push({ q: `Is there negative marking in ${p.examName}?`, a: `Yes, ${p.examName} deducts ${p.negativeMarking} marks for each wrong answer, so accuracy matters.` })
-  if (p.sourceUrl) faqs.push({ q: `Where can I get the official ${p.examName} answer key?`, a: `The official question paper and answer key PDF is linked on this page; every question is also solved here with explanations.` })
-  return faqs.map(f => ({ '@type': 'Question' as const, name: f.q, acceptedAnswer: { '@type': 'Answer' as const, text: f.a } }))
 }
 
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[]): string {
@@ -610,11 +608,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             author: { '@type': 'Organization', name: 'Ministry of Papers' },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
           },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: buildPaperFaqs(p),
-          },
+          paperFaqJsonLd(buildPaperFaqs({ ...p, attemptable: (questions ?? []).length > 0 })),
           {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
