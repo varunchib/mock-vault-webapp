@@ -26,6 +26,9 @@ jobs:
           VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
           VITE_ADMIN_EMAILS: ${{ secrets.VITE_ADMIN_EMAILS }}
           VITE_GA_MEASUREMENT_ID: ${{ secrets.VITE_GA_MEASUREMENT_ID }}
+          # Clarity project ID is public (it ships in the client bundle), so it is
+          # set inline rather than as a secret — same as VITE_API_BASE_URL above.
+          VITE_CLARITY_PROJECT_ID: wy23s94pps
 
       - name: Deploy to Cloudflare Workers
         run: npx wrangler deploy
