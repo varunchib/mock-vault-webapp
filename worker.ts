@@ -38,6 +38,10 @@ type PaperData = {
   questions?: number
   subjects?: string[]
   heldOn?: string
+  sourceUrl?: string
+  negativeMarking?: number
+  durationMinutes?: number
+  maxMarks?: number
 }
 
 type MockData = {
@@ -69,6 +73,7 @@ type QuestionData = {
   options?: Array<{ key: string; text: string }>
   tags?: string[]
   images?: string[]
+  translations?: Partial<Record<'en' | 'hi', { passage?: string; question?: string; options?: string[] }>>
 }
 
 const BOT_UA = /Googlebot|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
@@ -199,6 +204,34 @@ function paragraph(s: string | undefined | null): string {
   return clean ? `<p>${clean}</p>` : ''
 }
 
+// inlineFmt escapes text then applies **bold**, matching how the React app
+// (MathText) renders it, so explanations look identical to users and to Google.
+function inlineFmt(s: string): string {
+  return esc(String(s)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+}
+
+// richText renders explanation content: each non-empty line becomes a paragraph
+// (same as the app's MultilineText), with **bold** section labels preserved.
+function richText(s: string | undefined | null): string {
+  if (!s) return ''
+  return String(s)
+    .replace(/\r/g, '')
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .map(l => `<p>${inlineFmt(l)}</p>`)
+    .join('')
+}
+
+// questionTopic derives a short keyword phrase from the question text for titles,
+// stripping boilerplate stems ("Consider the following statements", etc.).
+function questionTopic(question: string | undefined | null): string {
+  let s = stripMarkdown(String(question ?? ''))
+  s = s.replace(/^(consider the following( statements)?|which (one )?of the following|with reference to|in the context of|arrange the following( segments)?|the following|match list[- ]?i|read the following)[:,\s-]*/i, '')
+  s = s.replace(/[:.?].*$/, '').trim()
+  return s.split(/\s+/).slice(0, 8).join(' ')
+}
+
 function titleFit(core: string): string {
   const brand = ' | Ministry of Papers'
   const full = `${core}${brand}`
@@ -224,7 +257,10 @@ function renderPageShell(title: string, children: string): string {
 
 function renderQuestionContent(q: QuestionData): string {
   const optionItems = (q.options ?? [])
-    .map(opt => `<li><strong>${htmlText(opt.key)}.</strong> ${htmlText(opt.text)}</li>`)
+    .map(opt => {
+      const correct = String(opt.key).toUpperCase() === String(q.answerKey).toUpperCase()
+      return `<li${correct ? ' class="correct"' : ''}><strong>${htmlText(opt.key)}.</strong> ${htmlText(opt.text)}${correct ? ' <strong>(Correct answer)</strong>' : ''}</li>`
+    })
     .join('')
   const tags = (q.tags ?? [])
     .filter(Boolean)
@@ -232,14 +268,30 @@ function renderQuestionContent(q: QuestionData): string {
     .map(tag => `<span>${htmlText(tag)}</span>`)
     .join(' ')
   const paperLink = q.paperSlug
-    ? `<p><a href="${paperPath(q.paperSlug)}">View full paper: ${htmlText(q.paper)}</a></p>`
+    ? `<p><a href="${paperPath(q.paperSlug)}">View the full solved paper: ${htmlText(q.paper)}</a></p>`
     : ''
   const images = (q.images ?? [])
-    .map((src, i) => `<img src="${esc(src)}" alt="Question ${htmlText(q.questionNo)} figure ${i + 1}" loading="lazy" />`)
+    .map((src, i) => `<img src="${esc(src)}" alt="${htmlText(q.examName)} ${htmlText(q.year)} Q${htmlText(q.questionNo)} figure ${i + 1}" loading="lazy" />`)
     .join('')
 
-  return renderPageShell(`${q.examName} ${q.year} Q${q.questionNo} solved answer`, `
-    <p><a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.subject ? ` - ${htmlText(q.subject)}` : ''}${q.year ? ` - ${htmlText(q.year)}` : ''}</p>
+  // Hindi rendering (P0 #3) — index the bilingual content on the same page.
+  const hi = q.translations?.hi
+  const hiOptions = (hi?.options ?? [])
+    .map((t, i) => `<li><strong>${String.fromCharCode(65 + i)}.</strong> ${htmlText(t)}</li>`)
+    .join('')
+  const hindiSection = hi?.question
+    ? `<section lang="hi">
+      <h2>प्रश्न (हिन्दी में)</h2>
+      ${hi.passage ? paragraph(hi.passage) : ''}
+      ${paragraph(hi.question)}
+      ${hiOptions ? `<ol type="A">${hiOptions}</ol>` : ''}
+    </section>`
+    : ''
+
+  const solution = richText(q.explanation)
+
+  return renderPageShell(`${q.examName} ${q.year} — Q${q.questionNo} Solved Answer with Explanation`, `
+    <p><a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.subject ? ` — ${htmlText(q.subject)}` : ''}${q.year ? ` — ${htmlText(q.year)}` : ''}</p>
     ${paperLink}
     ${images ? `<figure>${images}</figure>` : ''}
     <section>
@@ -248,32 +300,61 @@ function renderQuestionContent(q: QuestionData): string {
       ${optionItems ? `<ol type="A">${optionItems}</ol>` : ''}
     </section>
     <section>
-      <h2>Answer</h2>
-      <p><strong>Correct option:</strong> ${htmlText(q.answerKey)}${q.answer ? ` - ${htmlText(q.answer)}` : ''}</p>
-      ${paragraph(q.explanation)}
+      <h2>Correct Answer</h2>
+      <p><strong>Option ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</strong></p>
     </section>
-    ${tags ? `<p><strong>Topics:</strong> ${tags}</p>` : ''}
+    ${solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
+    ${hindiSection}
+    ${tags ? `<p><strong>Topics covered:</strong> ${tags}</p>` : ''}
   `)
 }
 
 function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
   const override = paperSeoOverride(p.slug)
   const subjectText = (p.subjects ?? []).filter(Boolean).join(', ')
-  const questionItems = questions
-    .map(q => `<li>
-      <a href="/question/${encodeURIComponent(q.slug)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 220)}</a>
-      <br /><small><strong>Answer:</strong> ${htmlText(q.answerKey)}${q.answer ? ` - ${htmlText(q.answer)}` : ''}</small>
-      ${q.explanation ? `<br /><small>${htmlText(q.explanation).slice(0, 260)}</small>` : ''}
-    </li>`)
+
+  // Group questions into an H2 section per subject (P1 #5)
+  const bySubject = new Map<string, QuestionData[]>()
+  for (const q of questions) {
+    const s = (q.subject && q.subject.trim()) || 'General'
+    if (!bySubject.has(s)) bySubject.set(s, [])
+    bySubject.get(s)!.push(q)
+  }
+  const questionLi = (q: QuestionData) => `<li>
+      <a href="/question/${encodeURIComponent(q.slug)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 200)}</a>
+      <br /><small><strong>Answer:</strong> ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</small>
+      ${q.explanation ? `<br /><small>${htmlText(q.explanation).slice(0, 240)}</small>` : ''}
+    </li>`
+  const sections = [...bySubject.entries()]
+    .map(([subject, qs]) => `<section><h2>${htmlText(subject)} — Solved Questions</h2><ol>${qs.map(questionLi).join('')}</ol></section>`)
     .join('')
-  return renderPageShell(override?.h1 ?? `${p.title} solved PYQ`, `
+
+  const source = p.sourceUrl
+    ? `<p><strong>Official source:</strong> <a href="${esc(p.sourceUrl)}" rel="nofollow noopener" target="_blank">official question paper &amp; answer key (PDF)</a></p>`
+    : ''
+
+  return renderPageShell(override?.h1 ?? `${p.title} — Solved PYQ with Answer Key`, `
     ${override ? `<p><strong>${htmlText(override.title)}</strong></p>` : ''}
     ${override ? paragraph(override.review) : ''}
     ${paragraph(p.description)}
-    <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` - ${htmlText(p.year)}` : ''}${p.shift ? ` - ${htmlText(p.shift)}` : ''}</p>
-    <p>${p.questions ?? questions.length} solved questions - Answer key included${subjectText ? ` - Subjects: ${htmlText(subjectText)}` : ''}</p>
-    ${questionItems ? `<section><h2>Solved questions</h2><ol>${questionItems}</ol></section>` : ''}
+    <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` — ${htmlText(p.year)}` : ''}${p.shift ? ` — ${htmlText(p.shift)}` : ''}</p>
+    <p>${p.questions ?? questions.length} solved questions with answer key and detailed explanations${subjectText ? ` — Subjects: ${htmlText(subjectText)}` : ''}${(p.negativeMarking ?? 0) > 0 ? ` — Negative marking: ${p.negativeMarking}` : ''}</p>
+    ${source}
+    ${sections}
   `)
+}
+
+// buildPaperFaqs generates FAQPage Q&A entries from paper metadata (P1 #6).
+function buildPaperFaqs(p: PaperData): Array<{ '@type': 'Question'; name: string; acceptedAnswer: { '@type': 'Answer'; text: string } }> {
+  const yr = p.year ? ` ${p.year}` : ''
+  const faqs: Array<{ q: string; a: string }> = []
+  const n = p.questions ?? 0
+  if (n > 0) faqs.push({ q: `How many questions are in the ${p.title}?`, a: `The ${p.title} has ${n} questions, all solved with the correct answer key and detailed explanations.` })
+  faqs.push({ q: `Are answer keys and explanations provided for ${p.examName}${yr}?`, a: `Yes. Every question in this ${p.examName} paper includes the correct answer and a detailed step-by-step explanation, completely free.` })
+  if (p.heldOn) faqs.push({ q: `When was the ${p.title} held?`, a: `The ${p.title} was held on ${p.heldOn}.` })
+  if ((p.negativeMarking ?? 0) > 0) faqs.push({ q: `Is there negative marking in ${p.examName}?`, a: `Yes, ${p.examName} deducts ${p.negativeMarking} marks for each wrong answer, so accuracy matters.` })
+  if (p.sourceUrl) faqs.push({ q: `Where can I get the official ${p.examName} answer key?`, a: `The official question paper and answer key PDF is linked on this page; every question is also solved here with explanations.` })
+  return faqs.map(f => ({ '@type': 'Question' as const, name: f.q, acceptedAnswer: { '@type': 'Answer' as const, text: f.a } }))
 }
 
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[]): string {
@@ -502,8 +583,14 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             headline: title.replace(' | Ministry of Papers', ''),
             description,
             url: canonical,
+            ...(p.heldOn ? { datePublished: p.heldOn, dateModified: p.heldOn } : {}),
             author: { '@type': 'Organization', name: 'Ministry of Papers' },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: buildPaperFaqs(p),
           },
           {
             '@context': 'https://schema.org',
@@ -534,9 +621,14 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             ]
           : [{ '@type': 'ListItem', position: 3, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
       ]
+      const topic = questionTopic(q.question)
+      const answerText = [
+        q.answer ? `Correct answer: ${q.answer}.` : `Correct option: ${q.answerKey}.`,
+        stripMarkdown(q.explanation ?? ''),
+      ].filter(Boolean).join(' ').slice(0, 1000)
       return {
-        title: titleFit(`${q.examName} ${q.year} - Q${q.questionNo} Solved`),
-        description: `${stripMarkdown(q.question).slice(0, 145)}... - Solved with explanation on Ministry of Papers.`,
+        title: titleFit(`${q.examName} ${q.year} ${q.subject ? q.subject + ' ' : ''}Q${q.questionNo}${topic ? ' — ' + topic : ''} Solved`),
+        description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${stripMarkdown(q.question).slice(0, 120)} — correct answer (${q.answerKey}) with detailed explanation.`,
         contentHtml: renderQuestionContent(q),
         jsonLd: [
           {
@@ -544,12 +636,18 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             '@type': 'QAPage',
             name: `${q.examName} ${q.year} Q${q.questionNo} - Solved Answer`,
             url: `${BASE}/question/${slug}`,
+            inLanguage: q.translations?.hi ? ['en', 'hi'] : 'en',
+            ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
+            ...((q.tags ?? []).length ? { keywords: (q.tags ?? []).filter(Boolean).join(', ') } : {}),
             mainEntity: {
               '@type': 'Question',
-              name: q.question.slice(0, 200),
+              name: q.question.slice(0, 300),
+              answerCount: 1,
+              ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
               acceptedAnswer: {
                 '@type': 'Answer',
-                text: [q.answer, q.explanation].filter(Boolean).join(' - ').slice(0, 500),
+                text: answerText || `Correct option: ${q.answerKey}`,
+                url: `${BASE}/question/${slug}`,
               },
             },
           },
