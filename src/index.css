@@ -12735,6 +12735,15 @@ html {
   .pg-section { padding: 18px 16px; }
   .pg-header { padding: 20px; }
   .pg-dl-row { grid-template-columns: 1fr; gap: 4px; }
+
+  /* Meta strip gained a 3rd item (Last updated); at this width it wraps and the
+     "·" separators dangle at line ends. Stack the items and drop the dots. */
+  .pg-meta-strip {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+  .pg-meta-sep { display: none; }
 }
 
 /* ── Post-login page polish: 540px ──────────────────────────────────────── */
