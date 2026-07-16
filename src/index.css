@@ -14703,18 +14703,26 @@ html {
   font-style: normal;
 }
 
-/* Inside explanation/solution bodies, `**text**` must read as plain bold — NOT
-   the yellow highlight pill. The pill is meant for one or two emphasised terms
-   in a question stem; explanations bold heavily (the answer, key facts, exam
-   tips), so the pill turns the whole solution into a wall of yellow boxes. */
+/* Inside explanation/solution bodies, `**text**` must read as plain INLINE bold.
+   Two legacy rules fight it: .qr-highlight paints a yellow pill, and
+   .pyq-explanation strong forces `display:block` + 11px + uppercase + grey
+   (meant for a single heading-style label). MathText renders every `**bold**`
+   as <strong class="qr-highlight">, and explanations bold key terms mid-sentence
+   — so both rules must be fully neutralised here or each bold word jumps to its
+   own tiny grey line. */
 .pyq-explanation .qr-highlight,
 .pyq-solution-body .qr-highlight {
+  display: inline;
   background: none;
   border: 0;
   border-radius: 0;
   padding: 0;
-  color: inherit;
+  margin: 0;
+  font-size: inherit;
   font-weight: 700;
+  text-transform: none;
+  letter-spacing: normal;
+  color: inherit;
 }
 
 /* Error-detection segmented sentence */
