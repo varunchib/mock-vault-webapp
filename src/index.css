@@ -8582,6 +8582,36 @@ footer {
   gap: 6px;
   color: #9ca3af;
   font-size: 13px;
+  min-width: 0;
+}
+
+/* Long exam names ("Jammu & Kashmir Public Service Commission" is ~260px at
+   13px) blow past a phone's ~369px of usable width, and with no wrap rule the
+   link text broke mid-name while the chevrons stayed inline. Truncate instead:
+   flex-shrink is proportional to content width, so the longest crumb — always
+   the exam name — gives way first and the trail stays on one clean line.
+   The full name stays in the DOM: it is the anchor text of an internal link
+   and it matches the BreadcrumbList JSON-LD. */
+.ep-breadcrumb > a,
+.ep-breadcrumb > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* The first crumb and the current page stay readable; chevrons never squash. */
+.ep-breadcrumb > a:first-child,
+.ep-breadcrumb > span:last-child,
+.ep-breadcrumb > svg {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .ep-breadcrumb {
+    font-size: 12px;
+    gap: 4px;
+  }
 }
 .ep-breadcrumb a {
   color: #6b7280;
@@ -10014,10 +10044,21 @@ html {
   font-weight: 700;
 }
 
+/* Fixed 4-up on desktop so SUBEXAM_COLLAPSE_AT (8) is exactly two full rows.
+   auto-fill would let the column count drift with the viewport, and the collapse
+   threshold would stop lining up with the rows. */
 .ep-subexam-row {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
+}
+
+@media (max-width: 1024px) {
+  .ep-subexam-row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 768px) {
+  .ep-subexam-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 .ep-subexam-chip {
@@ -10071,9 +10112,84 @@ html {
   flex-shrink: 0;
 }
 
+/* Collapsed state hides the overflow chips with [hidden] in the markup, so the
+   links stay in the DOM for crawlers. Nothing to do here but keep the grid tidy. */
+.ep-subexam-chip[hidden] {
+  display: none;
+}
+
+.ep-subexam-more {
+  width: 100%;
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--ink3);
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color .13s, color .13s, background .13s;
+}
+
+.ep-subexam-more:hover {
+  border-color: var(--ink3);
+  color: var(--ink);
+  background: var(--line2);
+}
+
+.ep-subexam-more svg {
+  transition: transform .15s ease;
+}
+
+.ep-subexam-more svg.flip {
+  transform: rotate(180deg);
+}
+
+/* ── "All papers" heading above the papers list ──────────────────────────── */
+.ep-papers-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ep-papers-head h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--ink);
+}
+
+.ep-papers-head span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: var(--line2);
+  color: var(--ink3);
+  font-size: 11px;
+  font-weight: 700;
+}
+
 @media (max-width: 640px) {
   .ep-subexams { padding: 14px; }
-  .ep-subexam-row { grid-template-columns: 1fr; }
+  .ep-subexam-row { gap: 8px; }
+
+  .ep-subexam-chip { padding: 9px 10px; gap: 8px; }
+  .ep-subexam-icon { font-size: 17px; }
+  .ep-subexam-copy strong { font-size: 12.5px; }
+  .ep-subexam-copy small { font-size: 10.5px; }
+  /* The chevron is decoration; at this width the space is better spent on the name. */
+  .ep-subexam-chip > svg { display: none; }
 }
 
 /* Tab bar â€” new style replacing ep-tabs */
@@ -16276,4 +16392,9 @@ html {
   .qpage-head { flex-direction: column; gap: 10px; }
   .qpage-head-actions { flex-direction: row; }
   .qpage-head-actions .pyq-action-btn { flex: 1; }
+}
+
+/* Freshness signal on guide pages — visible counterpart of Article.dateModified */
+.pg-updated time {
+  font-variant-numeric: tabular-nums;
 }

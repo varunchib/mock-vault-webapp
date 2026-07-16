@@ -272,14 +272,50 @@ function safeJson(obj: unknown): string {
   return JSON.stringify(obj).replace(/<\/script>/gi, '<\\/script>')
 }
 
-function renderPageShell(title: string, children: string): string {
+/** One breadcrumb step. The same array feeds the JSON-LD and the visible nav. */
+type Crumb = { name: string; item: string }
+
+/**
+ * Google requires structured data to represent content that is actually visible
+ * on the page — the same rule that made a FAQPage without a visible FAQ a
+ * violation. Build the trail ONCE and pass it to both breadcrumbJsonLd() and
+ * renderPageShell(), so the markup can never claim a trail the page doesn't show.
+ */
+function breadcrumbJsonLd(crumbs: Crumb[]) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.name,
+      item: c.item,
+    })),
+  }
+}
+
+function renderBreadcrumb(crumbs: Crumb[]): string {
+  if (crumbs.length === 0) return ''
+  const last = crumbs.length - 1
+  const items = crumbs
+    .map((c, i) =>
+      i === last
+        ? `<span aria-current="page">${htmlText(c.name)}</span>`
+        : `<a href="${esc(c.item)}">${htmlText(c.name)}</a>`,
+    )
+    .join(' <span aria-hidden="true">&rsaquo;</span> ')
+  return `<nav class="seo-breadcrumb" aria-label="Breadcrumb">${items}</nav>`
+}
+
+function renderPageShell(title: string, children: string, crumbs: Crumb[] = []): string {
   return `<article class="seo-rendered">
+    ${renderBreadcrumb(crumbs)}
     <h1>${htmlText(title)}</h1>
     ${children}
   </article>`
 }
 
-function renderQuestionContent(q: QuestionData): string {
+function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
   const optionItems = (q.options ?? [])
     .map(opt => {
       const correct = String(opt.key).toUpperCase() === String(q.answerKey).toUpperCase()
@@ -330,10 +366,10 @@ function renderQuestionContent(q: QuestionData): string {
     ${solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
     ${hindiSection}
     ${tags ? `<p><strong>Topics covered:</strong> ${tags}</p>` : ''}
-  `)
+  `, crumbs)
 }
 
-function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
+function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Crumb[] = []): string {
   const override = paperSeoOverride(p.slug)
   const subjectText = (p.subjects ?? []).filter(Boolean).join(', ')
 
@@ -375,10 +411,10 @@ function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
     ${source}
     ${sections}
     ${faqSection}
-  `)
+  `, crumbs)
 }
 
-function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[]): string {
+function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], crumbs: Crumb[] = []): string {
   const paperLinks = papers
     .slice(0, 30)
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
@@ -394,10 +430,10 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[]):
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
-  `)
+  `, crumbs)
 }
 
-function renderMockContent(exam: ExamData, mocks: MockData[], papers: PaperData[]): string {
+function renderMockContent(exam: ExamData, mocks: MockData[], papers: PaperData[], crumbs: Crumb[] = []): string {
   const mockItems = mocks
     .map(m => `<li><strong>${htmlText(m.title)}</strong><br />${htmlText(m.description)}<br /><small>${m.questions} questions - ${m.durationMinutes} minutes - ${htmlText(m.difficulty)}</small></li>`)
     .join('')
@@ -409,10 +445,10 @@ function renderMockContent(exam: ExamData, mocks: MockData[], papers: PaperData[
     ${paragraph(exam.description)}
     ${mockItems ? `<section><h2>Available mock tests</h2><ul>${mockItems}</ul></section>` : '<p>No published mock tests are available for this exam yet.</p>'}
     ${paperLinks ? `<section><h2>Related PYQ papers</h2><ul>${paperLinks}</ul></section>` : ''}
-  `)
+  `, crumbs)
 }
 
-function renderGuideContent(slug: string, guide: (typeof postGuides)[string]): string {
+function renderGuideContent(slug: string, guide: (typeof postGuides)[string], crumbs: Crumb[] = []): string {
   const facts = (guide.quickFacts ?? [])
     .map(f => `<li><strong>${htmlText(f.label)}:</strong> ${htmlText(f.value)}</li>`)
     .join('')
@@ -427,13 +463,17 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string]): s
 
   return renderPageShell(guide.title, `
     <p>${htmlText(guide.tagline)}</p>
+    <!-- Visible counterpart of Article.dateModified — the markup must reflect
+         something on the page, the same rule that made a FAQPage without a
+         visible FAQ a violation. -->
+    <p><small>Last updated: <time datetime="${esc(guide.lastUpdated)}">${htmlText(guide.lastUpdated)}</time></small></p>
     <p><a href="/exam/${encodeURIComponent(guide.examSlug)}">Browse ${htmlText(guide.shortName)} PYQ papers</a></p>
     ${facts ? `<section><h2>Quick facts</h2><ul>${facts}</ul></section>` : ''}
     ${about ? `<section><h2>About ${htmlText(guide.shortName)}</h2>${about}</section>` : ''}
     ${papers ? `<section><h2>Previous year papers</h2><ul>${papers}</ul></section>` : ''}
     ${syllabus}
     <p><a href="/guide/${encodeURIComponent(slug)}">Canonical guide page</a></p>
-  `)
+  `, crumbs)
 }
 
 function isDynamicSeoPath(pathname: string): boolean {
@@ -462,13 +502,19 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       const slug = overviewMatch[1]
       const e = await apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600)
       if (!e) return null
+      const overviewCrumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: 'Exams', item: `${BASE}/exams` },
+        { name: e.shortName, item: `${BASE}/exam/${slug}` },
+        { name: 'Overview', item: `${BASE}/exam/${slug}/overview` },
+      ]
       return {
         title: `${e.shortName} Overview - Exam Pattern, Eligibility & PYQ | Ministry of Papers`,
         description: `${e.shortName} overview - exam pattern, eligibility criteria, selection process, salary, and free PYQ with detailed explanations on Ministry of Papers.`,
         contentHtml: renderPageShell(`${e.shortName} exam overview`, `
           ${paragraph(e.description)}
           <p><a href="/exam/${encodeURIComponent(slug)}">Browse ${htmlText(e.shortName)} PYQ papers and mock tests</a></p>
-        `),
+        `, overviewCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'Course',
@@ -476,15 +522,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
           description: e.description || `${e.name} exam pattern, eligibility, selection process, and free PYQ.`,
           url: `${BASE}/exam/${slug}/overview`,
           provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: {
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-              { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
-              { '@type': 'ListItem', position: 3, name: e.shortName, item: `${BASE}/exam/${slug}` },
-              { '@type': 'ListItem', position: 4, name: 'Overview', item: `${BASE}/exam/${slug}/overview` },
-            ],
-          },
+          breadcrumb: breadcrumbJsonLd(overviewCrumbs),
         },
       }
     }
@@ -501,11 +539,16 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       const examMocks = (mocks ?? []).filter(m => m.examSlug === slug)
       // An exam with no papers and no mocks is a thin page → keep it out of the index.
       const examEmpty = (e.papers ?? 0) === 0 && (e.mocks ?? 0) === 0
+      const examCrumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: 'Exams', item: `${BASE}/exams` },
+        { name: e.shortName, item: `${BASE}/exam/${slug}` },
+      ]
       return {
         title: `${e.shortName} - Mock Tests & PYQ Papers | Ministry of Papers`,
         description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
         robots: examEmpty ? 'noindex, follow' : undefined,
-        contentHtml: renderExamContent(e, papers ?? [], examMocks),
+        contentHtml: renderExamContent(e, papers ?? [], examMocks, examCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
@@ -513,14 +556,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
           description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
           url: `${BASE}/exam/${slug}`,
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: {
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-              { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
-              { '@type': 'ListItem', position: 3, name: e.shortName, item: `${BASE}/exam/${slug}` },
-            ],
-          },
+          breadcrumb: breadcrumbJsonLd(examCrumbs),
         },
       }
     }
@@ -542,10 +578,16 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         apiJson<PaperData[]>(`${API}/api/v1/exams/${examSlug}/papers`, 3600),
       ])
       const examMocks = (allMocks ?? []).filter(m => m.examSlug === examSlug)
+      const mockCrumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: 'Exams', item: `${BASE}/exams` },
+        { name: e.shortName, item: `${BASE}/exam/${examSlug}` },
+        { name: 'Mock Tests', item: `${BASE}/mock-test/${examSlug}` },
+      ]
       return {
         title: `${e.shortName} Mock Tests - Free Full-Length Practice | Ministry of Papers`,
         description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
-        contentHtml: renderMockContent(e, examMocks, papers ?? []),
+        contentHtml: renderMockContent(e, examMocks, papers ?? [], mockCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'LearningResource',
@@ -555,15 +597,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
           learningResourceType: 'Practice Test',
           educationalUse: 'Practice',
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: {
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-              { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
-              { '@type': 'ListItem', position: 3, name: e.shortName, item: `${BASE}/exam/${examSlug}` },
-              { '@type': 'ListItem', position: 4, name: 'Mock Tests', item: `${BASE}/mock-test/${examSlug}` },
-            ],
-          },
+          breadcrumb: breadcrumbJsonLd(mockCrumbs),
         },
       }
     }
@@ -581,10 +615,17 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       const canonical = `${BASE}${paperPath(p.slug)}`
       const title = override?.title ?? titleFit(`${p.title} PYQ - Solved Questions & Answers`)
       const description = override?.description ?? (p.description || `${p.examName} PYQ - solved previous year question paper with answers and detailed explanations, free on Ministry of Papers.`)
+      // Built once, rendered visibly AND declared in JSON-LD.
+      const crumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: 'Exams', item: `${BASE}/exams` },
+        { name: p.examName, item: `${BASE}/exam/${p.examSlug}` },
+        { name: override?.h1 ?? p.title, item: canonical },
+      ]
       return {
         title,
         description,
-        contentHtml: renderPaperContent(p, questions ?? []),
+        contentHtml: renderPaperContent(p, questions ?? [], crumbs),
         jsonLd: [
           {
             '@context': 'https://schema.org',
@@ -609,16 +650,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
           },
           paperFaqJsonLd(buildPaperFaqs({ ...p, attemptable: (questions ?? []).length > 0 })),
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-              { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
-              { '@type': 'ListItem', position: 3, name: p.examName, item: `${BASE}/exam/${p.examSlug}` },
-              { '@type': 'ListItem', position: 4, name: title.replace(' | Ministry of Papers', ''), item: canonical },
-            ],
-          },
+          breadcrumbJsonLd(crumbs),
         ],
       }
     }
@@ -628,15 +660,17 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       const slug = questionMatch[1]
       const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${slug}`, 86400)
       if (!q) return null
-      const breadcrumbs = [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-        { '@type': 'ListItem', position: 2, name: q.examName, item: `${BASE}/exam/${q.examSlug}` },
+      // Built once: rendered visibly by renderQuestionContent AND declared in
+      // JSON-LD, so the markup cannot claim a trail the page does not show.
+      const crumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: q.examName, item: `${BASE}/exam/${q.examSlug}` },
         ...(q.paperSlug
           ? [
-              { '@type': 'ListItem', position: 3, name: q.paper, item: `${BASE}${paperPath(q.paperSlug)}` },
-              { '@type': 'ListItem', position: 4, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` },
+              { name: q.paper, item: `${BASE}${paperPath(q.paperSlug)}` },
+              { name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` },
             ]
-          : [{ '@type': 'ListItem', position: 3, name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
+          : [{ name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
       ]
       const topic = questionTopic(q)
       // questions.exam_name holds the long official name ("UPSC Civil Services
@@ -651,7 +685,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       return {
         title: questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic),
         description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${stripMarkdown(q.question).slice(0, 120)} — correct answer (${q.answerKey}) with detailed explanation.`,
-        contentHtml: renderQuestionContent(q),
+        contentHtml: renderQuestionContent(q, crumbs),
         jsonLd: [
           {
             '@context': 'https://schema.org',
@@ -673,11 +707,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
               },
             },
           },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BreadcrumbList',
-            itemListElement: breadcrumbs,
-          },
+          breadcrumbJsonLd(crumbs),
         ],
       }
     }
@@ -687,16 +717,24 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       const slug = guideMatch[1]
       const guide = postGuides[slug]
       if (!guide) return null
+      const guideCrumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: 'Exams', item: `${BASE}/exams` },
+        { name: guide.shortName, item: `${BASE}/guide/${slug}` },
+      ]
       return {
         title: `${guide.shortName} Syllabus & Exam Pattern | Ministry of Papers`,
         description: stripMarkdown(guide.tagline).slice(0, 160),
-        contentHtml: renderGuideContent(slug, guide),
+        contentHtml: renderGuideContent(slug, guide, guideCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'Article',
           headline: guide.title,
           description: guide.tagline,
           url: `${BASE}/guide/${slug}`,
+          // Mirrors the visible "Last updated" rendered by renderGuideContent.
+          datePublished: guide.lastUpdated,
+          dateModified: guide.lastUpdated,
           author: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
         },

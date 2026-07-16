@@ -5,6 +5,12 @@ import { useAuth } from '../context/useAuth'
 import { postGuides } from '../data/postGuides'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 
+function formatUpdated(iso: string): string {
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return iso
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 export function PostGuidePage() {
   const { postSlug } = useParams<{ postSlug: string }>()
   const guide = postSlug ? postGuides[postSlug] : null
@@ -20,6 +26,8 @@ export function PostGuidePage() {
           '@type': 'Article',
           headline: guide.title,
           description: guide.tagline,
+          datePublished: guide.lastUpdated,
+          dateModified: guide.lastUpdated,
           url: `https://ministryofpapers.com/guide/${postSlug}`,
           keywords: `${guide.shortName}, ${guide.shortName} syllabus, ${guide.shortName} exam pattern, ${guide.conductingBody}, ${guide.shortName} previous year papers`,
           publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
@@ -69,6 +77,14 @@ export function PostGuidePage() {
               <span className="pg-meta-sep" aria-hidden="true">·</span>
               <span className="pg-meta-item">
                 <strong>Mode:</strong> {guide.examMode}
+              </span>
+              <span className="pg-meta-sep" aria-hidden="true">·</span>
+              {/* Visible, and mirrored into Article.dateModified below. Shown to
+                  users because freshness is judged on sight, and declared to
+                  Google because "<exam> date" style queries are recency-ranked. */}
+              <span className="pg-meta-item pg-updated">
+                <strong>Last updated:</strong>{' '}
+                <time dateTime={guide.lastUpdated}>{formatUpdated(guide.lastUpdated)}</time>
               </span>
             </div>
           </header>

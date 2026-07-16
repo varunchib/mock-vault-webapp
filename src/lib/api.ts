@@ -10,6 +10,9 @@ export type Exam = {
   description: string;
   popularYears: string[];
   subjects: string[];
+  /** Parent board ("jkssb" for "jkssb-patwari"); absent for a top-level exam.
+   *  Backed by vaultcore.exams.board_slug — see lib/examTree.ts. */
+  boardSlug?: string;
 };
 
 export type QuestionOption = {

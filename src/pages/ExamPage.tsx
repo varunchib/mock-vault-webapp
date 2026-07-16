@@ -32,6 +32,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { recordExamView } from '../lib/examActivity'
+import { subExamsOf } from '../lib/examTree'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { examFaqs, type FaqItem } from '../data/examFaq'
@@ -69,6 +70,10 @@ function getDisplayDate(paper: { heldOn?: string; shift: string; year: string })
 
 const FREE_QUESTION_LIMIT = 10
 const PAGE_SIZE = 15
+// Collapse the sub-exam grid past this many. The grid is 4-up on desktop, so 8
+// is exactly two full rows. Pagination would be wrong here: the largest board
+// has 7 sub-exams, so page 2 would hold a single chip.
+const SUBEXAM_COLLAPSE_AT = 8
 
 function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagClick: (tag: string) => void }) {
   const [selected, setSelected] = useState<string | null>(null)
@@ -178,6 +183,7 @@ export function ExamPage() {
   // Derived, not hardcoded: an exam is a "board" precisely when others nest
   // under its slug. Adding a sub-exam reclassifies its parent automatically.
   const isBoard = subExams.length > 0
+  const [showAllSubExams, setShowAllSubExams] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -204,13 +210,13 @@ export function ExamPage() {
       setPapers(paperData ?? [])
       setAllMocks(mockData ?? [])
       setExamQuestions(questionData ?? [])
-      setSubExams(
-        (catalog ?? []).filter(
-          (e) => e.slug !== examData.slug && e.slug.startsWith(examData.slug + '-'),
-        ),
-      )
+      const kids = subExamsOf(examData.slug, catalog ?? [])
+      setSubExams(kids)
       if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
-      recordExamView(examData)
+      // Only record exams a candidate actually sits. A board (JKSSB) is a
+      // navigation hub, so recording it would put "JKSSB" in Recently viewed
+      // instead of "JKSSB Junior Assistant".
+      if (kids.length === 0) recordExamView(examData)
     })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -231,6 +237,9 @@ export function ExamPage() {
     finally { setEnrollBusy(false) }
   }
 
+  // Mocks are a separate entity and deliberately do NOT roll up to a board the
+  // way papers and questions do: a mock belongs to the exam it was written for.
+  // Only this exam's own mocks appear here, under the Mocks tab.
   const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
   const filteredMocks = useMemo(
     () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
@@ -448,18 +457,43 @@ export function ExamPage() {
             <h2>Exams under {exam.shortName}</h2>
             <span>{subExams.length}</span>
           </div>
-          <div className="ep-subexam-row">
-            {subExams.map((sub) => (
-              <Link className="ep-subexam-chip" to={`/exam/${sub.slug}`} key={sub.slug}>
+          {/* Every chip is rendered into the DOM even when collapsed — only the
+              overflow is clipped in CSS. Appending links on click would keep
+              them out of the initial HTML, and uncrawled sub-exams are exactly
+              the problem this section exists to fix. */}
+          <div className={`ep-subexam-row${!showAllSubExams && subExams.length > SUBEXAM_COLLAPSE_AT ? ' collapsed' : ''}`}>
+            {subExams.map((sub, i) => (
+              <Link
+                className="ep-subexam-chip"
+                to={`/exam/${sub.slug}`}
+                key={sub.slug}
+                hidden={!showAllSubExams && i >= SUBEXAM_COLLAPSE_AT ? true : undefined}
+              >
                 <span className="ep-subexam-icon">{sub.icon}</span>
                 <span className="ep-subexam-copy">
                   <strong>{sub.shortName}</strong>
-                  <small>{sub.papers} papers · {sub.totalQuestions} Qs</small>
+                  <small>
+                    {sub.papers} paper{sub.papers === 1 ? '' : 's'} · {sub.totalQuestions} Qs
+                  </small>
                 </span>
                 <ChevronRight size={14} />
               </Link>
             ))}
           </div>
+
+          {subExams.length > SUBEXAM_COLLAPSE_AT && (
+            <button
+              type="button"
+              className="ep-subexam-more"
+              onClick={() => setShowAllSubExams((v) => !v)}
+              aria-expanded={showAllSubExams}
+            >
+              {showAllSubExams
+                ? 'Show less'
+                : `Show all ${subExams.length} exams`}
+              <ChevronDown size={14} className={showAllSubExams ? 'flip' : undefined} />
+            </button>
+          )}
         </section>
       )}
 
@@ -497,6 +531,13 @@ export function ExamPage() {
       {/* ── PYQ Papers ─────────────────────────────── */}
       {activeTab === 'papers' && (
         <div className="ep-tab-body">
+          {/* On a board this list is aggregated from every exam beneath it, so
+              say so — otherwise it reads as if the board owns them directly. */}
+          <div className="ep-papers-head">
+            <h2>All papers{isBoard ? ` under ${exam.shortName}` : ''}</h2>
+            <span>{papers.length}</span>
+          </div>
+
           <label className="ep-search-bar">
             <Search size={14} />
             <input
@@ -570,8 +611,11 @@ export function ExamPage() {
 
           {faqs && <FaqAccordion items={faqs} />}
 
-          {/* Exam Guides — links to post-specific guide pages */}
+          {/* Exam Guides — links to post-specific guide pages.
+              Skipped on a board: you sit JKSSB Patwari, not "JKSSB", and every
+              sub-exam now carries its own guide on its own page. */}
           {(() => {
+            if (isBoard) return null
             const guides = Object.entries(postGuides).filter(([, g]) => g.examSlug === exam.slug)
             if (guides.length === 0) return null
             return (
@@ -592,6 +636,11 @@ export function ExamPage() {
       {/* ── Mock Tests ─────────────────────────────── */}
       {activeTab === 'mocks' && (
         <div className="ep-tab-body">
+          <div className="ep-papers-head">
+            <h2>Mock tests</h2>
+            <span>{examMocks.length}</span>
+          </div>
+
           <div className="ep-filter-bar">
             {['All', 'Beginner', 'Moderate', 'Advanced'].map((d) => (
               <button
