@@ -2,6 +2,7 @@ import { CheckCircle2, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { searchExams } from '../lib/examSearch'
 import {
   fetchExamCatalog,
   fetchEnrolledSlugs,
@@ -19,6 +20,9 @@ const ALL = 'All'
 export function ExamCatalogPage() {
   const [searchParams] = useSearchParams()
   const [exams, setExams] = useState<Exam[]>([])
+  // Full catalog including sub-exams. The grid browses boards only, but search
+  // spans everything — otherwise sub-exams like JKSSB Patwari are unreachable.
+  const [allExams, setAllExams] = useState<Exam[]>([])
   const [enrolledSlugs, setEnrolledSlugs] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -62,6 +66,7 @@ export function ExamCatalogPage() {
           (e) => !all.some((other) => other.slug !== e.slug && e.slug.startsWith(other.slug + '-') && slugs.has(other.slug))
         )
         setExams(boards)
+        setAllExams(all)
         setEnrolledSlugs(new Set(enrolled.slugs))
       })
       .catch(() => setError(true))
@@ -91,15 +96,15 @@ export function ExamCatalogPage() {
   }, [exams])
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    return exams.filter((e) => {
-      const catMatch = activeCategory === ALL || normalizeExamCategory(e.category) === activeCategory
-      if (!catMatch) return false
-      if (!q) return true
-      return [e.name, e.shortName, e.category, e.description, ...e.subjects]
-        .join(' ').toLowerCase().includes(q)
-    })
-  }, [exams, activeCategory, query])
+    const q = query.trim()
+    // Browse the boards; search the whole catalog. Restricting search to boards
+    // made sub-exams (JKSSB Patwari, Junior Assistant, ...) unfindable here even
+    // though they have their own pages.
+    const pool = (q ? allExams : exams).filter(
+      (e) => activeCategory === ALL || normalizeExamCategory(e.category) === activeCategory,
+    )
+    return q ? searchExams(pool, q) : pool
+  }, [exams, allExams, activeCategory, query])
 
   if (loading) return <HaloLoader label="Loading exams" />
 

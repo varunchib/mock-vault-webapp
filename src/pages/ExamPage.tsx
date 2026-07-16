@@ -16,6 +16,7 @@ import { HaloLoader } from '../components/common/HaloLoader'
 import {
   fetchEnrolledSlugs,
   fetchExamBySlug,
+  fetchExamCatalog,
   fetchExamPapers,
   fetchExamQuestions,
   fetchMockCatalog,
@@ -171,6 +172,12 @@ export function ExamPage() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [isEnrolled, setIsEnrolled] = useState(false)
   const [enrollBusy, setEnrollBusy] = useState(false)
+  // Sibling exams under this board (e.g. JKSSB -> JKSSB Patwari). Without this
+  // they are unreachable by browsing, so nobody can view or enrol in them.
+  const [subExams, setSubExams] = useState<Exam[]>([])
+  // Derived, not hardcoded: an exam is a "board" precisely when others nest
+  // under its slug. Adding a sub-exam reclassifies its parent automatically.
+  const isBoard = subExams.length > 0
 
   useEffect(() => {
     if (!slug) return
@@ -191,11 +198,17 @@ export function ExamPage() {
       fetchMockCatalog(),
       fetchExamQuestions(slug).catch(() => []),
       isAuthenticated ? fetchEnrolledSlugs().catch(() => null) : Promise.resolve(null),
-    ]).then(([examData, paperData, mockData, questionData, enrollData]) => {
+      fetchExamCatalog().catch(() => [] as Exam[]),
+    ]).then(([examData, paperData, mockData, questionData, enrollData, catalog]) => {
       setExam(examData)
       setPapers(paperData ?? [])
       setAllMocks(mockData ?? [])
       setExamQuestions(questionData ?? [])
+      setSubExams(
+        (catalog ?? []).filter(
+          (e) => e.slug !== examData.slug && e.slug.startsWith(examData.slug + '-'),
+        ),
+      )
       if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
       recordExamView(examData)
     })
@@ -407,7 +420,11 @@ export function ExamPage() {
           </div>
         </div>
 
-        {isAuthenticated && (
+        {/* You enrol in an exam you actually sit, not a board — so a board (an
+            exam with sub-exams) offers no Enroll button. The `|| isEnrolled`
+            keeps it visible for anyone already enrolled in a board from before
+            this rule, otherwise their enrolment would be impossible to undo. */}
+        {isAuthenticated && (!isBoard || isEnrolled) && (
           <div className="ep-hero-actions">
             <button
               className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
@@ -420,6 +437,31 @@ export function ExamPage() {
           </div>
         )}
       </header>
+
+      {/* ── Exams under this board ─────────────────────
+          Without this, sub-exams (JKSSB Patwari, Junior Assistant, …) are
+          unreachable by browsing: the /exams grid lists boards only, so nobody
+          could view or enrol in the specific exam they actually sit. */}
+      {subExams.length > 0 && (
+        <section className="ep-subexams">
+          <div className="ep-subexams-head">
+            <h2>Exams under {exam.shortName}</h2>
+            <span>{subExams.length}</span>
+          </div>
+          <div className="ep-subexam-row">
+            {subExams.map((sub) => (
+              <Link className="ep-subexam-chip" to={`/exam/${sub.slug}`} key={sub.slug}>
+                <span className="ep-subexam-icon">{sub.icon}</span>
+                <span className="ep-subexam-copy">
+                  <strong>{sub.shortName}</strong>
+                  <small>{sub.papers} papers · {sub.totalQuestions} Qs</small>
+                </span>
+                <ChevronRight size={14} />
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* ── Tab bar ────────────────────────────────── */}
       <div className="ep-tab-bar">
@@ -483,7 +525,7 @@ export function ExamPage() {
                       <div className="ep-paper-card" key={paper.slug}>
                         <Link className="ep-paper-card-inner" to={paperPath(paper.slug)}>
                           <div className="ep-paper-card-main">
-                            <strong>{paperSeoOverride(paper.slug)?.title ?? paper.title}</strong>
+                            <strong>{paperSeoOverride(paper.slug)?.h1 ?? paper.title}</strong>
                             <div className="ep-paper-meta">
                               {(() => {
                                 const label = extractShiftLabel(paper.shift)

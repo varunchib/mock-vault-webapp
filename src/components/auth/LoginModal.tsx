@@ -1,6 +1,6 @@
 import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from '@react-oauth/google'
 import { X } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
@@ -16,7 +16,29 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
   const { loginWithGoogleCredential } = useAuth()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const slotRef = useRef<HTMLDivElement | null>(null)
+  const [buttonWidth, setButtonWidth] = useState(320)
 
+  // Google's Sign-In button takes a fixed pixel width and cannot be sized in
+  // CSS — it renders inside an iframe. A hardcoded width overflows narrow
+  // phones: a Redmi 12 is ~393px CSS wide, which leaves ~282px inside this
+  // modal, so a 320px button hangs off the screen. Measure the slot instead.
+  // (GSI clamps the width to 200-400.)
+  useEffect(() => {
+    if (!open) return
+    const el = slotRef.current
+    if (!el) return
+    const measure = () => {
+      const w = Math.floor(el.getBoundingClientRect().width)
+      if (w > 0) setButtonWidth(Math.max(200, Math.min(400, w)))
+    }
+    measure()
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [open])
+
+  // Hooks above this line — an early return must never sit before them.
   if (!open) return null
 
   const handleSuccess = async (response: CredentialResponse) => {
@@ -66,7 +88,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
           // the only consumer. Mounting it here means anonymous visitors (most of
           // our search traffic) never download it.
           <GoogleOAuthProvider clientId={env.googleClientId}>
-            <div className="auth-google-slot">
+            <div className="auth-google-slot" ref={slotRef}>
               <GoogleLogin
                 onSuccess={handleSuccess}
                 onError={() => setErrorMessage('Google login failed. Please try again.')}
@@ -74,7 +96,7 @@ export function LoginModal({ open, onClose }: LoginModalProps) {
                 text="continue_with"
                 shape="pill"
                 size="large"
-                width="320"
+                width={String(buttonWidth)}
               />
             </div>
           </GoogleOAuthProvider>

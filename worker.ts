@@ -381,7 +381,7 @@ function renderPaperContent(p: PaperData, questions: QuestionData[]): string {
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[]): string {
   const paperLinks = papers
     .slice(0, 30)
-    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.title ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
+    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
     .join('')
   const mockLinks = mocks
     .slice(0, 20)
@@ -403,7 +403,7 @@ function renderMockContent(exam: ExamData, mocks: MockData[], papers: PaperData[
     .join('')
   const paperLinks = papers
     .slice(0, 10)
-    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.title ?? p.title)}</a></li>`)
+    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a></li>`)
     .join('')
   return renderPageShell(`${exam.shortName} mock tests`, `
     ${paragraph(exam.description)}
@@ -418,7 +418,7 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string]): s
     .join('')
   const about = guide.about.map(paragraph).join('')
   const papers = guide.papers
-    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.title ?? p.title)}</a> <small>${htmlText(p.year)} - ${p.questions} questions</small></li>`)
+    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${htmlText(p.year)} - ${p.questions} questions</small></li>`)
     .join('')
   const syllabus = guide.syllabus
     .slice(0, 10)

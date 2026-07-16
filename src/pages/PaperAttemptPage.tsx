@@ -714,26 +714,32 @@ export function PaperAttemptPage() {
 
           <section className="pa-subject-panel">
             {results.subjectScores.length > 0 ? (
-              <table className="pa-subject-table">
-                <thead>
-                  <tr><th>Subject</th><th>Qs</th><th>✓</th><th>✗</th><th>—</th><th>Marks</th></tr>
-                </thead>
-                <tbody>
-                  {results.subjectScores.map((s) => {
-                    const sm = subjectMarks(s)
-                    return (
-                      <tr key={s.subject}>
-                        <td>{s.subject}</td>
-                        <td>{s.total}</td>
-                        <td className="correct">{s.correct}</td>
-                        <td className="wrong">{s.wrong}</td>
-                        <td className="skipped">{s.skipped}</td>
-                        <td className={sm < 0 ? 'wrong' : sm > 0 ? 'correct' : ''}>{sm}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
+              // Six columns with long subject names ("General Knowledge & Current
+              // Affairs") overflow a ~393px phone. Scroll the table itself rather
+              // than letting it push the whole page sideways — same treatment as
+              // .ov-table-wrap and .qr-table-wrap.
+              <div className="pa-subject-table-wrap">
+                <table className="pa-subject-table">
+                  <thead>
+                    <tr><th>Subject</th><th>Qs</th><th>✓</th><th>✗</th><th>—</th><th>Marks</th></tr>
+                  </thead>
+                  <tbody>
+                    {results.subjectScores.map((s) => {
+                      const sm = subjectMarks(s)
+                      return (
+                        <tr key={s.subject}>
+                          <td>{s.subject}</td>
+                          <td>{s.total}</td>
+                          <td className="correct">{s.correct}</td>
+                          <td className="wrong">{s.wrong}</td>
+                          <td className="skipped">{s.skipped}</td>
+                          <td className={sm < 0 ? 'wrong' : sm > 0 ? 'correct' : ''}>{sm}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="pa-subject-empty">No subject breakdown available</div>
             )}

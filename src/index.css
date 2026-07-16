@@ -59,6 +59,13 @@ img, svg {
   display: block;
 }
 
+/* Safety net: an image wider than its container pushes the whole page sideways
+   on a phone. Individual rules (e.g. .pyq-q-img) already set this; declaring it
+   once here means a newly added <img> cannot regress the layout. */
+img {
+  max-width: 100%;
+}
+
 .site-nav {
   position: sticky;
   top: 0;
@@ -1775,6 +1782,23 @@ footer {
   display: flex;
   justify-content: center;
   margin: 8px 0 18px;
+  /* LoginModal measures this element to size Google's fixed-width button.
+     Keep it a plain full-width block — no padding — so the measurement is
+     the space actually available. */
+  width: 100%;
+}
+
+/* Narrow phones: 34px of padding a side costs 68px of a ~393px screen (a Redmi
+   12 is 1080px at DPR 2.75). Tighten so the Google button has room to breathe. */
+@media (max-width: 480px) {
+  .auth-backdrop {
+    padding: 14px;
+  }
+
+  .auth-modal {
+    padding: 26px 18px;
+    border-radius: 18px;
+  }
 }
 
 .auth-config-warning {
@@ -8281,19 +8305,70 @@ footer {
   white-space: nowrap;
 }
 
+/* Inline search — desktop and tablet. Tonal fill: a white input with a border
+   and a shadow on a white topbar reads as a floating card, so it sits flat and
+   lifts to white only on focus. Shrinks on tablet rather than overflowing. */
+/* Centred: .vault-tb-left and .vault-tb-right both flex:1 from a 0 basis, so
+   they claim equal width and this sits in the middle of the bar regardless of
+   how long the page title or user name is. It shrinks (0 1) but never grows. */
+.vault-topbar-new .vault-search-wrap {
+  position: relative;
+  flex: 0 1 420px;
+  max-width: 420px;
+  min-width: 0;
+}
+
+.vault-topbar-new .vault-search {
+  width: 100%;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: var(--line2);
+  box-shadow: none;
+  color: var(--ink4);
+  transition: background .14s, border-color .14s, box-shadow .14s;
+}
+
+.vault-topbar-new .vault-search:hover { background: #ebebed; }
+
+.vault-topbar-new .vault-search:focus-within {
+  background: #fff;
+  border-color: var(--ink3);
+  box-shadow: 0 0 0 3px rgba(24, 24, 27, .07);
+}
+
+.vault-topbar-new .vault-search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 13.5px;
+}
+
+.vault-topbar-new .vault-search input::placeholder { color: var(--ink4); }
+
+/* flex:1 here mirrors .vault-tb-left so the search bar between them is centred */
 .vault-tb-right {
   flex: 1;
+  min-width: 0;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
 }
 
-/* Icon-only topbar action (search). Borderless — the topbar stays quiet. */
+/* Icon-only topbar action (search). Mobile only — the inline bar covers
+   desktop/tablet. Borderless so the topbar stays quiet. */
 .vault-tb-icon-btn {
   width: 36px;
   height: 36px;
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
   border: 0;
@@ -9902,6 +9977,105 @@ html {
   border-radius: 100px;
 }
 
+/* ── Exams under a board (sub-exams) ─────────────────────────────────────── */
+.ep-subexams {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  padding: 16px;
+}
+
+.ep-subexams-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.ep-subexams-head h2 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+  color: var(--ink);
+}
+
+.ep-subexams-head span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 99px;
+  background: var(--line2);
+  color: var(--ink3);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.ep-subexam-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 10px;
+}
+
+.ep-subexam-chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color .13s, box-shadow .13s;
+}
+
+.ep-subexam-chip:hover {
+  border-color: var(--ink3);
+  box-shadow: var(--shadow);
+}
+
+.ep-subexam-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.ep-subexam-copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.ep-subexam-copy strong {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ep-subexam-copy small {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 1px;
+}
+
+.ep-subexam-chip > svg {
+  color: var(--ink4);
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .ep-subexams { padding: 14px; }
+  .ep-subexam-row { grid-template-columns: 1fr; }
+}
+
 /* Tab bar â€” new style replacing ep-tabs */
 .ep-tab-bar {
   display: flex;
@@ -10733,8 +10907,19 @@ html {
   .db-header { flex-direction: column; gap: 14px; }
   .db-header-stats { flex-direction: row; justify-content: flex-start; gap: 20px; }
   .db-header-stat { align-items: flex-start; }
-  .db-enrolled-row { flex-direction: column; }
-  .db-enrolled-chip { min-width: 0; width: 100%; }
+  /* Two-up grid rather than one full-width chip per row: at 360px the content
+     box is ~336px, so 2 x 150px + 10px gap fits and halves the scroll. */
+  .db-enrolled-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+  .db-enrolled-chip {
+    min-width: 0;
+    width: 100%;
+    padding: 10px 12px;
+  }
+  .db-enrolled-chip .db-chip-icon { font-size: 18px; }
   .db-attempts-empty { flex-direction: column; align-items: flex-start; }
   .db-enroll-cta { flex-direction: column; align-items: flex-start; }
   .db-page { gap: 18px; }
@@ -11021,8 +11206,23 @@ html {
   .ec-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
+/* Stay 2-up all the way down — a single full-width card per row wastes half a
+   phone screen and makes the catalog a long scroll. At 393px (Redmi 12) this
+   gives ~180px per card; the tighter padding below keeps the content readable.
+   Note: this block previously forced 1 column, which is what any phone under
+   400px was getting. */
 @media (max-width: 400px) {
-  .ec-grid { grid-template-columns: 1fr; }
+  .ec-grid { gap: 10px; }
+
+  .ec-card {
+    padding: 12px;
+    gap: 5px;
+    border-radius: 12px;
+  }
+
+  .ec-card-icon { font-size: 22px; }
+  .ec-card-name { font-size: 13.5px; }
+  .ec-card-full { font-size: 11px; }
 }
 
 
@@ -11532,6 +11732,12 @@ html {
   display: flex;
   flex-direction: column;
 }
+/* Scrolls the table instead of the page — see .ov-table-wrap / .qr-table-wrap */
+.pa-subject-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .pa-subject-table {
   width: 100%;
   border-collapse: collapse;
@@ -11968,6 +12174,16 @@ html {
      crowds a 360px bar. */
   .vault-tb-title {
     display: none;
+  }
+
+  /* Swap the inline bar for the magnifier — a full input has no room next to
+     the logo and avatar at this width. Both drive the same search state. */
+  .vault-topbar-new .vault-search-wrap {
+    display: none;
+  }
+
+  .vault-tb-icon-btn {
+    display: inline-flex;
   }
 }
 

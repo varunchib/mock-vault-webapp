@@ -220,7 +220,7 @@ export function PostGuidePage() {
               {guide.papers.map((paper) => (
                 <Link className="pg-paper-row" key={paper.slug} to={paperPath(paper.slug)}>
                   <div className="pg-paper-info">
-                    <span className="pg-paper-title">{paperSeoOverride(paper.slug)?.title ?? paper.title}</span>
+                    <span className="pg-paper-title">{paperSeoOverride(paper.slug)?.h1 ?? paper.title}</span>
                     <span className="pg-paper-meta">{paper.questions} questions · {paper.year}</span>
                   </div>
                   <ChevronRight size={13} className="pg-paper-arrow" />

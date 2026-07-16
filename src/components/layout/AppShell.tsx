@@ -15,6 +15,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 import { fetchExamCatalog, type Exam } from '../../lib/api'
+import { searchExams } from '../../lib/examSearch'
 import { Logo } from '../ui/Logo'
 
 type NavItem = {
@@ -72,11 +73,12 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   // Mobile nav drawer (replaces the old bottom bar at <=768px)
   const [navOpen, setNavOpen] = useState(false)
-  // Search is an overlay now, opened from the magnifier in the topbar
+  // Desktop uses the inline topbar bar; mobile uses the magnifier + overlay.
   const [searchOpen, setSearchOpen] = useState(false)
   const [inboxOpen, setInboxOpen] = useState(false)
   const [inboxUnread, setInboxUnread] = useState(false)
   const searchInputRef = useRef<HTMLInputElement | null>(null)
+  const searchRef = useRef<HTMLDivElement | null>(null)
   const profileRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -138,24 +140,21 @@ export function AppShell({ children }: { children: ReactNode }) {
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
       const target = event.target as Node
+      // Skip while the overlay is open: its results live outside searchRef, so
+      // clearing here would unmount them before the click could land.
+      if (!searchOpen && searchRef.current && !searchRef.current.contains(target)) {
+        setSearchQuery('')
+      }
       if (profileRef.current && !profileRef.current.contains(target)) setProfileOpen(false)
     }
     document.addEventListener('mousedown', handlePointerDown)
     return () => document.removeEventListener('mousedown', handlePointerDown)
-  }, [])
+  }, [searchOpen])
 
-  const searchResults = useMemo(() => {
-    const normalized = searchQuery.trim().toLowerCase()
-    if (!normalized) return []
-    return allExams
-      .filter((exam) =>
-        [exam.name, exam.shortName, exam.category, exam.description, ...exam.subjects]
-          .join(' ')
-          .toLowerCase()
-          .includes(normalized),
-      )
-      .slice(0, 7)
-  }, [allExams, searchQuery])
+  const searchResults = useMemo(
+    () => searchExams(allExams, searchQuery, 7),
+    [allExams, searchQuery],
+  )
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -172,6 +171,35 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   const pageTitle = getPageTitle(location.pathname)
+
+  // One result list, rendered by both the inline topbar bar (as a dropdown)
+  // and the mobile overlay — so they can never drift apart.
+  const searchResultList = searchQuery.trim() ? (
+    <div className="vault-search-results">
+      {searchResults.length ? (
+        searchResults.map((exam) => (
+          <button
+            className="vault-search-result"
+            type="button"
+            key={exam.slug}
+            onClick={() => navigate(`/exam/${exam.slug}`)}
+          >
+            <span>{exam.icon}</span>
+            <div>
+              <strong>{exam.shortName}</strong>
+              <small>{exam.name}</small>
+            </div>
+            <ChevronRight size={14} />
+          </button>
+        ))
+      ) : (
+        <div className="vault-search-empty">
+          <strong>No matching exams</strong>
+          <small>Try an exam name, like “UPSC CSE” or “SSC CGL”.</small>
+        </div>
+      )}
+    </div>
+  ) : null
 
   return (
     <>
@@ -246,7 +274,23 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="vault-tb-title">{pageTitle}</span>
             </div>
 
+            {/* Inline search — desktop/tablet. Hidden at <=768px in favour of
+                the magnifier, which has no room to sit next to a full input. */}
+            <div className="vault-search-wrap" ref={searchRef}>
+              <label className="vault-search">
+                <Search size={14} />
+                <input
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search exams…"
+                  aria-label="Search exams"
+                />
+              </label>
+              {searchResultList}
+            </div>
+
             <div className="vault-tb-right">
+              {/* Mobile-only: opens the same search as an overlay */}
               <button
                 type="button"
                 className="vault-tb-icon-btn"
@@ -300,7 +344,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   ref={searchInputRef}
                   value={searchQuery}
                   onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder="Search exams, subjects..."
+                  placeholder="Search exams…"
                 />
                 <button
                   type="button"
@@ -312,33 +356,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                 </button>
               </label>
 
-              {searchQuery.trim() ? (
-                <div className="vault-search-results">
-                  {searchResults.length ? (
-                    searchResults.map((exam) => (
-                      <button
-                        className="vault-search-result"
-                        type="button"
-                        key={exam.slug}
-                        onClick={() => navigate(`/exam/${exam.slug}`)}
-                      >
-                        <span>{exam.icon}</span>
-                        <div>
-                          <strong>{exam.shortName}</strong>
-                          <small>{exam.name}</small>
-                        </div>
-                        <ChevronRight size={14} />
-                      </button>
-                    ))
-                  ) : (
-                    <div className="vault-search-empty">
-                      <strong>No matching exams</strong>
-                      <small>Try exam name, category, or subject.</small>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <p className="vault-search-hint">Start typing to find an exam.</p>
+              {searchResultList ?? (
+                <p className="vault-search-hint">Start typing an exam name.</p>
               )}
             </div>
           </div>
