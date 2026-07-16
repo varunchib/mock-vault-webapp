@@ -289,7 +289,7 @@ export function PyqPaperPage() {
 
               {isDeleted ? (
                 <div className="pyq-deleted-notice">
-                  <strong>This question was officially deleted by BPSC</strong>
+                  <strong>This question was officially deleted by {paper.examSlug.split('-')[0].toUpperCase()}</strong>
                   <p>{q.explanation}</p>
                 </div>
               ) : (
