@@ -54,12 +54,27 @@ async function generate() {
 
   const mockExamSlugs = new Set(mocks.map(mock => mock.examSlug).filter(Boolean))
   // Skip near-empty papers (too thin to index → Soft 404).
-  const paperSlugs = papers
-    .filter(paper => (paper.questions ?? 0) >= 5)
+  const indexablePapers = papers.filter(paper => (paper.questions ?? 0) >= 5)
+  const paperSlugs = indexablePapers
     .map(paper => PAPER_SEO_SLUGS[paper.slug] ?? paper.slug)
     .filter(Boolean)
 
-  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers`)
+  // Individual question pages — only the ones with a real explanation. This is
+  // the same >=300-char gate the IndexNow submit-all endpoint uses: a fully
+  // solved question deserves its own indexed URL, but a bare stub would be thin
+  // content and waste crawl budget. Fetch per paper (indexable papers only).
+  const MIN_EXPLANATION = 300
+  const questionArrays = await Promise.all(
+    indexablePapers.map(paper =>
+      fetchData(`/api/v1/papers/${encodeURIComponent(paper.slug)}/questions`).catch(() => []),
+    ),
+  )
+  const questionSlugs = questionArrays
+    .flat()
+    .filter(q => q && q.slug && (q.explanation ?? '').trim().length >= MIN_EXPLANATION)
+    .map(q => q.slug)
+
+  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers, ${questionSlugs.length} solved questions`)
 
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),
@@ -74,6 +89,7 @@ async function generate() {
     ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
+    ...questionSlugs.map(slug => url(`${BASE}/question/${slug}`, '0.6', 'monthly')),
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`
