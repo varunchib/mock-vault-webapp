@@ -33,6 +33,12 @@ export type PostGuideData = {
   title: string
   shortName: string
   tagline: string
+  // ISO date (YYYY-MM-DD) of the last real content review. Rendered visibly
+  // AND as Article.dateModified. Queries like "<exam> exam date" are
+  // recency-ranked, so a page with no date signal competes badly however
+  // good its content is. Required, not optional: a freshness signal you can
+  // forget to set is useless.
+  lastUpdated: string
   patternNotification?: string  // e.g. "Based on 2017 notification. Updated when new notification releases."
   quickFacts?: QuickFact[]      // shown in sidebar — only put stable/current facts here
 
@@ -94,9 +100,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector of Police (PSI) — Official Syllabus & Exam Pattern 2024',
     shortName: 'JKPSI',
     tagline: 'Official syllabus for JKSSB Sub Inspector (J&K Police) — Adv. 02/2024. 100 questions, 200 marks, 6 sections. Solved previous year papers included.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkssb',
-    paperSearchTerm: 'psi',
+    examSlug: 'jkpsi',
 
     papers: [
       { slug: 'jkpsi-2017', title: 'JKSSB Sub Inspector of Police — 2017', year: '2017', questions: 120 },
@@ -246,6 +252,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'UPSC Civil Services Examination (CSE) — Complete Syllabus & Exam Pattern',
     shortName: 'UPSC CSE',
     tagline: 'UPSC IAS/IPS/IFS exam — Prelims syllabus, GS Paper I & CSAT pattern, Mains overview, and previous year solved papers.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'upsc-cse',
 
@@ -393,6 +400,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'SSC CGL — Complete Syllabus, Exam Pattern & Previous Year Papers',
     shortName: 'SSC CGL',
     tagline: 'SSC Combined Graduate Level — Tier I & II syllabus, section-wise exam pattern, previous year papers with solutions.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'ssc-cgl',
 
@@ -524,6 +532,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'BPSC Combined Competitive Examination (CCE) — Syllabus & Exam Pattern',
     shortName: 'BPSC CCE',
     tagline: 'Bihar Public Service Commission CCE — Prelims syllabus, 150 GS questions, no negative marking. Previous year papers with solutions.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'bpsc',
 
@@ -650,6 +659,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'IBPS PO — Complete Syllabus & Exam Pattern 2025',
     shortName: 'IBPS PO',
     tagline: 'IBPS Probationary Officer exam — Prelims & Mains syllabus, section-wise pattern, Banking Awareness topics, previous year papers.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'ibps-po',
 
@@ -778,8 +788,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKPSC JKCCE — Official Syllabus, Exam Pattern & Previous Year Papers',
     shortName: 'JKPSC',
     tagline: 'JKPSC Combined Competitive Examination (JKCCE) — GS Paper I & CSAT syllabus, Prelims pattern, and solved papers for J&K Gazetted Officer recruitment.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkpsc',
+    examSlug: 'jkcce',
 
     papers: [
       { slug: 'jkpsc-jkcce-prelims-2025-gs1-set-b', title: 'JKCCE Prelims 2025 — GS Paper I (Set B)', year: '2025', questions: 100 },
@@ -910,6 +921,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'RSSB Patwari — Official Syllabus & Exam Pattern 2025',
     shortName: 'RSSB Patwari',
     tagline: 'Rajasthan Staff Selection Board Patwari exam — 150 questions, 300 marks, −0.67 negative marking. Official syllabus, Rajasthan GK topics, and solved 2025 paper.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'rssb',
 
@@ -1045,6 +1057,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB — All Exam Syllabus, Posts & Previous Year Papers',
     shortName: 'JKSSB',
     tagline: 'J&K Services Selection Board — Patwari, Junior Assistant, Finance Account Assistant, Wildlife Guard, Sub Inspector exam syllabus and solved papers.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'jkssb',
 
@@ -1168,6 +1181,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'NEET UG — Complete Syllabus & Exam Pattern 2025',
     shortName: 'NEET UG',
     tagline: 'NEET UG medical entrance — official syllabus for Physics, Chemistry, Biology. 180 questions, 720 marks, −1 negative marking. NTA-conducted.',
+    lastUpdated: '2026-07-16',
 
     examSlug: 'neet-ug',
     papers: [],
@@ -1303,9 +1317,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Patwari — Syllabus, Revenue Laws & Exam Pattern',
     shortName: 'JKSSB Patwari',
     tagline: 'JKSSB Patwari exam — Revenue Laws syllabus, J&K Land Records, 120 MCQs, −0.25 negative marking. 2024 solved paper included.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkssb',
-    paperSearchTerm: 'patwari',
+    examSlug: 'jkssb-patwari',
 
     papers: [
       { slug: 'jkssb-patwari-2024-sep1-set-a', title: 'JKSSB Patwari — 1 Sep 2024 (Set A)', year: '2024', questions: 120 },
@@ -1436,9 +1450,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Junior Assistant — Syllabus, Computer Knowledge & Exam Pattern',
     shortName: 'JKSSB Junior Assistant',
     tagline: 'JKSSB Junior Assistant exam — Computer Knowledge syllabus, GK, Reasoning, English. 80 questions, −0.25 negative marking. 2026 solved paper.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkssb',
-    paperSearchTerm: 'junior assistant',
+    examSlug: 'jkssb-junior-assistant',
 
     papers: [
       { slug: 'jkssb-junior-assistant-pyq', title: 'JKSSB Junior Assistant — 19 Apr 2026', year: '2026', questions: 80 },
@@ -1570,9 +1584,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Finance Account Assistant (FAA) — Syllabus & Exam Pattern',
     shortName: 'JKSSB FAA',
     tagline: 'JKSSB Finance Account Assistant exam — J&K Financial Code, Treasury Code, Government Accounting. 120 MCQs, −0.25 negative marking. 2024 solved paper.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkssb',
-    paperSearchTerm: 'finance',
+    examSlug: 'jkssb-faa',
 
     papers: [
       { slug: 'jkssb-finance-accounts-2024-paper', title: 'JKSSB Finance Account Assistant — Jan 2024', year: '2024', questions: 120 },
@@ -1702,9 +1716,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Wildlife Guard — Official Syllabus & Exam Pattern (Forest Dept.)',
     shortName: 'JKSSB Wildlife Guard',
     tagline: 'Official syllabus for JKSSB Wildlife Guard (Forest, Ecology & Environment) — 4 sections, 120 marks. Mathematics, Reasoning, English, General Awareness + Forest & Wildlife. 2026 solved paper.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkssb',
-    paperSearchTerm: 'wildlife',
+    examSlug: 'jkssb-wildlife-guard',
 
     papers: [
       { slug: 'jkssb-wildlife-guard-2026-may-10', title: 'JKSSB Wildlife Guard — 10 May 2026', year: '2026', questions: 120 },
@@ -1849,9 +1863,9 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Veterinary Pharmacist — Official Syllabus & Exam Pattern 2025',
     shortName: 'JKSSB Veterinary Pharmacist',
     tagline: 'Official syllabus for JKSSB Veterinary Pharmacist — 120 questions, 120 marks, 2 hours. English, GK, Reasoning, Computer + 60 marks of Zoology, Physiology, Evolution & Immunology. Solved 2025 paper with answer key.',
+    lastUpdated: '2026-07-16',
 
-    examSlug: 'jkssb',
-    paperSearchTerm: 'veterinary pharmacist',
+    examSlug: 'jkssb-veterinary-pharmacist',
 
     papers: [
       { slug: 'jkssb-veterinary-pharmacist-2025', title: 'JKSSB Veterinary Pharmacist — 2 March 2025', year: '2025', questions: 120 },
@@ -1859,11 +1873,11 @@ export const postGuides: Record<string, PostGuideData> = {
 
     conductingBody: 'J&K Services Selection Board (JKSSB)',
     officialWebsite: 'https://jkssb.nic.in',
-    examLevel: 'UT Level (Jammu & Kashmir) — Animal Husbandry Department',
+    examLevel: 'UT Level (J&K) — Agriculture Production Department (Animal Husbandry)',
     examMode: 'OMR-based Written Test only (No Interview)',
 
     about: [
-      'The JKSSB Veterinary Pharmacist is a Group C post under the Animal Husbandry Department of J&K UT. Veterinary Pharmacists are responsible for dispensing medicines, maintaining drug inventories, assisting veterinary officers in treatment of livestock and animals, and managing pharmaceutical records at veterinary hospitals and dispensaries across Jammu and Kashmir.',
+      'The JKSSB Veterinary Pharmacist is a Group C post in the Animal Husbandry Department, which sits under the Agriculture Production Department of J&K UT. Veterinary Pharmacists are responsible for dispensing medicines, maintaining drug inventories, assisting veterinary officers in treatment of livestock and animals, and managing pharmaceutical records at veterinary hospitals and dispensaries across Jammu and Kashmir.',
       'The written examination consists of 120 objective-type MCQ questions carrying 1 mark each, with a duration of 2 hours. Negative marking of −0.25 marks applies per wrong answer. The paper has a strong subject-specific component — approximately 60 out of 120 marks are from Zoology, Animal Physiology, Evolution, and Immunology, making it one of the most science-heavy JKSSB exams. The remaining 60 marks cover English, General Knowledge & Current Affairs (including J&K-specific topics), Reasoning & Mental Ability, and Computer Knowledge.',
       'JKSSB Advertisement Notification 03 of 2026 announced 194 vacancies for Veterinary Pharmacist. The exam held on 2 March 2025 (Set A) is fully solved and available on Ministry of Papers. Selection is made purely on written exam merit — there is no interview stage. Document verification follows shortlisting.',
     ],
@@ -1880,7 +1894,8 @@ export const postGuides: Record<string, PostGuideData> = {
       { label: 'Reasoning', value: '~15 marks' },
       { label: 'Computer Knowledge', value: '~10 marks' },
       { label: 'Zoology / Biology (subject-specific)', value: '~60 marks' },
-      { label: 'Qualification', value: 'B.Sc with Zoology' },
+      { label: 'Department', value: 'Agriculture Production Dept. — Animal Husbandry' },
+      { label: 'Qualification', value: 'B.Sc with Zoology as a subject' },
       { label: 'Pay Level', value: 'Level 4 — ₹25,500 to ₹81,100' },
       { label: 'Interview', value: 'None — merit-based written exam only' },
     ],

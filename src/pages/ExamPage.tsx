@@ -16,6 +16,7 @@ import { HaloLoader } from '../components/common/HaloLoader'
 import {
   fetchEnrolledSlugs,
   fetchExamBySlug,
+  fetchExamCatalog,
   fetchExamPapers,
   fetchExamQuestions,
   fetchMockCatalog,
@@ -31,6 +32,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { recordExamView } from '../lib/examActivity'
+import { subExamsOf } from '../lib/examTree'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { examFaqs, type FaqItem } from '../data/examFaq'
@@ -68,6 +70,10 @@ function getDisplayDate(paper: { heldOn?: string; shift: string; year: string })
 
 const FREE_QUESTION_LIMIT = 10
 const PAGE_SIZE = 15
+// Collapse the sub-exam grid past this many. The grid is 4-up on desktop, so 8
+// is exactly two full rows. Pagination would be wrong here: the largest board
+// has 7 sub-exams, so page 2 would hold a single chip.
+const SUBEXAM_COLLAPSE_AT = 8
 
 function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagClick: (tag: string) => void }) {
   const [selected, setSelected] = useState<string | null>(null)
@@ -171,6 +177,13 @@ export function ExamPage() {
   const [loginOpen, setLoginOpen] = useState(false)
   const [isEnrolled, setIsEnrolled] = useState(false)
   const [enrollBusy, setEnrollBusy] = useState(false)
+  // Sibling exams under this board (e.g. JKSSB -> JKSSB Patwari). Without this
+  // they are unreachable by browsing, so nobody can view or enrol in them.
+  const [subExams, setSubExams] = useState<Exam[]>([])
+  // Derived, not hardcoded: an exam is a "board" precisely when others nest
+  // under its slug. Adding a sub-exam reclassifies its parent automatically.
+  const isBoard = subExams.length > 0
+  const [showAllSubExams, setShowAllSubExams] = useState(false)
 
   useEffect(() => {
     if (!slug) return
@@ -191,13 +204,19 @@ export function ExamPage() {
       fetchMockCatalog(),
       fetchExamQuestions(slug).catch(() => []),
       isAuthenticated ? fetchEnrolledSlugs().catch(() => null) : Promise.resolve(null),
-    ]).then(([examData, paperData, mockData, questionData, enrollData]) => {
+      fetchExamCatalog().catch(() => [] as Exam[]),
+    ]).then(([examData, paperData, mockData, questionData, enrollData, catalog]) => {
       setExam(examData)
       setPapers(paperData ?? [])
       setAllMocks(mockData ?? [])
       setExamQuestions(questionData ?? [])
+      const kids = subExamsOf(examData.slug, catalog ?? [])
+      setSubExams(kids)
       if (enrollData) setIsEnrolled(enrollData.slugs.includes(examData.slug))
-      recordExamView(examData)
+      // Only record exams a candidate actually sits. A board (JKSSB) is a
+      // navigation hub, so recording it would put "JKSSB" in Recently viewed
+      // instead of "JKSSB Junior Assistant".
+      if (kids.length === 0) recordExamView(examData)
     })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -218,6 +237,9 @@ export function ExamPage() {
     finally { setEnrollBusy(false) }
   }
 
+  // Mocks are a separate entity and deliberately do NOT roll up to a board the
+  // way papers and questions do: a mock belongs to the exam it was written for.
+  // Only this exam's own mocks appear here, under the Mocks tab.
   const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
   const filteredMocks = useMemo(
     () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
@@ -407,7 +429,11 @@ export function ExamPage() {
           </div>
         </div>
 
-        {isAuthenticated && (
+        {/* You enrol in an exam you actually sit, not a board — so a board (an
+            exam with sub-exams) offers no Enroll button. The `|| isEnrolled`
+            keeps it visible for anyone already enrolled in a board from before
+            this rule, otherwise their enrolment would be impossible to undo. */}
+        {isAuthenticated && (!isBoard || isEnrolled) && (
           <div className="ep-hero-actions">
             <button
               className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
@@ -420,6 +446,56 @@ export function ExamPage() {
           </div>
         )}
       </header>
+
+      {/* ── Exams under this board ─────────────────────
+          Without this, sub-exams (JKSSB Patwari, Junior Assistant, …) are
+          unreachable by browsing: the /exams grid lists boards only, so nobody
+          could view or enrol in the specific exam they actually sit. */}
+      {subExams.length > 0 && (
+        <section className="ep-subexams">
+          <div className="ep-subexams-head">
+            <h2>Exams under {exam.shortName}</h2>
+            <span>{subExams.length}</span>
+          </div>
+          {/* Every chip is rendered into the DOM even when collapsed — only the
+              overflow is clipped in CSS. Appending links on click would keep
+              them out of the initial HTML, and uncrawled sub-exams are exactly
+              the problem this section exists to fix. */}
+          <div className={`ep-subexam-row${!showAllSubExams && subExams.length > SUBEXAM_COLLAPSE_AT ? ' collapsed' : ''}`}>
+            {subExams.map((sub, i) => (
+              <Link
+                className="ep-subexam-chip"
+                to={`/exam/${sub.slug}`}
+                key={sub.slug}
+                hidden={!showAllSubExams && i >= SUBEXAM_COLLAPSE_AT ? true : undefined}
+              >
+                <span className="ep-subexam-icon">{sub.icon}</span>
+                <span className="ep-subexam-copy">
+                  <strong>{sub.shortName}</strong>
+                  <small>
+                    {sub.papers} paper{sub.papers === 1 ? '' : 's'} · {sub.totalQuestions} Qs
+                  </small>
+                </span>
+                <ChevronRight size={14} />
+              </Link>
+            ))}
+          </div>
+
+          {subExams.length > SUBEXAM_COLLAPSE_AT && (
+            <button
+              type="button"
+              className="ep-subexam-more"
+              onClick={() => setShowAllSubExams((v) => !v)}
+              aria-expanded={showAllSubExams}
+            >
+              {showAllSubExams
+                ? 'Show less'
+                : `Show all ${subExams.length} exams`}
+              <ChevronDown size={14} className={showAllSubExams ? 'flip' : undefined} />
+            </button>
+          )}
+        </section>
+      )}
 
       {/* ── Tab bar ────────────────────────────────── */}
       <div className="ep-tab-bar">
@@ -455,6 +531,13 @@ export function ExamPage() {
       {/* ── PYQ Papers ─────────────────────────────── */}
       {activeTab === 'papers' && (
         <div className="ep-tab-body">
+          {/* On a board this list is aggregated from every exam beneath it, so
+              say so — otherwise it reads as if the board owns them directly. */}
+          <div className="ep-papers-head">
+            <h2>All papers{isBoard ? ` under ${exam.shortName}` : ''}</h2>
+            <span>{papers.length}</span>
+          </div>
+
           <label className="ep-search-bar">
             <Search size={14} />
             <input
@@ -483,7 +566,7 @@ export function ExamPage() {
                       <div className="ep-paper-card" key={paper.slug}>
                         <Link className="ep-paper-card-inner" to={paperPath(paper.slug)}>
                           <div className="ep-paper-card-main">
-                            <strong>{paperSeoOverride(paper.slug)?.title ?? paper.title}</strong>
+                            <strong>{paperSeoOverride(paper.slug)?.h1 ?? paper.title}</strong>
                             <div className="ep-paper-meta">
                               {(() => {
                                 const label = extractShiftLabel(paper.shift)
@@ -528,8 +611,11 @@ export function ExamPage() {
 
           {faqs && <FaqAccordion items={faqs} />}
 
-          {/* Exam Guides — links to post-specific guide pages */}
+          {/* Exam Guides — links to post-specific guide pages.
+              Skipped on a board: you sit JKSSB Patwari, not "JKSSB", and every
+              sub-exam now carries its own guide on its own page. */}
           {(() => {
+            if (isBoard) return null
             const guides = Object.entries(postGuides).filter(([, g]) => g.examSlug === exam.slug)
             if (guides.length === 0) return null
             return (
@@ -550,6 +636,11 @@ export function ExamPage() {
       {/* ── Mock Tests ─────────────────────────────── */}
       {activeTab === 'mocks' && (
         <div className="ep-tab-body">
+          <div className="ep-papers-head">
+            <h2>Mock tests</h2>
+            <span>{examMocks.length}</span>
+          </div>
+
           <div className="ep-filter-bar">
             {['All', 'Beginner', 'Moderate', 'Advanced'].map((d) => (
               <button

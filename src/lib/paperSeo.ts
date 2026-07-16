@@ -15,7 +15,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
     apiSlug: 'upsc-cse-prelims-2026-gs1',
     canonicalSlug: 'upsc-cse-prelims-2026-gs1',
     title: 'UPSC Prelims 2026 GS Paper 1 (Set A) - Solved, Answer Key',
-    h1: 'UPSC CSE Prelims 2026 General Studies Paper I (Set A) - Solved',
+    h1: 'UPSC CSE Prelims 2026 General Studies Paper I (Set A)',
     description:
       'Fully solved UPSC CSE Prelims 2026 General Studies Paper I (Set A) held on 24 May 2026 - all 100 questions with the official answer key and detailed explanations, free.',
     review:
@@ -25,7 +25,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
     apiSlug: 'upsc-cse-prelims-2025-gs1',
     canonicalSlug: 'upsc-cse-prelims-2025-gs1',
     title: 'UPSC Prelims 2025 GS Paper 1 - Solved, Answer Key',
-    h1: 'UPSC CSE Prelims 2025 General Studies Paper I - Solved',
+    h1: 'UPSC CSE Prelims 2025 General Studies Paper I',
     description:
       'Fully solved UPSC CSE Prelims 2025 General Studies Paper I - all 100 questions with the official answer key, subject-wise breakdown and detailed explanations, free.',
     review:
@@ -35,7 +35,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
     apiSlug: 'upsc-cse-prelims-2025-gs2',
     canonicalSlug: 'upsc-cse-prelims-2025-gs2',
     title: 'UPSC Prelims 2025 CSAT Paper 2 - Solved, Answer Key',
-    h1: 'UPSC CSE Prelims 2025 CSAT (General Studies Paper II) - Solved',
+    h1: 'UPSC CSE Prelims 2025 CSAT (General Studies Paper II)',
     description:
       'Fully solved UPSC CSE Prelims 2025 CSAT (General Studies Paper II) - all 80 questions with the answer key and detailed explanations. Qualifying paper: 33% required.',
     review:
@@ -44,7 +44,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-junior-assistant-pyq': {
     apiSlug: 'jkssb-junior-assistant-pyq',
     canonicalSlug: 'jkssb-junior-assistant-question-paper-2026',
-    title: 'JKSSB Junior Assistant Question Paper 2026 - Answer Key',
+    title: 'JKSSB Junior Assistant Question Paper 2026 - Solved, Answer Key',
     h1: 'JKSSB Junior Assistant Question Paper 2026',
     description:
       'Fully solved JKSSB Junior Assistant question paper held on 19 April 2026 with 80 questions, answer key, section-wise subjects and detailed explanations.',
@@ -54,7 +54,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-lab-attendant-2026-may-10': {
     apiSlug: 'jkssb-lab-attendant-2026-may-10',
     canonicalSlug: 'jkssb-laboratory-attendant-question-paper-2026',
-    title: 'JKSSB Laboratory Attendant Question Paper 2026 - Answer Key',
+    title: 'JKSSB Laboratory Attendant Question Paper 2026 - Solved, Answer Key',
     h1: 'JKSSB Laboratory Attendant Question Paper 2026',
     description:
       'Fully solved JKSSB Laboratory Attendant question paper held on 10 May 2026 with answer key, subjects and detailed explanations.',
@@ -64,7 +64,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-wildlife-guard-2026-may-10': {
     apiSlug: 'jkssb-wildlife-guard-2026-may-10',
     canonicalSlug: 'jkssb-wildlife-guard-question-paper-2026',
-    title: 'JKSSB Wildlife Guard Question Paper 2026 - Answer Key',
+    title: 'JKSSB Wildlife Guard Question Paper 2026 - Solved, Answer Key',
     h1: 'JKSSB Wildlife Guard Question Paper 2026',
     description:
       'Fully solved JKSSB Wildlife Guard question paper held on 10 May 2026 with answer key, subjects and detailed explanations.',
@@ -74,7 +74,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-patwari-2024-sep1-set-a': {
     apiSlug: 'jkssb-patwari-2024-sep1-set-a',
     canonicalSlug: 'jkssb-patwari-question-paper-2024',
-    title: 'JKSSB Patwari Question Paper 2024 - Answer Key',
+    title: 'JKSSB Patwari Question Paper 2024 - Solved, Answer Key',
     h1: 'JKSSB Patwari Question Paper 2024',
     description:
       'Fully solved JKSSB Patwari 2024 question paper with answer key, subject-wise questions and detailed explanations.',
@@ -84,7 +84,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-veterinary-pharmacist-2025': {
     apiSlug: 'jkssb-veterinary-pharmacist-2025',
     canonicalSlug: 'jkssb-veterinary-pharmacist-question-paper-2025',
-    title: 'JKSSB Veterinary Pharmacist Question Paper 2025 - Answer Key',
+    title: 'JKSSB Veterinary Pharmacist Question Paper 2025 - Solved, Answer Key',
     h1: 'JKSSB Veterinary Pharmacist Question Paper 2025',
     description:
       'Fully solved JKSSB Veterinary Pharmacist 2025 question paper with answer key, subjects and detailed explanations.',
@@ -94,7 +94,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-finance-accounts-2024-paper': {
     apiSlug: 'jkssb-finance-accounts-2024-paper',
     canonicalSlug: 'jkssb-finance-accounts-assistant-question-paper-2024',
-    title: 'JKSSB Finance Accounts Assistant Question Paper 2024',
+    title: 'JKSSB Finance Accounts Assistant 2024 - Solved, Answer Key',
     h1: 'JKSSB Finance Accounts Assistant Question Paper 2024',
     description:
       'Fully solved JKSSB Finance Accounts Assistant 2024 question paper with answer key, subjects and detailed explanations.',

@@ -5,6 +5,7 @@ import {
   APIError,
   fetchActiveLiveAttempts,
   fetchDashboardBootstrap,
+  fetchExamCatalog,
   refreshAuthSession,
   type ActiveAttempt,
   type Exam,
@@ -15,6 +16,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { useAuth } from '../context/useAuth'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { readRecentlyViewed } from '../lib/examActivity'
+import { withoutBoards } from '../lib/examTree'
 import { paperPath } from '../lib/paperSeo'
 
 export const categoryOrder = [
@@ -117,6 +119,9 @@ export function DashboardPage() {
 
   const [mocks, setMocks] = useState<MockItem[]>([])
   const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
+  // Needed only to tell a board (JKSSB) from an exam you actually sit
+  // (JKSSB Junior Assistant). Small, and Redis-cached server-side.
+  const [allExams, setAllExams] = useState<Exam[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
   const [activeAttempts, setActiveAttempts] = useState<ActiveAttempt[]>([])
   const [loading, setLoading] = useState(true)
@@ -178,7 +183,27 @@ export function DashboardPage() {
     return () => { cancelled = true }
   }, [])
 
-  const recentlyViewed = useMemo(() => readRecentlyViewed(), [])
+  // Catalog is only used to identify boards; a failure must never break the
+  // dashboard, so it loads separately and falls back to an empty list.
+  useEffect(() => {
+    let cancelled = false
+    void fetchExamCatalog()
+      .then((catalog) => { if (!cancelled) setAllExams(catalog ?? []) })
+      .catch(() => { if (!cancelled) setAllExams([]) })
+    return () => { cancelled = true }
+  }, [])
+
+  // Boards (JKSSB) are not exams anyone sits — you enrol in JKSSB Junior
+  // Assistant. Boards can no longer be enrolled, but older enrolments and
+  // stored views still reference them, so filter on read too.
+  const visibleEnrolled = useMemo(
+    () => withoutBoards(enrolledExams, allExams),
+    [enrolledExams, allExams],
+  )
+  const recentlyViewed = useMemo(
+    () => withoutBoards(readRecentlyViewed(), allExams),
+    [allExams],
+  )
 
   useEffect(() => {
     if (!activeAttempts.length) return
@@ -216,7 +241,7 @@ export function DashboardPage() {
         </div>
         <div className="db-header-stats">
           <div className="db-header-stat">
-            <strong>{enrolledExams.length}</strong>
+            <strong>{visibleEnrolled.length}</strong>
             <span>Enrolled</span>
           </div>
           <div className="db-header-stat">
@@ -277,7 +302,7 @@ export function DashboardPage() {
           <Link className="db-section-link" to="/exams">Browse all →</Link>
         </div>
 
-        {enrolledExams.length === 0 ? (
+        {visibleEnrolled.length === 0 ? (
           <div className="db-enroll-cta">
             <PlusCircle size={22} />
             <div>
@@ -288,7 +313,7 @@ export function DashboardPage() {
           </div>
         ) : (
           <div className="db-enrolled-row">
-            {enrolledExams.map((exam) => (
+            {visibleEnrolled.map((exam) => (
               <Link className="db-enrolled-chip" to={`/exam/${exam.slug}`} key={exam.slug}>
                 <span className="db-chip-icon">{exam.icon}</span>
                 <div>

@@ -114,11 +114,14 @@ export function PyqPaperPage() {
           {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
+            // Mirrors the trail the worker serves to crawlers. Positions 2 and 3
+            // previously shared /exam/{slug} — two steps claiming the same page,
+            // with position 3's name ("… Papers") visible nowhere.
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
-              { '@type': 'ListItem', position: 2, name: paper.examName, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
-              { '@type': 'ListItem', position: 3, name: `${paper.examName} ${paper.year} Papers`, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
-              { '@type': 'ListItem', position: 4, name: seoTitle.replace(' | Ministry of Papers', ''), item: `https://ministryofpapers.com${canonicalPath}` },
+              { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
+              { '@type': 'ListItem', position: 3, name: paper.examName, item: `https://ministryofpapers.com/exam/${paper.examSlug}` },
+              { '@type': 'ListItem', position: 4, name: seoOverride?.h1 ?? paper.title, item: `https://ministryofpapers.com${canonicalPath}` },
             ],
           },
           // Matches the visible FAQ rendered at the bottom of this page.

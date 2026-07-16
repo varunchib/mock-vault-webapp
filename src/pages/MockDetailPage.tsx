@@ -193,7 +193,7 @@ export function MockDetailPage() {
               {examPapers.slice(0, 3).map((p, i) => (
                 <span key={p.slug}>
                   {i > 0 && ', '}
-                  <Link to={paperPath(p.slug)}>{paperSeoOverride(p.slug)?.title ?? p.title}</Link>
+                  <Link to={paperPath(p.slug)}>{paperSeoOverride(p.slug)?.h1 ?? p.title}</Link>
                 </span>
               ))}
               {examPapers.length > 3
