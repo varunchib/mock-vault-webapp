@@ -123,6 +123,7 @@ export function DashboardPage() {
   // (JKSSB Junior Assistant). Small, and Redis-cached server-side.
   const [allExams, setAllExams] = useState<Exam[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
+  const [newPapersByExam, setNewPapersByExam] = useState<Record<string, number>>({})
   const [activeAttempts, setActiveAttempts] = useState<ActiveAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -142,6 +143,7 @@ export function DashboardPage() {
         setMocks(data.mocks ?? [])
         setEnrolledExams(data.enrolledExams ?? [])
         setRecentAttempts(data.recentAttempts ?? [])
+        setNewPapersByExam(data.newPapersByExam ?? {})
       }
 
       try {
@@ -313,19 +315,27 @@ export function DashboardPage() {
           </div>
         ) : (
           <div className="db-enrolled-row">
-            {visibleEnrolled.map((exam) => (
-              <Link className="db-enrolled-chip" to={`/exam/${exam.slug}`} key={exam.slug}>
-                <span className="db-chip-icon">{exam.icon}</span>
-                <div>
-                  <strong>{exam.shortName}</strong>
-                  <small>
-                    {exam.mocks > 0 ? `${exam.mocks} mocks` : ''}
-                    {exam.mocks > 0 && exam.papers > 0 ? ' · ' : ''}
-                    {exam.papers > 0 ? `${exam.papers} papers` : ''}
-                  </small>
-                </div>
-              </Link>
-            ))}
+            {visibleEnrolled.map((exam) => {
+              const fresh = newPapersByExam[exam.slug] ?? 0
+              return (
+                <Link className="db-enrolled-chip" to={`/exam/${exam.slug}`} key={exam.slug}>
+                  <span className="db-chip-icon">{exam.icon}</span>
+                  <div>
+                    <strong>{exam.shortName}</strong>
+                    <small>
+                      {exam.mocks > 0 ? `${exam.mocks} mocks` : ''}
+                      {exam.mocks > 0 && exam.papers > 0 ? ' · ' : ''}
+                      {exam.papers > 0 ? `${exam.papers} papers` : ''}
+                    </small>
+                  </div>
+                  {fresh > 0 && (
+                    <span className="db-chip-new" title={`${fresh} paper${fresh !== 1 ? 's' : ''} added since you enrolled`}>
+                      {fresh} new
+                    </span>
+                  )}
+                </Link>
+              )
+            })}
             <Link className="db-enrolled-chip db-add-chip" to="/exams">
               <span className="db-chip-icon">＋</span>
               <div><strong>Add exam</strong></div>

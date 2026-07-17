@@ -224,6 +224,11 @@ export function ExamPage() {
 
   const handleEnrollToggle = async () => {
     if (!slug) return
+    // Logged-out visitors see the button too — enrolling starts with signing in.
+    if (!isAuthenticated) {
+      setLoginOpen(true)
+      return
+    }
     setEnrollBusy(true)
     try {
       if (isEnrolled) {
@@ -432,8 +437,9 @@ export function ExamPage() {
         {/* You enrol in an exam you actually sit, not a board — so a board (an
             exam with sub-exams) offers no Enroll button. The `|| isEnrolled`
             keeps it visible for anyone already enrolled in a board from before
-            this rule, otherwise their enrolment would be impossible to undo. */}
-        {isAuthenticated && (!isBoard || isEnrolled) && (
+            this rule, otherwise their enrolment would be impossible to undo.
+            Logged-out visitors see the button too; clicking it opens login. */}
+        {(!isBoard || isEnrolled) && (
           <div className="ep-hero-actions">
             <button
               className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}

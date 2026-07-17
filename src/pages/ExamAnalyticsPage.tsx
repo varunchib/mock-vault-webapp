@@ -161,9 +161,16 @@ function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutof
 const MEDALS = ['🥇', '🥈', '🥉']
 
 function LeaderboardPanel({
-  top10, userRank, userName,
-}: { top10: LeaderboardEntry[]; userRank: number; userName: string }) {
-  const userInTop10 = top10.some(e => e.isMe)
+  top10, userRank, userName, viewerBestPct,
+}: { top10: LeaderboardEntry[]; userRank: number; userName: string; viewerBestPct: number }) {
+  // The server board can lag behind (or miss a 0-correct attempt) — if the
+  // viewer has local attempts but isn't on the board, show them anyway so the
+  // panel never says "No attempts yet" to someone who just attempted.
+  const rows: LeaderboardEntry[] = top10.length === 0 && viewerBestPct >= 0
+    ? [{ userId: 'me', name: userName, scorePct: viewerBestPct, rank: 1, isMe: true }]
+    : top10
+  const userInTop10 = rows.some(e => e.isMe)
+  const soloViewer = rows.length === 1 && rows[0].isMe
   const pool = 0
 
   return (
@@ -173,24 +180,24 @@ function LeaderboardPanel({
         <span>Leaderboard</span>
       </div>
 
-      {top10.length === 0 ? (
-        <div className="ea2-lb-empty">No attempts yet</div>
-      ) : (
-        <ol className="ea2-lb-list">
-          {top10.map((entry) => (
-            <li
-              key={entry.userId}
-              className={`ea2-lb-row${entry.isMe ? ' ea2-lb-row--me' : ''}`}
-            >
-              <span className="ea2-lb-rank">
-                {entry.rank <= 3 ? MEDALS[entry.rank - 1] : entry.rank}
-              </span>
-              <span className="ea2-lb-name" title={entry.name}>{entry.name}</span>
-              <span className="ea2-lb-score">{entry.scorePct}%</span>
-              {entry.isMe && <span className="ea2-lb-you">You</span>}
-            </li>
-          ))}
-        </ol>
+      <ol className="ea2-lb-list">
+        {rows.map((entry) => (
+          <li
+            key={entry.userId}
+            className={`ea2-lb-row${entry.isMe ? ' ea2-lb-row--me' : ''}`}
+          >
+            <span className="ea2-lb-rank">
+              {entry.rank <= 3 ? MEDALS[entry.rank - 1] : entry.rank}
+            </span>
+            <span className="ea2-lb-name" title={entry.name}>{entry.name}</span>
+            <span className="ea2-lb-score">{entry.scorePct}%</span>
+            {entry.isMe && <span className="ea2-lb-you">You</span>}
+          </li>
+        ))}
+      </ol>
+
+      {soloViewer && (
+        <p className="ea2-lb-solo">You&apos;re the first to attempt this exam — the board is yours.</p>
       )}
 
       {!userInTop10 && userRank > 0 && (
@@ -396,11 +403,20 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           <strong className={scoreClass(summary.bestPct)}>{summary.bestScore}</strong>
           <span>Best Score</span>
         </div>
-        <div className="ea2-strip-card">
-          <span className="ea2-strip-icon"><Medal size={14} /></span>
-          <strong>{summary.avgPercentile > 0 ? `~${summary.avgPercentile}th` : '—'}</strong>
-          <span>Avg Percentile</span>
-        </div>
+        {/* Percentile only exists where we have cutoff data — a "—" tile is noise */}
+        {summary.avgPercentile > 0 ? (
+          <div className="ea2-strip-card">
+            <span className="ea2-strip-icon"><Medal size={14} /></span>
+            <strong>~{summary.avgPercentile}th</strong>
+            <span>Avg Percentile</span>
+          </div>
+        ) : (
+          <div className="ea2-strip-card">
+            <span className="ea2-strip-icon"><Medal size={14} /></span>
+            <strong>{results.length}</strong>
+            <span>Attempts</span>
+          </div>
+        )}
         <div className="ea2-strip-card">
           <span className="ea2-strip-icon"><Clock3 size={14} /></span>
           <strong>{fmtTime(summary.totalTime)}</strong>
@@ -518,6 +534,7 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           top10={leaderboard?.top10 ?? []}
           userRank={leaderboard?.userRank ?? -1}
           userName={userName}
+          viewerBestPct={summary.bestPct}
         />
       </div>
 

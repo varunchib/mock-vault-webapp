@@ -115,6 +115,8 @@ export type DashboardBootstrap = {
   mocks: MockItem[];
   enrolledExams: Exam[];
   recentAttempts: RecentAttempt[];
+  /** Papers added after the user enrolled, keyed by exam slug ("N new" badges). */
+  newPapersByExam?: Record<string, number>;
 };
 
 export type AdminSummary = {
