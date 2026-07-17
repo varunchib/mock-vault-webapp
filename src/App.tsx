@@ -5,7 +5,7 @@ import { Footer } from './components/layout/Footer'
 import { Navbar } from './components/layout/Navbar'
 import { AppShell } from './components/layout/AppShell'
 import { HaloLoader } from './components/common/HaloLoader'
-import { hasSessionHint } from './components/auth/AuthProvider'
+import { hasSessionHint } from './lib/sessionHint'
 import { useAuth } from './context/useAuth'
 import { AppRoutes } from './routes/AppRoutes'
 
