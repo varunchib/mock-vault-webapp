@@ -32,17 +32,32 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- Loaded non-blocking: media="print" makes the browser fetch it off the
-         critical render path, then onload flips it to apply. The fonts already use
-         display=swap, so text paints immediately in the fallback either way. -->
+    <!-- Loaded non-blocking (media="print" + onload flip) so fonts stay off the
+         critical render path. Split by family so display can differ:
+         - Fraunces (serif DISPLAY font, headings) uses display=optional. Its
+           metrics differ a lot from any fallback, so a late swap reflows every
+           heading and cascades the whole page (and the footer) downward — that
+           was ~all of the field/lab CLS. `optional` never swaps mid-page: it
+           uses the font only if it arrives in the first ~100ms, else the
+           fallback for that view. Zero font-driven layout shift.
+         - DM Sans (body) keeps display=swap: its metrics are close to the system
+           sans fallback, so the swap barely shifts, and body text always shows in
+           the brand font. -->
     <link
       rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&display=optional"
+      media="print"
+      onload="this.media='all';this.onload=null"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap"
       media="print"
       onload="this.media='all';this.onload=null"
     />
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&display=optional" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" />
     </noscript>
   </head>
   <body>
