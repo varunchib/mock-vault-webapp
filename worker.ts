@@ -77,7 +77,11 @@ type QuestionData = {
   translations?: Partial<Record<'en' | 'hi', { passage?: string; question?: string; options?: string[] }>>
 }
 
-const BOT_UA = /Googlebot|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
+// Google-InspectionTool is what Search Console's URL Inspection and the Rich
+// Results Test crawl with (NOT "Googlebot") — without it those tools see the
+// empty SPA shell and report "No items detected" even though real Googlebot
+// gets the prerendered page. GoogleOther/Storebot cover Google's other fetchers.
+const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 const API_TIMEOUT_MS = 4000
@@ -890,7 +894,19 @@ export default {
       }
 
       const html = await baseRes.text()
-      const enhanced = injectMeta(html, meta, path)
+      let enhanced = injectMeta(html, meta, path)
+      // When the page carries full prerendered content, drop the SPA bundle for
+      // bots. Otherwise Googlebot's renderer executes the app, React's createRoot
+      // discards this server content and re-renders from the API — so what gets
+      // indexed depends on that fetch succeeding inside Google's renderer. With
+      // the scripts gone, the rendered snapshot IS the prerendered page. Pages
+      // without contentHtml (static shell metas) keep the app so bots can still
+      // render them client-side.
+      if (meta.contentHtml) {
+        enhanced = enhanced
+          .replace(/<script type="module"[^>]*><\/script>\s*/g, '')
+          .replace(/<link rel="modulepreload"[^>]*>\s*/g, '')
+      }
       const headers = withSecurityHeaders(new Headers(baseRes.headers))
       headers.set('content-type', 'text/html; charset=UTF-8')
       headers.delete('content-length')
