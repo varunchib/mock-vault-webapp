@@ -32,6 +32,9 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- The session check fires on every page load; warming the API origin
+         saves a DNS+TLS round-trip (~300ms on mobile) off that request. -->
+    <link rel="preconnect" href="https://api.ministryofpapers.com" crossorigin />
     <!-- Loaded non-blocking (media="print" + onload flip) so fonts stay off the
          critical render path. Split by family so display can differ:
          - Fraunces (serif DISPLAY font, headings) uses display=optional. Its

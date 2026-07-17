@@ -2,7 +2,10 @@ import { BookOpen, ChevronRight, Clock3, FileText, Flame, LayoutGrid, TrendingUp
 import { Link } from 'react-router-dom'
 import { useMemo, useRef, useState } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
+import { SubjectStrength } from '../components/analytics/SubjectStrength'
 import { readAttemptResults, readPaperResults, type CombinedResult } from '../lib/mockActivity'
+
+type SourceFilter = 'all' | 'mock' | 'paper'
 
 // ── shared helpers ────────────────────────────────────────────────────────
 
@@ -190,6 +193,7 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
   })
 
   const linkBase = source?.linkBase ?? '/analytics'
+  const [filter, setFilter] = useState<SourceFilter>('all')
 
   const allResults = useMemo<CombinedResult[]>(() => {
     const base: CombinedResult[] = source
@@ -213,33 +217,42 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
     )
   }, [source])
 
+  // The Mocks/PYQ filter scopes everything below it — tiles, trend, subjects,
+  // exams, and recents all describe the same slice.
+  const results = useMemo(
+    () => (filter === 'all' ? allResults : allResults.filter(r => r.type === filter)),
+    [allResults, filter],
+  )
+  const mockCount = useMemo(() => allResults.filter(r => r.type === 'mock').length, [allResults])
+  const paperCount = allResults.length - mockCount
+
   const examGroups = useMemo(() => {
     const map = new Map<string, { examSlug: string; examName: string; results: CombinedResult[] }>()
-    for (const r of allResults) {
+    for (const r of results) {
       if (!map.has(r.examSlug)) map.set(r.examSlug, { examSlug: r.examSlug, examName: r.examName, results: [] })
       map.get(r.examSlug)!.results.push(r)
     }
     return [...map.values()]
-  }, [allResults])
+  }, [results])
 
   const summary = useMemo(() => {
-    if (!allResults.length) return null
-    const totalTime = allResults.reduce((s, r) => s + r.timeTakenSeconds, 0)
-    const best = allResults.reduce<{ marks: ReturnType<typeof netMarks>; r: CombinedResult } | null>((acc, r) => {
+    if (!results.length) return null
+    const totalTime = results.reduce((s, r) => s + r.timeTakenSeconds, 0)
+    const best = results.reduce<{ marks: ReturnType<typeof netMarks>; r: CombinedResult } | null>((acc, r) => {
       const m = netMarks(r)
       return !acc || m.pct > acc.marks.pct ? { marks: m, r } : acc
     }, null)
-    return { totalTime, best, examCount: examGroups.length, attemptCount: allResults.length }
-  }, [allResults, examGroups])
+    return { totalTime, best, examCount: examGroups.length, attemptCount: results.length }
+  }, [results, examGroups])
 
   const trendPoints = useMemo<TrendPoint[]>(
-    () => [...allResults]
+    () => [...results]
       .sort((x, z) => new Date(x.attemptedAt).getTime() - new Date(z.attemptedAt).getTime())
       .map(r => {
         const m = netMarks(r)
         return { pct: m.pct, net: m.net, max: m.max, title: r.title, examName: r.examName, attemptedAt: r.attemptedAt }
       }),
-    [allResults],
+    [results],
   )
 
   return (
@@ -258,6 +271,34 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
           <strong>No results yet</strong>
           <p>Attempt a mock test or a PYQ paper — your scores, cutoff comparison, and leaderboard will appear here.</p>
           <Link to="/exams" className="an-empty-btn">Browse Tests &amp; Papers</Link>
+        </div>
+      )}
+
+      {/* Mocks vs PYQ scope — one control, everything below follows it */}
+      {allResults.length > 0 && (
+        <div className="an2-filter-row" role="tablist" aria-label="Attempt type">
+          {([
+            ['all', `All (${allResults.length})`],
+            ['mock', `Mock Tests (${mockCount})`],
+            ['paper', `PYQ Papers (${paperCount})`],
+          ] as [SourceFilter, string][]).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              role="tab"
+              aria-selected={filter === key}
+              className={`an2-filter-btn${filter === key ? ' active' : ''}`}
+              onClick={() => setFilter(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {allResults.length > 0 && !summary && (
+        <div className="an2-filter-empty">
+          No {filter === 'mock' ? 'mock test' : 'PYQ paper'} attempts yet.
         </div>
       )}
 
@@ -306,6 +347,9 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
             )}
           </div>
 
+          {/* Per-subject accuracy — where you're strong and where you lack */}
+          <SubjectStrength results={results} />
+
           {/* Exam rows */}
           <div className="an2-panel">
             <div className="an2-panel-head">
@@ -344,7 +388,7 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
               </div>
             </div>
             <div className="an2-recent-list">
-              {allResults.slice(0, 6).map(r => {
+              {results.slice(0, 6).map(r => {
                 const m = netMarks(r)
                 return (
                   <div key={`${r.type}-${r.slug}-${r.attemptedAt}`} className="an2-recent-row">

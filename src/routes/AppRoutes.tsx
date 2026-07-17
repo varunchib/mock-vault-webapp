@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { homePathForUser, isAdminUser } from '../context/admin'
 import { useAuth } from '../context/useAuth'
+import { hasSessionHint } from '../lib/sessionHint'
 import { HaloLoader } from '../components/common/HaloLoader'
 
 // Eager — public SEO pages must render fast on any cold URL
@@ -41,7 +42,15 @@ function Lazy({ children }: { children: ReactNode }) {
 
 function RootRoute() {
   const { user, isAuthenticated, isLoading } = useAuth()
-  if (isLoading) return <Loader />
+  // Waiting on the session check here made every anonymous visitor stare at a
+  // small loader (footer visible right under it), then the landing content
+  // arrived and shoved the footer off-screen — a single ~0.5 CLS and seconds
+  // of LCP delay on slow connections. Anonymous visitors (no session hint)
+  // are the overwhelming majority and the SEO-critical case: give them the
+  // landing page immediately. Returning signed-in users keep the loader for
+  // the brief moment before their dashboard redirect.
+  if (isLoading && hasSessionHint()) return <Loader />
+  if (isLoading) return <LandingPage />
   return isAuthenticated ? <Navigate to={homePathForUser(user)} replace /> : <LandingPage />
 }
 
