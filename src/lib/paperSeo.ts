@@ -64,12 +64,12 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   'jkssb-wildlife-guard-2026-may-10': {
     apiSlug: 'jkssb-wildlife-guard-2026-may-10',
     canonicalSlug: 'jkssb-wildlife-guard-question-paper-2026',
-    title: 'JKSSB Wildlife Guard Question Paper 2026 - Solved, Answer Key',
-    h1: 'JKSSB Wildlife Guard Question Paper 2026',
+    title: 'JKSSB Wildlife Guard Question Paper 2026 - All 120 Solved, Answer Key',
+    h1: 'JKSSB Wildlife Guard Question Paper 2026 (8 March) — Fully Solved',
     description:
-      'Fully solved JKSSB Wildlife Guard question paper held on 10 May 2026 with answer key, subjects and detailed explanations.',
+      'Fully solved JKSSB Wildlife Guard question paper held on 8 March 2026 - all 120 questions with the answer key, subject-wise breakdown and detailed explanations, free.',
     review:
-      'The JKSSB Wildlife Guard paper held on 10 May 2026 is useful for understanding the latest JKSSB question style, subject mix and difficulty level. Practise the full solved paper with answers and explanations.',
+      'The JKSSB Wildlife Guard written exam was held on 8 March 2026 in OMR mode with 120 questions for 120 marks in 2 hours, with negative marking of 0.25 per wrong answer. The paper covered Mathematics, Reasoning, English, General Knowledge, J&K Studies and Wildlife & Ecology. Use this fully solved previous year paper to check the answer key for every question, study the exam analysis and difficulty level, and attempt the complete paper online in a timed, exam-like interface.',
   },
   'jkssb-patwari-2024-sep1-set-a': {
     apiSlug: 'jkssb-patwari-2024-sep1-set-a',
