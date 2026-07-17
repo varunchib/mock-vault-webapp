@@ -338,6 +338,7 @@ export function PyqPaperPage() {
                         className="pyq-reveal-btn"
                         onClick={() => revealAnswer(q.slug)}
                         disabled={!chosen}
+                        title={chosen ? undefined : 'Select an option first'}
                       >
                         Check Answer
                       </button>
