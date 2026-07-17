@@ -60,7 +60,7 @@ export function usePageMeta({ title, description, canonicalPath, ogType = 'websi
     setMeta('twitter:card', 'summary_large_image')
     setMeta('twitter:title', title)
     setMeta('twitter:description', description)
-    setMeta('twitter:site', '@ministryofpapers')
+    setMeta('twitter:site', '@ministryfpapers')
     if (ogImage) {
       setMeta('twitter:image', ogImage)
     }

@@ -32,7 +32,7 @@ export function LandingPage() {
         url: 'https://ministryofpapers.com',
         logo: 'https://ministryofpapers.com/favicon.svg',
         description: 'Free previous year question papers and mock tests for UPSC, SSC, IBPS, NEET, JEE and 240+ Indian competitive exams.',
-        sameAs: ['https://x.com/ministryofpapers'],
+        sameAs: ['https://x.com/ministryfpapers'],
       },
       {
         '@context': 'https://schema.org',
