@@ -9,9 +9,33 @@ import {
   refreshAuthSession,
 } from "../../lib/api";
 
+// Lightweight, synchronous hint of whether the user was signed in last time.
+// Written on login, cleared on logout. It only influences which LAYOUT to show
+// optimistically (public chrome vs app shell) so returning users don't flicker —
+// it never grants access; real gating still runs on the verified `user`.
+export const SESSION_HINT_KEY = "mv.session";
+export function hasSessionHint(): boolean {
+  try {
+    return typeof window !== "undefined" && window.localStorage.getItem(SESSION_HINT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthContextValue["user"]>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Keep the session hint in step with the verified auth state. Set it as soon
+  // as a user is known; only CLEAR it once the session check has finished with
+  // no user (a real logout / expired session) — never during the initial load,
+  // or we would wipe the hint before bootstrap has had a chance to confirm.
+  useEffect(() => {
+    try {
+      if (user) window.localStorage.setItem(SESSION_HINT_KEY, "1");
+      else if (!isLoading) window.localStorage.removeItem(SESSION_HINT_KEY);
+    } catch { /* storage unavailable — hint is only an optimisation */ }
+  }, [user, isLoading]);
 
   useEffect(() => {
     let cancelled = false;
