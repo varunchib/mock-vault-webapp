@@ -1830,6 +1830,10 @@ footer {
 .public-page {
   padding: 34px 5% 88px;
   background: linear-gradient(180deg, var(--paper), #fff 55%, var(--paper));
+  /* Fill the viewport so a route loader never leaves the footer visible above
+     the fold — when the real content arrives, nothing already on screen moves
+     (this exact jump was a 0.5 CLS on the landing page). */
+  min-height: 100vh;
 }
 
 .public-shell {
@@ -16602,3 +16606,91 @@ html {
   padding: 2px 7px;
   white-space: nowrap;
 }
+
+/* Hero entrance — CSS-only and transform-only. Opacity stays 1 from the first
+   frame (an opacity-0 start would delay LCP exactly like the JS animation did);
+   the gentle rise gives the same feel without touching paint timing. */
+.hero-enter { animation: hero-rise .55s cubic-bezier(.22, 1, .36, 1) both; }
+@keyframes hero-rise {
+  from { transform: translateY(14px); }
+  to   { transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-enter { animation: none; }
+}
+
+/* Filter row: Mocks vs PYQ scope */
+.an2-filter-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.an2-filter-btn {
+  height: 32px;
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  color: var(--ink3);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .13s;
+}
+.an2-filter-btn:hover { border-color: var(--ink4); color: var(--ink); }
+.an2-filter-btn.active { background: var(--ink); border-color: var(--ink); color: var(--white); }
+.an2-filter-empty {
+  padding: 34px;
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--ink3);
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+
+/* Subject strength bars */
+.an2-subj-list { display: grid; gap: 9px; }
+.an2-subj-row {
+  display: grid;
+  grid-template-columns: 150px 1fr 44px 56px;
+  gap: 12px;
+  align-items: center;
+}
+.an2-subj-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.an2-subj-track { height: 10px; border-radius: 6px; background: var(--line2); overflow: hidden; }
+.an2-subj-fill { height: 100%; border-radius: 6px; transition: width .4s ease; }
+.an2-subj-fill.good { background: #22C55E; }
+.an2-subj-fill.mid  { background: #F59E0B; }
+.an2-subj-fill.bad  { background: #EF4444; }
+.an2-subj-pct { font-size: 12.5px; font-weight: 800; text-align: right; }
+.an2-subj-pct.good { color: var(--green); }
+.an2-subj-pct.mid  { color: #92400E; }
+.an2-subj-pct.bad  { color: var(--red); }
+.an2-subj-n { font-size: 11px; color: var(--ink4); text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 560px) {
+  .an2-subj-row { grid-template-columns: 96px 1fr 40px; }
+  .an2-subj-n { display: none; }
+  .an2-subj-name { font-size: 11.5px; }
+}
+
+.an2-focus {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 10px 12px;
+  background: var(--red-bg);
+  border: 1px solid #FECACA;
+  border-radius: var(--radius);
+}
+.an2-focus svg { color: var(--red); flex-shrink: 0; margin-top: 1px; }
+.an2-focus p { font-size: 12.5px; color: var(--ink2); margin: 0; line-height: 1.55; }

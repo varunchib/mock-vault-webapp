@@ -1,23 +1,14 @@
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { motion, type Variants } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { quickTags } from '../../data/landing'
 
-const stagger: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.06 } },
-}
-
-const item: Variants = {
-  hidden: { opacity: 0, y: 18 },
-  show: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
-  },
-}
-
+// The hero is the LCP element — it must paint the moment React renders, not
+// after framer-motion's chunk loads and animates it up from opacity 0 (that
+// was ~2.7s of "element render delay" in Lighthouse). The entrance animation
+// is a pure-CSS fade/rise (see .hero-enter in index.css) that starts from the
+// first painted frame, so LCP sees it immediately. Below-fold sections keep
+// their framer-motion Reveals — they're never the LCP.
 export function Hero() {
   const navigate = useNavigate()
   const [query, setQuery] = useState('')
@@ -34,22 +25,22 @@ export function Hero() {
   return (
     <section className="hero" id="top">
       <div className="hero-lines" aria-hidden="true" />
-      <motion.div variants={stagger} initial="hidden" animate="show" className="hero-inner">
-        <motion.div variants={item} className="hero-chip">
+      <div className="hero-inner hero-enter">
+        <div className="hero-chip">
           <span className="chip-dot" />
           New - UPSC 2026 paper just added
-        </motion.div>
+        </div>
 
-        <motion.h1 variants={item}>
+        <h1>
           Every exam paper.<br />
           <span className="hl-word">Solved</span> and <span className="italic-word">free.</span>
-        </motion.h1>
+        </h1>
 
-        <motion.p variants={item} className="hero-sub">
+        <p className="hero-sub">
           Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams - with complete answers and explanations.
-        </motion.p>
+        </p>
 
-        <motion.div variants={item} className="search-outer">
+        <div className="search-outer">
           <Search className="s-icon" size={20} aria-hidden="true" />
           <input
             type="search"
@@ -62,16 +53,16 @@ export function Hero() {
             aria-label="Search exam papers"
           />
           <button className="s-btn" type="button" onClick={() => runSearch()}>Search Papers</button>
-        </motion.div>
+        </div>
 
-        <motion.div variants={item} className="tag-row" aria-label="Quick searches">
+        <div className="tag-row" aria-label="Quick searches">
           {quickTags.map((tag) => (
             <button className="s-tag" type="button" key={tag.label} onClick={() => runSearch(tag.query)}>
               {tag.label}
             </button>
           ))}
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </section>
   )
 }

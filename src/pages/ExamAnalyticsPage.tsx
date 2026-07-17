@@ -7,6 +7,7 @@ import { readAllResults, type CombinedResult } from '../lib/mockActivity'
 import { examCutoffs, estimatePercentile } from '../data/examCutoffs'
 import { fetchExamCutoffs, fetchLeaderboard, type ExamCutoffSet, type LeaderboardEntry } from '../lib/api'
 import { useAuth } from '../context/useAuth'
+import { SubjectStrength } from '../components/analytics/SubjectStrength'
 
 // ── Constants ─────────────────────────────────────────────────────────────
 
@@ -537,6 +538,9 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           viewerBestPct={summary.bestPct}
         />
       </div>
+
+      {/* ── Subject strength: where you lack in THIS exam ── */}
+      <SubjectStrength results={results} />
 
       {/* ── Attempt history ─────────────────────────── */}
       <div className="ea2-history">
