@@ -538,6 +538,38 @@ export type ScoreDistribution = {
   systemCutoffPct: number;
 };
 
+export type RecentVisit = {
+  type: "paper" | "mock";
+  slug: string;
+  title: string;
+  examName: string;
+  at: string;
+};
+
+export type TopVisited = {
+  type: "paper" | "mock";
+  slug: string;
+  title: string;
+  examName: string;
+  visits: number;
+};
+
+/** Fire-and-forget: records a paper/mock view for recent-visits + the top chart. */
+export function recordContentVisit(type: "paper" | "mock", slug: string): Promise<{ message: string }> {
+  return requestJson<{ message: string }>("/api/v1/activity/visit", {
+    method: "POST",
+    body: JSON.stringify({ type, slug }),
+  });
+}
+
+export function fetchRecentVisits(): Promise<{ visits: RecentVisit[] }> {
+  return requestJson("/api/v1/activity/recent-visits");
+}
+
+export function fetchAdminTopVisited(): Promise<{ month: string; top: TopVisited[] }> {
+  return requestJson("/api/v1/admin/top-visited");
+}
+
 export function fetchScoreDistribution(examSlug: string): Promise<ScoreDistribution> {
   return requestJson(`/api/v1/analytics/score-distribution?examSlug=${encodeURIComponent(examSlug)}`);
 }

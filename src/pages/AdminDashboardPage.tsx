@@ -42,6 +42,7 @@ import {
   fetchAdminReports,
   fetchAdminSummary,
   fetchAdminActiveCount,
+  fetchAdminTopVisited,
   fetchAdminUsers,
   fetchAdminUserDetail,
   fetchAdminInbox,
@@ -66,6 +67,7 @@ import {
   type AdminPaperQuestionPayload,
   type AdminSummary,
   type AdminUser,
+  type TopVisited,
   type AdminUserDetail,
   type InboxThread,
   type MockItem,
@@ -500,6 +502,7 @@ export function AdminDashboardPage() {
 
   // Active users (real-time, polled every 30s)
   const [activeCount, setActiveCount] = useState<number | null>(null)
+  const [topVisited, setTopVisited] = useState<TopVisited[]>([])
 
   // Users
   const [users, setUsers] = useState<AdminUser[]>([])
@@ -914,6 +917,16 @@ export function AdminDashboardPage() {
     )
   }, [papers, paperSearch])
 
+  // Top-visited (this month) — one fetch per overview visit
+  useEffect(() => {
+    if (activeTab !== 'overview') return
+    let cancelled = false
+    void fetchAdminTopVisited()
+      .then((r) => { if (!cancelled) setTopVisited(r.top ?? []) })
+      .catch(() => { if (!cancelled) setTopVisited([]) })
+    return () => { cancelled = true }
+  }, [activeTab])
+
   // ── Active-users polling (30s, overview tab only) ───────────────
 
   useEffect(() => {
@@ -1266,6 +1279,30 @@ export function AdminDashboardPage() {
                 <span>Users</span>
               </article>
             </div>
+
+            {/* Top-visited content this month (Redis, monthly bucket) */}
+            {topVisited.length > 0 && (
+              <div className="admin-tool-panel">
+                <div className="admin-panel-title">
+                  <div><small>This month</small><h2>Most visited papers &amp; mocks</h2></div>
+                </div>
+                <div className="admin-topv-list">
+                  {topVisited.map((t) => {
+                    const max = topVisited[0]?.visits || 1
+                    return (
+                      <div className="admin-topv-row" key={`${t.type}-${t.slug}`}>
+                        <span className={`admin-topv-type ${t.type}`}>{t.type === 'paper' ? 'PYQ' : 'Mock'}</span>
+                        <span className="admin-topv-title" title={t.title}>{t.title}</span>
+                        <div className="admin-topv-track">
+                          <div className="admin-topv-fill" style={{ width: `${Math.max(6, Math.round((t.visits / max) * 100))}%` }} />
+                        </div>
+                        <strong className="admin-topv-count">{t.visits}</strong>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            )}
 
             <div className="admin-overview-grid">
               <div className="admin-tool-panel">

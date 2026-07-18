@@ -16803,3 +16803,62 @@ html {
 .an2-solution-row:hover { background: var(--paper); }
 .an2-solution-title { font-size: 13.5px; font-weight: 600; color: var(--ink); }
 .an2-solution-cta { font-size: 12px; font-weight: 700; color: var(--blue); white-space: nowrap; }
+
+/* ── Dashboard: recently visited papers/mocks (24h, Redis) ─────────────── */
+.db-visits-list { display: grid; margin-top: 10px; }
+.db-visit-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 4px;
+  border-top: 1px solid var(--line2);
+  text-decoration: none;
+  transition: background .12s;
+}
+.db-visit-row:first-child { border-top: 0; }
+.db-visit-row:hover { background: var(--paper); }
+.db-visit-type {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: .03em;
+  border-radius: 5px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+.db-visit-type.paper { color: var(--blue); background: #EFF6FF; }
+.db-visit-type.mock { color: var(--hl-dark); background: var(--hl-bg); }
+.db-visit-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.db-visit-exam { margin-left: auto; font-size: 11.5px; color: var(--ink4); white-space: nowrap; }
+
+/* ── Admin: most-visited chart (monthly) ───────────────────────────────── */
+.admin-topv-list { display: grid; gap: 10px; }
+.admin-topv-row {
+  display: grid;
+  grid-template-columns: 44px minmax(120px, 1fr) minmax(80px, 220px) 40px;
+  gap: 10px;
+  align-items: center;
+}
+.admin-topv-type {
+  font-size: 10px;
+  font-weight: 800;
+  text-align: center;
+  border-radius: 5px;
+  padding: 2px 0;
+}
+.admin-topv-type.paper { color: var(--blue); background: #EFF6FF; }
+.admin-topv-type.mock { color: var(--hl-dark); background: var(--hl-bg); }
+.admin-topv-title { font-size: 12.5px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.admin-topv-track { height: 14px; border-radius: 4px; background: var(--line2); overflow: hidden; }
+.admin-topv-fill { height: 100%; border-radius: 4px 0 0 4px; background: var(--blue); }
+.admin-topv-count { font-size: 12.5px; font-weight: 800; color: var(--ink); text-align: right; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) {
+  .admin-topv-row { grid-template-columns: 44px 1fr 40px; }
+  .admin-topv-track { display: none; }
+}

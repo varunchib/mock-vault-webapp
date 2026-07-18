@@ -12,6 +12,7 @@ import {
   type Question,
 } from '../lib/api'
 import { useAuth } from '../context/useAuth'
+import { recordContentVisit } from '../lib/api'
 import { usePageMeta } from '../lib/usePageMeta'
 import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
@@ -43,11 +44,17 @@ export function PyqPaperPage() {
     fetchPaperBySlug(apiPaperSlug(slug))
       .then((paperData) => {
         setPaper(paperData)
+        // Feeds "Recently visited" (24h) and the admin top-visited chart.
+        // Fire-and-forget — a failed beacon must never affect the page.
+        if (isAuthenticated) void recordContentVisit('paper', paperData.slug).catch(() => undefined)
         return fetchPaperQuestions(paperData.slug)
       })
       .then(setQuestions)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
+    // isAuthenticated intentionally not a dep: re-running this fetch on login
+    // would reload the whole paper just to send the visit beacon.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug, retryCount])
 
   const seoOverride = paperSeoOverride(paper?.slug ?? slug)
