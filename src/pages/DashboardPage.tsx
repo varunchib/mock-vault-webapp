@@ -6,10 +6,12 @@ import {
   fetchActiveLiveAttempts,
   fetchDashboardBootstrap,
   fetchExamCatalog,
+  fetchRecentVisits,
   refreshAuthSession,
   type ActiveAttempt,
   type Exam,
   type RecentAttempt,
+  type RecentVisit,
 } from '../lib/api'
 import { usePageMeta } from '../lib/usePageMeta'
 import { useAuth } from '../context/useAuth'
@@ -122,6 +124,7 @@ export function DashboardPage() {
   const [allExams, setAllExams] = useState<Exam[]>([])
   const [recentAttempts, setRecentAttempts] = useState<RecentAttempt[]>([])
   const [newPapersByExam, setNewPapersByExam] = useState<Record<string, number>>({})
+  const [recentVisits, setRecentVisits] = useState<RecentVisit[]>([])
   const [activeAttempts, setActiveAttempts] = useState<ActiveAttempt[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -189,6 +192,15 @@ export function DashboardPage() {
     void fetchExamCatalog()
       .then((catalog) => { if (!cancelled) setAllExams(catalog ?? []) })
       .catch(() => { if (!cancelled) setAllExams([]) })
+    return () => { cancelled = true }
+  }, [])
+
+  // Redis-backed "papers/mocks you opened in the last 24h" — best-effort.
+  useEffect(() => {
+    let cancelled = false
+    void fetchRecentVisits()
+      .then((r) => { if (!cancelled) setRecentVisits(r.visits ?? []) })
+      .catch(() => { if (!cancelled) setRecentVisits([]) })
     return () => { cancelled = true }
   }, [])
 
@@ -338,7 +350,7 @@ export function DashboardPage() {
       </section>
 
       {/* ── Recently viewed ─────────────────────────── */}
-      {recentlyViewed.length > 0 && (
+      {(recentlyViewed.length > 0 || recentVisits.length > 0) && (
         <section className="db-section">
           <div className="db-section-head">
             <div>
@@ -346,14 +358,32 @@ export function DashboardPage() {
               <h2>Recently viewed</h2>
             </div>
           </div>
-          <div className="db-viewed-row">
-            {recentlyViewed.map((rec) => (
-              <Link className="db-viewed-chip" to={`/exam/${rec.slug}`} key={rec.slug}>
-                <span>{rec.icon}</span>
-                <strong>{rec.shortName}</strong>
-              </Link>
-            ))}
-          </div>
+          {recentlyViewed.length > 0 && (
+            <div className="db-viewed-row">
+              {recentlyViewed.map((rec) => (
+                <Link className="db-viewed-chip" to={`/exam/${rec.slug}`} key={rec.slug}>
+                  <span>{rec.icon}</span>
+                  <strong>{rec.shortName}</strong>
+                </Link>
+              ))}
+            </div>
+          )}
+          {/* Papers/mocks opened in the last 24h (Redis-backed, per user) */}
+          {recentVisits.length > 0 && (
+            <div className="db-visits-list">
+              {recentVisits.map((v) => (
+                <Link
+                  className="db-visit-row"
+                  to={v.type === 'paper' ? paperPath(v.slug) : `/mock-test/${v.slug}`}
+                  key={`${v.type}-${v.slug}`}
+                >
+                  <span className={`db-visit-type ${v.type}`}>{v.type === 'paper' ? 'PYQ' : 'Mock'}</span>
+                  <span className="db-visit-title">{v.title}</span>
+                  <span className="db-visit-exam">{v.examName}</span>
+                </Link>
+              ))}
+            </div>
+          )}
         </section>
       )}
 
