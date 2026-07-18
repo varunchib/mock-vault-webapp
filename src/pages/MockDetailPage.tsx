@@ -14,10 +14,23 @@ import {
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { mockListingSeoTitle, mockListingSeoDescription } from '../lib/pageTitles'
+import { MocksComingSoon } from '../components/common/MocksComingSoon'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { normalizeExamCategory } from './DashboardPage'
 
 export function MockDetailPage() {
+  // Mocks are under development — gate the whole page, including direct URLs.
+  return (
+    <section className="public-page">
+      <div className="public-shell">
+        <MocksComingSoon showBrowseLink />
+      </div>
+    </section>
+  )
+}
+
+// Original page, restored when mocks launch.
+export function MockDetailPageDisabled() {
   const navigate = useNavigate()
   const { slug } = useParams()
   const { isAuthenticated } = useAuth()

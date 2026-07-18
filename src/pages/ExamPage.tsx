@@ -6,12 +6,12 @@ import {
   FileText,
   Lock,
   Search,
-  Timer,
   X,
 } from 'lucide-react'
 import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
+import { MocksComingSoon } from '../components/common/MocksComingSoon'
 import { HaloLoader } from '../components/common/HaloLoader'
 import {
   fetchEnrolledSlugs,
@@ -170,7 +170,6 @@ export function ExamPage() {
   const [retryCount, setRetryCount] = useState(0)
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [paperSearch, setPaperSearch] = useState(() => searchParams.get('s') ?? '')
-  const [diffFilter, setDiffFilter] = useState('All')
   const [selectedSubject, setSelectedSubject] = useState<string | null>(initialSubject)
   const [topicFilter, setTopicFilter] = useState<string | null>(null)
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
@@ -190,7 +189,6 @@ export function ExamPage() {
     setLoading(true)
     setError(false)
     setPaperSearch('')
-    setDiffFilter('All')
 
     const tabFromUrl = (searchParams.get('tab') as Tab | null) ?? 'papers'
     const subjectFromUrl = searchParams.get('subject')
@@ -244,12 +242,9 @@ export function ExamPage() {
 
   // Mocks are a separate entity and deliberately do NOT roll up to a board the
   // way papers and questions do: a mock belongs to the exam it was written for.
-  // Only this exam's own mocks appear here, under the Mocks tab.
+  // (The Mocks tab currently renders a coming-soon panel; the count still
+  // feeds the tab label.)
   const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
-  const filteredMocks = useMemo(
-    () => (diffFilter === 'All' ? examMocks : examMocks.filter((m) => m.difficulty === diffFilter)),
-    [examMocks, diffFilter],
-  )
 
   const filteredPapers = useMemo(() => {
     const q = paperSearch.trim().toLowerCase()
@@ -639,65 +634,14 @@ export function ExamPage() {
         </div>
       )}
 
-      {/* ── Mock Tests ─────────────────────────────── */}
+      {/* ── Mock Tests — under development, gated for everyone ── */}
       {activeTab === 'mocks' && (
         <div className="ep-tab-body">
           <div className="ep-papers-head">
             <h2>Mock tests</h2>
-            <span>{examMocks.length}</span>
           </div>
 
-          <div className="ep-filter-bar">
-            {['All', 'Beginner', 'Moderate', 'Advanced'].map((d) => (
-              <button
-                key={d}
-                type="button"
-                className={`ep-filter-btn${diffFilter === d ? ' active' : ''}`}
-                onClick={() => setDiffFilter(d)}
-              >
-                {d}
-              </button>
-            ))}
-          </div>
-
-          {filteredMocks.length === 0 ? (
-            <p className="ep-empty">
-              {diffFilter === 'All' ? 'No mock tests available yet.' : `No ${diffFilter} mocks found.`}
-            </p>
-          ) : (
-            <div className="ep-mock-grid">
-              {filteredMocks.map((mock) => (
-                <div className={`ep-mock-card ep-mock-${mock.difficulty.toLowerCase()}`} key={mock.slug}>
-                  <div className="ep-mock-badges">
-                    <span className={`ep-diff-badge diff-${mock.difficulty.toLowerCase()}`}>
-                      {mock.difficulty}
-                    </span>
-                    {mock.isFree && <span className="ep-free-badge">Free</span>}
-                  </div>
-                  <strong className="ep-mock-title">{mock.title}</strong>
-                  <p className="ep-mock-desc">{mock.description}</p>
-                  <div className="ep-mock-meta">
-                    <span><Timer size={12} /> {mock.durationMinutes} min</span>
-                    <span><ClipboardList size={12} /> {mock.questions} Qs</span>
-                  </div>
-                  <div className="ep-mock-footer">
-                    {isAuthenticated ? (
-                      <Link className="ep-start-btn" to={`/mock-attempt/${mock.slug}`}>
-                        Start Mock
-                      </Link>
-                    ) : (
-                      <button className="ep-start-btn" type="button" onClick={() => setLoginOpen(true)}>
-                        Login to Start
-                      </button>
-                    )}
-                    <Link className="ep-preview-btn" to={`/mock-test/${mock.slug}`}>
-                      Preview
-                    </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <MocksComingSoon />
         </div>
       )}
 

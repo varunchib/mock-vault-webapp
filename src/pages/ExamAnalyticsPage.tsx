@@ -5,17 +5,16 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { analyticsSeoTitle, analyticsSeoDescription } from '../lib/pageTitles'
 import { readAllResults, type CombinedResult } from '../lib/mockActivity'
 import { examCutoffs, estimatePercentile } from '../data/examCutoffs'
-import { fetchExamCutoffs, fetchLeaderboard, type ExamCutoffSet, type LeaderboardEntry } from '../lib/api'
+import { fetchExamCatalog, fetchExamCutoffs, fetchLeaderboard, fetchPaperCatalog, fetchScoreDistribution, type Exam, type ExamCutoffSet, type LeaderboardEntry, type Paper, type ScoreDistribution } from '../lib/api'
+import { remapToPaperExam } from '../lib/remapExam'
+import { paperPath } from '../lib/paperSeo'
 import { useAuth } from '../context/useAuth'
 import { SubjectStrength } from '../components/analytics/SubjectStrength'
+import { ScoreTrendChart, type TrendPoint } from '../components/analytics/ScoreTrendChart'
+import { ScorePositionChart } from '../components/analytics/ScorePositionChart'
+import { AnswerDonut } from '../components/analytics/AnswerDonut'
 
 // ── Constants ─────────────────────────────────────────────────────────────
-
-const POOL: Record<string, number> = {
-  'upsc-cse': 900000, 'ssc-cgl': 3000000, 'ssc-chsl': 1500000,
-  'ibps-po': 1000000, 'ibps-clerk': 1500000, 'sbi-po': 800000,
-  'sbi-clerk': 700000, 'rrb-ntpc': 3000000, 'neet-ug': 2000000,
-}
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
@@ -28,133 +27,6 @@ function fmtTime(s: number) {
 
 function scoreClass(pct: number): 'good' | 'mid' | 'bad' {
   return pct >= 70 ? 'good' : pct >= 50 ? 'mid' : 'bad'
-}
-
-function normalPdf(x: number, mean: number, std: number) {
-  return Math.exp(-0.5 * ((x - mean) / std) ** 2) / (std * Math.sqrt(2 * Math.PI))
-}
-
-// ── Score Distribution (bell curve) chart ─────────────────────────────────
-
-type DistChartProps = {
-  userScore: number
-  totalMarks: number
-  avgScore: number
-  stdDev: number
-  cutoff: number
-  cutoffLabel: string
-  topperScore?: number
-}
-
-function ScoreDistChart({ userScore, totalMarks, avgScore, stdDev, cutoff, cutoffLabel, topperScore }: DistChartProps) {
-  const W = 560, H = 200
-  const PAD = { left: 36, right: 16, top: 20, bottom: 36 }
-  const pw = W - PAD.left - PAD.right
-  const ph = H - PAD.top - PAD.bottom
-
-  const xMin = Math.max(0, avgScore - stdDev * 3.2)
-  const xMax = Math.min(totalMarks, avgScore + stdDev * 3.2)
-  const STEPS = 120
-  const step = (xMax - xMin) / STEPS
-
-  const points = Array.from({ length: STEPS + 1 }, (_, i) => {
-    const x = xMin + i * step
-    return { x, y: normalPdf(x, avgScore, stdDev) }
-  })
-  const maxY = Math.max(...points.map(p => p.y))
-
-  const toSvgX = (v: number) => PAD.left + ((v - xMin) / (xMax - xMin)) * pw
-  const toSvgY = (v: number) => PAD.top + (1 - v / maxY) * ph
-
-  const curvePts = points.map(p => `${toSvgX(p.x).toFixed(1)},${toSvgY(p.y).toFixed(1)}`).join(' L ')
-  const curveD = `M ${curvePts}`
-  const BOTTOM = PAD.top + ph
-  const areaD = `${curveD} L ${toSvgX(xMax).toFixed(1)},${BOTTOM} L ${toSvgX(xMin).toFixed(1)},${BOTTOM} Z`
-
-  // Above-cutoff shaded region
-  const cutoffX = Math.max(xMin, Math.min(xMax, cutoff))
-  const cutoffPts = points
-    .filter(p => p.x >= cutoffX)
-    .map(p => `${toSvgX(p.x).toFixed(1)},${toSvgY(p.y).toFixed(1)}`)
-    .join(' L ')
-  const shadeD = cutoffPts
-    ? `M ${cutoffPts} L ${toSvgX(xMax).toFixed(1)},${BOTTOM} L ${toSvgX(cutoffX).toFixed(1)},${BOTTOM} Z`
-    : ''
-
-  const ux = toSvgX(Math.max(xMin, Math.min(xMax, userScore)))
-  const ax = toSvgX(avgScore)
-  const cx = toSvgX(cutoffX)
-  const tx = topperScore != null ? toSvgX(Math.max(xMin, Math.min(xMax, topperScore))) : null
-
-  const xTicks = [xMin, avgScore, cutoff, userScore, xMax]
-    .filter((v, i, arr) => v >= xMin && v <= xMax && arr.indexOf(v) === i)
-    .sort((a, b) => a - b)
-    .filter((v, i, arr) => i === 0 || Math.abs(toSvgX(v) - toSvgX(arr[i - 1])) > 28)
-
-  return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="ea2-dist-svg" aria-hidden="true">
-      <defs>
-        <linearGradient id="ea2-curve-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#94a3b8" stopOpacity="0.18" />
-          <stop offset="100%" stopColor="#94a3b8" stopOpacity="0.02" />
-        </linearGradient>
-        <linearGradient id="ea2-shade-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#22c55e" stopOpacity="0.22" />
-          <stop offset="100%" stopColor="#22c55e" stopOpacity="0.04" />
-        </linearGradient>
-      </defs>
-
-      {/* Baseline */}
-      <line x1={PAD.left} y1={BOTTOM} x2={W - PAD.right} y2={BOTTOM} stroke="#e2e8f0" strokeWidth={1} />
-
-      {/* X-axis ticks */}
-      {xTicks.map(v => (
-        <g key={v}>
-          <line x1={toSvgX(v)} y1={BOTTOM} x2={toSvgX(v)} y2={BOTTOM + 4} stroke="#cbd5e1" strokeWidth={1} />
-          <text x={toSvgX(v)} y={BOTTOM + 14} textAnchor="middle" fontSize={8.5} fill="#94a3b8">
-            {Math.round(v)}
-          </text>
-        </g>
-      ))}
-
-      {/* Bell curve area */}
-      <path d={areaD} fill="url(#ea2-curve-fill)" />
-      <path d={curveD} fill="none" stroke="#94a3b8" strokeWidth={1.5} />
-
-      {/* Above-cutoff shaded zone */}
-      {shadeD && <path d={shadeD} fill="url(#ea2-shade-fill)" />}
-
-      {/* Cutoff marker */}
-      <line x1={cx} y1={PAD.top - 4} x2={cx} y2={BOTTOM} stroke="#ef4444" strokeWidth={1.5} strokeDasharray="4 3" />
-      <text x={cx} y={PAD.top - 7} textAnchor="middle" fontSize={8.5} fill="#ef4444" fontWeight={700}>
-        {cutoffLabel} {Math.round(cutoff)}
-      </text>
-
-      {/* Average marker */}
-      <line x1={ax} y1={PAD.top - 4} x2={ax} y2={BOTTOM} stroke="#f59e0b" strokeWidth={1.5} strokeDasharray="4 3" />
-      <text x={ax} y={PAD.top - 7} textAnchor="middle" fontSize={8.5} fill="#f59e0b" fontWeight={600}>
-        Avg {Math.round(avgScore)}
-      </text>
-
-      {/* Topper marker */}
-      {tx != null && topperScore != null && (
-        <>
-          <line x1={tx} y1={PAD.top - 4} x2={tx} y2={BOTTOM} stroke="#10b981" strokeWidth={1.5} strokeDasharray="4 3" />
-          <circle cx={tx} cy={PAD.top - 4} r={3} fill="#10b981" />
-          <text x={tx} y={PAD.top - 10} textAnchor="middle" fontSize={8.5} fill="#10b981" fontWeight={700}>
-            Top {Math.round(topperScore)}
-          </text>
-        </>
-      )}
-
-      {/* User marker */}
-      <line x1={ux} y1={PAD.top - 4} x2={ux} y2={BOTTOM} stroke="#3b82f6" strokeWidth={2} />
-      <circle cx={ux} cy={PAD.top - 4} r={3.5} fill="#3b82f6" />
-      <text x={ux} y={PAD.top - 10} textAnchor="middle" fontSize={8.5} fill="#3b82f6" fontWeight={800}>
-        You {Math.round(userScore)}
-      </text>
-    </svg>
-  )
 }
 
 // ── Leaderboard panel ─────────────────────────────────────────────────────
@@ -221,42 +93,6 @@ function LeaderboardPanel({
   )
 }
 
-// ── Attempt history row ───────────────────────────────────────────────────
-
-function HistoryCard({ r, examSlug }: {
-  r: ReturnType<typeof readAllResults>[0]
-  examSlug: string
-}) {
-  const maxMarks = (r.maxMarks ?? 0) > 0 ? r.maxMarks! : r.totalQuestions
-  const marksPerQ = maxMarks / r.totalQuestions
-  const negMark = r.negativeMarking ?? 0
-  const netMarks = r.rawScore ?? parseFloat((r.correct * marksPerQ - r.wrong * negMark).toFixed(2))
-  const scorePct = maxMarks > 0 ? Math.round((netMarks / maxMarks) * 100) : 0
-  const pctile = estimatePercentile(r.correct, r.totalQuestions, examSlug)
-  return (
-    <div className="ea2-hist-card">
-      <div className="ea2-hist-card-top">
-        <span className={`ea2-hist-score ${scoreClass(Math.max(0, scorePct))}${netMarks < 0 ? ' bad' : ''}`}>
-          {netMarks}
-        </span>
-        <span className="ea2-hist-outof">/ {maxMarks}</span>
-        {pctile > 0 && <span className="ea2-hist-pctile">~{pctile}th</span>}
-      </div>
-      <strong className="ea2-hist-card-title">{r.title}</strong>
-      <span className="ea2-hist-card-meta">
-        {r.type === 'mock' ? 'Mock Test' : 'PYQ Paper'}
-        {' · '}
-        {new Date(r.attemptedAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-      </span>
-      <div className="ea2-hist-card-stats">
-        <span className="ea2-hist-cs ea2-hist-cs--c">{r.correct} Correct</span>
-        <span className="ea2-hist-cs ea2-hist-cs--w">{r.wrong} Wrong</span>
-        <span className="ea2-hist-cs ea2-hist-cs--s">{r.skipped} Skipped</span>
-      </div>
-    </div>
-  )
-}
-
 // ── Main page ─────────────────────────────────────────────────────────────
 
 export type ExamAnalyticsSource = {
@@ -274,9 +110,28 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
   const examSlug = source?.examSlug ?? params.examSlug ?? ''
   const asUserId = source?.asUserId
 
+  // Catalogs re-attribute stale attempts (recorded against a board before the
+  // sub-exam split) to the paper's current exam, so /analytics/jkcce finds
+  // attempts stored under "jkpsc".
+  const [catalogExams, setCatalogExams] = useState<Exam[]>([])
+  const [catalogPapers, setCatalogPapers] = useState<Paper[]>([])
+  const [catalogsReady, setCatalogsReady] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    void Promise.allSettled([
+      fetchExamCatalog().then(e => { if (!cancelled) setCatalogExams(e ?? []) }),
+      fetchPaperCatalog().then(p => { if (!cancelled) setCatalogPapers(p ?? []) }),
+    ]).then(() => { if (!cancelled) setCatalogsReady(true) })
+    return () => { cancelled = true }
+  }, [])
+
   const results = useMemo(
-    () => (source ? source.results : (examSlug ? readAllResults(examSlug) : [])),
-    [source, examSlug],
+    () => {
+      const base = source ? source.results : readAllResults()
+      return remapToPaperExam(base, catalogPapers, catalogExams)
+        .filter(r => !examSlug || r.examSlug === examSlug)
+    },
+    [source, examSlug, catalogPapers, catalogExams],
   )
   const examName = results[0]?.examName ?? examSlug
   const userName = source?.userName ?? user?.name ?? 'You'
@@ -285,16 +140,27 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
 
   const [apiCutoffs, setApiCutoffs] = useState<ExamCutoffSet[] | null>(null)
   const [leaderboard, setLeaderboard] = useState<{ top10: LeaderboardEntry[]; userRank: number } | null>(null)
+  const [dist, setDist] = useState<ScoreDistribution | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<string>('General')
 
   useEffect(() => {
     if (!examSlug) return
     fetchExamCutoffs(examSlug).then(setApiCutoffs).catch(() => setApiCutoffs([]))
     fetchLeaderboard(examSlug, asUserId).then(setLeaderboard).catch(() => setLeaderboard({ top10: [], userRank: -1 }))
+    fetchScoreDistribution(examSlug).then(setDist).catch(() => setDist(null))
   }, [examSlug, asUserId])
 
-  const recentFirst = useMemo(
-    () => [...results].sort((a, b) => new Date(b.attemptedAt).getTime() - new Date(a.attemptedAt).getTime()),
+  // Attempts oldest-first for the per-exam trend line
+  const trendPoints = useMemo<TrendPoint[]>(
+    () => [...results]
+      .sort((a, b) => new Date(a.attemptedAt).getTime() - new Date(b.attemptedAt).getTime())
+      .map(r => {
+        const max = (r.maxMarks ?? 0) > 0 ? r.maxMarks! : r.totalQuestions
+        const perQ = max / r.totalQuestions
+        const net = r.rawScore ?? parseFloat((r.correct * perQ - r.wrong * (r.negativeMarking ?? 0)).toFixed(2))
+        const pct = max > 0 ? Math.max(0, Math.round((net / max) * 100)) : 0
+        return { pct, net, max, title: r.title, examName: r.examName, attemptedAt: r.attemptedAt }
+      }),
     [results],
   )
 
@@ -314,13 +180,9 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
     const avgMax = marksData.reduce((s, m) => s + m.max, 0) / marksData.length
     const bestPct = Math.round((Math.max(0, bestScore) / bestMax) * 100)
     const avgAccPct = Math.round((Math.max(0, avgScore) / avgMax) * 100)
-    const cut = examCutoffs[examSlug]
-    const avgScaledScore = cut
-      ? marksData.reduce((s, m) => s + (m.max > 0 ? (m.net / m.max) * cut.totalMarks : 0), 0) / marksData.length
-      : 0
     const percentiles = results.map(r => estimatePercentile(r.correct, r.totalQuestions, examSlug)).filter(p => p > 0)
     const avgPercentile = percentiles.length ? Math.round(percentiles.reduce((s, p) => s + p, 0) / percentiles.length) : 0
-    return { totalTime, avgScore, bestScore, avgAccPct, bestPct, avgScaledScore, avgPercentile }
+    return { totalTime, avgScore, bestScore, avgAccPct, bestPct, avgPercentile }
   }, [results, examSlug])
 
   // Merge API + static cutoffs
@@ -358,6 +220,12 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
   })
 
   if (!examSlug) return source ? null : <Navigate to="/analytics" replace />
+  // Don't decide "no attempts" until the catalogs have loaded — stale attempts
+  // may re-attribute INTO this exam once the remap runs, and redirecting early
+  // would bounce a perfectly valid deep link.
+  if (!source && !catalogsReady && !results.length) {
+    return <section className="ea2-page workspace-page" />
+  }
   if (!results.length || !summary) {
     if (source) {
       return (
@@ -374,9 +242,6 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
     }
     return <Navigate to={`/exam/${examSlug}`} replace />
   }
-
-  const pool = POOL[examSlug] ?? 0
-  const poolLabel = pool >= 1000000 ? `${(pool / 100000).toFixed(0)}L` : pool >= 1000 ? `${(pool / 1000).toFixed(0)}K` : ''
 
   return (
     <section className="ea2-page workspace-page">
@@ -433,7 +298,7 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           <div className="ea2-chart-heading">
             <div>
               <h2>Score Position</h2>
-              <p>Where you stand relative to the average and cutoff</p>
+              <p>How everyone on the platform scored on this exam — and where you sit</p>
             </div>
             {activeCutoff && (
               <span className="ea2-chart-meta">{activeCutoff.stage} · {activeCutoff.year}</span>
@@ -456,78 +321,40 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
             </div>
           )}
 
-          {/* Bell curve */}
-          {activeCutoff && summary.avgScaledScore > 0 ? (
-            <ScoreDistChart
-              userScore={summary.avgScaledScore}
-              totalMarks={activeCutoff.totalMarks}
-              avgScore={activeCutoff.avgScore}
-              stdDev={activeCutoff.stdDev}
-              cutoff={selectedCutoffVal}
-              cutoffLabel={selectedCategory}
-              topperScore={
-                leaderboard?.top10?.length
-                  ? (leaderboard.top10[0].scorePct / 100) * activeCutoff.totalMarks
-                  : undefined
-              }
-            />
-          ) : (
-            <div className="ea2-chart-placeholder">
-              No cutoff data available for this exam yet.
-            </div>
-          )}
+          {/* Real platform-user distribution — always renders. If the API is
+              unavailable, fall back to just the viewer so the chart never
+              disappears behind a "no cutoff data" wall. */}
+          <ScorePositionChart
+            dist={dist ?? {
+              totalUsers: 1,
+              buckets: Array.from({ length: 10 }, (_, i) =>
+                i === Math.min(9, Math.floor(summary.bestPct / 10)) ? 1 : 0),
+              systemCutoffPct: 0,
+            }}
+            userPct={summary.bestPct}
+            officialCutoffPct={
+              activeCutoff && selectedCutoffVal > 0 && activeCutoff.totalMarks > 0
+                ? (selectedCutoffVal / activeCutoff.totalMarks) * 100
+                : undefined
+            }
+            officialCutoffLabel={selectedCategory}
+          />
 
-          {/* Legend */}
-          {activeCutoff && (
-            <div className="ea2-legend">
-              <span className="ea2-legend-item ea2-legend--you">
-                <span className="ea2-legend-line" />
-                Your avg score
-              </span>
-              <span className="ea2-legend-item ea2-legend--avg">
-                <span className="ea2-legend-line" />
-                Average score
-              </span>
-              <span className="ea2-legend-item ea2-legend--cut">
-                <span className="ea2-legend-line ea2-legend-line--dash" />
-                {selectedCategory} cutoff
-              </span>
-              <span className="ea2-legend-item ea2-legend--zone">
-                <span className="ea2-legend-dot-fill" />
-                Above cutoff zone
-              </span>
-              {leaderboard?.top10?.length ? (
-                <span className="ea2-legend-item ea2-legend--topper">
-                  <span className="ea2-legend-line" />
-                  Topper score
-                </span>
-              ) : null}
-            </div>
-          )}
-
-          {/* User vs cutoff callout */}
-          {activeCutoff && summary.avgScaledScore > 0 && selectedCutoffVal > 0 && (
-            <div className={`ea2-verdict ${summary.avgScaledScore >= selectedCutoffVal ? 'pass' : 'fail'}`}>
-              {summary.avgScaledScore >= selectedCutoffVal ? '✓' : '✗'}
-              {' '}Your avg score <strong>{Math.round(summary.avgScaledScore * 10) / 10}</strong>
-              {' '}{summary.avgScaledScore >= selectedCutoffVal ? 'clears' : 'misses'} the{' '}
-              <strong>{selectedCategory}</strong> cutoff of <strong>{selectedCutoffVal}</strong>
-              {' '}/ {activeCutoff.totalMarks}
-            </div>
-          )}
-
-          {/* Percentile + rank estimate */}
-          {summary.avgPercentile > 0 && (
-            <div className="ea2-rank-estimate">
-              <span>~{summary.avgPercentile}th percentile</span>
-              {pool > 0 && (
-                <span>
-                  Est. rank <strong>~{Math.max(1, Math.round(((100 - summary.avgPercentile) / 100) * pool)).toLocaleString('en-IN')}</strong>
-                  {' '}/ {poolLabel}
-                </span>
-              )}
-            </div>
-          )}
+          {/* User vs official cutoff — compared in percent space, same as the
+              chart, so different papers' mark scales can't skew it */}
+          {activeCutoff && selectedCutoffVal > 0 && activeCutoff.totalMarks > 0 && (() => {
+            const cutoffPct = (selectedCutoffVal / activeCutoff.totalMarks) * 100
+            const clears = summary.bestPct >= cutoffPct
+            return (
+              <div className={`ea2-verdict ${clears ? 'pass' : 'fail'}`}>
+                {clears ? '✓' : '✗'}
+                {' '}Your best score <strong>{summary.bestPct}%</strong>
+                {' '}{clears ? 'clears' : 'misses'} the{' '}
+                <strong>{selectedCategory}</strong> cutoff of <strong>{Math.round(cutoffPct)}%</strong>
+                {' '}({selectedCutoffVal} / {activeCutoff.totalMarks})
+              </div>
+            )
+          })()}
         </div>
 
         {/* Right: leaderboard */}
@@ -542,19 +369,66 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
       {/* ── Subject strength: where you lack in THIS exam ── */}
       <SubjectStrength results={results} />
 
-      {/* ── Attempt history ─────────────────────────── */}
-      <div className="ea2-history">
-        <h2>Attempt History</h2>
-        <div className="ea2-hist-list">
-          {recentFirst.map((r) => (
-            <HistoryCard
-              key={`${r.type}-${r.slug}-${r.attemptedAt}`}
-              r={r}
-              examSlug={examSlug}
-            />
-          ))}
+      {/* ── Score trend + answer breakdown for THIS exam ── */}
+      <div className="ea2-charts-row">
+        <div className="an2-panel">
+          <div className="an2-panel-head">
+            <div>
+              <h2>Score trend</h2>
+              <p>Net score as % of maximum, every attempt on this exam</p>
+            </div>
+          </div>
+          {trendPoints.length >= 2 ? (
+            <ScoreTrendChart points={trendPoints} />
+          ) : (
+            <div className="an2-trend-single">
+              One attempt so far — the trend line starts at the second attempt.
+            </div>
+          )}
+        </div>
+        <div className="an2-panel">
+          <div className="an2-panel-head">
+            <div>
+              <h2>Answer breakdown</h2>
+              <p>All questions across your {results.length} attempt{results.length !== 1 ? 's' : ''}</p>
+            </div>
+          </div>
+          <AnswerDonut
+            correct={results.reduce((n, r) => n + r.correct, 0)}
+            wrong={results.reduce((n, r) => n + r.wrong, 0)}
+            skipped={results.reduce((n, r) => n + r.skipped, 0)}
+          />
         </div>
       </div>
+
+      {/* ── Review solutions of attempted papers ── */}
+      {(() => {
+        const seen = new Set<string>()
+        const attemptedPapers = results.filter(r => {
+          if (r.type !== 'paper' || seen.has(r.slug)) return false
+          seen.add(r.slug)
+          return true
+        })
+        if (attemptedPapers.length === 0) return null
+        return (
+          <div className="an2-panel">
+            <div className="an2-panel-head">
+              <div>
+                <h2>Review solutions</h2>
+                <p>Reopen the solved papers you attempted — every question with its answer and explanation</p>
+              </div>
+            </div>
+            <div className="an2-solutions-list">
+              {attemptedPapers.map(r => (
+                <Link key={r.slug} to={paperPath(r.slug)} className="an2-solution-row">
+                  <span className="an2-solution-title">{r.title}</span>
+                  <span className="an2-solution-cta">View solutions →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
     </section>
   )
