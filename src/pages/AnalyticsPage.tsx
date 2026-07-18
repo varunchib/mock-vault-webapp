@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
 import { SubjectStrength } from '../components/analytics/SubjectStrength'
 import { ScoreTrendChart, type TrendPoint } from '../components/analytics/ScoreTrendChart'
-import { fetchExamCatalog } from '../lib/api'
+import { fetchExamCatalog, fetchPaperCatalog, type Exam, type Paper } from '../lib/api'
+import { remapToPaperExam } from '../lib/remapExam'
 import { readAttemptResults, readPaperResults, type CombinedResult } from '../lib/mockActivity'
 
 type SourceFilter = 'all' | 'mock' | 'paper'
@@ -59,20 +60,16 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
   const linkBase = source?.linkBase ?? '/analytics'
   const [filter, setFilter] = useState<SourceFilter>('all')
 
-  // Attempts store the exam's full official name ("Jammu & Kashmir Public
-  // Service Commission"); rows read far better with the catalog shortName
-  // ("JKPSC"). Redis-cached server-side, so this is cheap.
-  const [shortNames, setShortNames] = useState<Record<string, string>>({})
+  // Attempts store a snapshot of the exam at attempt time — old records carry
+  // the board ("JKPSC") instead of the actual exam ("JKCCE"). The catalogs are
+  // the source of truth: re-attribute every paper attempt to its paper's
+  // current exam and show that exam's shortName. Both Redis-cached server-side.
+  const [catalogExams, setCatalogExams] = useState<Exam[]>([])
+  const [catalogPapers, setCatalogPapers] = useState<Paper[]>([])
   useEffect(() => {
     let cancelled = false
-    fetchExamCatalog()
-      .then(exams => {
-        if (cancelled) return
-        const map: Record<string, string> = {}
-        for (const e of exams) map[e.slug] = e.shortName || e.name
-        setShortNames(map)
-      })
-      .catch(() => undefined)
+    fetchExamCatalog().then(e => { if (!cancelled) setCatalogExams(e ?? []) }).catch(() => undefined)
+    fetchPaperCatalog().then(p => { if (!cancelled) setCatalogPapers(p ?? []) }).catch(() => undefined)
     return () => { cancelled = true }
   }, [])
 
@@ -93,10 +90,10 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
             rawScore: r.rawScore, timeTakenSeconds: r.timeTakenSeconds, subjects: r.subjects,
           })),
         ]
-    return [...base].sort(
+    return remapToPaperExam(base, catalogPapers, catalogExams).sort(
       (a, b) => new Date(b.attemptedAt).getTime() - new Date(a.attemptedAt).getTime()
     )
-  }, [source])
+  }, [source, catalogPapers, catalogExams])
 
   // The Mocks/PYQ filter scopes everything below it — tiles, trend, subjects,
   // exams, and recents all describe the same slice.
@@ -210,6 +207,36 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
             )}
           </div>
 
+          {/* Exam rows */}
+          <div className="an2-panel">
+            <div className="an2-panel-head">
+              <div>
+                <h2>By exam</h2>
+                <p>Cutoff position and leaderboard live inside each exam</p>
+              </div>
+            </div>
+            <div className="an2-exam-list">
+              {examGroups.map(g => {
+                const marks = g.results.map(netMarks)
+                const best = marks.reduce((a, b) => (b.pct > a.pct ? b : a))
+                const avgPct = Math.round(marks.reduce((s, m) => s + m.pct, 0) / marks.length)
+                return (
+                  <Link key={g.examSlug} to={`${linkBase}/${g.examSlug}`} className="an2-exam-row">
+                    <div className="an2-exam-main">
+                      <strong>{g.examName}</strong>
+                      <span>{g.results.length} attempt{g.results.length !== 1 ? 's' : ''} · last {relativeDate(g.results[0].attemptedAt)}</span>
+                    </div>
+                    <div className="an2-exam-meter" title={`Average ${avgPct}%`}>
+                      <div className="an2-exam-meter-fill" style={{ width: `${avgPct}%` }} />
+                    </div>
+                    <span className={`an2-exam-best ${scoreClass(best.pct)}`}>{best.net}<em>/{best.max}</em></span>
+                    <ChevronRight size={15} className="an2-exam-chev" />
+                  </Link>
+                )
+              })}
+            </div>
+          </div>
+
           {/* Score trend */}
           <div className="an2-panel">
             <div className="an2-panel-head">
@@ -230,36 +257,6 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
 
           {/* Per-subject accuracy — where you're strong and where you lack */}
           <SubjectStrength results={results} />
-
-          {/* Exam rows */}
-          <div className="an2-panel">
-            <div className="an2-panel-head">
-              <div>
-                <h2>By exam</h2>
-                <p>Cutoff position and leaderboard live inside each exam</p>
-              </div>
-            </div>
-            <div className="an2-exam-list">
-              {examGroups.map(g => {
-                const marks = g.results.map(netMarks)
-                const best = marks.reduce((a, b) => (b.pct > a.pct ? b : a))
-                const avgPct = Math.round(marks.reduce((s, m) => s + m.pct, 0) / marks.length)
-                return (
-                  <Link key={g.examSlug} to={`${linkBase}/${g.examSlug}`} className="an2-exam-row">
-                    <div className="an2-exam-main">
-                      <strong>{shortNames[g.examSlug] ?? g.examName}</strong>
-                      <span>{g.results.length} attempt{g.results.length !== 1 ? 's' : ''} · last {relativeDate(g.results[0].attemptedAt)}</span>
-                    </div>
-                    <div className="an2-exam-meter" title={`Average ${avgPct}%`}>
-                      <div className="an2-exam-meter-fill" style={{ width: `${avgPct}%` }} />
-                    </div>
-                    <span className={`an2-exam-best ${scoreClass(best.pct)}`}>{best.net}<em>/{best.max}</em></span>
-                    <ChevronRight size={15} className="an2-exam-chev" />
-                  </Link>
-                )
-              })}
-            </div>
-          </div>
 
           {/* Recent attempts */}
           <div className="an2-panel">

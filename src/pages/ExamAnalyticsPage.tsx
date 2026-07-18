@@ -5,7 +5,9 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { analyticsSeoTitle, analyticsSeoDescription } from '../lib/pageTitles'
 import { readAllResults, type CombinedResult } from '../lib/mockActivity'
 import { examCutoffs, estimatePercentile } from '../data/examCutoffs'
-import { fetchExamCutoffs, fetchLeaderboard, fetchScoreDistribution, type ExamCutoffSet, type LeaderboardEntry, type ScoreDistribution } from '../lib/api'
+import { fetchExamCatalog, fetchExamCutoffs, fetchLeaderboard, fetchPaperCatalog, fetchScoreDistribution, type Exam, type ExamCutoffSet, type LeaderboardEntry, type Paper, type ScoreDistribution } from '../lib/api'
+import { remapToPaperExam } from '../lib/remapExam'
+import { paperPath } from '../lib/paperSeo'
 import { useAuth } from '../context/useAuth'
 import { SubjectStrength } from '../components/analytics/SubjectStrength'
 import { ScoreTrendChart, type TrendPoint } from '../components/analytics/ScoreTrendChart'
@@ -108,9 +110,28 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
   const examSlug = source?.examSlug ?? params.examSlug ?? ''
   const asUserId = source?.asUserId
 
+  // Catalogs re-attribute stale attempts (recorded against a board before the
+  // sub-exam split) to the paper's current exam, so /analytics/jkcce finds
+  // attempts stored under "jkpsc".
+  const [catalogExams, setCatalogExams] = useState<Exam[]>([])
+  const [catalogPapers, setCatalogPapers] = useState<Paper[]>([])
+  const [catalogsReady, setCatalogsReady] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    void Promise.allSettled([
+      fetchExamCatalog().then(e => { if (!cancelled) setCatalogExams(e ?? []) }),
+      fetchPaperCatalog().then(p => { if (!cancelled) setCatalogPapers(p ?? []) }),
+    ]).then(() => { if (!cancelled) setCatalogsReady(true) })
+    return () => { cancelled = true }
+  }, [])
+
   const results = useMemo(
-    () => (source ? source.results : (examSlug ? readAllResults(examSlug) : [])),
-    [source, examSlug],
+    () => {
+      const base = source ? source.results : readAllResults()
+      return remapToPaperExam(base, catalogPapers, catalogExams)
+        .filter(r => !examSlug || r.examSlug === examSlug)
+    },
+    [source, examSlug, catalogPapers, catalogExams],
   )
   const examName = results[0]?.examName ?? examSlug
   const userName = source?.userName ?? user?.name ?? 'You'
@@ -199,6 +220,12 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
   })
 
   if (!examSlug) return source ? null : <Navigate to="/analytics" replace />
+  // Don't decide "no attempts" until the catalogs have loaded — stale attempts
+  // may re-attribute INTO this exam once the remap runs, and redirecting early
+  // would bounce a perfectly valid deep link.
+  if (!source && !catalogsReady && !results.length) {
+    return <section className="ea2-page workspace-page" />
+  }
   if (!results.length || !summary) {
     if (source) {
       return (
@@ -373,6 +400,35 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           />
         </div>
       </div>
+
+      {/* ── Review solutions of attempted papers ── */}
+      {(() => {
+        const seen = new Set<string>()
+        const attemptedPapers = results.filter(r => {
+          if (r.type !== 'paper' || seen.has(r.slug)) return false
+          seen.add(r.slug)
+          return true
+        })
+        if (attemptedPapers.length === 0) return null
+        return (
+          <div className="an2-panel">
+            <div className="an2-panel-head">
+              <div>
+                <h2>Review solutions</h2>
+                <p>Reopen the solved papers you attempted — every question with its answer and explanation</p>
+              </div>
+            </div>
+            <div className="an2-solutions-list">
+              {attemptedPapers.map(r => (
+                <Link key={r.slug} to={paperPath(r.slug)} className="an2-solution-row">
+                  <span className="an2-solution-title">{r.title}</span>
+                  <span className="an2-solution-cta">View solutions →</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
     </section>
   )
