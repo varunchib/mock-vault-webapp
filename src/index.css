@@ -11039,17 +11039,28 @@ html {
   .db-header { flex-direction: column; gap: 14px; }
   .db-header-stats { flex-direction: row; justify-content: flex-start; gap: 20px; }
   .db-header-stat { align-items: flex-start; }
-  /* Two-up grid rather than one full-width chip per row: at 360px the content
-     box is ~336px, so 2 x 150px + 10px gap fits and halves the scroll. */
+  /* One full-width chip per row: two-up forced long names ("JKSSB Wildlife
+     Guard") into a 3-line wrap and ragged card heights. A single column keeps
+     the name on one line with the badge beside it. */
   .db-enrolled-row {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    grid-template-columns: 1fr;
     gap: 10px;
   }
   .db-enrolled-chip {
     min-width: 0;
     width: 100%;
     padding: 10px 12px;
+  }
+  .db-enrolled-chip > div {
+    flex: 1;
+    min-width: 0;
+  }
+  .db-enrolled-chip strong {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .db-enrolled-chip .db-chip-icon { font-size: 18px; }
   .db-attempts-empty { flex-direction: column; align-items: flex-start; }

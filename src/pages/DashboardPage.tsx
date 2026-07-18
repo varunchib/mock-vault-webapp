@@ -328,9 +328,9 @@ export function DashboardPage() {
                   <div>
                     <strong>{exam.shortName}</strong>
                     <small>
-                      {exam.mocks > 0 ? `${exam.mocks} mocks` : ''}
+                      {exam.mocks > 0 ? `${exam.mocks} mock${exam.mocks !== 1 ? 's' : ''}` : ''}
                       {exam.mocks > 0 && exam.papers > 0 ? ' · ' : ''}
-                      {exam.papers > 0 ? `${exam.papers} papers` : ''}
+                      {exam.papers > 0 ? `${exam.papers} paper${exam.papers !== 1 ? 's' : ''}` : ''}
                     </small>
                   </div>
                   {fresh > 0 && (
