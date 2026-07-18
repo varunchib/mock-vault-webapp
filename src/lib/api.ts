@@ -532,6 +532,16 @@ export type LeaderboardEntry = {
   isMe: boolean
 }
 
+export type ScoreDistribution = {
+  totalUsers: number;
+  buckets: number[];
+  systemCutoffPct: number;
+};
+
+export function fetchScoreDistribution(examSlug: string): Promise<ScoreDistribution> {
+  return requestJson(`/api/v1/analytics/score-distribution?examSlug=${encodeURIComponent(examSlug)}`);
+}
+
 export function fetchLeaderboard(examSlug: string, asUser?: string): Promise<{ top10: LeaderboardEntry[]; userRank: number }> {
   const qs = new URLSearchParams({ examSlug })
   if (asUser) qs.set('asUser', asUser)

@@ -9,7 +9,6 @@ import {
   refreshAuthSession,
   type ActiveAttempt,
   type Exam,
-  type MockItem,
   type RecentAttempt,
 } from '../lib/api'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -117,7 +116,6 @@ export function DashboardPage() {
   const { user } = useAuth()
   const firstName = user?.name?.split(' ')[0] ?? 'there'
 
-  const [mocks, setMocks] = useState<MockItem[]>([])
   const [enrolledExams, setEnrolledExams] = useState<Exam[]>([])
   // Needed only to tell a board (JKSSB) from an exam you actually sit
   // (JKSSB Junior Assistant). Small, and Redis-cached server-side.
@@ -140,7 +138,6 @@ export function DashboardPage() {
     let cancelled = false
     const load = async () => {
       const applyData = (data: Awaited<ReturnType<typeof fetchDashboardBootstrap>>) => {
-        setMocks(data.mocks ?? [])
         setEnrolledExams(data.enrolledExams ?? [])
         setRecentAttempts(data.recentAttempts ?? [])
         setNewPapersByExam(data.newPapersByExam ?? {})
@@ -249,10 +246,6 @@ export function DashboardPage() {
           <div className="db-header-stat">
             <strong>{recentAttempts.length}</strong>
             <span>Attempted</span>
-          </div>
-          <div className="db-header-stat">
-            <strong>{mocks.length}</strong>
-            <span>Mocks</span>
           </div>
         </div>
       </header>

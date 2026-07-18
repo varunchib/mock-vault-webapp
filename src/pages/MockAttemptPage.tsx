@@ -1,5 +1,6 @@
 import { AlertTriangle, BarChart3, ChevronLeft, ChevronRight, Clock3, Flag, Home, RotateCcw, XCircle } from 'lucide-react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { MocksComingSoon } from '../components/common/MocksComingSoon'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { homePathForUser } from '../context/admin'
@@ -240,6 +241,18 @@ function ResultScreen({
 
 // ── Main page ─────────────────────────────────────────────────────────────
 export function MockAttemptPage() {
+  // Mocks are under development — gate the attempt flow, including direct URLs.
+  return (
+    <section className="public-page">
+      <div className="public-shell">
+        <MocksComingSoon showBrowseLink />
+      </div>
+    </section>
+  )
+}
+
+// Original attempt flow, restored when mocks launch.
+export function MockAttemptPageDisabled() {
   const navigate = useNavigate()
   const { slug } = useParams()
   const { user } = useAuth()
