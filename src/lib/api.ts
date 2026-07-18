@@ -591,7 +591,7 @@ export type AdminUser = {
   city?: string
 }
 
-export function fetchAdminActiveCount(): Promise<{ count: number }> {
+export function fetchAdminActiveCount(): Promise<{ count: number; onlineIds?: string[] }> {
   return requestJson('/api/v1/admin/active-count')
 }
 

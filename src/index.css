@@ -6058,6 +6058,7 @@ footer {
 .admin-file-action,
 .admin-link-action,
 .admin-manage-row .admin-row-action,
+.admin-panel-title .admin-row-action,
 .admin-mock-preview .admin-panel-title button {
   width: auto;
   min-height: 34px;
@@ -6088,11 +6089,18 @@ footer {
   cursor: pointer;
 }
 
-.admin-manage-row .admin-row-action.danger {
+.admin-manage-row .admin-row-action.danger,
+.admin-panel-title .admin-row-action.danger {
   border-color: #fee2e2;
   background: #fff1f1;
   color: #dc2626;
   padding: 0 9px;
+}
+
+/* The drawer close lives in the rail header; something later in the cascade
+   flips it to flex, so pin it hidden wherever the drawer can't exist. */
+@media (min-width: 901px) {
+  .admin-rail .admin-drawer-close { display: none !important; }
 }
 
 .admin-mock-row {
@@ -15065,12 +15073,14 @@ html {
 .admin-dark .admin-file-action,
 .admin-dark .admin-link-action,
 .admin-dark .admin-manage-row .admin-row-action,
+.admin-dark .admin-panel-title .admin-row-action,
 .admin-dark .admin-mock-preview .admin-panel-title button {
   background: #21262d;
   border-color: #30363d;
   color: #c9d1d9;
 }
-.admin-dark .admin-manage-row .admin-row-action.danger {
+.admin-dark .admin-manage-row .admin-row-action.danger,
+.admin-dark .admin-panel-title .admin-row-action.danger {
   background: rgba(220,38,38,.12);
   border-color: rgba(220,38,38,.25);
   color: #f87171;
@@ -16862,3 +16872,18 @@ html {
   .admin-topv-row { grid-template-columns: 44px 1fr 40px; }
   .admin-topv-track { display: none; }
 }
+
+/* ── Presence dot on registered users (green = active in last 5 min) ───── */
+.ov-user-avatar-wrap { position: relative; display: inline-flex; flex-shrink: 0; }
+.ov-user-presence {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #9ca3af;
+  border: 2px solid var(--white);
+}
+.ov-user-presence.online { background: #22c55e; }
+.admin-dark .ov-user-presence { border-color: #161b22; }

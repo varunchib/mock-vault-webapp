@@ -80,6 +80,13 @@ import { usePageMeta } from '../lib/usePageMeta'
 
 // ─── Types ────────────────────────────────────────────────────
 
+function fmtLastLogin(iso: string | undefined) {
+  if (!iso) return '—'
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return '—'
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
 type Tab = 'overview' | 'exams' | 'mocks' | 'papers' | 'inbox'
 
 type StatusMsg = { kind: 'success' | 'error'; text: string }
@@ -502,6 +509,7 @@ export function AdminDashboardPage() {
 
   // Active users (real-time, polled every 30s)
   const [activeCount, setActiveCount] = useState<number | null>(null)
+  const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set())
   const [topVisited, setTopVisited] = useState<TopVisited[]>([])
 
   // Users
@@ -930,7 +938,11 @@ export function AdminDashboardPage() {
   // ── Active-users polling (30s, overview tab only) ───────────────
 
   useEffect(() => {
-    const poll = () => { void fetchAdminActiveCount().then((r) => setActiveCount(r.count)).catch(() => setActiveCount(0)) }
+    const poll = () => {
+      void fetchAdminActiveCount()
+        .then((r) => { setActiveCount(r.count); setOnlineIds(new Set(r.onlineIds ?? [])) })
+        .catch(() => setActiveCount(0))
+    }
     poll()
     const id = setInterval(poll, 30_000)
     return () => clearInterval(id)
@@ -951,6 +963,16 @@ export function AdminDashboardPage() {
       setUsersLoading(false)
     }
   }
+
+  // Registered Users initial page — without this the section sat empty until
+  // the admin typed a search, which read as broken. Deferred a tick so the
+  // loading setState isn't synchronous inside the effect.
+  useEffect(() => {
+    if (activeTab !== 'overview') return
+    const id = setTimeout(() => { void loadUsers(0, '', true) }, 0)
+    return () => clearTimeout(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab])
 
   const handleUserSearch = () => {
     setUserSearch(userSearchInput)
@@ -1072,7 +1094,7 @@ export function AdminDashboardPage() {
 
                 <div className="ov-udetail-meta">
                   <div><small>Joined</small>{new Date(userDetail.user.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                  <div><small>Last login</small>{new Date(userDetail.user.lastLogin).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                  <div><small>Last login</small>{fmtLastLogin(userDetail.user.lastLogin)}</div>
                   <div><small>Attempts</small>{userDetail.attempts.length}</div>
                   <div><small>Ranked exams</small>{userDetail.examRanks.length}</div>
                 </div>
@@ -1432,7 +1454,14 @@ export function AdminDashboardPage() {
                           onClick={() => void openUserDetail(user.id)}
                           title="View full profile"
                         >
-                          <span className="ov-user-initial">{user.name.charAt(0).toUpperCase()}</span>
+                          <span className="ov-user-avatar-wrap">
+                            <span className="ov-user-initial">{user.name.charAt(0).toUpperCase()}</span>
+                            <span
+                              className={`ov-user-presence${onlineIds.has(user.id) ? ' online' : ''}`}
+                              title={onlineIds.has(user.id) ? 'Online now (active in the last 5 min)' : 'Offline'}
+                              aria-label={onlineIds.has(user.id) ? 'Online' : 'Offline'}
+                            />
+                          </span>
                           <div>
                             <span className="ov-user-name-text">{user.name}</span>
                             {user.city && <small className="ov-user-city">{user.city}</small>}
@@ -1444,7 +1473,7 @@ export function AdminDashboardPage() {
                           {user.isActive ? 'Active' : 'Banned'}
                         </span>
                         <span className="ov-user-login-text">
-                          {new Date(user.lastLogin).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                          {fmtLastLogin(user.lastLogin)}
                         </span>
                         <div className="ov-user-actions">
                           <button
