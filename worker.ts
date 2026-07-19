@@ -701,9 +701,16 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         q.answer ? `Correct answer: ${q.answer}.` : `Correct option: ${q.answerKey}.`,
         stripMarkdown(q.explanation ?? ''),
       ].filter(Boolean).join(' ').slice(0, 1000)
+      // For reading-passage questions the stored text begins with the shared
+      // passage, so slicing its first chars gives every Q in the set the SAME
+      // description (Bing flags duplicates). The actual question is the last
+      // line ending in '?', so prefer that when the text is multi-line.
+      const qLines = q.question.split('\n').map((l) => stripMarkdown(l).trim()).filter(Boolean)
+      const actualQuestion =
+        qLines.length > 2 ? ([...qLines].reverse().find((l) => l.endsWith('?')) ?? qLines[qLines.length - 1]) : qLines.join(' ')
       return {
         title: questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic),
-        description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${stripMarkdown(q.question).slice(0, 120)} — correct answer (${q.answerKey}) with detailed explanation.`,
+        description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${actualQuestion.slice(0, 140)} — correct answer (${q.answerKey}) with detailed explanation.`,
         contentHtml: renderQuestionContent(q, crumbs),
         jsonLd: [
           {
