@@ -643,10 +643,34 @@ export type AdminUserExamRank = {
   totalRanked: number
 }
 
+export type AdminRecentVisit = {
+  type: 'paper' | 'mock'
+  slug: string
+  title: string
+  examName: string
+  at: string
+}
+
 export type AdminUserDetail = {
   user: AdminUser
   attempts: AdminUserAttempt[]
   examRanks: AdminUserExamRank[]
+  recentVisits: AdminRecentVisit[]
+}
+
+export type AdminActiveUser = {
+  id: string
+  name: string
+  email: string
+  city?: string
+  lastSeen: string
+  secondsAgo: number
+  recentVisits: AdminRecentVisit[]
+}
+
+// Live users behind the green presence dot — most recently seen first, max 20.
+export function fetchAdminActiveUsers(): Promise<{ users: AdminActiveUser[]; count: number }> {
+  return requestJson('/api/v1/admin/active-users')
 }
 
 export function fetchAdminUserDetail(id: string): Promise<AdminUserDetail> {
