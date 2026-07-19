@@ -74,7 +74,10 @@ export type PostGuideData = {
 // Reverse lookup: paper slug → guide slug
 // Used by PyqPaperPage to show a "Exam Guide" link in the sidebar
 export const paperGuideMap: Record<string, string> = {
+  'jkpsi-2026':                        'jkpsi',
+  'jkpsi-2022':                        'jkpsi',
   'jkpsi-2017':                        'jkpsi',
+  'jkpsi-telecom-2026':                'jkpsi-telecom',
   'bpsc-70th-cce-prelims-2024-gs':     'bpsc',
   'ibps-po-pre-2025-aug-23-shift-1':   'ibps-po',
   'jkpsc-jkcce-prelims-2025-gs1-set-b':'jkpsc',
@@ -97,15 +100,16 @@ export const postGuides: Record<string, PostGuideData> = {
   // Source: JKSSB Syllabus Notice No. JKSSB-COE0EXAM(UT)/47/2023-03 dated 26.12.2024
   // Advertisement Notification 02 of 2024 dated 22.11.2024
   jkpsi: {
-    title: 'JKSSB Sub Inspector of Police (PSI) — Official Syllabus & Exam Pattern 2024',
-    shortName: 'JKPSI',
-    tagline: 'Official syllabus for JKSSB Sub Inspector (J&K Police) — Adv. 02/2024. 100 questions, 200 marks, 6 sections. Solved previous year papers included.',
-    lastUpdated: '2026-07-16',
+    title: 'JKSSB Sub Inspector (Executive) 2026 Syllabus & Exam Pattern (Advt. 02/2024)',
+    shortName: 'JKSSB SI (Executive)',
+    tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Executive) — J&K Police, Home Department — exam under Advertisement 02/2024. 100 questions, 200 marks, 6 sections, exam expected in 2026. Solved 2017 & 2022 previous year papers included.',
+    lastUpdated: '2026-07-19',
 
     examSlug: 'jkpsi',
 
     papers: [
-      { slug: 'jkpsi-2017', title: 'JKSSB Sub Inspector of Police — 2017', year: '2017', questions: 120 },
+      { slug: 'jkpsi-2022', title: 'JKSSB Sub Inspector (Executive) — 2022', year: '2022', questions: 120 },
+      { slug: 'jkpsi-2017', title: 'JKSSB Sub Inspector (Executive) — 2017', year: '2017', questions: 120 },
     ],
 
     conductingBody: 'J&K Services Selection Board (JKSSB)',
@@ -114,7 +118,7 @@ export const postGuides: Record<string, PostGuideData> = {
     examMode: 'OMR-based Written Test + Physical Test',
 
     about: [
-      'The JKSSB Sub Inspector of Police (PSI) examination recruits officers for the J&K Police force under the Home Department of J&K UT. Advertisement Notification 02 of 2024 (dated 22 November 2024) announced the current round of JKPSI recruitment. Sub Inspectors serve as frontline supervisory officers in law enforcement, investigation, traffic, and public order management across all districts of Jammu and Kashmir.',
+      'The JKSSB Sub Inspector (Executive) examination recruits officers for the J&K Police force under the Home Department of J&K UT. This is the Executive wing of the Sub Inspector cadre (a separate Telecommunication wing is recruited under its own notification). Advertisement Notification 02 of 2024 (dated 22 November 2024) announced the latest round of JKPSI (Executive) recruitment; the written examination has not been conducted yet and is expected around 2026, with the exact date to be notified separately by JKSSB. Sub Inspectors serve as frontline supervisory officers in law enforcement, investigation, traffic, and public order management across all districts of Jammu and Kashmir.',
       'The written examination per the 2024 notification consists of 100 objective-type MCQ questions, each carrying 2 marks, for a total of 200 marks. Duration is 120 minutes. Negative marking of 0.5 marks applies per wrong answer. The six sections are: General Intelligence & Reasoning, General Awareness, Quantitative Aptitude, English Comprehension, Mathematical Abilities, and Computer Proficiency.',
       'A key change from earlier JKPSI exams: the 2024 syllabus removes the Law/Legal Knowledge section (IPC, CrPC, Evidence Act) and replaces it with Computer Proficiency (15 questions) and a dedicated Mathematical Abilities section. Candidates who prepared using the 2017 paper should note that Law questions will not appear. The 2017 paper (120 questions, −0.25 marking) remains available on Ministry of Papers as a practice resource for Reasoning, GK, and English sections.',
     ],
@@ -244,6 +248,218 @@ export const postGuides: Record<string, PostGuideData> = {
       'Mathematical Abilities is separate from Quantitative Aptitude. It covers Geometry, Trigonometry, and Statistics (Class 10 level). Revise NCERT Class 9–10 Maths chapters on triangles, circles, trigonometry, and statistics.',
       'General Awareness (20 Qs, 40 marks) is the highest-weight section alongside Reasoning. Cover J&K History, Geography, and current J&K government events for the 6 months before the exam.',
       'Practice using the JKPSI 2017 paper for Reasoning, GK, and English — though the pattern and marks have changed, those sections overlap significantly with the 2024 syllabus and will train your speed and accuracy.',
+    ],
+  },
+
+  // ─── JKPSI Telecommunication — JKSSB Sub Inspector (Telecom wing) ─────────────
+  'jkpsi-telecom': {
+    title: 'JKSSB Sub Inspector (Telecommunication) 2026 Syllabus & Exam Pattern (Advt. 11/2025)',
+    shortName: 'JKSSB SI (Telecom)',
+    tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Telecommunication) — J&K Police, Home Department — exam under Advertisement 11/2025. 100 questions, 200 marks, two parts (60 General + 140 Technical), exam expected in 2026.',
+    lastUpdated: '2026-07-19',
+
+    examSlug: 'jkpsi-telecom',
+
+    papers: [],
+
+    conductingBody: 'J&K Services Selection Board (JKSSB)',
+    officialWebsite: 'https://jkssb.nic.in',
+    examLevel: 'UT Level (Jammu & Kashmir)',
+    examMode: 'OMR-based Written Test + Physical Test',
+
+    about: [
+      'The JKSSB Sub Inspector (Telecommunication) examination recruits technical Sub Inspectors for the Telecommunication wing of the J&K Police under the Home Department of J&K UT. This is a separate cadre from the Executive Sub Inspector post — it is advertised under its own notification and carries a heavily technical, electronics-and-communication-focused syllabus. Advertisement Notification 11 of 2025 (dated 26 November 2025) announced this round of recruitment; the written examination has not been conducted yet and is expected around 2026, with the exact date to be notified separately by JKSSB.',
+      'The written examination consists of 100 objective-type MCQ questions, each carrying 2 marks, for a total of 200 marks in 120 minutes, with negative marking of 0.5 marks per wrong answer. The paper is split into two parts: Part A — General Awareness, Aptitude & Communication (60 marks) and Part B — Technical / Professional Knowledge (140 marks). The technical weightage is the defining feature of this exam: 70% of the marks test electronics, communication systems, computer networking, cyber security and emerging technologies.',
+      'Because Part B (140 of 200 marks) is technical, an engineering or diploma background in Electronics, Communication, Computer Science or IT is a strong advantage. Candidates should treat this as a technical exam first and a general-awareness exam second — mastering Communication Systems, Electronic Devices, Digital Electronics and Computer Networking is essential to clear the cut-off.',
+    ],
+
+    patternNotification: 'Official syllabus per JKSSB Notice dated 09.04.2026 (Advertisement Notification 11/2025, dated 26.11.2025). Exam dates not yet announced as of this update.',
+
+    quickFacts: [
+      { label: 'Advertisement', value: 'Notification 11/2025' },
+      { label: 'Questions', value: '100 MCQs' },
+      { label: 'Total Marks', value: '200 (2 per question)' },
+      { label: 'Duration', value: '120 minutes' },
+      { label: 'Neg. Marking', value: '−0.5 per wrong answer' },
+      { label: 'Structure', value: 'Part A: 60 marks · Part B: 140 marks' },
+      { label: 'Qualification', value: 'Graduation (technical background advantageous)' },
+    ],
+
+    syllabus: [
+      {
+        subject: 'PART A · 1. General Knowledge & Current Affairs (20 marks)',
+        topics: [
+          'Major national and international events',
+          'Indian economy: budget, flagship schemes, reforms',
+          'Developments in science & technology',
+          'Space, defence and nuclear programmes',
+          'Indian Polity: Preamble, Fundamental Rights & Duties, Directive Principles',
+          'Disaster Management, Climatic change',
+        ],
+      },
+      {
+        subject: 'PART A · 2. General Knowledge — Special Reference to J&K UT (10 marks)',
+        topics: [
+          'History of Jammu & Kashmir',
+          'Geography: rivers, lakes, climate, soils, flora & fauna',
+          'Jammu & Kashmir Reorganisation Act, 2019',
+        ],
+      },
+      {
+        subject: 'PART A · 3. General English & Communication Skills (10 marks)',
+        topics: [
+          'Grammar: tenses, modals, articles, prepositions',
+          'Active & passive voice, Direct & indirect speech',
+          'Synonyms, antonyms, idioms and phrases',
+          'Reading comprehension, Error spotting and sentence improvement',
+          'Basics of professional communication: official drafting, email etiquette, technical terminology',
+        ],
+      },
+      {
+        subject: 'PART A · 4. General Intelligence & Reasoning (10 marks)',
+        topics: [
+          'Analogies, Number and letter series',
+          'Coding–decoding, Venn diagrams',
+          'Syllogisms, Blood relations',
+          'Logical reasoning and pattern recognition',
+        ],
+      },
+      {
+        subject: 'PART A · 5. Basic Numeracy (10 marks)',
+        topics: [
+          'Ratio and proportion, Percentages',
+          'Profit and loss, Simple and compound interest',
+          'Averages, Time, speed and distance',
+          'Elementary statistics and data interpretation',
+        ],
+      },
+      {
+        subject: 'PART B · 6. Engineering Mathematics & Signal Fundamentals (10 marks)',
+        topics: [
+          'Linear algebra: matrices, determinants, rank, eigenvalues/eigenvectors, linear equations',
+          'Calculus: differentiation, integration, differential equations',
+          'Transforms: Fourier series, basics of Fourier and Laplace transforms',
+          'Signals & systems: signal types, operations, sampling theorem, convolution, LTI systems',
+          'Frequency domain: spectra, bandwidth, aliasing, basic filters',
+        ],
+      },
+      {
+        subject: 'PART B · 7. Electronic Devices, Analog Circuits & Network Theory (20 marks)',
+        topics: [
+          'Electronic Devices: Semiconductor basics, PN junction & Zener diode, BJT & MOSFET, LED/photodiode/phototransistor, SCR & TRIAC',
+          'Analog Circuits: Op-amps (inverting/non-inverting), summing/integrator/differentiator, comparators & Schmitt trigger, oscillators (RC, LC, crystal), rectifiers and filters',
+          'Network Theory: KVL & KCL, mesh & nodal analysis, network theorems, resonance in RLC circuits, frequency response of filters',
+        ],
+      },
+      {
+        subject: 'PART B · 8. Digital Electronics & Microprocessors (20 marks)',
+        topics: [
+          'Number systems and conversions, Logic gates and Boolean algebra',
+          'Karnaugh maps, Combinational circuits',
+          'Sequential circuits: flip-flops, counters and shift registers',
+          '8085/8086 architecture and instruction set, addressing modes, interrupts and timing',
+          '8051 microcontroller fundamentals, Introduction to ARM architecture, Memory interfacing',
+        ],
+      },
+      {
+        subject: 'PART B · 9. Communication Systems (20 marks)',
+        topics: [
+          'Analog communication: AM, FM, PM, modulation index, bandwidth, demodulation, noise',
+          'Digital communication: sampling, quantization, PCM, DPCM, DM',
+          'Digital modulation: ASK, FSK, PSK, QPSK; Error detection & correction (parity, CRC)',
+          'SNR and BER concepts, Antennas, Wave propagation (ground/sky/space wave)',
+          'Optical fibre & satellite communication, Wireless & mobile (cellular, frequency reuse, handoff)',
+          'Evolution of mobile networks 2G to 5G, Multiple access: FDMA, TDMA, CDMA, OFDMA',
+        ],
+      },
+      {
+        subject: 'PART B · 10. Computer Science & Networking Systems (20 marks)',
+        topics: [
+          'OSI and TCP/IP models, IP addressing, subnetting and CIDR',
+          'Routing protocols: RIP and OSPF, Switching techniques',
+          'Network devices: router, switch, hub; Wireless standards: Wi-Fi (802.11), Bluetooth, NFC',
+          'Programming fundamentals, Object-oriented concepts',
+          'Data structures & algorithms (conceptual), Operating systems (process, memory, file systems)',
+        ],
+      },
+      {
+        subject: 'PART B · 11. Cyber Security & Legal Framework (10 marks)',
+        topics: [
+          'Cyber threats: malware, phishing, ransomware',
+          'Network security: firewalls, IDS/IPS; Authentication and access control',
+          'Security protocols: HTTPS, SSL/TLS; Cryptography: symmetric/asymmetric, hashing, digital signatures',
+          'IT Act, 2000 and cyber offences relevant to policing',
+          'Introduction to post-quantum cryptography',
+        ],
+      },
+      {
+        subject: 'PART B · 12. IT Systems & e-Governance (10 marks)',
+        topics: [
+          'Web application basics, Client–server architecture',
+          'Cloud computing fundamentals, Data centres, backup and disaster recovery',
+          'Government IT systems, interoperability and APIs (basic concepts)',
+        ],
+      },
+      {
+        subject: 'PART B · 13. Database Management Systems (10 marks)',
+        topics: [
+          'Database system architecture and data models',
+          'Relational databases and SQL concepts, Database design and normalization',
+          'Integrity constraints, Transaction processing and concurrency control',
+          'Storage, indexing and file organization, Database security',
+        ],
+      },
+      {
+        subject: 'PART B · 14. IoT, Embedded Systems & Mechatronics (10 marks)',
+        topics: [
+          'IoT architecture and M2M communication, Embedded and real-time systems',
+          'Surveillance & access control systems: CCTV, ANPR, RFID',
+          'Drone technology, Robotics fundamentals',
+          'Sensors and actuators, Basics of hydraulics and pneumatics',
+        ],
+      },
+      {
+        subject: 'PART B · 15. Artificial Intelligence, Data Science & Automation (10 marks)',
+        topics: [
+          'Fundamentals of AI and its components',
+          'AI techniques and applications in engineering and government systems',
+          'Big data and analytics in law enforcement',
+          'Advantages, limitations and ethical concerns of AI',
+        ],
+      },
+    ],
+
+    examPattern: [
+      { section: 'PART A — General Awareness, Aptitude & Communication', questions: 30, marks: 60, note: 'GK, J&K GK, English, Reasoning, Numeracy' },
+      { section: 'PART B — Technical / Professional Knowledge', questions: 70, marks: 140, note: 'Electronics, Communication, CS, Cyber, IoT, AI' },
+      { section: 'Total', questions: 100, marks: 200, isTotal: true },
+    ],
+    examPatternNote: '2 marks per correct answer. −0.5 per wrong answer. Duration: 120 minutes. Part B (Technical) carries 70% of the total marks.',
+
+    eligibility: {
+      age: 'As per Advertisement Notification 11/2025. Age relaxations for SC/ST, OBC, Ex-Servicemen as per J&K Government rules.',
+      education: 'Graduation from a recognized university; a technical qualification (Engineering/Diploma in Electronics, Communication, Computer Science or IT) is strongly advantageous given the 140-mark technical part.',
+      domicile: 'Valid Domicile Certificate of J&K UT is mandatory.',
+    },
+
+    selectionProcess: [
+      'Written Examination — 100 MCQs, 200 marks, 120 minutes, OMR-based (Part A 60 + Part B 140)',
+      'Physical Efficiency Test (PET) — Gender-specific standards for running, long jump, high jump',
+      'Medical Examination — Eyesight, height, weight, and fitness standards',
+      'Document Verification — Educational, technical, Domicile and category certificates',
+      'Final Merit List — Based on written exam marks (PET/Medical are qualifying only)',
+    ],
+
+    salary: [
+      { post: 'Sub Inspector (Telecommunication), J&K Police', level: 'Level 6', payScale: '₹35,400 – ₹1,12,400' },
+    ],
+
+    preparationTips: [
+      'Part B (Technical) is 140 of 200 marks — this exam is won or lost here. Prioritise Communication Systems, Electronic Devices/Analog, Digital Electronics and Computer Networking, which together carry 80 marks.',
+      'If you have an ECE/CSE/IT engineering or diploma background, revise your core semester subjects directly — the syllabus mirrors a standard diploma/degree curriculum at conceptual depth, not advanced problem-solving.',
+      'Communication Systems (20 marks) is high-yield and predictable: master modulation (AM/FM/PM, ASK/FSK/PSK/QPSK), multiple access (FDMA/TDMA/CDMA/OFDMA) and the 2G→5G evolution.',
+      'Do not neglect Part A (60 marks). J&K General Knowledge and Current Affairs are scoring and quick — cover J&K history, geography and the Reorganisation Act 2019, plus 6 months of current affairs before the exam.',
+      'Cyber Security, IT Act 2000, IoT surveillance (CCTV/ANPR/RFID) and AI in law enforcement are new-age, policing-relevant topics — they are easy to score and frequently framed around real J&K Police use-cases.',
     ],
   },
 
@@ -1066,7 +1282,7 @@ export const postGuides: Record<string, PostGuideData> = {
       { slug: 'jkssb-junior-assistant-pyq',         title: 'JKSSB Junior Assistant — 19 Apr 2026',   year: '2026', questions: 80  },
       { slug: 'jkssb-finance-accounts-2024-paper',  title: 'JKSSB Finance Account Asst. — Jan 2024', year: '2024', questions: 120 },
       { slug: 'jkssb-wildlife-guard-2026-may-10',   title: 'JKSSB Wildlife Guard — 10 May 2026',     year: '2026', questions: 120 },
-      { slug: 'jkpsi-2017',                         title: 'JKSSB Sub Inspector (PSI) — 2017',       year: '2017', questions: 120 },
+      { slug: 'jkpsi-2017',                         title: 'JKSSB Sub Inspector (Executive) — 2017', year: '2017', questions: 120 },
     ],
 
     conductingBody: 'J&K Services Selection Board (JKSSB)',

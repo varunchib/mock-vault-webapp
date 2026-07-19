@@ -16937,3 +16937,42 @@ html {
 }
 .ov-user-presence.online { background: #22c55e; }
 .admin-dark .ov-user-presence { border-color: #161b22; }
+
+/* Coming-soon paper card (announced exam, not yet conducted, 0 questions) */
+/* Still a real link (opens the "coming soon" paper page), so keep the pointer
+   cursor and a hover cue — a default cursor read as "dead / not clickable". */
+.ep-paper-card-inner.ep-paper-card-soon { cursor: pointer; }
+.ep-soon-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: var(--hl-dark);
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* Coming-soon PYQ paper page (announced exam, not yet conducted) */
+.pyq-soon-pill {
+  font-weight: 800;
+  color: var(--hl-dark);
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.pyq-coming-soon {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 26px 22px;
+  margin-bottom: 20px;
+  background: var(--white);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+.pyq-coming-soon strong { font-size: 17px; font-weight: 800; color: var(--ink); }
+.pyq-coming-soon p { font-size: 14px; color: var(--ink3); line-height: 1.6; margin: 0; max-width: 620px; }
+.pyq-coming-soon-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }

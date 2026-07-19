@@ -236,8 +236,12 @@ export function fetchPaperBySlug(slug: string): Promise<Paper> {
   return requestJson<Paper>(`/api/v1/papers/${encodeURIComponent(slug)}`);
 }
 
-export function fetchPaperQuestions(slug: string): Promise<Question[]> {
-  return requestJson<Question[]>(`/api/v1/papers/${encodeURIComponent(slug)}/questions`);
+export async function fetchPaperQuestions(slug: string): Promise<Question[]> {
+  // The API returns JSON `null` (not []) for a paper with no rows — e.g. an
+  // announced-but-not-yet-conducted paper like JKPSI 2026. Coalesce so callers
+  // always get an array; a null here crashes the render (questions.some/.length).
+  const data = await requestJson<Question[] | null>(`/api/v1/papers/${encodeURIComponent(slug)}/questions`);
+  return data ?? [];
 }
 
 export function fetchQuestionBySlug(slug: string): Promise<Question> {

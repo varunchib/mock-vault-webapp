@@ -169,6 +169,9 @@ export function PyqPaperPage() {
   const firstQuestion = questions[0]
   const visibleQuestions = questions
   const hasHindiQuestions = questions.some(hasHindi)
+  // A paper with no questions is an announced-but-not-yet-conducted exam
+  // (e.g. JKPSI 2026). Render a "coming soon" state instead of an empty list.
+  const comingSoon = questions.length === 0
 
   const selectAnswer = (qSlug: string, key: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [qSlug]: key }))
@@ -198,10 +201,20 @@ export function PyqPaperPage() {
           <h1>{seoH1}</h1>
           {paper.shift && <p className="pyq-paper-shift">{paper.shift}</p>}
           <div className="pyq-paper-meta-row">
-            <span>{paper.questions} questions</span>
-            {paper.heldOn && <span>Held on {formatHeldOn(paper.heldOn)}</span>}
-            <span>Answer key included</span>
-            {paper.subjects.length > 0 && <span>{paper.subjects.join(' · ')}</span>}
+            {comingSoon ? (
+              <>
+                <span className="pyq-soon-pill">Coming soon</span>
+                <span>Held on: coming soon</span>
+                {paper.subjects.length > 0 && <span>{paper.subjects.join(' · ')}</span>}
+              </>
+            ) : (
+              <>
+                <span>{paper.questions} questions</span>
+                {paper.heldOn && <span>Held on {formatHeldOn(paper.heldOn)}</span>}
+                <span>Answer key included</span>
+                {paper.subjects.length > 0 && <span>{paper.subjects.join(' · ')}</span>}
+              </>
+            )}
           </div>
         </div>
         <div className="pyq-paper-actions">
@@ -252,6 +265,27 @@ export function PyqPaperPage() {
       <section className="pyq-paper-seo-intro">
         <p>{seoOverride?.review ?? seoDesc}</p>
       </section>
+
+      {comingSoon && (
+        <section className="pyq-coming-soon">
+          <strong>This exam hasn&apos;t been conducted yet</strong>
+          <p>
+            The {paper.examName} {paper.year} exam has not taken place yet, so the question paper is
+            not available. As soon as the exam is held, the fully solved paper — every question with
+            the official answer key and detailed explanations — will be published on this page.
+          </p>
+          <div className="pyq-coming-soon-actions">
+            {paper && paperGuideMap[paper.slug] && (
+              <Link className="pyq-action-btn primary" to={`/guide/${paperGuideMap[paper.slug]}`}>
+                <BookOpen size={14} /> View syllabus &amp; exam pattern
+              </Link>
+            )}
+            <Link className="pyq-action-btn" to={`/exam/${paper.examSlug}`}>
+              Practise previous year papers
+            </Link>
+          </div>
+        </section>
+      )}
 
       <div className="pyq-question-list">
         {visibleQuestions.map((q, index) => {

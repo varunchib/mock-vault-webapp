@@ -259,12 +259,18 @@ export function ExamPage() {
   }, [papers, paperSearch])
 
   const papersByYear = useMemo(() => {
+    // Announced-but-not-yet-conducted papers (0 questions) surface first, in their
+    // own "Upcoming" group above every year — a coming-soon exam should be the
+    // first thing a visitor sees, not buried in its calendar-year bucket.
+    const upcoming: Paper[] = []
     const map = new Map<string, Paper[]>()
     filteredPapers.forEach((p) => {
+      if (p.questions === 0) { upcoming.push(p); return }
       const yr = p.year || 'Other'
       map.set(yr, [...(map.get(yr) ?? []), p])
     })
-    return [...map.entries()].sort(([a], [b]) => b.localeCompare(a))
+    const years = [...map.entries()].sort(([a], [b]) => b.localeCompare(a))
+    return upcoming.length ? [['Upcoming', upcoming] as [string, Paper[]], ...years] : years
   }, [filteredPapers])
 
   // Only PYQ paper questions belong in the subject bank — exclude mock questions
@@ -563,9 +569,14 @@ export function ExamPage() {
                 <div className="ep-year-group" key={year}>
                   <div className="ep-year-label">{year}</div>
                   <div className="ep-paper-grid">
-                    {yearPapers.map((paper) => (
-                      <div className="ep-paper-card" key={paper.slug}>
-                        <Link className="ep-paper-card-inner" to={paperPath(paper.slug)}>
+                    {yearPapers.map((paper) => {
+                      // A 0-question paper is an announced-but-not-yet-conducted
+                      // exam (e.g. JKPSI 2026): still a clickable card, but it
+                      // shows a "Coming soon" badge and opens the paper page in
+                      // its coming-soon state instead of an attemptable list.
+                      const comingSoon = paper.questions === 0
+                      const inner = (
+                        <>
                           <div className="ep-paper-card-main">
                             <strong>{paperSeoOverride(paper.slug)?.h1 ?? paper.title}</strong>
                             <div className="ep-paper-meta">
@@ -580,10 +591,18 @@ export function ExamPage() {
                             </div>
                           </div>
                           <div className="ep-paper-card-right">
-                            <span className="ep-q-count">{paper.questions} Qs</span>
-                            <span className="ep-attempt-btn">Open <ChevronRight size={12} /></span>
+                            {comingSoon
+                              ? <span className="ep-soon-badge">Coming soon</span>
+                              : <>
+                                  <span className="ep-q-count">{paper.questions} Qs</span>
+                                  <span className="ep-attempt-btn">Open <ChevronRight size={12} /></span>
+                                </>}
                           </div>
-                        </Link>
+                        </>
+                      )
+                      return (
+                      <div className="ep-paper-card" key={paper.slug}>
+                        <Link className={`ep-paper-card-inner${comingSoon ? ' ep-paper-card-soon' : ''}`} to={paperPath(paper.slug)}>{inner}</Link>
                         {paper.subjects.length > 0 && (
                           <div className="ep-paper-tags">
                             {paper.subjects.slice(0, 4).map((s) => (
@@ -603,7 +622,8 @@ export function ExamPage() {
                           </div>
                         )}
                       </div>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               ))}
