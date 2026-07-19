@@ -10726,8 +10726,16 @@ html {
 
 .db-page {
   display: grid;
+  /* minmax(0, 1fr), not the implicit `auto`: an auto/1fr track keeps a
+     min-content floor, so a wide child (long paper title, the in-progress
+     card's non-wrapping row) grew the single column past the mobile viewport
+     and the whole dashboard spilled off-screen to the right. minmax(0,…) lets
+     the column shrink to the container; `> * { min-width: 0 }` lets each
+     section shrink inside it so their text ellipsizes instead of forcing width. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
 }
+.db-page > * { min-width: 0; }
 
 /* Welcome header */
 .db-header {
@@ -10804,8 +10812,12 @@ html {
 /* Sections */
 .db-section {
   display: grid;
+  /* Same minmax(0,…) guard as .db-page — an implicit grid column here let the
+     attempt/enrolled rows force the section wider than the viewport. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
 }
+.db-section > * { min-width: 0; }
 
 .db-section-head {
   display: flex;
