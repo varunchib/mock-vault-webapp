@@ -166,18 +166,33 @@ const STATIC_META: Record<string, PageMeta> = {
   },
   '/privacy': {
     title: 'Privacy Policy | Ministry of Papers',
-    description: 'Privacy policy for Ministry of Papers - how we collect, use and protect your data.',
+    description: 'Privacy Policy for Ministry of Papers: what data we collect when you use our free previous-year-question and mock-test platform, how it is used and protected, cookies, third-party analytics, and your rights.',
   },
   '/terms': {
     title: 'Terms of Service | Ministry of Papers',
-    description: 'Terms of service for Ministry of Papers.',
+    description: 'Terms of Service for Ministry of Papers: the rules for using our free previous-year-question and mock-test platform, acceptable use, intellectual-property and content policy, disclaimers, and account terms for aspirants.',
   },
 }
 
+// Bump to invalidate ALL edge-cached API responses at once (the query param
+// changes the Cloudflare cache key, forcing a fresh origin fetch). Needed once
+// to flush ~500 stale cached 404s; the API ignores unknown query params.
+const API_CACHE_VERSION = '2'
+
 function apiFetch(url: string, cacheTtl: number): Promise<Response> {
-  return fetch(url, {
+  const versioned = url + (url.includes('?') ? '&' : '?') + '_cv=' + API_CACHE_VERSION
+  return fetch(versioned, {
     signal: AbortSignal.timeout(API_TIMEOUT_MS),
-    cf: { cacheEverything: true, cacheTtl },
+    cf: {
+      cacheEverything: true,
+      // Cache 2xx for the full TTL, but NEVER pin a 404/5xx for hours. A single
+      // transient 404 (e.g. during a slug migration or deploy) used to get
+      // cached for 24h, so valid question pages returned 404 to crawlers — every
+      // such page shared the "404 Not Found" title and an empty description,
+      // which Bing flags as duplicate/short metadata. Short error TTLs let a
+      // stale 404 self-heal on the next crawl instead.
+      cacheTtlByStatus: { '200-299': cacheTtl, '300-399': 60, '400-499': 5, '500-599': 0 },
+    },
   } as RequestInit)
 }
 
