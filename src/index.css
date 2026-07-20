@@ -17068,3 +17068,126 @@ html {
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .ov-live-visit-at { font-size: 10px; color: var(--ink4); flex-shrink: 0; white-space: nowrap; }
+
+
+/* ── Paper-attempt (test window) — mobile ──────────────────────────────────
+   The attempt screen was built desktop-first: a fixed 100dvh grid with a
+   1fr + 330px split. The only mobile rule moved the palette to the top with
+   max-height:200px, which on a phone ate a third of the viewport while a
+   150-question paper still rendered as 30 rows of a 5-column grid inside a
+   tiny scroller. The question itself was left with almost no room.
+   Below: pack the palette into far fewer rows, shrink chrome, and make every
+   control a proper touch target. */
+@media (max-width: 768px) {
+  /* Two fixes in one rule:
+     - 100dvh (not vh) so the mobile browser's collapsing URL bar can't push
+       the footer nav off-screen.
+     - minmax(0, 1fr) on the column is the load-bearing fix. Grid items default
+       to min-width:auto, so the topbar's non-shrinking right section (timer +
+       submit + language toggle) was sizing the single column to its min-content
+       — 490px against a 360px viewport — dragging every row wider than the
+       screen. minmax(0, …) lets the track shrink to the viewport instead. */
+  .pa-attempt-page {
+    grid-template-rows: 48px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    height: 100dvh;
+  }
+
+  /* The children must then actually be allowed to shrink into that track. */
+  .pa-topbar { padding: 0 12px; gap: 8px; min-width: 0; }
+  /* The countdown lives in .pa-topbar-center, which the previous mobile rule
+     set to display:none — leaving candidates with NO visible timer during a
+     timed exam on a phone. Show it and let the paper title absorb the space
+     instead (it already truncates with an ellipsis). */
+  .pa-topbar-center { display: flex; align-items: center; flex-shrink: 0; min-width: 0; }
+  .pa-topbar-left strong { font-size: 12px; }
+  .pa-topbar-left small { font-size: 9px; }
+  .pa-topbar-right { gap: 6px; min-width: 0; flex-shrink: 1; }
+  /* The subject strip already scrolls internally (overflow-x:auto); it just
+     needs permission to be narrower than its content. */
+  .pa-subject-tabs { min-width: 0; max-width: 100%; }
+  .pa-timer { padding: 4px 10px; font-size: 13px; gap: 4px; }
+  .pa-submit-topbar-btn { height: 30px; padding: 0 11px; font-size: 11px; }
+
+  /* Palette stays on top for quick jumps, but compact. auto-fill packs ~8-9
+     buttons per row instead of 5, so 150 questions fit in a few rows. */
+  .pa-palette-panel {
+    order: -1;
+    max-height: 132px;
+    padding: 8px 12px;
+    gap: 8px;
+    border-left: none;
+    border-bottom: 1px solid #e5e7eb;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pa-palette-grid { grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 5px; }
+  .pa-palette-btn { font-size: 11px; border-radius: 5px; }
+  /* Hover transform is meaningless on touch and causes sticky :hover states. */
+  .pa-palette-btn:hover { transform: none; box-shadow: none; }
+  .pa-palette-stats { gap: 5px; }
+  .pa-stat-chip { padding: 3px 7px; font-size: 11px; }
+  /* The legend is the least useful thing on a small screen — the colours are
+     self-evident once you tap. Reclaim the vertical space for questions. */
+  .pa-palette-legend { display: none; }
+
+  .pa-question-scroll { padding: 14px 14px 10px; -webkit-overflow-scrolling: touch; }
+  .pa-q-header { gap: 8px; margin-bottom: 12px; }
+  .pa-q-subject { margin-left: 0; }
+  .pa-q-text { font-size: 15px; line-height: 1.6; }
+
+  .pa-option { padding: 12px; gap: 10px; font-size: 14px; }
+  .pa-option:hover { border-color: #e5e7eb; background: #fafafa; }
+
+  .pa-q-actions { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+  /* 44px = minimum comfortable touch target. */
+  .pa-nav-btn { height: 44px; padding: 0 14px; font-size: 13px; flex: 1 1 0; justify-content: center; min-width: 0; }
+  .pa-q-progress { order: -1; flex-basis: 100%; text-align: center; font-size: 11px; }
+
+  .pa-confirm-dialog { width: calc(100vw - 32px); max-width: 400px; padding: 20px; }
+  .pa-confirm-actions { flex-direction: column-reverse; gap: 8px; }
+  .pa-confirm-actions button { width: 100%; height: 44px; }
+}
+
+@media (max-width: 480px) {
+  .pa-attempt-page { grid-template-rows: 44px minmax(0, 1fr); }
+  .pa-topbar { padding: 0 10px; gap: 6px; }
+  /* Below 480px the paper title, timer, language toggle and submit button
+     genuinely cannot coexist — keeping the title only left it as a ~7px
+     sliver, which reads as broken. Drop it deliberately: the candidate already
+     knows which paper they opened, and it is still shown on the intro screen
+     and in the subject strip. Timer and submit are non-negotiable. */
+  .pa-topbar-left { display: none; }
+  .pa-timer { padding: 3px 9px; font-size: 12px; }
+  .pa-submit-topbar-btn { height: 28px; padding: 0 9px; font-size: 10px; }
+  /* On a bilingual paper (BPSC prints English + Hindi) the language toggle sits
+     in the topbar and was claiming ~110px, squeezing the paper title to almost
+     nothing. Shrink it rather than drop it — switching language mid-exam is a
+     genuinely needed control for Hindi-medium candidates. */
+  .pa-topbar .pyq-language-toggle button { padding: 3px 6px; font-size: 10px; }
+  .pa-topbar .pyq-language-toggle { flex-shrink: 0; }
+
+  .pa-palette-panel { max-height: 118px; padding: 7px 10px; }
+  .pa-palette-grid { grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 4px; }
+  .pa-palette-btn { font-size: 10px; }
+
+  .pa-question-scroll { padding: 12px 11px 8px; }
+  .pa-q-text { font-size: 14.5px; }
+  .pa-option { padding: 11px 10px; font-size: 13.5px; gap: 8px; }
+  .pa-q-actions { padding: 8px 10px; }
+  .pa-nav-btn { height: 42px; padding: 0 10px; font-size: 12px; }
+
+  /* Intro screen */
+  .pa-intro-card { padding: 22px 16px; }
+  .pa-intro-stats { gap: 8px; }
+  .pa-intro-start-btn { width: 100%; height: 46px; }
+}
+
+/* Belt-and-braces after the minmax(0,1fr) fix above. Deliberately NOT
+   overflow-x:hidden on the page itself — that only clips runaway content and
+   hides the bug. These just stop long unbroken strings (URLs, long codes)
+   from re-introducing overflow. */
+@media (max-width: 768px) {
+  .pa-attempt-body, .pa-question-panel, .pa-question-scroll,
+  .pa-palette-panel { min-width: 0; max-width: 100%; }
+  .pa-q-text, .pa-option, .pa-topbar-left strong { overflow-wrap: anywhere; }
+}
