@@ -42,6 +42,7 @@ import {
   fetchAdminReports,
   fetchAdminSummary,
   fetchAdminActiveCount,
+  fetchAdminActiveUsers,
   fetchAdminTopVisited,
   fetchAdminUsers,
   fetchAdminUserDetail,
@@ -60,6 +61,7 @@ import {
   updateAdminUserStatus,
   refreshAuthSession,
   APIError,
+  type AdminActiveUser,
   type AdminExamPayload,
   type AdminMockPayload,
   type AdminMockQuestionPayload,
@@ -85,6 +87,20 @@ function fmtLastLogin(iso: string | undefined) {
   const d = new Date(iso)
   if (Number.isNaN(d.getTime())) return '—'
   return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+// Compact relative time for visit/presence logs: "just now", "4m", "3h", "2d".
+function fmtAgo(iso: string | undefined) {
+  if (!iso) return '—'
+  const t = new Date(iso).getTime()
+  if (Number.isNaN(t)) return '—'
+  const secs = Math.max(0, Math.floor((Date.now() - t) / 1000))
+  if (secs < 45) return 'just now'
+  const mins = Math.floor(secs / 60)
+  if (mins < 60) return `${Math.max(1, mins)}m ago`
+  const hrs = Math.floor(mins / 60)
+  if (hrs < 24) return `${hrs}h ago`
+  return `${Math.floor(hrs / 24)}d ago`
 }
 
 type Tab = 'overview' | 'exams' | 'mocks' | 'papers' | 'inbox'
@@ -510,6 +526,10 @@ export function AdminDashboardPage() {
   // Active users (real-time, polled every 30s)
   const [activeCount, setActiveCount] = useState<number | null>(null)
   const [onlineIds, setOnlineIds] = useState<Set<string>>(new Set())
+  // Live-users panel, opened by clicking the green presence dot.
+  const [activeUsersOpen, setActiveUsersOpen] = useState(false)
+  const [activeUsers, setActiveUsers] = useState<AdminActiveUser[]>([])
+  const [activeUsersLoading, setActiveUsersLoading] = useState(false)
   const [topVisited, setTopVisited] = useState<TopVisited[]>([])
 
   // Users
@@ -948,6 +968,23 @@ export function AdminDashboardPage() {
     return () => clearInterval(id)
   }, [])
 
+  // The live-users panel refreshes faster than the 30s count, and only while
+  // it is open — closing it stops the polling entirely.
+  useEffect(() => {
+    if (!activeUsersOpen) return
+    let cancelled = false
+    const poll = () => {
+      void fetchAdminActiveUsers()
+        .then((r) => { if (!cancelled) setActiveUsers(r.users ?? []) })
+        .catch(() => { if (!cancelled) setActiveUsers([]) })
+        .finally(() => { if (!cancelled) setActiveUsersLoading(false) })
+    }
+    setActiveUsersLoading(true)
+    poll()
+    const id = setInterval(poll, 10_000)
+    return () => { cancelled = true; clearInterval(id) }
+  }, [activeUsersOpen])
+
   // ── Users handlers ──────────────────────────────────────────────
 
   const loadUsers = async (offset = 0, q = userSearch, replace = true) => {
@@ -1057,11 +1094,77 @@ export function AdminDashboardPage() {
           <Menu size={22} />
         </button>
         <span className="admin-mobile-title">Admin · {tabLabel[activeTab]}</span>
-        <div className="admin-active-pill admin-active-pill--mobile">
+        <button
+          type="button"
+          className="admin-active-pill admin-active-pill--mobile"
+          onClick={() => setActiveUsersOpen(true)}
+          title="See who is online now"
+        >
           <span className={`admin-active-dot${activeCount !== null && activeCount > 0 ? ' live' : ''}`} />
           <span>{activeCount ?? 0}</span>
-        </div>
+        </button>
       </div>
+
+      {/* ── Live users panel (opened from the green presence dot) ── */}
+      {activeUsersOpen && (
+        <div className="ov-udetail-overlay" onClick={() => setActiveUsersOpen(false)}>
+          <div className="ov-live" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <button type="button" className="ov-udetail-close" onClick={() => setActiveUsersOpen(false)} aria-label="Close">
+              <X size={18} />
+            </button>
+            <div className="ov-live-head">
+              <span className={`admin-active-dot${activeUsers.length > 0 ? ' live' : ''}`} />
+              <h3>Online now</h3>
+              <span className="ov-live-count">{activeUsers.length}</span>
+            </div>
+            <p className="ov-live-sub">
+              Active in the last 5 minutes, most recent first · refreshes every 10s · max 20
+            </p>
+
+            {activeUsersLoading && activeUsers.length === 0 ? (
+              <p className="ov-udetail-empty">Loading…</p>
+            ) : activeUsers.length === 0 ? (
+              <p className="ov-udetail-empty">Nobody is online right now.</p>
+            ) : (
+              <div className="ov-live-list">
+                {activeUsers.map((u) => (
+                  <div className="ov-live-user" key={u.id}>
+                    <button
+                      type="button"
+                      className="ov-live-user-head"
+                      onClick={() => { setActiveUsersOpen(false); void openUserDetail(u.id) }}
+                      title="Open full user detail"
+                    >
+                      <span className="ov-udetail-avatar">{u.name.charAt(0).toUpperCase()}</span>
+                      <span className="ov-live-user-copy">
+                        <strong>{u.name}</strong>
+                        <small>{u.email}{u.city ? ` · ${u.city}` : ''}</small>
+                      </span>
+                      <span className="ov-live-seen">{fmtAgo(u.lastSeen)}</span>
+                    </button>
+                    {u.recentVisits.length > 0 && (
+                      <div className="ov-live-visits">
+                        {u.recentVisits.slice(0, 3).map((v, i) => (
+                          <Link
+                            className="ov-live-visit"
+                            key={`${v.type}-${v.slug}-${i}`}
+                            to={v.type === 'paper' ? `/pyq/${v.slug}` : `/mock-test/${v.slug}`}
+                            target="_blank"
+                          >
+                            <span className={`ov-udetail-type ${v.type}`}>{v.type}</span>
+                            <span className="ov-live-visit-title">{v.title || v.slug}</span>
+                            <span className="ov-live-visit-at">{fmtAgo(v.at)}</span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* ── User detail modal ────────────────────────────────── */}
       {userDetailOpen && (
@@ -1120,6 +1223,35 @@ export function AdminDashboardPage() {
                           <span className="ov-udetail-rank-pos">#{er.rank}<small> / {er.totalRanked}</small></span>
                           <span className="ov-udetail-rank-score">{er.scorePct}%</span>
                         </div>
+                      ))}
+                    </div>
+                  )}
+                </section>
+
+                {/* Pages this user actually opened (Redis visit log, newest first).
+                    Distinct from attempts below: a visit is a page view, an
+                    attempt is a scored submission. */}
+                <section className="ov-udetail-section">
+                  <h4>Recently visited pages</h4>
+                  {userDetail.recentVisits.length === 0 ? (
+                    <p className="ov-udetail-empty">No page visits in the last 7 days.</p>
+                  ) : (
+                    <div className="ov-udetail-visits">
+                      {userDetail.recentVisits.map((v, i) => (
+                        <Link
+                          className="ov-udetail-visit"
+                          key={`${v.type}-${v.slug}-${i}`}
+                          to={v.type === 'paper' ? `/pyq/${v.slug}` : `/mock-test/${v.slug}`}
+                          target="_blank"
+                        >
+                          <span className="ov-udetail-visit-idx">{i + 1}</span>
+                          <span className={`ov-udetail-type ${v.type}`}>{v.type}</span>
+                          <span className="ov-udetail-visit-copy">
+                            <strong>{v.title || v.slug}</strong>
+                            <small>{v.examName}</small>
+                          </span>
+                          <span className="ov-udetail-visit-at">{fmtAgo(v.at)}</span>
+                        </Link>
                       ))}
                     </div>
                   )}
@@ -1262,10 +1394,15 @@ export function AdminDashboardPage() {
             </div>
           )}
 
-          <div className="admin-active-pill">
+          <button
+            type="button"
+            className="admin-active-pill"
+            onClick={() => setActiveUsersOpen(true)}
+            title="See who is online now"
+          >
             <span className={`admin-active-dot${activeCount !== null && activeCount > 0 ? ' live' : ''}`} />
             <span>{activeCount ?? 0} active</span>
-          </div>
+          </button>
         </header>
 
         {/* Status banner */}

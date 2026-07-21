@@ -16,7 +16,7 @@ const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bps
 
 // Editorial /guide/:slug pages. Keep in sync with keys of src/data/postGuides.ts.
 const GUIDE_SLUGS = [
-  'jkpsi', 'upsc-cse', 'ssc-cgl', 'bpsc', 'ibps-po', 'jkpsc', 'rssb', 'jkssb', 'neet-ug',
+  'jkpsi', 'jkpsi-telecom', 'upsc-cse', 'ssc-cgl', 'bpsc', 'ibps-po', 'jkpsc', 'rssb', 'jkssb', 'neet-ug',
   'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
 ]
 
@@ -63,7 +63,7 @@ async function generate() {
   // the same >=300-char gate the IndexNow submit-all endpoint uses: a fully
   // solved question deserves its own indexed URL, but a bare stub would be thin
   // content and waste crawl budget. Fetch per paper (indexable papers only).
-  const MIN_EXPLANATION = 300
+  const MIN_EXPLANATION = 100
   const questionArrays = await Promise.all(
     indexablePapers.map(paper =>
       fetchData(`/api/v1/papers/${encodeURIComponent(paper.slug)}/questions`).catch(() => []),

@@ -6671,7 +6671,13 @@ footer {
   background: var(--white);
   margin-left: auto;
   white-space: nowrap;
+  /* It is a <button> now (opens the live-users panel) — reset UA styling and
+     signal that it is clickable. */
+  font-family: inherit;
+  cursor: pointer;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
+.admin-active-pill:hover { border-color: var(--ink4); box-shadow: var(--shadow-sm); }
 
 .admin-active-dot {
   width: 7px;
@@ -10726,8 +10732,16 @@ html {
 
 .db-page {
   display: grid;
+  /* minmax(0, 1fr), not the implicit `auto`: an auto/1fr track keeps a
+     min-content floor, so a wide child (long paper title, the in-progress
+     card's non-wrapping row) grew the single column past the mobile viewport
+     and the whole dashboard spilled off-screen to the right. minmax(0,…) lets
+     the column shrink to the container; `> * { min-width: 0 }` lets each
+     section shrink inside it so their text ellipsizes instead of forcing width. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 24px;
 }
+.db-page > * { min-width: 0; }
 
 /* Welcome header */
 .db-header {
@@ -10804,8 +10818,12 @@ html {
 /* Sections */
 .db-section {
   display: grid;
+  /* Same minmax(0,…) guard as .db-page — an implicit grid column here let the
+     attempt/enrolled rows force the section wider than the viewport. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
 }
+.db-section > * { min-width: 0; }
 
 .db-section-head {
   display: flex;
@@ -16925,3 +16943,251 @@ html {
 }
 .ov-user-presence.online { background: #22c55e; }
 .admin-dark .ov-user-presence { border-color: #161b22; }
+
+/* Coming-soon paper card (announced exam, not yet conducted, 0 questions) */
+/* Still a real link (opens the "coming soon" paper page), so keep the pointer
+   cursor and a hover cue — a default cursor read as "dead / not clickable". */
+.ep-paper-card-inner.ep-paper-card-soon { cursor: pointer; }
+.ep-soon-badge {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: var(--hl-dark);
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
+  border-radius: 999px;
+  padding: 4px 10px;
+  white-space: nowrap;
+}
+
+/* Coming-soon PYQ paper page (announced exam, not yet conducted) */
+.pyq-soon-pill {
+  font-weight: 800;
+  color: var(--hl-dark);
+  background: var(--hl-bg);
+  border: 1px solid var(--hl-border);
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+.pyq-coming-soon {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  padding: 26px 22px;
+  margin-bottom: 20px;
+  background: var(--white);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-lg);
+}
+.pyq-coming-soon strong { font-size: 17px; font-weight: 800; color: var(--ink); }
+.pyq-coming-soon p { font-size: 14px; color: var(--ink3); line-height: 1.6; margin: 0; max-width: 620px; }
+.pyq-coming-soon-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+
+/* ── Admin: recently-visited log on the user detail modal ────────────── */
+.ov-udetail-visits { display: grid; gap: 6px; }
+.ov-udetail-visit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  text-decoration: none;
+  transition: border-color .15s ease, background .15s ease;
+}
+.ov-udetail-visit:hover { border-color: var(--ink4); background: var(--bg2); }
+.ov-udetail-visit-idx {
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--ink4);
+  width: 16px;
+  flex-shrink: 0;
+}
+.ov-udetail-visit-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.ov-udetail-visit-copy strong {
+  font-size: 13px; font-weight: 600; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ov-udetail-visit-copy small { font-size: 11px; color: var(--ink3); }
+.ov-udetail-visit-at { font-size: 11px; color: var(--ink3); flex-shrink: 0; white-space: nowrap; }
+
+/* ── Admin: live users panel (green presence dot) ────────────────────── */
+.ov-live {
+  position: relative;
+  width: min(560px, 94vw);
+  max-height: 86vh;
+  overflow-y: auto;
+  padding: 22px;
+  background: var(--white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+.ov-live-head { display: flex; align-items: center; gap: 9px; }
+.ov-live-head h3 { font-size: 17px; font-weight: 800; color: var(--ink); margin: 0; }
+.ov-live-count {
+  font-size: 11px; font-weight: 800; color: var(--ink3);
+  background: var(--bg2); border-radius: 999px; padding: 2px 9px;
+}
+.ov-live-sub { font-size: 12px; color: var(--ink3); margin: 6px 0 16px; }
+.ov-live-list { display: grid; gap: 10px; }
+.ov-live-user { border: 1px solid var(--line); border-radius: var(--radius-sm); overflow: hidden; }
+.ov-live-user-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px;
+  background: var(--white);
+  border: 0;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background .15s ease;
+}
+.ov-live-user-head:hover { background: var(--bg2); }
+.ov-live-user-copy { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.ov-live-user-copy strong {
+  font-size: 13px; font-weight: 700; color: var(--ink);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ov-live-user-copy small {
+  font-size: 11px; color: var(--ink3);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ov-live-seen { font-size: 11px; font-weight: 600; color: var(--green); flex-shrink: 0; white-space: nowrap; }
+.ov-live-visits { border-top: 1px solid var(--line); background: var(--bg2); padding: 6px; display: grid; gap: 4px; }
+.ov-live-visit {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 7px; border-radius: 5px;
+  text-decoration: none; transition: background .15s ease;
+}
+.ov-live-visit:hover { background: var(--white); }
+.ov-live-visit-title {
+  font-size: 12px; color: var(--ink2); flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.ov-live-visit-at { font-size: 10px; color: var(--ink4); flex-shrink: 0; white-space: nowrap; }
+
+
+/* ── Paper-attempt (test window) — mobile ──────────────────────────────────
+   The attempt screen was built desktop-first: a fixed 100dvh grid with a
+   1fr + 330px split. The only mobile rule moved the palette to the top with
+   max-height:200px, which on a phone ate a third of the viewport while a
+   150-question paper still rendered as 30 rows of a 5-column grid inside a
+   tiny scroller. The question itself was left with almost no room.
+   Below: pack the palette into far fewer rows, shrink chrome, and make every
+   control a proper touch target. */
+@media (max-width: 768px) {
+  /* Two fixes in one rule:
+     - 100dvh (not vh) so the mobile browser's collapsing URL bar can't push
+       the footer nav off-screen.
+     - minmax(0, 1fr) on the column is the load-bearing fix. Grid items default
+       to min-width:auto, so the topbar's non-shrinking right section (timer +
+       submit + language toggle) was sizing the single column to its min-content
+       — 490px against a 360px viewport — dragging every row wider than the
+       screen. minmax(0, …) lets the track shrink to the viewport instead. */
+  .pa-attempt-page {
+    grid-template-rows: 48px minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    height: 100dvh;
+  }
+
+  /* The children must then actually be allowed to shrink into that track. */
+  .pa-topbar { padding: 0 12px; gap: 8px; min-width: 0; }
+  /* The countdown lives in .pa-topbar-center, which the previous mobile rule
+     set to display:none — leaving candidates with NO visible timer during a
+     timed exam on a phone. Show it and let the paper title absorb the space
+     instead (it already truncates with an ellipsis). */
+  .pa-topbar-center { display: flex; align-items: center; flex-shrink: 0; min-width: 0; }
+  .pa-topbar-left strong { font-size: 12px; }
+  .pa-topbar-left small { font-size: 9px; }
+  .pa-topbar-right { gap: 6px; min-width: 0; flex-shrink: 1; }
+  /* The subject strip already scrolls internally (overflow-x:auto); it just
+     needs permission to be narrower than its content. */
+  .pa-subject-tabs { min-width: 0; max-width: 100%; }
+  .pa-timer { padding: 4px 10px; font-size: 13px; gap: 4px; }
+  .pa-submit-topbar-btn { height: 30px; padding: 0 11px; font-size: 11px; }
+
+  /* Palette stays on top for quick jumps, but compact. auto-fill packs ~8-9
+     buttons per row instead of 5, so 150 questions fit in a few rows. */
+  .pa-palette-panel {
+    order: -1;
+    max-height: 132px;
+    padding: 8px 12px;
+    gap: 8px;
+    border-left: none;
+    border-bottom: 1px solid #e5e7eb;
+    -webkit-overflow-scrolling: touch;
+  }
+  .pa-palette-grid { grid-template-columns: repeat(auto-fill, minmax(34px, 1fr)); gap: 5px; }
+  .pa-palette-btn { font-size: 11px; border-radius: 5px; }
+  /* Hover transform is meaningless on touch and causes sticky :hover states. */
+  .pa-palette-btn:hover { transform: none; box-shadow: none; }
+  .pa-palette-stats { gap: 5px; }
+  .pa-stat-chip { padding: 3px 7px; font-size: 11px; }
+  /* The legend is the least useful thing on a small screen — the colours are
+     self-evident once you tap. Reclaim the vertical space for questions. */
+  .pa-palette-legend { display: none; }
+
+  .pa-question-scroll { padding: 14px 14px 10px; -webkit-overflow-scrolling: touch; }
+  .pa-q-header { gap: 8px; margin-bottom: 12px; }
+  .pa-q-subject { margin-left: 0; }
+  .pa-q-text { font-size: 15px; line-height: 1.6; }
+
+  .pa-option { padding: 12px; gap: 10px; font-size: 14px; }
+  .pa-option:hover { border-color: #e5e7eb; background: #fafafa; }
+
+  .pa-q-actions { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
+  /* 44px = minimum comfortable touch target. */
+  .pa-nav-btn { height: 44px; padding: 0 14px; font-size: 13px; flex: 1 1 0; justify-content: center; min-width: 0; }
+  .pa-q-progress { order: -1; flex-basis: 100%; text-align: center; font-size: 11px; }
+
+  .pa-confirm-dialog { width: calc(100vw - 32px); max-width: 400px; padding: 20px; }
+  .pa-confirm-actions { flex-direction: column-reverse; gap: 8px; }
+  .pa-confirm-actions button { width: 100%; height: 44px; }
+}
+
+@media (max-width: 480px) {
+  .pa-attempt-page { grid-template-rows: 44px minmax(0, 1fr); }
+  .pa-topbar { padding: 0 10px; gap: 6px; }
+  /* Below 480px the paper title, timer, language toggle and submit button
+     genuinely cannot coexist — keeping the title only left it as a ~7px
+     sliver, which reads as broken. Drop it deliberately: the candidate already
+     knows which paper they opened, and it is still shown on the intro screen
+     and in the subject strip. Timer and submit are non-negotiable. */
+  .pa-topbar-left { display: none; }
+  .pa-timer { padding: 3px 9px; font-size: 12px; }
+  .pa-submit-topbar-btn { height: 28px; padding: 0 9px; font-size: 10px; }
+  /* On a bilingual paper (BPSC prints English + Hindi) the language toggle sits
+     in the topbar and was claiming ~110px, squeezing the paper title to almost
+     nothing. Shrink it rather than drop it — switching language mid-exam is a
+     genuinely needed control for Hindi-medium candidates. */
+  .pa-topbar .pyq-language-toggle button { padding: 3px 6px; font-size: 10px; }
+  .pa-topbar .pyq-language-toggle { flex-shrink: 0; }
+
+  .pa-palette-panel { max-height: 118px; padding: 7px 10px; }
+  .pa-palette-grid { grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 4px; }
+  .pa-palette-btn { font-size: 10px; }
+
+  .pa-question-scroll { padding: 12px 11px 8px; }
+  .pa-q-text { font-size: 14.5px; }
+  .pa-option { padding: 11px 10px; font-size: 13.5px; gap: 8px; }
+  .pa-q-actions { padding: 8px 10px; }
+  .pa-nav-btn { height: 42px; padding: 0 10px; font-size: 12px; }
+
+  /* Intro screen */
+  .pa-intro-card { padding: 22px 16px; }
+  .pa-intro-stats { gap: 8px; }
+  .pa-intro-start-btn { width: 100%; height: 46px; }
+}
+
+/* Belt-and-braces after the minmax(0,1fr) fix above. Deliberately NOT
+   overflow-x:hidden on the page itself — that only clips runaway content and
+   hides the bug. These just stop long unbroken strings (URLs, long codes)
+   from re-introducing overflow. */
+@media (max-width: 768px) {
+  .pa-attempt-body, .pa-question-panel, .pa-question-scroll,
+  .pa-palette-panel { min-width: 0; max-width: 100%; }
+  .pa-q-text, .pa-option, .pa-topbar-left strong { overflow-wrap: anywhere; }
+}

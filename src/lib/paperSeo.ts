@@ -57,7 +57,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
     title: 'JKSSB Laboratory Attendant Question Paper 2026 - Solved, Answer Key',
     h1: 'JKSSB Laboratory Attendant Question Paper 2026',
     description:
-      'Fully solved JKSSB Laboratory Attendant question paper held on 10 May 2026 with answer key, subjects and detailed explanations.',
+      'Fully solved JKSSB Laboratory Attendant question paper 2026, held on 10 May 2026 — every question with the official answer key, subject-wise breakdown and detailed explanations, free.',
     review:
       'The JKSSB Laboratory Attendant paper held on 10 May 2026 covered Quantitative Aptitude, Reasoning, General Knowledge, Current Affairs, General Science, Computer Knowledge and English. This solved paper helps candidates revise the actual question pattern and answer key.',
   },

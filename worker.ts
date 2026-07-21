@@ -128,6 +128,35 @@ const STATIC_META: Record<string, PageMeta> = {
   '/': {
     title: 'Ministry of Papers - Every Exam Paper. Solved & Free.',
     description: 'Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams. Every answer solved, explained, and free - no login needed.',
+    // The homepage is served through the Worker now (assets run_worker_first),
+    // so give bots a real <h1> and crawlable intro instead of the empty SPA
+    // shell. Keeps the homepage from being flagged for a missing <h1>.
+    contentHtml: `<article class="seo-rendered">
+      <h1>Ministry of Papers — Free Previous Year Question Papers, Solved &amp; Explained</h1>
+      <p>Ministry of Papers is India's free platform for <strong>previous year question papers (PYQs)</strong> and <strong>mock tests</strong>. Every question is <strong>fully solved</strong> with the official answer key and a detailed explanation — no login, no paywall.</p>
+      <p>Practise solved papers for <strong>UPSC Civil Services, SSC CGL, State PSCs (BPSC, JKSSB, JKPSC, RSSB), Banking (IBPS PO), NEET UG</strong> and 200+ competitive exams, in both <strong>English and Hindi</strong>.</p>
+      <nav aria-label="Browse exams">
+        <a href="/exams">Browse all exams</a>
+        <a href="/exam/upsc-cse">UPSC CSE</a>
+        <a href="/exam/ssc-cgl">SSC CGL</a>
+        <a href="/exam/bpsc">BPSC</a>
+        <a href="/exam/jkssb">JKSSB</a>
+      </nav>
+    </article>`,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Ministry of Papers',
+      alternateName: 'MinistryOfPapers',
+      url: BASE,
+      description: 'Free previous year question papers and mock tests for UPSC, SSC, State PSCs, NEET and 200+ exams — every answer solved and explained.',
+      publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${BASE}/exams?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    },
   },
   '/exams': {
     title: 'Exam Catalog - Browse Competitive Exams | Ministry of Papers',
@@ -166,18 +195,33 @@ const STATIC_META: Record<string, PageMeta> = {
   },
   '/privacy': {
     title: 'Privacy Policy | Ministry of Papers',
-    description: 'Privacy policy for Ministry of Papers - how we collect, use and protect your data.',
+    description: 'Privacy Policy for Ministry of Papers: what data we collect when you use our free previous-year-question and mock-test platform, how it is used and protected, cookies, third-party analytics, and your rights.',
   },
   '/terms': {
     title: 'Terms of Service | Ministry of Papers',
-    description: 'Terms of service for Ministry of Papers.',
+    description: 'Terms of Service for Ministry of Papers: the rules for using our free previous-year-question and mock-test platform, acceptable use, intellectual-property and content policy, disclaimers, and account terms for aspirants.',
   },
 }
 
+// Bump to invalidate ALL edge-cached API responses at once (the query param
+// changes the Cloudflare cache key, forcing a fresh origin fetch). Needed once
+// to flush ~500 stale cached 404s; the API ignores unknown query params.
+const API_CACHE_VERSION = '2'
+
 function apiFetch(url: string, cacheTtl: number): Promise<Response> {
-  return fetch(url, {
+  const versioned = url + (url.includes('?') ? '&' : '?') + '_cv=' + API_CACHE_VERSION
+  return fetch(versioned, {
     signal: AbortSignal.timeout(API_TIMEOUT_MS),
-    cf: { cacheEverything: true, cacheTtl },
+    cf: {
+      cacheEverything: true,
+      // Cache 2xx for the full TTL, but NEVER pin a 404/5xx for hours. A single
+      // transient 404 (e.g. during a slug migration or deploy) used to get
+      // cached for 24h, so valid question pages returned 404 to crawlers — every
+      // such page shared the "404 Not Found" title and an empty description,
+      // which Bing flags as duplicate/short metadata. Short error TTLs let a
+      // stale 404 self-heal on the next crawl instead.
+      cacheTtlByStatus: { '200-299': cacheTtl, '300-399': 60, '400-499': 5, '500-599': 0 },
+    },
   } as RequestInit)
 }
 
@@ -686,9 +730,16 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         q.answer ? `Correct answer: ${q.answer}.` : `Correct option: ${q.answerKey}.`,
         stripMarkdown(q.explanation ?? ''),
       ].filter(Boolean).join(' ').slice(0, 1000)
+      // For reading-passage questions the stored text begins with the shared
+      // passage, so slicing its first chars gives every Q in the set the SAME
+      // description (Bing flags duplicates). The actual question is the last
+      // line ending in '?', so prefer that when the text is multi-line.
+      const qLines = q.question.split('\n').map((l) => stripMarkdown(l).trim()).filter(Boolean)
+      const actualQuestion =
+        qLines.length > 2 ? ([...qLines].reverse().find((l) => l.endsWith('?')) ?? qLines[qLines.length - 1]) : qLines.join(' ')
       return {
         title: questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic),
-        description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${stripMarkdown(q.question).slice(0, 120)} — correct answer (${q.answerKey}) with detailed explanation.`,
+        description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${actualQuestion.slice(0, 140)} — correct answer (${q.answerKey}) with detailed explanation.`,
         contentHtml: renderQuestionContent(q, crumbs),
         jsonLd: [
           {
@@ -829,11 +880,16 @@ export default {
 
     if (path === '/sitemap.xml') {
       try {
-        const res = await apiFetch(`${API}/sitemap.xml`, 3600)
+        // ?sv bumps the edge cache key so a stale sitemap (e.g. the old
+        // 57-URL version cached before /question pages were added) is dropped
+        // immediately on deploy. Short 10-min TTL keeps it close to the DB —
+        // the sitemap changes whenever a paper/question is added, and a whole
+        // day of staleness (the old 3600s) held new pages back from crawlers.
+        const res = await apiFetch(`${API}/sitemap.xml?sv=3`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
-          headers.set('cache-control', 'public, max-age=3600')
+          headers.set('cache-control', 'public, max-age=600')
           return new Response(res.body, { status: 200, headers })
         }
       } catch {
