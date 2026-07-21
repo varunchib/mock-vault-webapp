@@ -10,6 +10,13 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
+    // Without this, Cloudflare serves dist/index.html DIRECTLY for "/" and the
+    // Worker never runs — so the homepage shipped the raw SPA shell (no <h1>,
+    // no canonical, no injected meta), which Bing flagged. Every other route
+    // has no matching asset, so the Worker already runs for them via the SPA
+    // fallback. Scope worker-first to "/" only, so hashed JS/CSS/img assets
+    // keep being served directly without an extra Worker hop.
+    "run_worker_first": ["/"],
   },
   "compatibility_flags": ["nodejs_compat"],
   "routes": [

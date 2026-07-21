@@ -128,6 +128,35 @@ const STATIC_META: Record<string, PageMeta> = {
   '/': {
     title: 'Ministry of Papers - Every Exam Paper. Solved & Free.',
     description: 'Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams. Every answer solved, explained, and free - no login needed.',
+    // The homepage is served through the Worker now (assets run_worker_first),
+    // so give bots a real <h1> and crawlable intro instead of the empty SPA
+    // shell. Keeps the homepage from being flagged for a missing <h1>.
+    contentHtml: `<article class="seo-rendered">
+      <h1>Ministry of Papers — Free Previous Year Question Papers, Solved &amp; Explained</h1>
+      <p>Ministry of Papers is India's free platform for <strong>previous year question papers (PYQs)</strong> and <strong>mock tests</strong>. Every question is <strong>fully solved</strong> with the official answer key and a detailed explanation — no login, no paywall.</p>
+      <p>Practise solved papers for <strong>UPSC Civil Services, SSC CGL, State PSCs (BPSC, JKSSB, JKPSC, RSSB), Banking (IBPS PO), NEET UG</strong> and 200+ competitive exams, in both <strong>English and Hindi</strong>.</p>
+      <nav aria-label="Browse exams">
+        <a href="/exams">Browse all exams</a>
+        <a href="/exam/upsc-cse">UPSC CSE</a>
+        <a href="/exam/ssc-cgl">SSC CGL</a>
+        <a href="/exam/bpsc">BPSC</a>
+        <a href="/exam/jkssb">JKSSB</a>
+      </nav>
+    </article>`,
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Ministry of Papers',
+      alternateName: 'MinistryOfPapers',
+      url: BASE,
+      description: 'Free previous year question papers and mock tests for UPSC, SSC, State PSCs, NEET and 200+ exams — every answer solved and explained.',
+      publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: { '@type': 'EntryPoint', urlTemplate: `${BASE}/exams?q={search_term_string}` },
+        'query-input': 'required name=search_term_string',
+      },
+    },
   },
   '/exams': {
     title: 'Exam Catalog - Browse Competitive Exams | Ministry of Papers',
