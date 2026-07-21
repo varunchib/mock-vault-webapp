@@ -880,11 +880,16 @@ export default {
 
     if (path === '/sitemap.xml') {
       try {
-        const res = await apiFetch(`${API}/sitemap.xml`, 3600)
+        // ?sv bumps the edge cache key so a stale sitemap (e.g. the old
+        // 57-URL version cached before /question pages were added) is dropped
+        // immediately on deploy. Short 10-min TTL keeps it close to the DB —
+        // the sitemap changes whenever a paper/question is added, and a whole
+        // day of staleness (the old 3600s) held new pages back from crawlers.
+        const res = await apiFetch(`${API}/sitemap.xml?sv=3`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
-          headers.set('cache-control', 'public, max-age=3600')
+          headers.set('cache-control', 'public, max-age=600')
           return new Response(res.body, { status: 200, headers })
         }
       } catch {
