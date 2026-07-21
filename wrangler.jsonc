@@ -10,13 +10,17 @@
     "directory": "./dist",
     "binding": "ASSETS",
     "not_found_handling": "single-page-application",
-    // Without this, Cloudflare serves dist/index.html DIRECTLY for "/" and the
-    // Worker never runs — so the homepage shipped the raw SPA shell (no <h1>,
-    // no canonical, no injected meta), which Bing flagged. Every other route
-    // has no matching asset, so the Worker already runs for them via the SPA
-    // fallback. Scope worker-first to "/" only, so hashed JS/CSS/img assets
-    // keep being served directly without an extra Worker hop.
-    "run_worker_first": ["/"],
+    // Run the Worker first for EVERY request. Needed because Cloudflare
+    // otherwise serves dist/index.html directly for "/" (an existing asset),
+    // bypassing the Worker — so the homepage shipped the raw SPA shell with no
+    // <h1>/canonical/meta, which Bing flagged.
+    // NOTE: the array form (["/"]) does NOT work here — it makes ONLY the listed
+    // paths run the Worker and routes everything else straight to assets/SPA
+    // fallback, which broke bot SSR on all /pyq, /question, /exam, /guide pages.
+    // `true` is correct: the Worker's own handler passes hashed asset requests
+    // (paths containing ".") straight through to env.ASSETS, so JS/CSS/images
+    // still serve normally, just with one cheap Worker hop.
+    "run_worker_first": true,
   },
   "compatibility_flags": ["nodejs_compat"],
   "routes": [
