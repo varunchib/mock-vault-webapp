@@ -301,8 +301,13 @@ function parseMockJson(raw: string, defaultExamSlug: string): AdminMockPayload {
   const slug = asString(parsed.slug, slugify(title))
   const examSlug = asString(parsed.examSlug, defaultExamSlug)
   const subjects = asStringList(parsed.subjects)
-  const rawDiff = asString(parsed.difficulty, 'Moderate')
-  const difficulty = (['Beginner', 'Moderate', 'Advanced'].includes(rawDiff) ? rawDiff : 'Moderate') as AdminMockPayload['difficulty']
+  // Accept common synonyms so "Hard"/"Easy"/"Medium" don't silently become Moderate.
+  const diffAlias: Record<string, AdminMockPayload['difficulty']> = {
+    beginner: 'Beginner', easy: 'Beginner', basic: 'Beginner',
+    moderate: 'Moderate', medium: 'Moderate', intermediate: 'Moderate',
+    advanced: 'Advanced', hard: 'Advanced', difficult: 'Advanced', expert: 'Advanced',
+  }
+  const difficulty = diffAlias[asString(parsed.difficulty).toLowerCase()] ?? 'Moderate'
   const questionItems = Array.isArray(parsed.questions) ? (parsed.questions as ImportedPaperQuestion[]) : []
   const questions: AdminMockQuestionPayload[] = questionItems
     .filter((q) => asString(q.question))
@@ -830,9 +835,20 @@ export function AdminDashboardPage() {
 
   // ── Paper handlers ───────────────────────────────────────────
 
+  // A mock/paper must attach to an existing exam, or the server rejects it with
+  // an opaque "not found". Catch a bad examSlug here at Parse time with a clear,
+  // actionable message listing the valid slugs.
+  const validateExamSlug = (examSlug: string) => {
+    if (exams.length && !exams.some((e) => e.slug === examSlug)) {
+      const known = exams.map((e) => e.slug).sort().join(', ')
+      throw new Error(`Exam slug "${examSlug}" does not exist. Create the exam first, or use one of: ${known}`)
+    }
+  }
+
   const parsePaperPreview = (raw = paperJsonText) => {
     try {
       const payload = parsePaperJson(raw, exams[0]?.slug ?? '')
+      validateExamSlug(payload.examSlug)
       setPaperJsonPreview(payload)
       setPaperJsonError('')
     } catch (err) {
@@ -861,6 +877,7 @@ export function AdminDashboardPage() {
   const parseMockPreview = (raw = mockJsonText) => {
     try {
       const payload = parseMockJson(raw, exams[0]?.slug ?? '')
+      validateExamSlug(payload.examSlug)
       setMockJsonPreview(payload)
       setMockJsonError('')
     } catch (err) {
