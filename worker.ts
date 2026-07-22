@@ -635,6 +635,12 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       return {
         title: `${e.shortName} Mock Tests - Free Full-Length Practice | Ministry of Papers`,
         description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
+        // Mocks are still feature-gated ("coming soon") in the app, so the page
+        // a searcher would land on cannot actually be attempted. Keep it out of
+        // the index until mocks launch — indexing a "Free Practice" page that
+        // shows "coming soon" is thin/misleading content. Remove this line (and
+        // re-enable the mock_exam sitemap entry) when mocks go live.
+        robots: 'noindex, follow',
         contentHtml: renderMockContent(e, examMocks, papers ?? [], mockCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
