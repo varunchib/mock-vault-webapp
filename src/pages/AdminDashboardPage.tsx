@@ -1,6 +1,7 @@
 import {
   AlertTriangle,
   CheckCircle2,
+  ChevronDown,
   ClipboardList,
   Code2,
   ExternalLink,
@@ -292,6 +293,63 @@ const SAMPLE_PAPER_JSON = `{
   ]
 }`
 
+// Mirrors parsePaperJson: turns a pasted/uploaded JSON string into the mock
+// payload the API expects, so mocks get the same upload-first flow as papers.
+function parseMockJson(raw: string, defaultExamSlug: string): AdminMockPayload {
+  const parsed = JSON.parse(raw) as Record<string, unknown>
+  const title = asString(parsed.title)
+  const slug = asString(parsed.slug, slugify(title))
+  const examSlug = asString(parsed.examSlug, defaultExamSlug)
+  const subjects = asStringList(parsed.subjects)
+  const rawDiff = asString(parsed.difficulty, 'Moderate')
+  const difficulty = (['Beginner', 'Moderate', 'Advanced'].includes(rawDiff) ? rawDiff : 'Moderate') as AdminMockPayload['difficulty']
+  const questionItems = Array.isArray(parsed.questions) ? (parsed.questions as ImportedPaperQuestion[]) : []
+  const questions: AdminMockQuestionPayload[] = questionItems
+    .filter((q) => asString(q.question))
+    .map((q) => ({
+      question: asString(q.question),
+      options: normalizeOptions(q.options),
+      answerKey: normalizeAnswer(q.answerKey ?? q.answer ?? q.correct),
+      explanation: asString(q.explanation),
+      subject: asString(q.subject, subjects[0] ?? 'General'),
+    }))
+    .filter((q) => q.options.length >= 2)
+  if (!slug || !examSlug || !title) throw new Error('Mock JSON must include slug, examSlug, and title.')
+  if (!questions.length) throw new Error('Mock JSON must include at least one valid question with two options.')
+  const isFreeVal = parsed.isFree
+  return {
+    slug, examSlug, title,
+    description: asString(parsed.description),
+    durationMinutes: Number(parsed.durationMinutes) || 60,
+    negativeMarking: Number(parsed.negativeMarking) || 0,
+    difficulty,
+    isFree: isFreeVal === undefined ? true : Boolean(isFreeVal),
+    subjects: subjects.length ? subjects : ['General'],
+    questions,
+  }
+}
+
+const SAMPLE_MOCK_JSON = `{
+  "slug": "ssc-cgl-tier-1-full-mock-1",
+  "examSlug": "ssc-cgl",
+  "title": "SSC CGL Tier 1 — Full Mock 1",
+  "description": "Full-length SSC CGL Tier 1 practice mock with 100 questions.",
+  "durationMinutes": 60,
+  "negativeMarking": 0.5,
+  "difficulty": "Moderate",
+  "isFree": true,
+  "subjects": ["Reasoning", "Quantitative Aptitude", "English", "General Awareness"],
+  "questions": [
+    {
+      "question": "Select the odd one out: 3, 5, 11, 14, 17, 21",
+      "options": ["11", "14", "17", "21"],
+      "answerKey": "B",
+      "explanation": "All others are odd numbers; 14 is the only even number.",
+      "subject": "Reasoning"
+    }
+  ]
+}`
+
 // ─── Empty drafts ─────────────────────────────────────────────
 
 const emptyQuestion = (): AdminQuestionDraft => ({
@@ -482,6 +540,12 @@ export function AdminDashboardPage() {
   const [paperJsonError, setPaperJsonError] = useState('')
   const [pendingDeletePaper, setPendingDeletePaper] = useState<string | null>(null)
   const [paperSearch, setPaperSearch] = useState('')
+  const [showManualPaper, setShowManualPaper] = useState(false)
+  // Mock JSON upload flow (mirrors the paper flow above).
+  const [mockJsonText, setMockJsonText] = useState(SAMPLE_MOCK_JSON)
+  const [mockJsonPreview, setMockJsonPreview] = useState<AdminMockPayload | null>(null)
+  const [mockJsonError, setMockJsonError] = useState('')
+  const [showManualMock, setShowManualMock] = useState(false)
 
   // Questions browser state (inline in papers tab)
   const [selectedPaperSlug, setSelectedPaperSlug] = useState('')
@@ -788,6 +852,34 @@ export function AdminDashboardPage() {
       await loadData()
     } catch (err) {
       toast('error', err instanceof Error ? err.message : 'Failed to save paper.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  // ── Mock JSON upload handlers (mirror the paper ones) ────────
+  const parseMockPreview = (raw = mockJsonText) => {
+    try {
+      const payload = parseMockJson(raw, exams[0]?.slug ?? '')
+      setMockJsonPreview(payload)
+      setMockJsonError('')
+    } catch (err) {
+      setMockJsonPreview(null)
+      setMockJsonError(err instanceof Error ? err.message : 'Invalid JSON.')
+    }
+  }
+
+  const saveMockJson = async () => {
+    if (!mockJsonPreview) return
+    setSaving(true)
+    try {
+      await saveAdminMock(mockJsonPreview)
+      toast('success', `Mock "${mockJsonPreview.title}" saved (${mockJsonPreview.questions.length} questions).`)
+      setMockJsonPreview(null)
+      setMockJsonText(SAMPLE_MOCK_JSON)
+      await loadData()
+    } catch (err) {
+      toast('error', err instanceof Error ? err.message : 'Failed to save mock.')
     } finally {
       setSaving(false)
     }
@@ -1353,17 +1445,32 @@ export function AdminDashboardPage() {
           </div>
           {activeTab === 'mocks' && (
             <div className="admin-head-actions">
-              <button type="button" className="admin-ghost-btn" onClick={clearDraft} disabled={saving}>
-                Clear draft
-              </button>
-              <button
-                type="button"
-                className="admin-save-btn"
-                onClick={() => void saveMock()}
-                disabled={saving || !draft.title.trim() || draft.questions.length === 0}
-              >
-                <Save size={15} /> {saving ? 'Saving…' : `Save mock (${draft.questions.length} Qs)`}
-              </button>
+              {mockJsonPreview ? (
+                /* JSON upload is active — push the parsed mock. */
+                <button
+                  type="button"
+                  className="admin-save-btn"
+                  onClick={() => void saveMockJson()}
+                  disabled={saving}
+                >
+                  <Save size={15} /> {saving ? 'Pushing…' : `Push mock (${mockJsonPreview.questions.length} Qs)`}
+                </button>
+              ) : draft.questions.length > 0 ? (
+                /* Manual builder has a draft. */
+                <>
+                  <button type="button" className="admin-ghost-btn" onClick={clearDraft} disabled={saving}>
+                    Clear draft
+                  </button>
+                  <button
+                    type="button"
+                    className="admin-save-btn"
+                    onClick={() => void saveMock()}
+                    disabled={saving || !draft.title.trim()}
+                  >
+                    <Save size={15} /> {saving ? 'Saving…' : `Save mock (${draft.questions.length} Qs)`}
+                  </button>
+                </>
+              ) : null}
             </div>
           )}
           {activeTab === 'exams' && (
@@ -1753,6 +1860,82 @@ export function AdminDashboardPage() {
         {/* ── Mocks tab ─────────────────────────────────────────── */}
         {activeTab === 'mocks' && (
           <div className="admin-tab-body">
+            {/* JSON upload — the primary way to add a mock */}
+            <div className="admin-two-col">
+              <div className="admin-tool-panel">
+                <div className="admin-panel-title">
+                  <div><small>JSON upload</small><h2>Upload mock</h2></div>
+                  <div className="admin-row-actions">
+                    <label className="admin-file-action">
+                      <UploadCloud size={14} /> Upload file
+                      <input type="file" accept="application/json,.json" onChange={async (e) => {
+                        const file = e.target.files?.[0]
+                        if (!file) return
+                        const text = await file.text()
+                        setMockJsonText(text)
+                        parseMockPreview(text)
+                      }} />
+                    </label>
+                    <button type="button" className="admin-save-btn small" onClick={() => parseMockPreview()}>
+                      <Code2 size={14} /> Parse
+                    </button>
+                  </div>
+                </div>
+                <textarea
+                  className="admin-bulk-box admin-json-box"
+                  value={mockJsonText}
+                  onChange={(e) => { setMockJsonText(e.target.value); setMockJsonPreview(null); setMockJsonError('') }}
+                />
+                {mockJsonError && <p className="admin-help-text" style={{ color: 'var(--error)' }}>{mockJsonError}</p>}
+                <p className="admin-help-text">
+                  Fields: <code>slug</code>, <code>examSlug</code>, <code>title</code>, <code>description</code>, <code>durationMinutes</code>, <code>negativeMarking</code>, <code>difficulty</code>, <code>isFree</code>, <code>subjects[]</code>, <code>questions[]</code>.
+                  Each question: <code>question</code>, <code>options[]</code>, <code>answerKey</code>, <code>explanation</code>, <code>subject</code>.
+                  Uploading a mock whose slug already exists overwrites it (edit-in-place).
+                </p>
+              </div>
+
+              {/* Parsed preview */}
+              <div className="admin-tool-panel">
+                <div className="admin-panel-title">
+                  <div><small>Parsed preview</small><h2>{mockJsonPreview ? mockJsonPreview.title : 'No mock parsed yet'}</h2></div>
+                  {mockJsonPreview && (
+                    <button type="button" className="admin-save-btn" onClick={() => void saveMockJson()} disabled={saving}>
+                      <Save size={14} /> {saving ? 'Pushing…' : 'Push to system'}
+                    </button>
+                  )}
+                </div>
+                {mockJsonPreview ? (
+                  <div className="admin-form-stack">
+                    <div className="admin-manage-row"><div><strong>Slug</strong><small>{mockJsonPreview.slug}</small></div></div>
+                    <div className="admin-manage-row"><div><strong>Exam · Difficulty · Duration</strong><small>{mockJsonPreview.examSlug} · {mockJsonPreview.difficulty} · {mockJsonPreview.durationMinutes} min · {mockJsonPreview.isFree ? 'Free' : 'Paid'} · −{mockJsonPreview.negativeMarking}</small></div></div>
+                    <div className="admin-manage-row"><div><strong>Subjects</strong><small>{mockJsonPreview.subjects.join(', ')}</small></div></div>
+                    <div className="admin-manage-row"><div><strong>Questions</strong><small>{mockJsonPreview.questions.length} questions parsed</small></div></div>
+                    {mockJsonPreview.questions.slice(0, 3).map((q, i) => (
+                      <div className="admin-manage-row" key={i}>
+                        <span className="admin-q-num">Q{i + 1}</span>
+                        <div>
+                          <strong>{q.question.length > 80 ? q.question.slice(0, 80) + '…' : q.question}</strong>
+                          <small>{q.subject} · Ans: {q.answerKey}</small>
+                        </div>
+                      </div>
+                    ))}
+                    {mockJsonPreview.questions.length > 3 && (
+                      <p className="admin-help-text">… and {mockJsonPreview.questions.length - 3} more questions</p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="admin-empty">Click "Parse" after pasting or uploading a JSON file to preview, then push.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Manual builder — kept as a fallback, collapsed by default */}
+            <button type="button" className="admin-collapse-toggle" onClick={() => setShowManualMock((v) => !v)} aria-expanded={showManualMock}>
+              <ChevronDown size={15} className={showManualMock ? 'flip' : undefined} />
+              {showManualMock ? 'Hide manual builder' : 'Build a mock manually instead'}
+            </button>
+
+            {showManualMock && (<>
             <div className="admin-two-col">
               {/* Mock details form */}
               <div className="admin-tool-panel">
@@ -1871,9 +2054,10 @@ export function AdminDashboardPage() {
                     </button>
                   </div>
                 ))}
-                {draft.questions.length === 0 && <p className="admin-empty">No questions in draft. Add manually above or import via the Import tab.</p>}
+                {draft.questions.length === 0 && <p className="admin-empty">No questions in draft. Add manually above.</p>}
               </div>
             </div>
+            </>)}
 
             {/* Published mocks */}
             <div className="admin-tool-panel">
@@ -2111,7 +2295,14 @@ export function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Manual paper builder */}
+            {/* Manual paper builder — fallback, collapsed by default */}
+            <button type="button" className="admin-collapse-toggle" onClick={() => setShowManualPaper((v) => !v)} aria-expanded={showManualPaper}>
+              <ChevronDown size={15} className={showManualPaper ? 'flip' : undefined} />
+              {showManualPaper ? 'Hide manual builder' : 'Build a paper manually instead'}
+              {manualDraft.questions.length > 0 && <span className="admin-collapse-badge">{manualDraft.questions.length}Q draft</span>}
+            </button>
+
+            {showManualPaper && (
             <div className="admin-tool-panel">
               <div className="admin-panel-title">
                 <div>
@@ -2272,6 +2463,7 @@ export function AdminDashboardPage() {
                 </>
               )}
             </div>
+            )}
 
             {/* Published papers */}
             <div className="admin-tool-panel">
