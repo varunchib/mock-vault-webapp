@@ -185,10 +185,10 @@ function buildUrl(path: string) {
   return `${normalizeBaseUrl()}${path}`;
 }
 
-async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+function rawFetch(path: string, init?: RequestInit): Promise<Response> {
   const method = (init?.method ?? "GET").toUpperCase()
   const needsContentType = method !== "GET" && method !== "HEAD"
-  const response = await fetch(buildUrl(path), {
+  return fetch(buildUrl(path), {
     credentials: "include",
     headers: {
       ...(needsContentType ? { "Content-Type": "application/json" } : {}),
@@ -196,6 +196,37 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
     },
     ...init,
   });
+}
+
+// The access token cookie lives ~15 min; the refresh token ~30 days. Without
+// this, any request made after the access token expired (e.g. an admin who
+// prepared a JSON upload for a few minutes, then clicked Push) failed with a
+// 401 and no recovery. Now a single 401 transparently refreshes the session
+// once and retries the original request, so the whole app self-heals instead
+// of scattering copy-pasted retry logic onto individual calls.
+const AUTH_ENDPOINT = /\/api\/v1\/auth\/(refresh|me|google|logout)\b/
+let refreshInFlight: Promise<boolean> | null = null
+
+function refreshOnce(): Promise<boolean> {
+  if (!refreshInFlight) {
+    refreshInFlight = rawFetch("/api/v1/auth/refresh", { method: "POST" })
+      .then((r) => r.ok)
+      .catch(() => false)
+      .finally(() => { refreshInFlight = null })
+  }
+  return refreshInFlight
+}
+
+async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
+  let response = await rawFetch(path, init)
+
+  // Access token expired mid-session → refresh once (deduped across concurrent
+  // calls) and retry. Skip for the auth endpoints themselves to avoid a loop.
+  if (response.status === 401 && !AUTH_ENDPOINT.test(path)) {
+    if (await refreshOnce()) {
+      response = await rawFetch(path, init)
+    }
+  }
 
   if (!response.ok) {
     const errorPayload = await response
