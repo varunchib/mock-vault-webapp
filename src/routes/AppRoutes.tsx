@@ -18,6 +18,7 @@ import { PrivacyPolicyPage } from '../pages/PrivacyPolicyPage'
 import { TermsPage }         from '../pages/TermsPage'
 import { AboutPage }         from '../pages/AboutPage'
 import { PostGuidePage }     from '../pages/PostGuidePage'
+import { BlogPostPage }      from '../pages/BlogPostPage'
 
 // Lazy — auth-gated or heavy pages not needed on initial load
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
@@ -100,6 +101,7 @@ export function AppRoutes() {
       <Route path="/mock-attempt/:slug" element={<ProtectedPage><Lazy><MockAttemptPage /></Lazy></ProtectedPage>} />
       <Route path="/paper-attempt/:slug" element={<ProtectedPage><Lazy><PaperAttemptPage /></Lazy></ProtectedPage>} />
       <Route path="/guide/:postSlug" element={<PostGuidePage />} />
+      <Route path="/blog/:slug" element={<BlogPostPage />} />
       <Route path="/privacy"      element={<PrivacyPolicyPage />} />
       <Route path="/terms"        element={<TermsPage />} />
       <Route path="/about"        element={<AboutPage />} />

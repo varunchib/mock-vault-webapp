@@ -20,6 +20,11 @@ const GUIDE_SLUGS = [
   'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
 ]
 
+// Editorial /blog/:slug articles. Keep in sync with keys of src/data/blogPosts.ts.
+const BLOG_SLUGS = [
+  'ibps-po-exam',
+]
+
 const PAPER_SEO_SLUGS = {
   'jkssb-junior-assistant-pyq': 'jkssb-junior-assistant-question-paper-2026',
   'jkssb-lab-attendant-2026-may-10': 'jkssb-laboratory-attendant-question-paper-2026',
@@ -89,6 +94,7 @@ async function generate() {
     ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
+    ...BLOG_SLUGS.map(slug => url(`${BASE}/blog/${slug}`, '0.7', 'weekly')),
     ...questionSlugs.map(slug => url(`${BASE}/question/${slug}`, '0.6', 'monthly')),
   ]
 
