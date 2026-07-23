@@ -17221,3 +17221,171 @@ html {
   font-size: 11px;
   font-weight: 700;
 }
+
+/* ── Blog ─────────────────────────────────────────────────────────────── */
+.blog-page {
+  max-width: 760px;
+  margin: 0 auto;
+  color: #1f2937;
+}
+.blog-hero {
+  margin: 18px 0 26px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid #eceef1;
+}
+.blog-category {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: #2563eb;
+  background: #eff5ff;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+.blog-hero h1 {
+  margin: 14px 0 12px;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.2;
+  font-weight: 800;
+  color: #0f172a;
+}
+.blog-excerpt {
+  font-size: 17px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0 0 16px;
+}
+.blog-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  font-size: 13px;
+  color: #6b7280;
+}
+.blog-meta span { display: inline-flex; align-items: center; gap: 6px; }
+.blog-meta svg { color: #9ca3af; }
+
+.blog-toc {
+  background: #f8fafc;
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin: 0 0 30px;
+}
+.blog-toc strong {
+  display: block;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+.blog-toc ol { margin: 0; padding-left: 20px; display: grid; gap: 7px; }
+.blog-toc a { color: #2563eb; text-decoration: none; font-size: 14.5px; }
+.blog-toc a:hover { text-decoration: underline; }
+
+.blog-body { font-size: 16.5px; line-height: 1.75; }
+.blog-body h2 {
+  margin: 38px 0 14px;
+  font-size: 25px;
+  font-weight: 800;
+  color: #0f172a;
+  scroll-margin-top: 80px;
+}
+.blog-body h3 {
+  margin: 26px 0 10px;
+  font-size: 19px;
+  font-weight: 700;
+  color: #1e293b;
+}
+.blog-body p { margin: 0 0 16px; color: #374151; }
+.blog-body a { color: #2563eb; text-decoration: none; font-weight: 500; }
+.blog-body a:hover { text-decoration: underline; }
+.blog-body strong { color: #0f172a; font-weight: 700; }
+.blog-body ul, .blog-body ol { margin: 0 0 18px; padding-left: 24px; display: grid; gap: 8px; }
+.blog-body li { color: #374151; }
+.blog-body blockquote {
+  margin: 22px 0;
+  padding: 6px 18px;
+  border-left: 4px solid #93c5fd;
+  color: #475569;
+  font-style: italic;
+}
+.blog-callout {
+  margin: 22px 0;
+  padding: 16px 20px;
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 12px;
+}
+.blog-callout strong { display: block; margin-bottom: 6px; color: #0369a1; }
+.blog-callout p { margin: 0; color: #0c4a6e; }
+.blog-table-wrap { overflow-x: auto; margin: 20px 0; }
+.blog-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+  min-width: 460px;
+}
+.blog-table caption {
+  caption-side: top;
+  text-align: left;
+  font-size: 13px;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+.blog-table th, .blog-table td {
+  border: 1px solid #e5e9ef;
+  padding: 10px 12px;
+  text-align: left;
+}
+.blog-table thead th { background: #f8fafc; font-weight: 700; color: #0f172a; }
+.blog-table tbody tr:nth-child(even) { background: #fbfcfd; }
+
+.blog-faq { margin-top: 44px; }
+.blog-faq > h2 { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 16px; }
+.blog-faq-list { display: grid; gap: 10px; }
+.blog-faq-item {
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+  padding: 4px 18px;
+  background: #fff;
+}
+.blog-faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #1e293b;
+  padding: 14px 0;
+  list-style: none;
+  font-size: 15.5px;
+}
+.blog-faq-item summary::-webkit-details-marker { display: none; }
+.blog-faq-item[open] summary { color: #2563eb; }
+.blog-faq-item p { margin: 0 0 14px; color: #475569; line-height: 1.65; }
+
+.blog-related { margin-top: 40px; padding-top: 24px; border-top: 1px solid #eceef1; }
+.blog-related > h2 { font-size: 22px; font-weight: 800; color: #0f172a; margin-bottom: 14px; }
+.blog-related-list { display: grid; gap: 10px; }
+.blog-related-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border: 1px solid #e5e9ef;
+  border-radius: 12px;
+  color: #1e293b;
+  text-decoration: none;
+  font-weight: 600;
+  transition: border-color .15s ease, background .15s ease;
+}
+.blog-related-link:hover { border-color: #93c5fd; background: #f8fbff; }
+.blog-related-link svg { color: #94a3b8; flex-shrink: 0; }
+
+@media (max-width: 640px) {
+  .blog-body { font-size: 16px; }
+  .blog-body h2 { font-size: 22px; }
+  .blog-hero h1 { font-size: 26px; }
+}

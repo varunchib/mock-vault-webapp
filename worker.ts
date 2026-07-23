@@ -2,6 +2,7 @@
 // structured data for public SEO routes while keeping the user-facing SPA fast.
 
 import { postGuides } from './src/data/postGuides'
+import { blogPosts, renderBlogHtml } from './src/data/blogPosts'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 
@@ -462,6 +463,28 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
   `, crumbs)
 }
 
+function renderBlogContent(post: (typeof blogPosts)[string], crumbs: Crumb[] = []): string {
+  // renderBlogHtml is shared with BlogPostPage, so bots and users see identical body HTML.
+  const body = renderBlogHtml(post)
+  const faqs = post.faqs.length
+    ? `<section><h2>Frequently Asked Questions</h2><dl>${post.faqs
+        .map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`)
+        .join('')}</dl></section>`
+    : ''
+  const related = post.related.length
+    ? `<section><h2>Related on Ministry of Papers</h2><ul>${post.related
+        .map(r => `<li><a href="${esc(r.href)}">${htmlText(r.label)}</a></li>`)
+        .join('')}</ul></section>`
+    : ''
+  return renderPageShell(post.h1, `
+    <p><small>Updated <time datetime="${esc(post.updatedAt)}">${htmlText(post.updatedAt)}</time> · ${post.readMinutes} min read</small></p>
+    <p>${htmlText(post.excerpt)}</p>
+    ${body}
+    ${faqs}
+    ${related}
+  `, crumbs)
+}
+
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], crumbs: Crumb[] = []): string {
   const paperLinks = papers
     .slice(0, 30)
@@ -801,6 +824,48 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         },
       }
     }
+
+    const blogMatch = pathname.match(/^\/blog\/([^/]+)$/)
+    if (blogMatch) {
+      const slug = blogMatch[1]
+      const post = blogPosts[slug]
+      if (!post) return null
+      const blogCrumbs: Crumb[] = [
+        { name: 'Home', item: BASE },
+        { name: 'Blog', item: `${BASE}/blog` },
+        { name: post.title, item: `${BASE}/blog/${slug}` },
+      ]
+      return {
+        title: `${post.title} | Ministry of Papers`,
+        description: post.description,
+        contentHtml: renderBlogContent(post, blogCrumbs),
+        jsonLd: [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'BlogPosting',
+            headline: post.h1,
+            description: post.description,
+            url: `${BASE}/blog/${slug}`,
+            datePublished: post.publishedAt,
+            dateModified: post.updatedAt,
+            author: { '@type': 'Organization', name: post.author, url: BASE },
+            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+            articleSection: post.category,
+            keywords: post.tags.join(', '),
+            mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}/blog/${slug}` },
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: post.faqs.map(f => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: { '@type': 'Answer', text: f.a },
+            })),
+          },
+        ],
+      }
+    }
   } catch {
     return null
   }
@@ -891,7 +956,7 @@ export default {
         // immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=3`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=4`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
@@ -919,8 +984,12 @@ export default {
       }
     }
 
+    // Only bots get the prerendered contentHtml injected into #root. For humans,
+    // painting SSR content into #root that React then discards on hydration is a
+    // visible flash (FOUC) on load/reload — so real users fall through to the
+    // plain SPA shell below and hydrate cleanly.
     const staticMeta = STATIC_META[path]
-    if (staticMeta) {
+    if (staticMeta && BOT_UA.test(ua)) {
       try {
         const baseRes = await env.ASSETS.fetch(indexRequest)
         if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
