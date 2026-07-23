@@ -27,6 +27,10 @@ type ExamData = {
   papers?: number
   mocks?: number
   subjects?: string[]
+  boardSlug?: string
+  // Number of sub-exams under this one. 1 = a thin board (near-duplicate of its
+  // lone child) → served noindex until a 2nd sub-exam makes it a real hub.
+  childExamCount?: number
 }
 
 type PaperData = {
@@ -485,7 +489,14 @@ function renderBlogContent(post: (typeof blogPosts)[string], crumbs: Crumb[] = [
   `, crumbs)
 }
 
-function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], crumbs: Crumb[] = []): string {
+function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], subExams: ExamData[] = [], crumbs: Crumb[] = []): string {
+  // Sub-exam links so a board renders as a real hub for bots — matching the
+  // "Exams under this board" section the React page shows humans. Without these,
+  // Google saw a board (e.g. JKSSB, 8 sub-exams) as a flat paper list and passed
+  // no internal link equity down to the sub-exam pages that should actually rank.
+  const subExamLinks = subExams
+    .map(x => `<li><a href="/exam/${encodeURIComponent(x.slug)}">${htmlText(x.name)}</a> <small>${x.papers ?? 0} papers${x.mocks ? ` - ${x.mocks} mocks` : ''}</small></li>`)
+    .join('')
   const paperLinks = papers
     .slice(0, 30)
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
@@ -499,6 +510,7 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
+    ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
   `, crumbs)
@@ -601,15 +613,23 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
-      const [e, papers, mocks] = await Promise.all([
+      const [e, papers, mocks, allExams] = await Promise.all([
         apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600),
         apiJson<PaperData[]>(`${API}/api/v1/exams/${slug}/papers`, 3600),
         apiJson<MockData[]>(`${API}/api/v1/mocks`, 3600),
+        apiJson<ExamData[]>(`${API}/api/v1/exams`, 3600),
       ])
       if (!e) return null
       const examMocks = (mocks ?? []).filter(m => m.examSlug === slug)
+      // Sub-exams for board hubs (rendered as internal links, see renderExamContent).
+      const subExams = (allExams ?? []).filter(x => x.boardSlug === slug)
       // An exam with no papers and no mocks is a thin page → keep it out of the index.
       const examEmpty = (e.papers ?? 0) === 0 && (e.mocks ?? 0) === 0
+      // A thin board — one with exactly ONE sub-exam — just aggregates that lone
+      // child, so its page is a near-duplicate of the sub-exam's. Keep it out of
+      // the index (this matches the sitemap, which also skips it) until a 2nd
+      // sub-exam is added and childExamCount >= 2 turns it into a genuine hub.
+      const thinBoard = (e.childExamCount ?? 0) === 1
       const examCrumbs: Crumb[] = [
         { name: 'Home', item: BASE },
         { name: 'Exams', item: `${BASE}/exams` },
@@ -618,8 +638,8 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       return {
         title: `${e.shortName} - Mock Tests & PYQ Papers | Ministry of Papers`,
         description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
-        robots: examEmpty ? 'noindex, follow' : undefined,
-        contentHtml: renderExamContent(e, papers ?? [], examMocks, examCrumbs),
+        robots: examEmpty || thinBoard ? 'noindex, follow' : undefined,
+        contentHtml: renderExamContent(e, papers ?? [], examMocks, subExams, examCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
