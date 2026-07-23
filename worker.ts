@@ -984,8 +984,12 @@ export default {
       }
     }
 
+    // Only bots get the prerendered contentHtml injected into #root. For humans,
+    // painting SSR content into #root that React then discards on hydration is a
+    // visible flash (FOUC) on load/reload — so real users fall through to the
+    // plain SPA shell below and hydrate cleanly.
     const staticMeta = STATIC_META[path]
-    if (staticMeta) {
+    if (staticMeta && BOT_UA.test(ua)) {
       try {
         const baseRes = await env.ASSETS.fetch(indexRequest)
         if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
