@@ -4379,8 +4379,11 @@ footer {
 }
 
 .pyq-q-text {
-  font-size: 14.5px;
-  line-height: 1.65;
+  /* 16px is the readability / mobile-friendliness baseline (Google flags smaller
+     body text as "text too small to read"). This is the primary indexed content
+     on /pyq and /question pages, so it gets the full 16px. */
+  font-size: 16px;
+  line-height: 1.7;
   color: var(--ink);
   margin: 0;
 }
@@ -4399,7 +4402,7 @@ footer {
   background: #fff;
   text-align: left;
   cursor: pointer;
-  font-size: 13.5px;
+  font-size: 15px;
   color: var(--ink);
   width: 100%;
   transition: border-color .12s, background .12s;
@@ -4601,8 +4604,8 @@ footer {
 }
 
 .pyq-explanation p {
-  font-size: 13.5px;
-  line-height: 1.65;
+  font-size: 15.5px;
+  line-height: 1.75;
   color: var(--ink);
   margin: 0;
 }
@@ -12444,7 +12447,7 @@ html {
 }
 
 .pg-section p {
-  font-size: 14px;
+  font-size: 15.5px;
   line-height: 1.75;
   color: #374151;
   margin: 0 0 12px;
