@@ -4610,6 +4610,63 @@ footer {
   margin: 0;
 }
 
+/* ── Structured "Detailed Solution" (headings + bullets + nesting) ─────────
+   Rendered by ExplanationText / worker richText. Gives PYQ and question-page
+   solutions the clean, scannable Testbook-style layout. Scoped to the solution
+   body so plain-paragraph explanations elsewhere are untouched. */
+.pyq-solution-body > *:first-child { margin-top: 0; }
+.pyq-solution-body p { font-size: 15.5px; line-height: 1.75; color: var(--ink); margin: 0 0 10px; }
+.pyq-solution-body p:last-child { margin-bottom: 0; }
+
+.pyq-solution-body .expl-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #edece6;
+}
+.pyq-solution-body .expl-heading .qr-highlight { background: none; padding: 0; color: inherit; }
+.pyq-solution-body .expl-heading-icon { font-size: 16px; line-height: 1; }
+
+.pyq-solution-body .expl-list {
+  margin: 0 0 14px;
+  padding-left: 22px;
+  list-style: disc;
+  display: grid;
+  gap: 7px;
+}
+.pyq-solution-body .expl-list > li {
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--ink);
+  padding-left: 2px;
+}
+.pyq-solution-body .expl-list > li::marker { color: #94a3b8; }
+
+.pyq-solution-body .expl-sublist {
+  margin: 7px 0 2px;
+  padding-left: 20px;
+  list-style: circle;
+  display: grid;
+  gap: 5px;
+}
+.pyq-solution-body .expl-sublist > li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink2, #374151);
+}
+.pyq-solution-body .expl-sublist > li::marker { color: #cbd5e1; }
+
+@media (max-width: 640px) {
+  .pyq-solution-body .expl-list > li { font-size: 15px; }
+  .pyq-solution-body .expl-sublist > li { font-size: 14.5px; }
+  .pyq-solution-body .expl-heading { font-size: 15.5px; }
+}
+
 /* ── Deleted question — PYQ paper page ──────────────── */
 .pyq-question-card.deleted { opacity: .85; background: #fafafa; }
 

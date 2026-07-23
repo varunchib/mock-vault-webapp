@@ -1,4 +1,5 @@
 import { MathText } from '../components/common/MathText'
+import { ExplanationText } from '../components/common/ExplanationText'
 import { env } from '../lib/env'
 import { BookOpen, ChevronRight, Download, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
@@ -405,9 +406,7 @@ export function PyqPaperPage() {
                     <div className="pyq-explanation">
                       <strong>Explanation</strong>
                       <div className="pyq-solution-body">
-                        {q.explanation.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean).map((line, li) => (
-                          <p key={li}><MathText text={line} /></p>
-                        ))}
+                        <ExplanationText text={q.explanation} />
                       </div>
                     </div>
                   )}

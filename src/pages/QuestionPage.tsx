@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { MathText } from '../components/common/MathText'
+import { ExplanationText } from '../components/common/ExplanationText'
 import { fetchQuestionBySlug, type Question } from '../lib/api'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { useAuth } from '../context/useAuth'
@@ -12,15 +13,12 @@ import { questionSeoTitle, questionSeoDescription } from '../lib/pageTitles'
 import { env } from '../lib/env'
 import { paperPath } from '../lib/paperSeo'
 
-// Renders solution text: each non-empty line becomes a paragraph, with **bold**
-// and $math$ handled by MathText (identical to how the SSR/Worker renders it).
+// Renders solution text with headings/bullets/nesting (identical to how the
+// SSR/Worker renders it), falling back to paragraphs for plain text.
 function SolutionText({ text }: { text: string }) {
-  const lines = text.replace(/\r/g, '').split('\n').map(l => l.trim()).filter(Boolean)
   return (
     <div className="pyq-solution-body">
-      {lines.map((line, i) => (
-        <p key={i}><MathText text={line} /></p>
-      ))}
+      <ExplanationText text={text} />
     </div>
   )
 }

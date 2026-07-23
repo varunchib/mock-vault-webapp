@@ -264,17 +264,38 @@ function inlineFmt(s: string): string {
   return esc(String(s)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
 }
 
-// richText renders explanation content: each non-empty line becomes a paragraph
-// (same as the app's MultilineText), with **bold** section labels preserved.
+// richText renders explanation content with a light structure — headings,
+// bullet points and nested points — mirroring the app's ExplanationText so bots
+// see the same "Detailed Solution" layout users do. Plain text with no markers
+// still renders as paragraphs (backward compatible).
+//   ## Heading   → <h4>   ·   - item → <li>   ·   (indent) - item → nested <li>
 function richText(s: string | undefined | null): string {
   if (!s) return ''
-  return String(s)
-    .replace(/\r/g, '')
-    .split('\n')
-    .map(l => l.trim())
-    .filter(Boolean)
-    .map(l => `<p>${inlineFmt(l)}</p>`)
-    .join('')
+  const lines = String(s).replace(/\r/g, '').split('\n')
+  const out: string[] = []
+  let items: { text: string; sub: string[] }[] | null = null
+  const flush = () => {
+    if (items && items.length) {
+      out.push('<ul>' + items.map(it =>
+        `<li>${inlineFmt(it.text)}${it.sub.length ? '<ul>' + it.sub.map(x => `<li>${inlineFmt(x)}</li>`).join('') + '</ul>' : ''}</li>`,
+      ).join('') + '</ul>')
+    }
+    items = null
+  }
+  for (const raw of lines) {
+    const line = raw.replace(/\s+$/, '')
+    if (!line.trim()) { flush(); continue }
+    const heading = line.match(/^\s*#{2,3}\s+(.*)$/)
+    if (heading) { flush(); out.push(`<h4>${inlineFmt(heading[1].trim())}</h4>`); continue }
+    const nested = line.match(/^(?:\s{2,}|\t+)[-*•]\s+(.*)$/)
+    if (nested && items && items.length) { items[items.length - 1].sub.push(nested[1].trim()); continue }
+    const bullet = line.match(/^\s*[-*•]\s+(.*)$/)
+    if (bullet) { if (!items) items = []; items.push({ text: bullet[1].trim(), sub: [] }); continue }
+    flush()
+    out.push(`<p>${inlineFmt(line.trim())}</p>`)
+  }
+  flush()
+  return out.join('')
 }
 
 // questionTopic returns the question's primary topic keyword for the title.
