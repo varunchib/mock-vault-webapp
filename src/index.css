@@ -4184,6 +4184,22 @@ footer {
     border-radius: 12px;
   }
 
+  /* Stack the paper header on phones: the action buttons ("Share", "Full Paper",
+     "Exam Guide") sat in a non-shrinking column beside the title and pushed the
+     row — and the whole grid column — past the viewport (horizontal scroll,
+     clipped text). Below the title they get the full width and wrap. */
+  .pyq-paper-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pyq-paper-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .pyq-paper-actions .pyq-action-btn {
+    flex: 1 1 auto;
+  }
+
   .pyp-sober-toolbar,
   .pyp-sober-actions {
     flex-direction: column;
@@ -4207,10 +4223,25 @@ footer {
 /* Outer container (mirrors ec-page / ep-page pattern) */
 .pyq-page {
   display: grid;
+  /* minmax(0, 1fr) caps the single column at the container width. Without the
+     explicit 0 minimum, a grid track's implicit min-width is `auto` (= its
+     widest item's min-content), so one long question/passage stretched the
+     whole column past the viewport and every sibling (breadcrumb, header,
+     cards) inherited that width — causing horizontal scroll on mobile. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   width: min(1100px, 100%);
   margin: 0 auto;
 }
+/* Let grid/flex children actually shrink to the column, and wrap long text
+   instead of forcing the track wider. */
+.pyq-page > *,
+.pyq-question-list,
+.pyq-question-card { min-width: 0; }
+.pyq-q-text,
+.pyq-passage,
+.qr-text,
+.pyq-option { overflow-wrap: break-word; }
 
 /* ── Paper header card ──────────────────────────────── */
 .pyq-paper-header {
