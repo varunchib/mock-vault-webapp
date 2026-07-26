@@ -9487,17 +9487,23 @@ footer {
 .sq-option.wrong .sq-opt-key { background: #dc2626; color: #fff; }
 .sq-opt-text { flex: 1; line-height: 1.45; }
 
+/* Structured explanation on the subject-practice card. Renders via
+   ExplanationText (same as paper/question pages); the .pyq-solution-body class
+   on the wrapper supplies the heading/bullet/nesting styles. No white-space:
+   pre-wrap — the markdown (## Key Points, - bullets, **bold**) is now parsed,
+   not shown literally. */
 .sq-explanation {
-  font-size: 13px;
   color: #4b5563;
   background: #f9fafb;
   border-left: 3px solid #d1d5db;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 0 6px 6px 0;
-  margin: 4px 0 0;
-  line-height: 1.55;
-  white-space: pre-wrap;
+  margin: 6px 0 0;
 }
+.sq-explanation.pyq-solution-body p { font-size: 14.5px; margin: 0 0 8px; }
+.sq-explanation.pyq-solution-body .expl-heading { font-size: 14.5px; margin: 14px 0 8px; }
+.sq-explanation.pyq-solution-body .expl-list > li { font-size: 14px; }
+.sq-explanation.pyq-solution-body .expl-sublist > li { font-size: 13.5px; }
 
 /* Load more */
 .sq-load-more { display: flex; justify-content: center; padding: 20px 0 4px; }

@@ -35,6 +35,7 @@ import { recordExamView } from '../lib/examActivity'
 import { subExamsOf } from '../lib/examTree'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
+import { ExplanationText } from '../components/common/ExplanationText'
 import { examFaqs, type FaqItem } from '../data/examFaq'
 import { postGuides } from '../data/postGuides'
 
@@ -120,7 +121,9 @@ function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagCli
         })}
       </div>
       {answered && q.explanation && (
-        <p className="sq-explanation">{q.explanation}</p>
+        <div className="sq-explanation pyq-solution-body">
+          <ExplanationText text={q.explanation} />
+        </div>
       )}
     </div>
   )
