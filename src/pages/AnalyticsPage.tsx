@@ -2,7 +2,6 @@ import { BookOpen, ChevronRight, Clock3, FileText, Flame, LayoutGrid, TrendingUp
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
-import { SubjectStrength } from '../components/analytics/SubjectStrength'
 import { ScoreTrendChart, type TrendPoint } from '../components/analytics/ScoreTrendChart'
 import { fetchExamCatalog, fetchPaperCatalog, type Exam, type Paper } from '../lib/api'
 import { remapToPaperExam } from '../lib/remapExam'
@@ -254,9 +253,6 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
               </div>
             )}
           </div>
-
-          {/* Per-subject accuracy — where you're strong and where you lack */}
-          <SubjectStrength results={results} />
 
           {/* Recent attempts */}
           <div className="an2-panel">
