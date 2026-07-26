@@ -16722,6 +16722,42 @@ html {
   .an2-exam-meter { display: none; }
 }
 
+/* Exam cards — overview "By exam" grid, each with its own quick analytics */
+.an2-exam-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
+  gap: 12px;
+}
+.an2-exam-card {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color .13s, box-shadow .13s;
+}
+.an2-exam-card:hover { border-color: var(--ink4); box-shadow: 0 4px 14px rgba(15, 23, 42, .06); }
+.an2-exam-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.an2-exam-card-head strong { font-size: 14px; font-weight: 700; color: var(--ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.an2-exam-card-chev { color: var(--ink4); flex-shrink: 0; }
+.an2-exam-card-sub { font-size: 11.5px; color: var(--ink3); margin-top: -3px; }
+.an2-exam-card-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 3px; }
+.an2-exam-stat { display: grid; gap: 1px; }
+.an2-exam-stat span { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink4); }
+.an2-exam-stat strong { font-size: 15px; font-weight: 800; color: var(--ink); }
+.an2-exam-stat strong em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--ink4); }
+.an2-exam-stat strong.good { color: var(--green); }
+.an2-exam-stat strong.mid  { color: #92400E; }
+.an2-exam-stat strong.bad  { color: var(--red); }
+.an2-exam-card-meter { height: 6px; border-radius: 4px; background: var(--line2); overflow: hidden; margin-top: 2px; }
+.an2-exam-card-meter-fill { height: 100%; border-radius: 4px; background: var(--blue); }
+.an2-exam-card-meter-fill.good { background: var(--green); }
+.an2-exam-card-meter-fill.mid  { background: #d97706; }
+.an2-exam-card-meter-fill.bad  { background: var(--red); }
+@media (max-width: 480px) { .an2-exam-cards { grid-template-columns: 1fr; } }
+
 /* Recent attempts */
 .an2-recent-list { display: grid; }
 .an2-recent-row {
