@@ -35,23 +35,17 @@
     <!-- The session check fires on every page load; warming the API origin
          saves a DNS+TLS round-trip (~300ms on mobile) off that request. -->
     <link rel="preconnect" href="https://api.ministryofpapers.com" crossorigin />
-    <!-- Loaded non-blocking (media="print" + onload flip) so fonts stay off the
-         critical render path. Split by family so display can differ:
-         - Fraunces (serif DISPLAY font, headings) uses display=optional. Its
-           metrics differ a lot from any fallback, so a late swap reflows every
-           heading and cascades the whole page (and the footer) downward — that
-           was ~all of the field/lab CLS. `optional` never swaps mid-page: it
-           uses the font only if it arrives in the first ~100ms, else the
-           fallback for that view. Zero font-driven layout shift.
-         - DM Sans (body) keeps display=swap: its metrics are close to the system
-           sans fallback, so the swap barely shifts, and body text always shows in
-           the brand font. -->
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&display=optional"
-      media="print"
-      onload="this.media='all';this.onload=null"
-    />
+    <!-- Fraunces (serif DISPLAY font, headings) is SELF-HOSTED — see the
+         @font-face rules in index.css. Preloading the latin woff2 from our own
+         origin makes it ready at first paint, so the brand font renders on
+         virtually every load (not just warm-cache ones). font-display: optional
+         keeps font-driven CLS at zero — no mid-page swap that reflows headings.
+         crossorigin is required even same-origin: fonts are fetched in CORS mode,
+         so the preload must match to be reused (no double download). -->
+    <link rel="preload" href="/fonts/fraunces-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- DM Sans (body) stays on Google Fonts with display=swap: its metrics are
+         close to the system sans fallback, so the swap barely shifts. Loaded
+         non-blocking (media="print" + onload flip) to stay off the critical path. -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap"
@@ -59,9 +53,28 @@
       onload="this.media='all';this.onload=null"
     />
     <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,300;1,9..144,600&display=optional" />
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" />
     </noscript>
+    <!-- Theme bootstrap: resolve light/dark BEFORE first paint so there is no
+         flash. 'system' (or unset) follows the OS; 'light'/'dark' are explicit. -->
+    <script>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');       // 'light' | 'dark' | 'system'
+          var signedIn = localStorage.getItem('mv.session') === '1';
+          var onLanding = location.pathname === '/';
+          var sys = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          var pref = saved === 'dark' ? 'dark' : saved === 'system' ? sys : 'light';
+          // Dark is a logged-in experience only, and never on the landing page.
+          var theme = (signedIn && !onLanding && pref === 'dark') ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', theme);
+          var mc = document.querySelector('meta[name="theme-color"]');
+          if (mc) mc.setAttribute('content', theme === 'dark' ? '#1E1E1E' : '#FAFAF7');
+        } catch (e) {
+          document.documentElement.setAttribute('data-theme', 'light');
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

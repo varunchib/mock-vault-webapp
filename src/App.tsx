@@ -7,6 +7,7 @@ import { AppShell } from './components/layout/AppShell'
 import { HaloLoader } from './components/common/HaloLoader'
 import { hasSessionHint } from './lib/sessionHint'
 import { useAuth } from './context/useAuth'
+import { resolveTheme, useThemePref } from './lib/useTheme'
 import { AppRoutes } from './routes/AppRoutes'
 
 // Routes that genuinely need the verified user before they can render. Only
@@ -16,6 +17,33 @@ const AUTH_REQUIRED = /^\/(dashboard|admin|analytics|mock-attempt|paper-attempt)
 function AppChrome() {
   const location = useLocation()
   const { isAuthenticated, isLoading } = useAuth()
+  const themePref = useThemePref()
+
+  // Dark mode is a logged-in experience only. It applies inside the app shell
+  // (dashboard, analytics, admin, attempts, and content pages while signed in)
+  // — never on the public landing / marketing / SEO pages. `authedForLayout`
+  // already gates the app shell; the landing route is excluded explicitly.
+  const authedForLayout = isAuthenticated || (isLoading && hasSessionHint())
+  const darkEligible = authedForLayout && location.pathname !== '/'
+  useEffect(() => {
+    const resolved = darkEligible ? resolveTheme(themePref) : 'light'
+    document.documentElement.setAttribute('data-theme', resolved)
+    const mc = document.querySelector('meta[name="theme-color"]')
+    if (mc) mc.setAttribute('content', resolved === 'dark' ? '#1E1E1E' : '#FAFAF7')
+  }, [darkEligible, themePref])
+  // Follow the OS live while the preference is "system" (and dark is eligible).
+  useEffect(() => {
+    if (!(darkEligible && themePref === 'system')) return
+    const m = window.matchMedia('(prefers-color-scheme: dark)')
+    const onChange = () => {
+      const t = m.matches ? 'dark' : 'light'
+      document.documentElement.setAttribute('data-theme', t)
+      const mc = document.querySelector('meta[name="theme-color"]')
+      if (mc) mc.setAttribute('content', t === 'dark' ? '#1E1E1E' : '#FAFAF7')
+    }
+    m.addEventListener('change', onChange)
+    return () => m.removeEventListener('change', onChange)
+  }, [darkEligible, themePref])
 
   const isFirstRender = useRef(true)
   useEffect(() => {
@@ -35,10 +63,6 @@ function AppChrome() {
     return <main><section className="public-page"><div className="public-shell"><HaloLoader label="Loading session" /></div></section></main>
   }
 
-  // While auth is still resolving on a public route, fall back to the session
-  // hint so a returning signed-in user gets the app shell without a public->shell
-  // flip. The hint only picks the layout; it never grants access.
-  const authedForLayout = isAuthenticated || (isLoading && hasSessionHint())
   const useUserShell = authedForLayout && !isAdminRoute && !isAttemptRoute
 
   if (useUserShell) {

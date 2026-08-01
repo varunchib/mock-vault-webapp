@@ -4,6 +4,7 @@
 import { postGuides } from './src/data/postGuides'
 import { blogPosts, renderBlogHtml } from './src/data/blogPosts'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
+import { blogPathForExam, guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 
 interface Env {
@@ -90,6 +91,18 @@ const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Goog
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 const API_TIMEOUT_MS = 4000
+
+// Recommended QAPage fields (Google "improve item appearance"): the platform
+// authors and verifies every solution, so it is the author of both the
+// question write-up and the accepted answer.
+const QA_AUTHOR = { '@type': 'Organization', name: 'Ministry of Papers', url: BASE }
+function qaDate(year: string | number | undefined): string {
+  const m = String(year ?? '').match(/\d{4}/)
+  // Full ISO 8601 datetime with an explicit UTC offset — Google's QAPage
+  // validator rejects a bare date (YYYY-MM-DD) for datePublished as both an
+  // "invalid datetime value" and "missing a time zone".
+  return `${m ? m[0] : '2026'}-01-01T00:00:00+00:00`
+}
 
 // Content-Security-Policy for the SPA shell. Shipped as Report-Only so it CANNOT
 // break the site — it only logs violations to the browser console. Watch for a few
@@ -282,11 +295,28 @@ function richText(s: string | undefined | null): string {
     }
     items = null
   }
-  for (const raw of lines) {
-    const line = raw.replace(/\s+$/, '')
+  const cells = (l: string) => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
+  const isRow = (l: string) => l.trim().startsWith('|') && l.includes('|', 1)
+  const isSep = (l: string) => /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(l) && l.includes('-')
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].replace(/\s+$/, '')
     if (!line.trim()) { flush(); continue }
     const heading = line.match(/^\s*#{2,3}\s+(.*)$/)
     if (heading) { flush(); out.push(`<h4>${inlineFmt(heading[1].trim())}</h4>`); continue }
+    // Pipe table: header + separator + body rows
+    if (isRow(line) && i + 1 < lines.length && isSep(lines[i + 1])) {
+      flush()
+      const head = cells(line)
+      const body: string[][] = []
+      i += 2
+      while (i < lines.length && isRow(lines[i])) { body.push(cells(lines[i])); i++ }
+      i--
+      out.push('<div class="expl-table-wrap"><table class="expl-table"><thead><tr>' +
+        head.map(h => `<th>${inlineFmt(h)}</th>`).join('') + '</tr></thead><tbody>' +
+        body.map(r => '<tr>' + r.map(c => `<td>${inlineFmt(c)}</td>`).join('') + '</tr>').join('') +
+        '</tbody></table></div>')
+      continue
+    }
     const nested = line.match(/^(?:\s{2,}|\t+)[-*•]\s+(.*)$/)
     if (nested && items && items.length) { items[items.length - 1].sub.push(nested[1].trim()); continue }
     const bullet = line.match(/^\s*[-*•]\s+(.*)$/)
@@ -527,10 +557,19 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(m => `<li><a href="/mock-test/${encodeURIComponent(m.slug)}">${htmlText(m.title)}</a> <small>${htmlText(m.difficulty)} - ${m.questions} questions</small></li>`)
     .join('')
   const subjects = (e.subjects ?? []).filter(Boolean).join(', ')
+  // Guide / blog cross-links — hand crawlers off to the editorial reference and
+  // info article for this exam, mirroring the cards the React page shows.
+  const guideHref = guidePathForExam(e.slug)
+  const blogHref = blogPathForExam(e.slug)
+  const resourceLinks = [
+    guideHref ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>` : '',
+    blogHref ? `<li><a href="${blogHref}">${htmlText(e.shortName)}: notification, dates, salary &amp; preparation</a></li>` : '',
+  ].join('')
   return renderPageShell(`${e.name} PYQ papers and mock tests`, `
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
+    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} guides &amp; info</h2><ul>${resourceLinks}</ul></section>` : ''}
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
@@ -581,7 +620,7 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
 }
 
 function isDynamicSeoPath(pathname: string): boolean {
-  return /^\/exam\/[^/]+(?:\/overview)?$/.test(pathname)
+  return /^\/exam\/[^/]+$/.test(pathname)
     || /^\/pyq\/[^/]+$/.test(pathname)
     || /^\/question\/[^/]+$/.test(pathname)
     || /^\/mock-test\/[^/]+$/.test(pathname)
@@ -601,36 +640,6 @@ function notFoundResponse(): Response {
 
 async function fetchMeta(pathname: string): Promise<PageMeta | null> {
   try {
-    const overviewMatch = pathname.match(/^\/exam\/([^/]+)\/overview$/)
-    if (overviewMatch) {
-      const slug = overviewMatch[1]
-      const e = await apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600)
-      if (!e) return null
-      const overviewCrumbs: Crumb[] = [
-        { name: 'Home', item: BASE },
-        { name: 'Exams', item: `${BASE}/exams` },
-        { name: e.shortName, item: `${BASE}/exam/${slug}` },
-        { name: 'Overview', item: `${BASE}/exam/${slug}/overview` },
-      ]
-      return {
-        title: `${e.shortName} Overview - Exam Pattern, Eligibility & PYQ | Ministry of Papers`,
-        description: `${e.shortName} overview - exam pattern, eligibility criteria, selection process, salary, and free PYQ with detailed explanations on Ministry of Papers.`,
-        contentHtml: renderPageShell(`${e.shortName} exam overview`, `
-          ${paragraph(e.description)}
-          <p><a href="/exam/${encodeURIComponent(slug)}">Browse ${htmlText(e.shortName)} PYQ papers and mock tests</a></p>
-        `, overviewCrumbs),
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'Course',
-          name: `${e.shortName} Exam Overview`,
-          description: e.description || `${e.name} exam pattern, eligibility, selection process, and free PYQ.`,
-          url: `${BASE}/exam/${slug}/overview`,
-          provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: breadcrumbJsonLd(overviewCrumbs),
-        },
-      }
-    }
-
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
@@ -823,12 +832,18 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             mainEntity: {
               '@type': 'Question',
               name: q.question.slice(0, 300),
+              text: q.question,
               answerCount: 1,
+              author: QA_AUTHOR,
+              datePublished: qaDate(q.year),
               ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
               acceptedAnswer: {
                 '@type': 'Answer',
                 text: answerText || `Correct option: ${q.answerKey}`,
                 url: `${BASE}/question/${slug}`,
+                author: QA_AUTHOR,
+                datePublished: qaDate(q.year),
+                upvoteCount: 1,
               },
             },
           },
@@ -959,6 +974,18 @@ export default {
     if (LEGACY_REDIRECTS[path]) {
       const dest = new URL(request.url)
       dest.pathname = LEGACY_REDIRECTS[path]
+      dest.search = ''
+      return Response.redirect(dest.toString(), 301)
+    }
+
+    // Retired /exam/:slug/overview pages → the exam guide (or the hub if no
+    // guide). Overview duplicated the guide's pattern/eligibility content, so
+    // it was removed to end the cannibalization; 301 preserves any earned rank.
+    const overviewRedirect = path.match(/^\/exam\/([^/]+)\/overview$/)
+    if (overviewRedirect) {
+      const slug = overviewRedirect[1]
+      const dest = new URL(request.url)
+      dest.pathname = postGuides[slug] ? `/guide/${slug}` : `/exam/${slug}`
       dest.search = ''
       return Response.redirect(dest.toString(), 301)
     }

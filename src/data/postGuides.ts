@@ -69,6 +69,16 @@ export type PostGuideData = {
   selectionProcess: string[]
   salary: { post: string; payScale: string; level: string }[]
   preparationTips: string[]
+
+  // Exam analysis — the guide's unique, rankable hook (distinct from the blog,
+  // which owns broad info). Section weightage is DERIVED automatically from
+  // examPattern marks (never hand-entered — so it can't drift from the pattern).
+  // These optional fields add exam-specific colour on top of that:
+  analysis?: {
+    intro?: string             // 1-2 lines framing where the marks/questions come from
+    topTopics?: { section: string; topics: string }[] // most-tested topics per high-weight section
+    difficulty?: string        // factual difficulty read (negative marking, time pressure, cutoffs)
+  }
 }
 
 // Reverse lookup: paper slug → guide slug
@@ -87,7 +97,8 @@ export const paperGuideMap: Record<string, string> = {
   'jkssb-wildlife-guard-2026-may-10':  'jkssb-wildlife-guard',
   'jkssb-veterinary-pharmacist-2025':  'jkssb-veterinary-pharmacist',
   'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb',
-  'ssc-cgl-2023-tier-1-all-shifts':    'ssc-cgl',
+  'ssc-cgl-2025-sep17-shift1':         'ssc-cgl',
+  'ssc-cgl-2025-sep12-shift1':         'ssc-cgl',
   'upsc-cse-prelims-2026-gs1':         'upsc-cse',
   'upsc-cse-prelims-2025-gs1':         'upsc-cse',
   'upsc-cse-prelims-2025-gs2':         'upsc-cse',
@@ -621,7 +632,8 @@ export const postGuides: Record<string, PostGuideData> = {
     examSlug: 'ssc-cgl',
 
     papers: [
-      { slug: 'ssc-cgl-2023-tier-1-all-shifts', title: 'SSC CGL 2023 Tier I — All Shifts Combined', year: '2023', questions: 100 },
+      { slug: 'ssc-cgl-2025-sep17-shift1', title: 'SSC CGL 2025 Tier I — 17 Sep 2025 (Shift 1)', year: '2025', questions: 100 },
+      { slug: 'ssc-cgl-2025-sep12-shift1', title: 'SSC CGL 2025 Tier I — 12 Sep 2025 (Shift 1)', year: '2025', questions: 100 },
     ],
 
     conductingBody: 'Staff Selection Commission (SSC)',
@@ -872,7 +884,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── IBPS PO ─────────────────────────────────────────────────────────────────
   'ibps-po': {
-    title: 'IBPS PO — Complete Syllabus & Exam Pattern 2025',
+    title: 'IBPS PO Syllabus, Exam Pattern & Section Weightage Analysis 2025',
     shortName: 'IBPS PO',
     tagline: 'IBPS Probationary Officer exam — Prelims & Mains syllabus, section-wise pattern, Banking Awareness topics, previous year papers.',
     lastUpdated: '2026-07-16',
@@ -971,6 +983,16 @@ export const postGuides: Record<string, PostGuideData> = {
       { section: 'Prelims Total', questions: 100, marks: 100, isTotal: true },
     ],
     examPatternNote: 'Prelims: 60 min total, 20 min per section. Mains: 155 MCQs (200 marks, 3 hr) + 2 Descriptive (25 marks, 30 min). Interview: 100 marks.',
+
+    analysis: {
+      intro: 'In Prelims, Reasoning and Quantitative Aptitude carry 35 marks each and English 30 — so the two non-English sections together decide 70% of the Prelims score. Reasoning and Quant are where the exam is won or lost.',
+      topTopics: [
+        { section: 'Reasoning Ability', topics: 'Puzzles & Seating Arrangement dominate (15–20 of the 35 questions), followed by Syllogism, Inequality, Blood Relations and Coding–Decoding.' },
+        { section: 'Quantitative Aptitude', topics: 'Data Interpretation is the highest-frequency area (2–3 sets), then Simplification/Approximation, Arithmetic word problems and Number Series.' },
+        { section: 'English Language', topics: 'Reading Comprehension carries the most questions, alongside Cloze Test, Error Spotting and Sentence Rearrangement.' },
+      ],
+      difficulty: 'Difficulty driver: strict 20-minute sectional timing with −0.25 negative marking means speed and accuracy matter more than syllabus coverage — the cutoff is set by how many you can attempt cleanly in the window, not by the hardest question.',
+    },
 
     eligibility: {
       age: '20–30 years. OBC: +3 years. SC/ST: +5 years. PwD: +10 years. Ex-Servicemen: +5 years.',

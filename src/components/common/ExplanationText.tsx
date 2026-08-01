@@ -20,6 +20,19 @@ type Block =
   | { t: 'p'; text: string }
   | { t: 'h'; text: string }
   | { t: 'ul'; items: ListItem[] }
+  | { t: 'table'; head: string[]; rows: string[][] }
+
+// A pipe-table row: | a | b | c |  (leading/trailing pipe optional)
+function tableCells(line: string): string[] {
+  return line.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
+}
+// A separator row: | --- | :--: | (only dashes, colons, pipes, spaces)
+function isTableSep(line: string): boolean {
+  return /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(line) && line.includes('-')
+}
+function isTableRow(line: string): boolean {
+  return line.trim().startsWith('|') && line.includes('|', 1)
+}
 
 const HEADING_ICON: Record<string, string> = {
   'key points': '🔑',
@@ -41,12 +54,24 @@ export function parseExplanation(raw: string): Block[] {
     list = null
   }
 
-  for (const rawLine of lines) {
-    const line = rawLine.replace(/\s+$/, '')
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].replace(/\s+$/, '')
     if (!line.trim()) { flush(); continue }
 
     const heading = line.match(/^\s*#{2,3}\s+(.*)$/)
     if (heading) { flush(); blocks.push({ t: 'h', text: heading[1].trim() }); continue }
+
+    // Pipe table: a header row, a separator row, then one or more body rows.
+    if (isTableRow(line) && i + 1 < lines.length && isTableSep(lines[i + 1])) {
+      flush()
+      const head = tableCells(line)
+      const rows: string[][] = []
+      i += 2 // skip header + separator
+      while (i < lines.length && isTableRow(lines[i])) { rows.push(tableCells(lines[i])); i++ }
+      i-- // step back so the for-loop's i++ lands on the next unconsumed line
+      blocks.push({ t: 'table', head, rows })
+      continue
+    }
 
     // Nested bullet: 2+ leading spaces (or a tab) before the dash/•.
     const nested = line.match(/^(?:\s{2,}|\t+)[-*•]\s+(.*)$/)
@@ -94,6 +119,22 @@ export function ExplanationText({ text }: { text: string }) {
                 </li>
               ))}
             </ul>
+          )
+        }
+        if (b.t === 'table') {
+          return (
+            <div key={i} className="expl-table-wrap">
+              <table className="expl-table">
+                <thead>
+                  <tr>{b.head.map((h, j) => <th key={j}><MathText text={h} /></th>)}</tr>
+                </thead>
+                <tbody>
+                  {b.rows.map((r, j) => (
+                    <tr key={j}>{r.map((c, k) => <td key={k}><MathText text={c} /></td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )
         }
         return <p key={i}><MathText text={b.text} /></p>

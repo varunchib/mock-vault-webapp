@@ -50,6 +50,19 @@ export function PostGuidePage() {
 
   const examHref = `/exam/${guide.examSlug}${guide.paperSearchTerm ? `?s=${encodeURIComponent(guide.paperSearchTerm)}` : ''}`
 
+  // Section weightage, derived straight from the exam pattern's marks so it can
+  // never contradict the table. Only numeric, non-total rows count.
+  const weightage = (() => {
+    const rows = guide.examPattern
+      .filter(r => !r.isTotal && typeof r.marks === 'number' && (r.marks as number) > 0)
+      .map(r => ({ section: r.section, marks: r.marks as number }))
+    const total = rows.reduce((s, r) => s + r.marks, 0)
+    if (total <= 0) return []
+    return rows
+      .map(r => ({ ...r, share: Math.round((r.marks / total) * 100) }))
+      .sort((a, b) => b.marks - a.marks)
+  })()
+
   const content = (
     <div className="pg-page">
       {/* Breadcrumb */}
@@ -127,6 +140,46 @@ export function PostGuidePage() {
               </table>
             </div>
           </section>
+
+          {/* Exam Analysis — section weightage derived from the pattern above,
+              so "which section carries the most marks" is always accurate. This
+              is the guide's unique hook; the blog owns broad info instead. */}
+          {weightage.length > 0 && (
+            <section className="pg-section" aria-labelledby="analysis-heading">
+              <h2 id="analysis-heading">Exam Analysis: Section Weightage</h2>
+              {guide.analysis?.intro && <p>{guide.analysis.intro}</p>}
+              <p className="pg-note">
+                Ranked by share of total marks — the sections at the top carry the most marks,
+                so a mark scored there counts as much as anywhere and they decide your rank.
+              </p>
+              <div className="pg-weightage">
+                {weightage.map(w => (
+                  <div className="pg-weightage-row" key={w.section}>
+                    <div className="pg-weightage-head">
+                      <span className="pg-weightage-section">{w.section}</span>
+                      <span className="pg-weightage-share">{w.share}% · {w.marks} marks</span>
+                    </div>
+                    <div className="pg-weightage-bar">
+                      <div className="pg-weightage-fill" style={{ width: `${w.share}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {guide.analysis?.topTopics && guide.analysis.topTopics.length > 0 && (
+                <div className="pg-analysis-topics">
+                  <h3>Where the questions come from</h3>
+                  <ul>
+                    {guide.analysis.topTopics.map((t, i) => (
+                      <li key={i}><strong>{t.section}:</strong> {t.topics}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {guide.analysis?.difficulty && (
+                <p className="pg-note pg-note-warning">{guide.analysis.difficulty}</p>
+              )}
+            </section>
+          )}
 
           {/* Syllabus */}
           <section className="pg-section" aria-labelledby="syllabus-heading">

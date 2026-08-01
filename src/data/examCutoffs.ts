@@ -52,12 +52,15 @@ export const examCutoffs: Record<string, ExamCutoff> = {
     avgScore: 55, stdDev: 12,
   },
   'ssc-cgl': {
-    examName: 'SSC CGL', stage: 'Tier I', totalMarks: 200, year: '2023-24',
+    // Official SSC CGL 2025 Tier-I cut-off (revised), released 18 Dec 2025, for
+    // all posts except JSO / Statistical Investigator. Out of 200.
+    examName: 'SSC CGL', stage: 'Tier I', totalMarks: 200, year: '2025',
     cutoffs: [
-      { category: 'General', marks: 148.0 },
-      { category: 'OBC',     marks: 144.5 },
-      { category: 'SC',      marks: 127.0 },
-      { category: 'ST',      marks: 116.0 },
+      { category: 'General', marks: 136.40 },
+      { category: 'OBC',     marks: 130.37 },
+      { category: 'EWS',     marks: 127.42 },
+      { category: 'SC',      marks: 115.03 },
+      { category: 'ST',      marks: 106.39 },
     ],
     avgScore: 118, stdDev: 24,
   },

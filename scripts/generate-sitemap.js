@@ -22,7 +22,9 @@ const GUIDE_SLUGS = [
 
 // Editorial /blog/:slug articles. Keep in sync with keys of src/data/blogPosts.ts.
 const BLOG_SLUGS = [
-  'ibps-po-exam',
+  'ibps-po-exam', 'ssc-cgl-exam', 'upsc-cse-exam', 'neet-ug-exam', 'bpsc-exam',
+  'jkpsc-jkcce-exam', 'rssb-patwari-exam', 'jkssb-sub-inspector-exam',
+  'jkssb-patwari-exam', 'jkssb-junior-assistant-exam',
 ]
 
 const PAPER_SEO_SLUGS = {
@@ -88,9 +90,7 @@ async function generate() {
     url(`${BASE}/privacy`, '0.3', 'yearly'),
     url(`${BASE}/terms`, '0.3', 'yearly'),
     ...examSlugs.map(slug => url(`${BASE}/exam/${slug}`, '0.9')),
-    ...examSlugs
-      .filter(slug => EXAM_INFO_SLUGS.has(slug))
-      .map(slug => url(`${BASE}/exam/${slug}/overview`, '0.9', 'monthly')),
+    // /exam/:slug/overview retired (301 → /guide/:slug) — no longer emitted.
     ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),

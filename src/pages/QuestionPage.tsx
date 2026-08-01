@@ -2,6 +2,7 @@ import { BookOpen, ChevronRight, Copy, Play } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { NotFound } from '../components/common/NotFound'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { MathText } from '../components/common/MathText'
 import { ExplanationText } from '../components/common/ExplanationText'
@@ -67,12 +68,15 @@ export function QuestionPage() {
         answerCount: 1,
         educationalLevel: 'Competitive Exam Preparation',
         about: { '@type': 'Thing', name: question.subject || question.examName },
-        ...(question.year ? { datePublished: question.year } : {}),
+        author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+        datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01`,
         acceptedAnswer: {
           '@type': 'Answer',
           text: [question.answer, question.explanation].filter(Boolean).join(' — ').replace(/\*\*/g, '').slice(0, 800) || `Correct answer: ${question.answerKey}.`,
           url: `https://ministryofpapers.com/question/${question.slug}`,
           author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+          datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01`,
+          upvoteCount: 1,
         },
       },
       breadcrumb: {
@@ -94,7 +98,12 @@ export function QuestionPage() {
     </section>
   )
 
-  if (error || !question) return <Navigate to="/" replace />
+  if (error || !question) return (
+    <NotFound
+      title="Question not found"
+      message="This question isn't available — it may have been removed, or the link may be incorrect. Browse the exams to find solved papers."
+    />
+  )
 
   const isDeleted = question.answerKey === 'Deleted'
   const isPending = question.answerKey === 'Pending'

@@ -9,7 +9,7 @@ const footerColumns = [
       { label: 'SSC CGL / CHSL', href: '/exam/ssc-cgl' },
       { label: 'IBPS PO / Clerk', href: '/exam/ibps-po' },
       { label: 'NEET UG', href: '/exam/neet-ug' },
-      { label: 'JEE Main', href: '/exam/jee-main' },
+      { label: 'BPSC', href: '/exam/bpsc' },
       { label: 'State PSCs', href: '/exams' },
     ],
   },

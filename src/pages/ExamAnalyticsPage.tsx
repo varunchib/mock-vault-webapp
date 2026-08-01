@@ -75,10 +75,11 @@ function LeaderboardPanel({
 
       {!userInTop10 && userRank > 0 && (
         <>
-          <div className="ea2-lb-sep" />
+          <div className="ea2-lb-sep"><span>⋮</span></div>
           <div className="ea2-lb-row ea2-lb-row--me ea2-lb-row--user">
             <span className="ea2-lb-rank">{userRank.toLocaleString('en-IN')}</span>
             <span className="ea2-lb-name" title={userName}>{userName}</span>
+            <span className="ea2-lb-score">{viewerBestPct}%</span>
             <span className="ea2-lb-you">You</span>
           </div>
         </>
@@ -297,29 +298,25 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
         <div className="ea2-chart-panel">
           <div className="ea2-chart-heading">
             <div>
-              <h2>Score Position</h2>
+              <h2>Marks Distribution</h2>
               <p>How everyone on the platform scored on this exam — and where you sit</p>
             </div>
-            {activeCutoff && (
-              <span className="ea2-chart-meta">{activeCutoff.stage} · {activeCutoff.year}</span>
+            {/* Cut-off category selector — compact, sits in the heading */}
+            {categories.length > 0 && (
+              <label className="ea2-cutoff-select">
+                <span>{activeCutoff?.year && /^\d{4}/.test(String(activeCutoff.year)) ? 'Cutoff' : 'Est. cutoff'}:</span>
+                <select
+                  value={selectedCategory}
+                  onChange={e => setSelectedCategory(e.target.value)}
+                  aria-label="Cut-off category"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </label>
             )}
           </div>
-
-          {/* Category tabs */}
-          {categories.length > 0 && (
-            <div className="ea2-cat-tabs">
-              {categories.map(cat => (
-                <button
-                  key={cat}
-                  type="button"
-                  className={`ea2-cat-tab${selectedCategory === cat ? ' active' : ''}`}
-                  onClick={() => setSelectedCategory(cat)}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-          )}
 
           {/* Real platform-user distribution — always renders. If the API is
               unavailable, fall back to just the viewer so the chart never
@@ -332,6 +329,7 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
               systemCutoffPct: 0,
             }}
             userPct={summary.bestPct}
+            totalMarks={activeCutoff?.totalMarks}
             officialCutoffPct={
               activeCutoff && selectedCutoffVal > 0 && activeCutoff.totalMarks > 0
                 ? (selectedCutoffVal / activeCutoff.totalMarks) * 100
@@ -345,13 +343,24 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           {activeCutoff && selectedCutoffVal > 0 && activeCutoff.totalMarks > 0 && (() => {
             const cutoffPct = (selectedCutoffVal / activeCutoff.totalMarks) * 100
             const clears = summary.bestPct >= cutoffPct
+            // Bring the user's best score onto the exam's native mark scale so the
+            // gap reads in the same units as the official cutoff.
+            const userMarks = Math.round((summary.bestPct / 100) * activeCutoff.totalMarks * 10) / 10
+            const gapMarks = Math.round(Math.abs(userMarks - selectedCutoffVal) * 10) / 10
+            const gapPct = Math.abs(Math.round(summary.bestPct - cutoffPct))
             return (
               <div className={`ea2-verdict ${clears ? 'pass' : 'fail'}`}>
-                {clears ? '✓' : '✗'}
-                {' '}Your best score <strong>{summary.bestPct}%</strong>
-                {' '}{clears ? 'clears' : 'misses'} the{' '}
-                <strong>{selectedCategory}</strong> cutoff of <strong>{Math.round(cutoffPct)}%</strong>
-                {' '}({selectedCutoffVal} / {activeCutoff.totalMarks})
+                <span className="ea2-verdict-line">
+                  {clears ? '✓' : '✗'}
+                  {' '}Your best score <strong>{userMarks} / {activeCutoff.totalMarks}</strong> ({summary.bestPct}%)
+                  {' '}{clears ? 'clears' : 'is below'} the <strong>{selectedCategory}</strong> official cutoff of{' '}
+                  <strong>{selectedCutoffVal} / {activeCutoff.totalMarks}</strong> ({Math.round(cutoffPct)}%)
+                </span>
+                <span className="ea2-verdict-gap">
+                  {clears
+                    ? `+${gapMarks} marks (${gapPct}%) above cutoff`
+                    : `${gapMarks} marks (${gapPct}%) below cutoff`}
+                </span>
               </div>
             )
           })()}

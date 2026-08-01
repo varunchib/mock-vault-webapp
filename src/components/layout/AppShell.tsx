@@ -17,6 +17,7 @@ import { useAuth } from '../../context/useAuth'
 import { fetchExamCatalog, type Exam } from '../../lib/api'
 import { searchExams } from '../../lib/examSearch'
 import { Logo } from '../ui/Logo'
+import { ThemeToggle } from '../ui/ThemeToggle'
 
 type NavItem = {
   icon: typeof Home
@@ -300,6 +301,8 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Search size={18} />
               </button>
 
+              <ThemeToggle className="vault-theme-toggle" />
+
               <div className="vault-profile-wrap" ref={profileRef}>
                 <button
                   className="vault-profile-btn"
@@ -363,12 +366,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         )}
 
-        {/* Suggestions inbox — opened from the sidebar, logged-in users only */}
+        {/* Support chat — opened from the sidebar, logged-in users only */}
         <InboxWidget
           open={inboxOpen}
           onClose={() => setInboxOpen(false)}
           onUnreadChange={setInboxUnread}
-          searchTerm={searchQuery.trim() && searchResults.length === 0 ? searchQuery.trim() : undefined}
         />
 
       </section>
