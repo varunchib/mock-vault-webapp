@@ -4545,12 +4545,14 @@ footer {
 }
 
 .pyq-q-img {
-  /* Fill the available width (SVG diagrams scale crisply) so charts read large
-     on big screens; capped so a small figure never blows up absurdly. */
-  width: 100%;
-  max-width: 720px;
+  /* Show the diagram at its natural size, capped to the column width and a
+     sensible max. Forcing width:100% upscaled small line diagrams (blurring the
+     raster and reading "too big / out of the box"); pairing it with max-height
+     clamped the height while width stayed full, distorting the aspect ratio.
+     max-width + height:auto (no max-height) keeps the aspect ratio exact and
+     never enlarges a figure beyond its own pixels. */
+  max-width: min(100%, 520px);
   height: auto;
-  max-height: 520px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--surface);
@@ -4558,10 +4560,8 @@ footer {
 }
 
 @media (max-width: 640px) {
-  /* Let the diagram use a little more of the card width on phones. The card's
-     own padding absorbs the −8px, and the body clips any stray overflow. */
-  .pyq-q-images { margin-left: -8px; margin-right: -8px; }
-  .pyq-q-img { max-height: none; }
+  /* On phones let the diagram use the full card width (still aspect-correct). */
+  .pyq-q-img { max-width: 100%; }
 }
 
 .pyq-q-text {
