@@ -1,9 +1,7 @@
-import { BookOpen, ChevronRight, Clock3, FileText, Flame, LayoutGrid, TrendingUp } from 'lucide-react'
+import { BookOpen, ChevronRight, Clock3, FileText, Flame, LayoutGrid } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
-import { SubjectStrength } from '../components/analytics/SubjectStrength'
-import { ScoreTrendChart, type TrendPoint } from '../components/analytics/ScoreTrendChart'
 import { fetchExamCatalog, fetchPaperCatalog, type Exam, type Paper } from '../lib/api'
 import { remapToPaperExam } from '../lib/remapExam'
 import { readAttemptResults, readPaperResults, type CombinedResult } from '../lib/mockActivity'
@@ -123,16 +121,6 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
     return { totalTime, best, examCount: examGroups.length, attemptCount: results.length }
   }, [results, examGroups])
 
-  const trendPoints = useMemo<TrendPoint[]>(
-    () => [...results]
-      .sort((x, z) => new Date(x.attemptedAt).getTime() - new Date(z.attemptedAt).getTime())
-      .map(r => {
-        const m = netMarks(r)
-        return { pct: m.pct, net: m.net, max: m.max, title: r.title, examName: r.examName, attemptedAt: r.attemptedAt }
-      }),
-    [results],
-  )
-
   return (
     <section className="an-page workspace-page">
       <header className="an-header">
@@ -207,56 +195,53 @@ export function AnalyticsPage({ source }: { source?: AnalyticsSource } = {}) {
             )}
           </div>
 
-          {/* Exam rows */}
+          {/* Exam cards — each carries its own quick analytics; tap to drill in */}
           <div className="an2-panel">
             <div className="an2-panel-head">
               <div>
                 <h2>By exam</h2>
-                <p>Cutoff position and leaderboard live inside each exam</p>
+                <p>Tap an exam for subject strength, cutoffs and the leaderboard</p>
               </div>
             </div>
-            <div className="an2-exam-list">
+            <div className="an2-exam-cards">
               {examGroups.map(g => {
                 const marks = g.results.map(netMarks)
                 const best = marks.reduce((a, b) => (b.pct > a.pct ? b : a))
                 const avgPct = Math.round(marks.reduce((s, m) => s + m.pct, 0) / marks.length)
+                const attempted = g.results.reduce((s, r) => s + r.correct + r.wrong, 0)
+                const correct = g.results.reduce((s, r) => s + r.correct, 0)
+                const accuracy = attempted > 0 ? Math.round((correct / attempted) * 100) : 0
                 return (
-                  <Link key={g.examSlug} to={`${linkBase}/${g.examSlug}`} className="an2-exam-row">
-                    <div className="an2-exam-main">
+                  <Link key={g.examSlug} to={`${linkBase}/${g.examSlug}`} className="an2-exam-card">
+                    <div className="an2-exam-card-head">
                       <strong>{g.examName}</strong>
-                      <span>{g.results.length} attempt{g.results.length !== 1 ? 's' : ''} · last {relativeDate(g.results[0].attemptedAt)}</span>
+                      <ChevronRight size={16} className="an2-exam-card-chev" />
                     </div>
-                    <div className="an2-exam-meter" title={`Average ${avgPct}%`}>
-                      <div className="an2-exam-meter-fill" style={{ width: `${avgPct}%` }} />
+                    <span className="an2-exam-card-sub">
+                      {g.results.length} attempt{g.results.length !== 1 ? 's' : ''} · last {relativeDate(g.results[0].attemptedAt)}
+                    </span>
+                    <div className="an2-exam-card-stats">
+                      <div className="an2-exam-stat">
+                        <span>Avg</span>
+                        <strong className={scoreClass(avgPct)}>{avgPct}%</strong>
+                      </div>
+                      <div className="an2-exam-stat">
+                        <span>Best</span>
+                        <strong className={scoreClass(best.pct)}>{best.net}<em>/{best.max}</em></strong>
+                      </div>
+                      <div className="an2-exam-stat">
+                        <span>Accuracy</span>
+                        <strong className={scoreClass(accuracy)}>{accuracy}%</strong>
+                      </div>
                     </div>
-                    <span className={`an2-exam-best ${scoreClass(best.pct)}`}>{best.net}<em>/{best.max}</em></span>
-                    <ChevronRight size={15} className="an2-exam-chev" />
+                    <div className="an2-exam-card-meter" title={`Average ${avgPct}%`}>
+                      <div className={`an2-exam-card-meter-fill ${scoreClass(avgPct)}`} style={{ width: `${avgPct}%` }} />
+                    </div>
                   </Link>
                 )
               })}
             </div>
           </div>
-
-          {/* Score trend */}
-          <div className="an2-panel">
-            <div className="an2-panel-head">
-              <div>
-                <h2>Score trend</h2>
-                <p>Net score as % of maximum marks, every attempt in order</p>
-              </div>
-            </div>
-            {trendPoints.length >= 2 ? (
-              <ScoreTrendChart points={trendPoints} />
-            ) : (
-              <div className="an2-trend-single">
-                <TrendingUp size={18} />
-                One attempt so far — your trend line starts at the second attempt.
-              </div>
-            )}
-          </div>
-
-          {/* Per-subject accuracy — where you're strong and where you lack */}
-          <SubjectStrength results={results} />
 
           {/* Recent attempts */}
           <div className="an2-panel">

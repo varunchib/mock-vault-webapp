@@ -4184,6 +4184,22 @@ footer {
     border-radius: 12px;
   }
 
+  /* Stack the paper header on phones: the action buttons ("Share", "Full Paper",
+     "Exam Guide") sat in a non-shrinking column beside the title and pushed the
+     row — and the whole grid column — past the viewport (horizontal scroll,
+     clipped text). Below the title they get the full width and wrap. */
+  .pyq-paper-header {
+    flex-direction: column;
+    gap: 14px;
+  }
+  .pyq-paper-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .pyq-paper-actions .pyq-action-btn {
+    flex: 1 1 auto;
+  }
+
   .pyp-sober-toolbar,
   .pyp-sober-actions {
     flex-direction: column;
@@ -4207,10 +4223,25 @@ footer {
 /* Outer container (mirrors ec-page / ep-page pattern) */
 .pyq-page {
   display: grid;
+  /* minmax(0, 1fr) caps the single column at the container width. Without the
+     explicit 0 minimum, a grid track's implicit min-width is `auto` (= its
+     widest item's min-content), so one long question/passage stretched the
+     whole column past the viewport and every sibling (breadcrumb, header,
+     cards) inherited that width — causing horizontal scroll on mobile. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 16px;
   width: min(1100px, 100%);
   margin: 0 auto;
 }
+/* Let grid/flex children actually shrink to the column, and wrap long text
+   instead of forcing the track wider. */
+.pyq-page > *,
+.pyq-question-list,
+.pyq-question-card { min-width: 0; }
+.pyq-q-text,
+.pyq-passage,
+.qr-text,
+.pyq-option { overflow-wrap: break-word; }
 
 /* ── Paper header card ──────────────────────────────── */
 .pyq-paper-header {
@@ -4379,8 +4410,11 @@ footer {
 }
 
 .pyq-q-text {
-  font-size: 14.5px;
-  line-height: 1.65;
+  /* 16px is the readability / mobile-friendliness baseline (Google flags smaller
+     body text as "text too small to read"). This is the primary indexed content
+     on /pyq and /question pages, so it gets the full 16px. */
+  font-size: 16px;
+  line-height: 1.7;
   color: var(--ink);
   margin: 0;
 }
@@ -4399,7 +4433,7 @@ footer {
   background: #fff;
   text-align: left;
   cursor: pointer;
-  font-size: 13.5px;
+  font-size: 15px;
   color: var(--ink);
   width: 100%;
   transition: border-color .12s, background .12s;
@@ -4601,10 +4635,67 @@ footer {
 }
 
 .pyq-explanation p {
-  font-size: 13.5px;
-  line-height: 1.65;
+  font-size: 15.5px;
+  line-height: 1.75;
   color: var(--ink);
   margin: 0;
+}
+
+/* ── Structured "Detailed Solution" (headings + bullets + nesting) ─────────
+   Rendered by ExplanationText / worker richText. Gives PYQ and question-page
+   solutions the clean, scannable Testbook-style layout. Scoped to the solution
+   body so plain-paragraph explanations elsewhere are untouched. */
+.pyq-solution-body > *:first-child { margin-top: 0; }
+.pyq-solution-body p { font-size: 15.5px; line-height: 1.75; color: var(--ink); margin: 0 0 10px; }
+.pyq-solution-body p:last-child { margin-bottom: 0; }
+
+.pyq-solution-body .expl-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #0f172a;
+  margin: 20px 0 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid #edece6;
+}
+.pyq-solution-body .expl-heading .qr-highlight { background: none; padding: 0; color: inherit; }
+.pyq-solution-body .expl-heading-icon { font-size: 16px; line-height: 1; }
+
+.pyq-solution-body .expl-list {
+  margin: 0 0 14px;
+  padding-left: 22px;
+  list-style: disc;
+  display: grid;
+  gap: 7px;
+}
+.pyq-solution-body .expl-list > li {
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--ink);
+  padding-left: 2px;
+}
+.pyq-solution-body .expl-list > li::marker { color: #94a3b8; }
+
+.pyq-solution-body .expl-sublist {
+  margin: 7px 0 2px;
+  padding-left: 20px;
+  list-style: circle;
+  display: grid;
+  gap: 5px;
+}
+.pyq-solution-body .expl-sublist > li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--ink2, #374151);
+}
+.pyq-solution-body .expl-sublist > li::marker { color: #cbd5e1; }
+
+@media (max-width: 640px) {
+  .pyq-solution-body .expl-list > li { font-size: 15px; }
+  .pyq-solution-body .expl-sublist > li { font-size: 14.5px; }
+  .pyq-solution-body .expl-heading { font-size: 15.5px; }
 }
 
 /* ── Deleted question — PYQ paper page ──────────────── */
@@ -9396,17 +9487,23 @@ footer {
 .sq-option.wrong .sq-opt-key { background: #dc2626; color: #fff; }
 .sq-opt-text { flex: 1; line-height: 1.45; }
 
+/* Structured explanation on the subject-practice card. Renders via
+   ExplanationText (same as paper/question pages); the .pyq-solution-body class
+   on the wrapper supplies the heading/bullet/nesting styles. No white-space:
+   pre-wrap — the markdown (## Key Points, - bullets, **bold**) is now parsed,
+   not shown literally. */
 .sq-explanation {
-  font-size: 13px;
   color: #4b5563;
   background: #f9fafb;
   border-left: 3px solid #d1d5db;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-radius: 0 6px 6px 0;
-  margin: 4px 0 0;
-  line-height: 1.55;
-  white-space: pre-wrap;
+  margin: 6px 0 0;
 }
+.sq-explanation.pyq-solution-body p { font-size: 14.5px; margin: 0 0 8px; }
+.sq-explanation.pyq-solution-body .expl-heading { font-size: 14.5px; margin: 14px 0 8px; }
+.sq-explanation.pyq-solution-body .expl-list > li { font-size: 14px; }
+.sq-explanation.pyq-solution-body .expl-sublist > li { font-size: 13.5px; }
 
 /* Load more */
 .sq-load-more { display: flex; justify-content: center; padding: 20px 0 4px; }
@@ -12444,7 +12541,7 @@ html {
 }
 
 .pg-section p {
-  font-size: 14px;
+  font-size: 15.5px;
   line-height: 1.75;
   color: #374151;
   margin: 0 0 12px;
@@ -16624,6 +16721,42 @@ html {
   .an2-exam-row { grid-template-columns: 1fr 84px 18px; }
   .an2-exam-meter { display: none; }
 }
+
+/* Exam cards — overview "By exam" grid, each with its own quick analytics */
+.an2-exam-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(238px, 1fr));
+  gap: 12px;
+}
+.an2-exam-card {
+  display: grid;
+  gap: 7px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  text-decoration: none;
+  transition: border-color .13s, box-shadow .13s;
+}
+.an2-exam-card:hover { border-color: var(--ink4); box-shadow: 0 4px 14px rgba(15, 23, 42, .06); }
+.an2-exam-card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.an2-exam-card-head strong { font-size: 14px; font-weight: 700; color: var(--ink); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.an2-exam-card-chev { color: var(--ink4); flex-shrink: 0; }
+.an2-exam-card-sub { font-size: 11.5px; color: var(--ink3); margin-top: -3px; }
+.an2-exam-card-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 3px; }
+.an2-exam-stat { display: grid; gap: 1px; }
+.an2-exam-stat span { font-size: 10px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink4); }
+.an2-exam-stat strong { font-size: 15px; font-weight: 800; color: var(--ink); }
+.an2-exam-stat strong em { font-style: normal; font-size: 11px; font-weight: 600; color: var(--ink4); }
+.an2-exam-stat strong.good { color: var(--green); }
+.an2-exam-stat strong.mid  { color: #92400E; }
+.an2-exam-stat strong.bad  { color: var(--red); }
+.an2-exam-card-meter { height: 6px; border-radius: 4px; background: var(--line2); overflow: hidden; margin-top: 2px; }
+.an2-exam-card-meter-fill { height: 100%; border-radius: 4px; background: var(--blue); }
+.an2-exam-card-meter-fill.good { background: var(--green); }
+.an2-exam-card-meter-fill.mid  { background: #d97706; }
+.an2-exam-card-meter-fill.bad  { background: var(--red); }
+@media (max-width: 480px) { .an2-exam-cards { grid-template-columns: 1fr; } }
 
 /* Recent attempts */
 .an2-recent-list { display: grid; }

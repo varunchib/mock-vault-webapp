@@ -27,6 +27,10 @@ type ExamData = {
   papers?: number
   mocks?: number
   subjects?: string[]
+  boardSlug?: string
+  // Number of sub-exams under this one. 1 = a thin board (near-duplicate of its
+  // lone child) → served noindex until a 2nd sub-exam makes it a real hub.
+  childExamCount?: number
 }
 
 type PaperData = {
@@ -260,17 +264,38 @@ function inlineFmt(s: string): string {
   return esc(String(s)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
 }
 
-// richText renders explanation content: each non-empty line becomes a paragraph
-// (same as the app's MultilineText), with **bold** section labels preserved.
+// richText renders explanation content with a light structure — headings,
+// bullet points and nested points — mirroring the app's ExplanationText so bots
+// see the same "Detailed Solution" layout users do. Plain text with no markers
+// still renders as paragraphs (backward compatible).
+//   ## Heading   → <h4>   ·   - item → <li>   ·   (indent) - item → nested <li>
 function richText(s: string | undefined | null): string {
   if (!s) return ''
-  return String(s)
-    .replace(/\r/g, '')
-    .split('\n')
-    .map(l => l.trim())
-    .filter(Boolean)
-    .map(l => `<p>${inlineFmt(l)}</p>`)
-    .join('')
+  const lines = String(s).replace(/\r/g, '').split('\n')
+  const out: string[] = []
+  let items: { text: string; sub: string[] }[] | null = null
+  const flush = () => {
+    if (items && items.length) {
+      out.push('<ul>' + items.map(it =>
+        `<li>${inlineFmt(it.text)}${it.sub.length ? '<ul>' + it.sub.map(x => `<li>${inlineFmt(x)}</li>`).join('') + '</ul>' : ''}</li>`,
+      ).join('') + '</ul>')
+    }
+    items = null
+  }
+  for (const raw of lines) {
+    const line = raw.replace(/\s+$/, '')
+    if (!line.trim()) { flush(); continue }
+    const heading = line.match(/^\s*#{2,3}\s+(.*)$/)
+    if (heading) { flush(); out.push(`<h4>${inlineFmt(heading[1].trim())}</h4>`); continue }
+    const nested = line.match(/^(?:\s{2,}|\t+)[-*•]\s+(.*)$/)
+    if (nested && items && items.length) { items[items.length - 1].sub.push(nested[1].trim()); continue }
+    const bullet = line.match(/^\s*[-*•]\s+(.*)$/)
+    if (bullet) { if (!items) items = []; items.push({ text: bullet[1].trim(), sub: [] }); continue }
+    flush()
+    out.push(`<p>${inlineFmt(line.trim())}</p>`)
+  }
+  flush()
+  return out.join('')
 }
 
 // questionTopic returns the question's primary topic keyword for the title.
@@ -485,7 +510,14 @@ function renderBlogContent(post: (typeof blogPosts)[string], crumbs: Crumb[] = [
   `, crumbs)
 }
 
-function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], crumbs: Crumb[] = []): string {
+function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], subExams: ExamData[] = [], crumbs: Crumb[] = []): string {
+  // Sub-exam links so a board renders as a real hub for bots — matching the
+  // "Exams under this board" section the React page shows humans. Without these,
+  // Google saw a board (e.g. JKSSB, 8 sub-exams) as a flat paper list and passed
+  // no internal link equity down to the sub-exam pages that should actually rank.
+  const subExamLinks = subExams
+    .map(x => `<li><a href="/exam/${encodeURIComponent(x.slug)}">${htmlText(x.name)}</a> <small>${x.papers ?? 0} papers${x.mocks ? ` - ${x.mocks} mocks` : ''}</small></li>`)
+    .join('')
   const paperLinks = papers
     .slice(0, 30)
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
@@ -499,6 +531,7 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
+    ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
   `, crumbs)
@@ -601,15 +634,23 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
-      const [e, papers, mocks] = await Promise.all([
+      const [e, papers, mocks, allExams] = await Promise.all([
         apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600),
         apiJson<PaperData[]>(`${API}/api/v1/exams/${slug}/papers`, 3600),
         apiJson<MockData[]>(`${API}/api/v1/mocks`, 3600),
+        apiJson<ExamData[]>(`${API}/api/v1/exams`, 3600),
       ])
       if (!e) return null
       const examMocks = (mocks ?? []).filter(m => m.examSlug === slug)
+      // Sub-exams for board hubs (rendered as internal links, see renderExamContent).
+      const subExams = (allExams ?? []).filter(x => x.boardSlug === slug)
       // An exam with no papers and no mocks is a thin page → keep it out of the index.
       const examEmpty = (e.papers ?? 0) === 0 && (e.mocks ?? 0) === 0
+      // A thin board — one with exactly ONE sub-exam — just aggregates that lone
+      // child, so its page is a near-duplicate of the sub-exam's. Keep it out of
+      // the index (this matches the sitemap, which also skips it) until a 2nd
+      // sub-exam is added and childExamCount >= 2 turns it into a genuine hub.
+      const thinBoard = (e.childExamCount ?? 0) === 1
       const examCrumbs: Crumb[] = [
         { name: 'Home', item: BASE },
         { name: 'Exams', item: `${BASE}/exams` },
@@ -618,8 +659,8 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       return {
         title: `${e.shortName} - Mock Tests & PYQ Papers | Ministry of Papers`,
         description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
-        robots: examEmpty ? 'noindex, follow' : undefined,
-        contentHtml: renderExamContent(e, papers ?? [], examMocks, examCrumbs),
+        robots: examEmpty || thinBoard ? 'noindex, follow' : undefined,
+        contentHtml: renderExamContent(e, papers ?? [], examMocks, subExams, examCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
           '@type': 'CollectionPage',
