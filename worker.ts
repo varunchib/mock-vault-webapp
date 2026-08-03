@@ -143,6 +143,12 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/tests': '/exams',
   '/practice': '/exams',
   '/attempted': '/analytics',
+  // Retired: JKSSB Patwari's last paper was September 2024 and JKSSB Junior
+  // Assistant is already at skill-test stage - neither appears on the JKSSB
+  // exam-date annexure, so a "how to prepare" article implied a cycle that does
+  // not exist. The guides carry the evergreen syllabus and the solved papers.
+  '/blog/jkssb-patwari-exam': '/guide/jkssb-patwari',
+  '/blog/jkssb-junior-assistant-exam': '/guide/jkssb-junior-assistant',
 }
 
 const STATIC_META: Record<string, PageMeta> = {

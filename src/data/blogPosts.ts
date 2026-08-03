@@ -83,7 +83,7 @@ const ibpsPo: BlogPost = {
   description:
     'An IBPS PO 2026 preparation strategy that works backwards from the interview - sectional cut-offs, a phased plan, speed drills, and how to review previous year papers.',
   excerpt:
-    'Everything you need to crack IBPS PO 2026 in one place — the notification timeline, eligibility, exam pattern, section-wise syllabus, salary and job profile, and a stage-by-stage preparation plan built around previous year papers.',
+    'IBPS PO rewards speed under sectional timing more than raw knowledge. This is how to sequence prelims and mains preparation, what each section is really worth in time, and how to review a solved paper so it changes your score.',
   category: 'Preparation Strategy',
   tags: ['IBPS PO', 'Bank PO', 'Banking Exams', 'IBPS', 'Probationary Officer'],
   author: 'Ministry of Papers',
@@ -265,7 +265,7 @@ const upscCse: BlogPost = {
   description:
     'A UPSC CSE 2026 preparation strategy built prelims-first - what to read, how to sequence NCERTs and standard books, answer writing, and using previous year papers as the syllabus.',
   excerpt:
-    'The UPSC Civil Services Examination 2026 notification is out with 933 vacancies for IAS, IPS, IFS and allied services. Here is the complete picture — Prelims and Mains dates, eligibility and attempts, the three-stage pattern, and how to build a preparation plan around previous year papers.',
+    'Most UPSC preparation fails on sequencing, not effort. This is a prelims-first plan: what to read and in what order, how to use NCERTs against standard books, and why previous year papers are the real syllabus.',
   category: 'Preparation Strategy',
   tags: ['UPSC CSE', 'UPSC', 'Civil Services', 'IAS', 'IPS', 'UPSC 2026'],
   author: 'Ministry of Papers',
@@ -314,7 +314,7 @@ const neetUg: BlogPost = {
   description:
     'A NEET UG 2026 preparation strategy anchored on NCERT - subject-wise time split, revision cycles, error logs, and how to use previous year papers to find your weak chapters.',
   excerpt:
-    'NEET UG 2026, conducted by the NTA, is the single entrance test for MBBS, BDS, AYUSH and allied medical courses across India. Here is the complete picture — exam date, eligibility, the 720-mark pattern, marking scheme, and a subject-wise preparation plan built on previous year papers.',
+    'NEET rewards NCERT depth over breadth of material. This is an NCERT-first plan covering how to split time across Physics, Chemistry and Biology, how often to revise, and how to use solved papers to find the chapters actually costing you marks.',
   category: 'Preparation Strategy',
   tags: ['NEET UG', 'NEET', 'Medical Entrance', 'MBBS', 'NTA', 'NEET 2026'],
   author: 'Ministry of Papers',
@@ -357,7 +357,7 @@ const bpsc: BlogPost = {
   description:
     'A BPSC CCE preparation strategy covering the Bihar-specific General Knowledge that decides the paper, a phased study plan, and how to review solved previous year papers.',
   excerpt:
-    'The Bihar Public Service Commission conducts the Combined Competitive Examination (CCE) for prestigious state posts like SDM, DSP and BDO. Here is the complete picture of the current 71st and 72nd CCE cycles — dates, vacancies, eligibility, the exam pattern, salary and how to prepare with previous year papers.',
+    'BPSC is decided by Bihar-specific General Knowledge more than by general studies. This is how to build that base, sequence the rest, and review solved previous year papers properly.',
   category: 'Preparation Strategy',
   tags: ['BPSC', 'Bihar PSC', 'BPSC CCE', 'State PSC', 'BPSC 2026'],
   author: 'Ministry of Papers',
@@ -405,7 +405,7 @@ const jkpscJkcce: BlogPost = {
   description:
     'A JKPSC JKCCE preparation strategy focused on the J&K General Knowledge that carries the paper, plus a phased plan and how to review solved previous year papers.',
   excerpt:
-    'The J&K Public Service Commission conducts the Combined Competitive Examination (JKCCE) for the Kashmir Administrative Service and allied posts. Here is the complete picture — the three-stage pattern, eligibility, syllabus overview and a preparation plan built on previous year papers.',
+    'JKCCE turns on J&K General Knowledge, which is finite and repeats heavily across years. This is how to cover it systematically, sequence the remaining sections, and use solved previous year papers as your measuring stick.',
   category: 'Preparation Strategy',
   tags: ['JKPSC', 'JKCCE', 'KAS', 'Jammu Kashmir PSC', 'State PSC'],
   author: 'Ministry of Papers',
@@ -446,7 +446,7 @@ const rssbPatwari: BlogPost = {
   description:
     'A Rajasthan Patwari (RSSB) preparation strategy - Rajasthan GK, computer knowledge, reasoning and maths, the books worth buying, and how to use solved previous year papers.',
   excerpt:
-    'The Rajasthan Staff Selection Board (RSSB) recruits Patwaris — a coveted revenue-department post. The 2025 cycle filled 3,705 posts; a 2026 notification is awaited. Here is the complete picture — eligibility, exam pattern, salary and how to prepare with previous year papers.',
+    'Rajasthan Patwari is won on Rajasthan GK and computer knowledge, both learnable and both repeating year to year. This is how to prioritise them, which books are worth buying, and how to turn solved papers into marks.',
   category: 'Preparation Strategy',
   tags: ['RSSB Patwari', 'Rajasthan Patwari', 'RSMSSB', 'Rajasthan', 'Patwari'],
   author: 'Ministry of Papers',
@@ -487,7 +487,7 @@ const jkssbSi: BlogPost = {
   description:
     'A JKSSB Sub Inspector preparation strategy covering both halves - the written paper section by section, and building for the physical test alongside it.',
   excerpt:
-    'JKSSB recruits Sub Inspectors (Executive) for the J&K Police under the Home Department. Here is the complete picture of the latest recruitment — eligibility, the revised exam pattern, syllabus overview and how to prepare with previous year papers.',
+    'JKSSB Sub Inspector has two halves and most candidates prepare for only one. This is how to build the written paper section by section while conditioning for the physical test in parallel, rather than starting it after the result.',
   category: 'Preparation Strategy',
   tags: ['JKSSB', 'Sub Inspector', 'JKPSI', 'J&K Police', 'Jammu Kashmir'],
   author: 'Ministry of Papers',
@@ -521,88 +521,6 @@ const jkssbSi: BlogPost = {
   ],
 }
 
-const jkssbPatwari: BlogPost = {
-  slug: 'jkssb-patwari-exam',
-  title: 'How to Prepare for JKSSB Patwari: Strategy & Study Plan',
-  h1: 'How to Prepare for JKSSB Patwari: A Realistic Study Plan',
-  description:
-    'A JKSSB Patwari preparation strategy - J&K GK, computers, maths and reasoning in the right order, plus how to turn solved previous year papers into marks.',
-  excerpt:
-    'JKSSB recruits Patwaris for the J&K revenue department — a stable, locally-posted government job. Here is the complete picture — eligibility, the exam pattern, syllabus overview and how to prepare with previous year papers.',
-  category: 'Preparation Strategy',
-  tags: ['JKSSB', 'JKSSB Patwari', 'Patwari', 'Jammu Kashmir', 'Revenue Department'],
-  author: 'Ministry of Papers',
-  publishedAt: '2026-07-27',
-  updatedAt: '2026-08-03',
-  readMinutes: 8,
-  blocks: [
-    { t: 'p', text: 'The **JKSSB Patwari** exam recruits Patwaris for the **Jammu & Kashmir revenue department** — a stable, locally-posted government job in high demand across the union territory. This guide covers eligibility, the exam pattern, syllabus overview and a preparation strategy built on previous year papers.' },
-
-    { t: 'h2', text: 'JKSSB Patwari Preparation Strategy' },
-    { t: 'ul', items: [
-      '**J&K General Knowledge is the scoring differentiator** — study the region\'s geography, history and current affairs in depth.',
-      '**Maths and Reasoning reward daily timed practice** — accuracy under time decides the cutoff.',
-      '**Basic Computer is easy, reliable marks** — do not leave it for the end.',
-      '**Solve the JKSSB Patwari previous year paper** to calibrate the real difficulty and pacing.',
-    ] },
-
-    { t: 'h2', text: 'Practise with JKSSB Patwari Previous Year Papers' },
-    { t: 'p', text: 'On Ministry of Papers you can attempt the **[JKSSB Patwari previous year papers](/exam/jkssb)** — solved with detailed explanations, free. Start with the **[JKSSB Patwari 2024 (Set A) solved paper](/pyq/jkssb-patwari-question-paper-2024)**, then use the **[JKSSB Patwari guide](/guide/jkssb-patwari)** for the full syllabus.' },
-  ],
-  faqs: [
-    { q: 'When is the JKSSB Patwari 2026 exam?', a: 'The Patwari exam appears on the JKSSB 2026 exam calendar, with specific dates confirmed closer to the exam. Track jkssb.nic.in for the current notification.' },
-    { q: 'What is the eligibility for JKSSB Patwari?', a: 'A Bachelor\'s degree from a recognised university with a basic computer qualification, meeting the age and J&K domicile requirements in the notification.' },
-    { q: 'What is the JKSSB Patwari exam pattern?', a: 'An objective (OMR) written exam, typically 120 questions covering J&K-focused GK, General Science, Maths, Reasoning, English and Basic Computer, with negative marking as specified.' },
-    { q: 'Where can I practise JKSSB Patwari papers?', a: 'You can attempt the solved JKSSB Patwari 2024 previous year paper free on Ministry of Papers, with detailed explanations for every question.' },
-  ],
-  related: [
-    { label: 'JKSSB Exam Hub — Solved PYQs', href: '/exam/jkssb' },
-    { label: 'JKSSB Patwari Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/jkssb-patwari' },
-    { label: 'JKSSB Patwari 2024 (Set A) — Solved Paper', href: '/pyq/jkssb-patwari-question-paper-2024' },
-  ],
-}
-
-const jkssbJa: BlogPost = {
-  slug: 'jkssb-junior-assistant-exam',
-  title: 'How to Prepare for JKSSB Junior Assistant: Typing & Plan',
-  h1: 'How to Prepare for JKSSB Junior Assistant: Written and Typing',
-  description:
-    'A JKSSB Junior Assistant preparation strategy covering the written paper and the typing test together, with a phased plan and how to review solved previous year papers.',
-  excerpt:
-    'JKSSB recruits Junior Assistants — a clerical J&K government post with a written exam plus a typing skill test. The 2026 cycle carries 343 vacancies with the written exam on 19 April 2026. Here is the complete picture — eligibility, pattern and how to prepare with previous year papers.',
-  category: 'Preparation Strategy',
-  tags: ['JKSSB', 'Junior Assistant', 'Jammu Kashmir', 'Clerical Jobs', 'JKSSB 2026'],
-  author: 'Ministry of Papers',
-  publishedAt: '2026-07-27',
-  updatedAt: '2026-08-03',
-  readMinutes: 8,
-  blocks: [
-    { t: 'p', text: 'The **JKSSB Junior Assistant** exam recruits clerical staff across Jammu & Kashmir government departments — a stable entry-level post that pairs a written exam with a **typing/skill test**. This guide covers the **2026 cycle** end to end: vacancies, exam date, eligibility, pattern and a preparation strategy built on previous year papers.' },
-
-    { t: 'h2', text: 'JKSSB Junior Assistant Preparation Strategy' },
-    { t: 'ul', items: [
-      '**J&K General Knowledge and Basic Computer** together form the highest-return preparation — both are direct-recall and heavily weighted.',
-      '**Build typing speed in parallel** — the skill test is qualifying, and candidates who ignore it until after the written exam often struggle.',
-      '**Maths and Reasoning need daily timed practice** to clear the cutoff comfortably.',
-      '**Solve the previous year paper** to understand the exact difficulty and question mix.',
-    ] },
-
-    { t: 'h2', text: 'Practise with JKSSB Junior Assistant Previous Year Papers' },
-    { t: 'p', text: 'On Ministry of Papers you can attempt the **[JKSSB Junior Assistant previous year paper](/pyq/jkssb-junior-assistant-question-paper-2026)** — solved with detailed explanations, free — then use the **[JKSSB Junior Assistant guide](/guide/jkssb-junior-assistant)** for the full syllabus and the **[JKSSB exam hub](/exam/jkssb)** for more papers.' },
-  ],
-  faqs: [
-    { q: 'When is the JKSSB Junior Assistant 2026 exam?', a: 'The JKSSB Junior Assistant 2026 written (OMR) exam is scheduled for 19 April 2026, with the skill (typing) test on 7 July 2026, for 343 vacancies. Confirm on jkssb.nic.in.' },
-    { q: 'How many vacancies are in JKSSB Junior Assistant 2026?', a: 'The 2026 recruitment carries 343 Junior Assistant vacancies.' },
-    { q: 'What is the JKSSB Junior Assistant selection process?', a: 'An objective (OMR) written test followed by a qualifying typing/skill test. The written test covers J&K GK, General Science, Maths, Reasoning, English and Basic Computer.' },
-    { q: 'What is the eligibility for JKSSB Junior Assistant?', a: 'A Bachelor\'s degree from a recognised university with the computer/typing qualification specified, meeting the age and J&K domicile requirements.' },
-  ],
-  related: [
-    { label: 'JKSSB Exam Hub — Solved PYQs', href: '/exam/jkssb' },
-    { label: 'JKSSB Junior Assistant Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/jkssb-junior-assistant' },
-    { label: 'JKSSB Junior Assistant — Solved Question Paper', href: '/pyq/jkssb-junior-assistant-question-paper-2026' },
-  ],
-}
-
 export const blogPosts: Record<string, BlogPost> = {
   [ibpsPo.slug]: ibpsPo,
   [sscCgl.slug]: sscCgl,
@@ -612,6 +530,4 @@ export const blogPosts: Record<string, BlogPost> = {
   [jkpscJkcce.slug]: jkpscJkcce,
   [rssbPatwari.slug]: rssbPatwari,
   [jkssbSi.slug]: jkssbSi,
-  [jkssbPatwari.slug]: jkssbPatwari,
-  [jkssbJa.slug]: jkssbJa,
 }
