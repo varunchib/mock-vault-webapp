@@ -718,13 +718,30 @@ function isDynamicSeoPath(pathname: string): boolean {
     || /^\/guide\/[^/]+$/.test(pathname)
 }
 
-function notFoundResponse(): Response {
+// A 404 on a dynamic SEO path is *inferred*: the Worker asks the API and says
+// "not found" when the answer doesn't come back. That inference is wrong every
+// time the API merely blips — a deploy, a container restart, a query slower
+// than API_TIMEOUT_MS — and at `max-age=300` Cloudflare pinned the wrong answer
+// at the edge for five minutes, serving 404 for live pages long after the API
+// recovered. (Observed in production: flushing the catalog cache while the
+// webservice restarted made every /pyq page 404 to crawlers, and it stayed that
+// way through repeated requests because the edge had cached it.)
+//
+// apiFetch already caps *upstream* error caching at 5s for exactly this reason;
+// 'inferred' does the same for the response we hand back, so a transient
+// failure self-heals on the next crawl instead of outliving the outage. 5s
+// rather than no-store still damps a bot hammering bogus URLs during an outage.
+//
+// 'decided' is for paths that are gone by decision rather than by inference —
+// the retired /blog articles — where no API call is involved, nothing can blip,
+// and there is no reason to make crawlers re-ask every time.
+function notFoundResponse(certainty: 'inferred' | 'decided' = 'inferred'): Response {
   return new Response('<!doctype html><title>404 Not Found</title><h1>404 Not Found</h1>', {
     status: 404,
     headers: {
       'content-type': 'text/html; charset=UTF-8',
       'x-robots-tag': 'noindex',
-      'cache-control': 'public, max-age=300',
+      'cache-control': certainty === 'decided' ? 'public, max-age=300' : 'public, max-age=5',
     },
   })
 }
@@ -1058,7 +1075,7 @@ export default {
     // which Google classifies as a Soft 404 — the one blog-related error that
     // would actually show up in Search Console.
     if (path === '/blog' || path.startsWith('/blog/')) {
-      return notFoundResponse()
+      return notFoundResponse('decided')
     }
 
     // Retired /exam/:slug/overview pages → the exam guide (or the hub if no
@@ -1167,7 +1184,9 @@ export default {
       ])
 
       if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
-      if (!meta) return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()
+      // A dynamic path resolves through the API, so a miss here may just be an
+      // outage; an unknown static path is simply not a route we serve.
+      if (!meta) return notFoundResponse(isDynamicSeoPath(path) ? 'inferred' : 'decided')
 
       // Non-canonical URL (e.g. old bare /question/<id>) → 301 to the canonical
       // keyword URL so search engines transfer ranking to the new address.
@@ -1204,7 +1223,10 @@ export default {
       if (meta.robots) headers.set('X-Robots-Tag', meta.robots)
       return new Response(enhanced, { status: 200, headers })
     } catch {
-      return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()
+      // Reaching here means something threw — a failed fetch, a bad payload.
+      // That is never a durable statement about the URL, whatever its shape,
+      // so it must not be cached as one.
+      return notFoundResponse('inferred')
     }
   },
 }
