@@ -35,6 +35,7 @@ const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bps
 const GUIDE_SLUGS = [
   'jkpsi', 'jkpsi-telecom', 'upsc-cse', 'ssc-cgl', 'bpsc', 'ibps-po', 'jkpsc', 'rssb', 'jkssb', 'neet-ug',
   'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
+  'jkssb-constable', 'jkssb-constable-telecom',
 ]
 
 // Editorial /blog/:slug articles. Keep in sync with keys of src/data/blogPosts.ts.
