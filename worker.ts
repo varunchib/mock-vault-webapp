@@ -2,10 +2,9 @@
 // structured data for public SEO routes while keeping the user-facing SPA fast.
 
 import { postGuides } from './src/data/postGuides'
-import { blogPosts, renderBlogHtml } from './src/data/blogPosts'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 import { questionPath, questionRealSlug } from './src/lib/questionUrl'
-import { blogPathForExam, guidePathForExam } from './src/lib/examLinks'
+import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 
 interface Env {
@@ -143,12 +142,21 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/tests': '/exams',
   '/practice': '/exams',
   '/attempted': '/analytics',
-  // Retired: JKSSB Patwari's last paper was September 2024 and JKSSB Junior
-  // Assistant is already at skill-test stage - neither appears on the JKSSB
-  // exam-date annexure, so a "how to prepare" article implied a cycle that does
-  // not exist. The guides carry the evergreen syllabus and the solved papers.
+  // The blog is retired in full. Every article restated what the exam's guide
+  // already covers in more depth (syllabus, pattern, eligibility, dates), so
+  // the two pages competed for the same queries and the thinner one diluted
+  // the guide. Each article 301s to the guide for the same exam, which keeps
+  // the accumulated link equity instead of dropping it on a 404.
   '/blog/jkssb-patwari-exam': '/guide/jkssb-patwari',
   '/blog/jkssb-junior-assistant-exam': '/guide/jkssb-junior-assistant',
+  '/blog/ibps-po-exam': '/guide/ibps-po',
+  '/blog/ssc-cgl-exam': '/guide/ssc-cgl',
+  '/blog/upsc-cse-exam': '/guide/upsc-cse',
+  '/blog/neet-ug-exam': '/guide/neet-ug',
+  '/blog/bpsc-exam': '/guide/bpsc-cce',
+  '/blog/jkpsc-jkcce-exam': '/guide/jkcce',
+  '/blog/rssb-patwari-exam': '/guide/rssb-patwari',
+  '/blog/jkssb-sub-inspector-exam': '/guide/jkpsi',
   // A board has no syllabus or pattern of its own - JKSSB runs 10 different
   // exams with 10 different papers - so a board-level guide could only restate
   // its children. The hub at /exam/jkssb is the page that aggregates them.
@@ -625,28 +633,6 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
   `, crumbs)
 }
 
-function renderBlogContent(post: (typeof blogPosts)[string], crumbs: Crumb[] = []): string {
-  // renderBlogHtml is shared with BlogPostPage, so bots and users see identical body HTML.
-  const body = renderBlogHtml(post)
-  const faqs = post.faqs.length
-    ? `<section><h2>Frequently Asked Questions</h2><dl>${post.faqs
-        .map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`)
-        .join('')}</dl></section>`
-    : ''
-  const related = post.related.length
-    ? `<section><h2>Related on Ministry of Papers</h2><ul>${post.related
-        .map(r => `<li><a href="${esc(r.href)}">${htmlText(r.label)}</a></li>`)
-        .join('')}</ul></section>`
-    : ''
-  return renderPageShell(post.h1, `
-    <p><small>Updated <time datetime="${esc(post.updatedAt)}">${htmlText(post.updatedAt)}</time> · ${post.readMinutes} min read</small></p>
-    <p>${htmlText(post.excerpt)}</p>
-    ${body}
-    ${faqs}
-    ${related}
-  `, crumbs)
-}
-
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], subExams: ExamData[] = [], crumbs: Crumb[] = []): string {
   // Sub-exam links so a board renders as a real hub for bots — matching the
   // "Exams under this board" section the React page shows humans. Without these,
@@ -664,19 +650,17 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(m => `<li><a href="/mock-test/${encodeURIComponent(m.slug)}">${htmlText(m.title)}</a> <small>${htmlText(m.difficulty)} - ${m.questions} questions</small></li>`)
     .join('')
   const subjects = (e.subjects ?? []).filter(Boolean).join(', ')
-  // Guide / blog cross-links — hand crawlers off to the editorial reference and
-  // info article for this exam, mirroring the cards the React page shows.
+  // Guide cross-link — hands crawlers off to the editorial reference for this
+  // exam, mirroring the card the React page shows.
   const guideHref = guidePathForExam(e.slug)
-  const blogHref = blogPathForExam(e.slug)
-  const resourceLinks = [
-    guideHref ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>` : '',
-    blogHref ? `<li><a href="${blogHref}">${htmlText(e.shortName)}: notification, dates, salary &amp; preparation</a></li>` : '',
-  ].join('')
+  const resourceLinks = guideHref
+    ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`
+    : ''
   return renderPageShell(`${e.name} PYQ papers and mock tests`, `
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
-    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} guides &amp; info</h2><ul>${resourceLinks}</ul></section>` : ''}
+    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} exam guide</h2><ul>${resourceLinks}</ul></section>` : ''}
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
@@ -1012,47 +996,6 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       }
     }
 
-    const blogMatch = pathname.match(/^\/blog\/([^/]+)$/)
-    if (blogMatch) {
-      const slug = blogMatch[1]
-      const post = blogPosts[slug]
-      if (!post) return null
-      const blogCrumbs: Crumb[] = [
-        { name: 'Home', item: BASE },
-        { name: 'Blog', item: `${BASE}/blog` },
-        { name: post.title, item: `${BASE}/blog/${slug}` },
-      ]
-      return {
-        title: titleFit(post.title),
-        description: post.description,
-        contentHtml: renderBlogContent(post, blogCrumbs),
-        jsonLd: [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: post.h1,
-            description: post.description,
-            url: `${BASE}/blog/${slug}`,
-            datePublished: post.publishedAt,
-            dateModified: post.updatedAt,
-            author: { '@type': 'Organization', name: post.author, url: BASE },
-            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
-            articleSection: post.category,
-            keywords: post.tags.join(', '),
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}/blog/${slug}` },
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: post.faqs.map(f => ({
-              '@type': 'Question',
-              name: f.q,
-              acceptedAnswer: { '@type': 'Answer', text: f.a },
-            })),
-          },
-        ],
-      }
-    }
   } catch {
     return null
   }
@@ -1109,6 +1052,15 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
+    // The blog is retired. Known articles 301 above; anything else under /blog
+    // is gone for good and must say so with a real status. Falling through to
+    // the SPA returned 200 with an empty shell that client-redirects to "/",
+    // which Google classifies as a Soft 404 — the one blog-related error that
+    // would actually show up in Search Console.
+    if (path === '/blog' || path.startsWith('/blog/')) {
+      return notFoundResponse()
+    }
+
     // Retired /exam/:slug/overview pages → the exam guide (or the hub if no
     // guide). Overview duplicated the guide's pattern/eligibility content, so
     // it was removed to end the cannibalization; 301 preserves any earned rank.
@@ -1155,7 +1107,7 @@ export default {
         // immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=4`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=5`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')

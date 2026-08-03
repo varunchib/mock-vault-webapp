@@ -13,7 +13,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
 import { MocksComingSoon } from '../components/common/MocksComingSoon'
 import { HaloLoader } from '../components/common/HaloLoader'
-import { blogPathForExam, guidePathForExam } from '../lib/examLinks'
+import { guidePathForExam } from '../lib/examLinks'
 import {
   fetchEnrolledSlugs,
   fetchExamBySlug,
@@ -458,37 +458,23 @@ export function ExamPage() {
         )}
       </header>
 
-      {/* ── Guide / blog cross-links ───────────────────
+      {/* ── Guide cross-link ───────────────────────────
           The exam hub should hand crawlers (and readers) off to the editorial
-          guide (syllabus, pattern, weightage) and blog (notification, dates,
-          salary, prep) for this exam — strengthening internal linking and the
-          hub's own indexing. */}
+          guide (syllabus, pattern, weightage) for this exam — strengthening
+          internal linking and the hub's own indexing. */}
       {(() => {
         const guideHref = slug ? guidePathForExam(slug) : null
-        const blogHref = slug ? blogPathForExam(slug) : null
-        if (!guideHref && !blogHref) return null
+        if (!guideHref) return null
         return (
-          <section className="ep-resources" aria-label={`${exam.shortName} guides and info`}>
-            {guideHref && (
-              <Link to={guideHref} className="ep-resource-card">
-                <span className="ep-resource-icon"><BookOpen size={18} /></span>
-                <span className="ep-resource-copy">
-                  <strong>{exam.shortName} Exam Guide</strong>
-                  <small>Syllabus, exam pattern &amp; weightage analysis</small>
-                </span>
-                <ChevronRight size={15} className="ep-resource-chev" />
-              </Link>
-            )}
-            {blogHref && (
-              <Link to={blogHref} className="ep-resource-card">
-                <span className="ep-resource-icon"><FileText size={18} /></span>
-                <span className="ep-resource-copy">
-                  <strong>{exam.shortName}: Notification &amp; Prep</strong>
-                  <small>Dates, eligibility, salary &amp; how to prepare</small>
-                </span>
-                <ChevronRight size={15} className="ep-resource-chev" />
-              </Link>
-            )}
+          <section className="ep-resources" aria-label={`${exam.shortName} exam guide`}>
+            <Link to={guideHref} className="ep-resource-card">
+              <span className="ep-resource-icon"><BookOpen size={18} /></span>
+              <span className="ep-resource-copy">
+                <strong>{exam.shortName} Exam Guide</strong>
+                <small>Syllabus, exam pattern &amp; weightage analysis</small>
+              </span>
+              <ChevronRight size={15} className="ep-resource-chev" />
+            </Link>
           </section>
         )
       })()}
