@@ -153,6 +153,12 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   // exams with 10 different papers - so a board-level guide could only restate
   // its children. The hub at /exam/jkssb is the page that aggregates them.
   '/guide/jkssb': '/exam/jkssb',
+  // Guides describe one exam. These three held leaf-exam content (BPSC CCE,
+  // RSSB Patwari, JKCCE) but sat on board slugs, so the URL claimed a board the
+  // page never covered. Moved to the exam they actually describe.
+  '/guide/bpsc': '/guide/bpsc-cce',
+  '/guide/rssb': '/guide/rssb-patwari',
+  '/guide/jkpsc': '/guide/jkcce',
 }
 
 const STATIC_META: Record<string, PageMeta> = {

@@ -4,8 +4,9 @@
 // src/data/postGuides.ts and src/data/blogPosts.ts.
 
 const GUIDE_SLUGS = new Set<string>([
-  'jkpsi', 'jkpsi-telecom', 'upsc-cse', 'ssc-cgl', 'bpsc', 'ibps-po', 'jkpsc', 'rssb', 'jkssb', 'neet-ug',
+  'jkpsi', 'jkpsi-telecom', 'upsc-cse', 'ssc-cgl', 'bpsc-cce', 'ibps-po', 'jkcce', 'rssb-patwari', 'neet-ug',
   'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
+  'jkssb-constable', 'jkssb-constable-telecom',
 ])
 
 // exam-hub slug → blog slug (the broad-info article for that exam)
@@ -14,12 +15,13 @@ const EXAM_BLOG: Record<string, string> = {
   'ssc-cgl': 'ssc-cgl-exam',
   'upsc-cse': 'upsc-cse-exam',
   'neet-ug': 'neet-ug-exam',
-  'bpsc': 'bpsc-exam',
-  'jkpsc': 'jkpsc-jkcce-exam',
-  'rssb': 'rssb-patwari-exam',
-  'jkssb': 'jkssb-sub-inspector-exam',
-  'jkssb-patwari': 'jkssb-patwari-exam',
-  'jkssb-junior-assistant': 'jkssb-junior-assistant-exam',
+  'bpsc-cce': 'bpsc-exam',
+  'jkcce': 'jkpsc-jkcce-exam',
+  'rssb-patwari': 'rssb-patwari-exam',
+  'jkpsi': 'jkssb-sub-inspector-exam',
+  // jkssb-patwari and jkssb-junior-assistant deliberately absent: those blogs
+  // were retired and now 301, so linking them would point users and crawlers
+  // at a redirect.
 }
 
 /** /guide/:slug for an exam hub, or null when no guide exists. */
