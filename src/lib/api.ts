@@ -28,6 +28,7 @@ export type QuestionTranslation = {
 
 export type Question = {
   slug: string;
+  urlCode?: string;
   examSlug: string;
   paperSlug?: string;
   examName: string;
@@ -782,12 +783,7 @@ export type InboxThread = {
   status: 'open' | 'replied'
 }
 
-export function createInboxThread(payload: {
-  text: string
-  examSlug?: string
-  examName?: string
-  searchTerm?: string
-}): Promise<{ threadId: string }> {
+export function createInboxThread(payload: { text: string }): Promise<{ threadId: string }> {
   return requestJson('/api/v1/inbox', { method: 'POST', body: JSON.stringify(payload) })
 }
 

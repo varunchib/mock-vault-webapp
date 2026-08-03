@@ -113,7 +113,7 @@ function renderKatex(latex: string, displayMode: boolean): string | null {
   }
 }
 
-export function MathText({ text, className }: { text: string; className?: string }) {
+function MathTextImpl({ text, className }: { text: string; className?: string }) {
   // Hooks must run unconditionally, so all the early-exit decisions are derived
   // here rather than returning before them.
   const tokens = useMemo(() => {
@@ -128,7 +128,7 @@ export function MathText({ text, className }: { text: string; className?: string
   )
 
   // Re-render once KaTeX arrives; until then math shows as its raw expression.
-  const [, setKatexReady] = useState(() => katexMod !== null)
+  const [katexReady, setKatexReady] = useState(() => katexMod !== null)
   useEffect(() => {
     if (!hasMath || katexMod) return
     let alive = true
@@ -136,34 +136,45 @@ export function MathText({ text, className }: { text: string; className?: string
     return () => { alive = false }
   }, [hasMath])
 
+  // KaTeX's renderToString is expensive (~ms per expression on mobile). It must
+  // run only when the text or KaTeX-readiness actually changes — NOT on every
+  // re-render. Without this memo, selecting an MCQ option re-renders the option
+  // list and re-parses every math expression synchronously, causing a visible
+  // tap lag on math-heavy papers (e.g. NEET). katexReady is a dep so the output
+  // recomputes once when KaTeX finishes loading.
+  const nodes = useMemo(() => {
+    if (!tokens) return null
+    void katexReady
+    return tokens.map((tok, i) => {
+      switch (tok.kind) {
+        case 'block-math': {
+          const html = renderKatex(tok.content, true)
+          return html
+            ? <span key={i} className="math-block" dangerouslySetInnerHTML={{ __html: html }} />
+            : <span key={i} className="math-block">{tok.content}</span>
+        }
+        case 'inline-math': {
+          const html = renderKatex(tok.content, false)
+          return html
+            ? <span key={i} className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />
+            : <span key={i} className="math-inline">{tok.content}</span>
+        }
+        case 'bold':
+          return <strong key={i} className="qr-highlight">{tok.content}</strong>
+        case 'text':
+        default:
+          return <React.Fragment key={i}>{tok.content}</React.Fragment>
+      }
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tokens, katexReady])
+
   if (!text) return null
   if (!tokens) return <span className={className}>{text}</span>
 
-  return (
-    <span className={className}>
-      {tokens.map((tok, i) => {
-        switch (tok.kind) {
-          case 'block-math': {
-            const html = renderKatex(tok.content, true)
-            return html
-              ? <span key={i} className="math-block" dangerouslySetInnerHTML={{ __html: html }} />
-              : <span key={i} className="math-block">{tok.content}</span>
-          }
-          case 'inline-math': {
-            const html = renderKatex(tok.content, false)
-            return html
-              ? <span key={i} className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />
-              : <span key={i} className="math-inline">{tok.content}</span>
-          }
-          case 'bold':
-            return (
-              <strong key={i} className="qr-highlight">{tok.content}</strong>
-            )
-          case 'text':
-          default:
-            return <React.Fragment key={i}>{tok.content}</React.Fragment>
-        }
-      })}
-    </span>
-  )
+  return <span className={className}>{nodes}</span>
 }
+
+// Memoized: a parent re-render (e.g. selecting an MCQ option) that passes the
+// same text/className must not re-run this component or its KaTeX work at all.
+export const MathText = React.memo(MathTextImpl)

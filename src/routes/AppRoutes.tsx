@@ -10,7 +10,6 @@ import { HaloLoader } from '../components/common/HaloLoader'
 import { LandingPage }       from '../pages/LandingPage'
 import { ExamCatalogPage }   from '../pages/ExamCatalogPage'
 import { ExamPage }          from '../pages/ExamPage'
-import { ExamInfoPage }      from '../pages/ExamInfoPage'
 import { QuestionPage }      from '../pages/QuestionPage'
 import { PyqPaperPage }      from '../pages/PyqPaperPage'
 import { MockDetailPage }    from '../pages/MockDetailPage'
@@ -92,7 +91,7 @@ export function AppRoutes() {
       <Route path="/admin/users/:id/analytics/:examSlug" element={<ProtectedAdminPage><Lazy><AdminUserExamAnalytics /></Lazy></ProtectedAdminPage>} />
       <Route path="/exams"              element={<ExamCatalogPage />} />
       <Route path="/exam/:slug"          element={<ExamPage />} />
-      <Route path="/exam/:slug/overview" element={<ExamInfoPage />} />
+      {/* /exam/:slug/overview retired — the Worker 301s it to /guide/:slug */}
       <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/question/:slug"     element={<QuestionPage />} />

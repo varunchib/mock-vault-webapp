@@ -4,6 +4,8 @@
 import { postGuides } from './src/data/postGuides'
 import { blogPosts, renderBlogHtml } from './src/data/blogPosts'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
+import { questionPath, questionRealSlug } from './src/lib/questionUrl'
+import { blogPathForExam, guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 
 interface Env {
@@ -16,6 +18,7 @@ type PageMeta = {
   jsonLd?: unknown
   contentHtml?: string
   robots?: string
+  redirect?: string  // canonical path to 301 to (set when the URL is non-canonical)
 }
 
 type ExamData = {
@@ -65,6 +68,7 @@ type MockData = {
 
 type QuestionData = {
   slug: string
+  urlCode?: string
   question: string
   examName: string
   examSlug: string
@@ -90,6 +94,18 @@ const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Goog
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 const API_TIMEOUT_MS = 4000
+
+// Recommended QAPage fields (Google "improve item appearance"): the platform
+// authors and verifies every solution, so it is the author of both the
+// question write-up and the accepted answer.
+const QA_AUTHOR = { '@type': 'Organization', name: 'Ministry of Papers', url: BASE }
+function qaDate(year: string | number | undefined): string {
+  const m = String(year ?? '').match(/\d{4}/)
+  // Full ISO 8601 datetime with an explicit UTC offset — Google's QAPage
+  // validator rejects a bare date (YYYY-MM-DD) for datePublished as both an
+  // "invalid datetime value" and "missing a time zone".
+  return `${m ? m[0] : '2026'}-01-01T00:00:00+00:00`
+}
 
 // Content-Security-Policy for the SPA shell. Shipped as Report-Only so it CANNOT
 // break the site — it only logs violations to the browser console. Watch for a few
@@ -164,7 +180,7 @@ const STATIC_META: Record<string, PageMeta> = {
     },
   },
   '/exams': {
-    title: 'Exam Catalog - Browse Competitive Exams | Ministry of Papers',
+    title: 'Browse Competitive Exams - Free PYQ Papers & Mock Tests',
     description: 'Browse competitive exams - UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.',
     jsonLd: {
       '@context': 'https://schema.org',
@@ -240,8 +256,25 @@ function esc(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
-function stripMarkdown(s: string): string {
+const GREEK: Record<string, string> = {
+  theta: 'θ', alpha: 'α', beta: 'β', gamma: 'γ', delta: 'δ', pi: 'π',
+  lambda: 'λ', mu: 'μ', sigma: 'σ', omega: 'ω', phi: 'φ', rho: 'ρ',
+}
+// SSR titles/H1s/descriptions are plain text, so raw LaTeX ($, \dfrac, \theta)
+// reads badly in a SERP. Convert the common math to readable plain text.
+function mathToText(s: string): string {
   return s
+    .replace(/\\sqrt\s*{([^{}]*)}/g, '√$1')
+    .replace(/\\d?frac\s*{([^{}]*)}\s*{([^{}]*)}/g, '$1/$2')
+    .replace(/\\(theta|alpha|beta|gamma|delta|pi|lambda|mu|sigma|omega|phi|rho)\b/gi, (_m, g: string) => GREEK[g.toLowerCase()] ?? '')
+    .replace(/\\(sin|cos|tan|cot|sec|cosec|csc|log|ln)\b/g, '$1')
+    .replace(/\\times/g, '×').replace(/\\div/g, '÷').replace(/\\cdot/g, '·')
+    .replace(/\\pm/g, '±').replace(/\\leq/g, '≤').replace(/\\geq/g, '≥').replace(/\\neq/g, '≠').replace(/\\infty/g, '∞')
+    .replace(/\\[a-zA-Z]+/g, '') // drop any other LaTeX command
+    .replace(/[${}]/g, '')       // drop $ delimiters and leftover braces
+}
+function stripMarkdown(s: string): string {
+  return mathToText(s)
     .replace(/!\[[^\]]*]\([^)]+\)/g, '')
     .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
     .replace(/[*_`#>]/g, '')
@@ -282,11 +315,28 @@ function richText(s: string | undefined | null): string {
     }
     items = null
   }
-  for (const raw of lines) {
-    const line = raw.replace(/\s+$/, '')
+  const cells = (l: string) => l.trim().replace(/^\||\|$/g, '').split('|').map(c => c.trim())
+  const isRow = (l: string) => l.trim().startsWith('|') && l.includes('|', 1)
+  const isSep = (l: string) => /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(l) && l.includes('-')
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].replace(/\s+$/, '')
     if (!line.trim()) { flush(); continue }
     const heading = line.match(/^\s*#{2,3}\s+(.*)$/)
     if (heading) { flush(); out.push(`<h4>${inlineFmt(heading[1].trim())}</h4>`); continue }
+    // Pipe table: header + separator + body rows
+    if (isRow(line) && i + 1 < lines.length && isSep(lines[i + 1])) {
+      flush()
+      const head = cells(line)
+      const body: string[][] = []
+      i += 2
+      while (i < lines.length && isRow(lines[i])) { body.push(cells(lines[i])); i++ }
+      i--
+      out.push('<div class="expl-table-wrap"><table class="expl-table"><thead><tr>' +
+        head.map(h => `<th>${inlineFmt(h)}</th>`).join('') + '</tr></thead><tbody>' +
+        body.map(r => '<tr>' + r.map(c => `<td>${inlineFmt(c)}</td>`).join('') + '</tr>').join('') +
+        '</tbody></table></div>')
+      continue
+    }
     const nested = line.match(/^(?:\s{2,}|\t+)[-*•]\s+(.*)$/)
     if (nested && items && items.length) { items[items.length - 1].sub.push(nested[1].trim()); continue }
     const bullet = line.match(/^\s*[-*•]\s+(.*)$/)
@@ -307,6 +357,40 @@ function questionTopic(q: QuestionData): string {
   return (q.tags ?? []).map(t => String(t).trim()).filter(Boolean)[0] ?? ''
 }
 
+// Only 67% of questions carry a curated tag, so for the rest the topic has to
+// come out of the text. It is never the trailing stem — it is the opening line
+// ("Consider the following statements regarding the Blue Flag Certification:")
+// or, when that is bare boilerplate ("Consider the following statements:"),
+// the first numbered statement. Strip the lead-in and keep the noun phrase.
+const TOPIC_LEAD_IN =
+  /^(consider the following statements?(?:\s+(?:regarding|about|concerning|on))?(?:\s+the)?|with reference to(?:\s+the)?|in the context of(?:\s+the)?)\s*/i
+
+function topicFromQuestion(lines: string[]): string {
+  for (const raw of lines) {
+    if (/\babove\b/i.test(raw)) continue // the boilerplate stem, never the topic
+    let t = raw.replace(/^[IVXivx]+[.)]\s*/, '') // "I." / "II)" statement markers
+    // "With reference to X, consider the following statements" -> drop the
+    // trailing clause. Guarded: without this check the same pattern also eats
+    // lines that OPEN with it, throwing away "...regarding the Blue Flag
+    // Certification" — the one phrase worth putting in the title.
+    if (!/^consider\s+the\s+following/i.test(t)) {
+      t = t.replace(/,?\s*consider the following.*$/i, '')
+    }
+    t = t.replace(TOPIC_LEAD_IN, '').replace(/[:?.;,\s]+$/, '').trim()
+    if (t.length < 12) continue
+    // A whole statement is too long for a title; keep the subject of the
+    // sentence ("The Montreux Record is maintained under..." -> "The Montreux
+    // Record") so the keyword survives instead of being cut mid-phrase.
+    if (t.length > 45) {
+      const clause = t.split(/\s+(?:is|are|was|were|has|have|had|which|that)\s+/i)[0]
+      if (clause.length >= 12) t = clause
+    }
+    if (t.length > 45) t = t.split(',')[0]
+    return t.replace(/[:?.;,\s]+$/, '').trim()
+  }
+  return ''
+}
+
 // questionTitle builds a compact, keyword-first title for a question page.
 // It deliberately omits the " | Ministry of Papers" suffix: 21 chars of brand
 // crowd out the topic keywords that win long-tail queries, and the exam+subject
@@ -314,7 +398,9 @@ function questionTopic(q: QuestionData): string {
 function questionTitle(examLabel: string, year: string, subject: string, no: string | number, topic: string): string {
   const CAP = 65
   const tail = ' - Solved Answer'
-  const base = `${examLabel}${year ? ' ' + year : ''}${subject ? ' ' + subject : ''} Q${no}`
+  // With a topic present the subject is redundant and only eats budget the
+  // keyword needs ("JKCCE 2025 Environment & Ecology Q38: Blue Flag Certifi…").
+  const base = `${examLabel}${year ? ' ' + year : ''}${topic ? '' : subject ? ' ' + subject : ''} Q${no}`
   if (!topic) return `${base}${tail}`.slice(0, CAP)
 
   const full = `${base}: ${topic}${tail}`
@@ -330,12 +416,43 @@ function questionTitle(examLabel: string, year: string, subject: string, no: str
   return t ? `${base}: ${t}${tail}` : `${base}${tail}`
 }
 
+// Statement-list and passage items end with boilerplate that refers back to
+// content the title cannot show ("Which of the statements given above is/are
+// correct?"). Using that line as the <title> gave 242 question pages a title
+// they shared with at least one other page — 48 of them the exact same
+// sentence, and 21 titled only "Passage:" — so Google had nothing to tell them
+// apart. When the trailing line is one of these, fall back to the keyword-first
+// questionTitle() built from exam + year + subject + curated topic tag.
+function isGenericStem(line: string, multiline: boolean): boolean {
+  const t = line.replace(/\s+/g, ' ').trim()
+  if (!t) return true
+  // "above" always points at statements/pairs that live outside the title.
+  if (/\babove\b/i.test(t)) return true
+  if (/^(passage|match list|directions?)\b/i.test(t)) return true
+  // Instruction-style stems shared verbatim across whole English/reasoning
+  // sections ("Select the letter-cluster…", "In the passage below…").
+  if (/^(select|choose|identify|pick)\b/i.test(t)) return true
+  if (/^in the (passage|sentence|following)\b/i.test(t)) return true
+  if (/^a sentence is provided\b/i.test(t)) return true
+  // "Which of the following statements/pairs/conclusions is/are correct?" —
+  // the same closing question on hundreds of statement-list items.
+  if (/^(which|how many)\b.*\b(statements?|pairs?|assumptions?|conclusions?)\b/i.test(t)) return true
+  // On a multi-line item the substance sits in the lines that were dropped, so
+  // a short trailing line cannot identify the page on its own.
+  return multiline && t.length < 45
+}
+
+// Google renders roughly 60 characters and appends the site name itself, so the
+// old " | Ministry of Papers" suffix spent 21 of those on something Search shows
+// anyway — it pushed the keywords that win the query out of the visible part.
+// Competitors do the same (Testbook ships "SSC CGL 2026 Exam Date, 12256
+// vacancies, Eligibility and Selection Process" with no brand at all).
 function titleFit(core: string): string {
-  const brand = ' | Ministry of Papers'
-  const full = `${core}${brand}`
-  if (full.length <= 70) return full
-  const budget = 70 - brand.length
-  return `${core.slice(0, budget - 1).trimEnd()}...${brand}`
+  const CAP = 60
+  if (core.length <= CAP) return core
+  const cut = core.slice(0, CAP - 1)
+  const lastSpace = cut.lastIndexOf(' ')
+  return (lastSpace > 30 ? cut.slice(0, lastSpace) : cut).replace(/[,;:\-\s]+$/, '') + '…'
 }
 
 function h1Text(title: string): string {
@@ -390,9 +507,11 @@ function renderPageShell(title: string, children: string, crumbs: Crumb[] = []):
 }
 
 function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
+  const isDeleted = String(q.answerKey).toLowerCase() === 'deleted'
+  const isPending = String(q.answerKey).toLowerCase() === 'pending'
   const optionItems = (q.options ?? [])
     .map(opt => {
-      const correct = String(opt.key).toUpperCase() === String(q.answerKey).toUpperCase()
+      const correct = !isDeleted && !isPending && String(opt.key).toUpperCase() === String(q.answerKey).toUpperCase()
       return `<li${correct ? ' class="correct"' : ''}><strong>${htmlText(opt.key)}.</strong> ${htmlText(opt.text)}${correct ? ' <strong>(Correct answer)</strong>' : ''}</li>`
     })
     .join('')
@@ -424,8 +543,9 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
 
   const solution = richText(q.explanation)
 
-  return renderPageShell(`${q.examName} ${q.year} — Q${q.questionNo} Solved Answer with Explanation`, `
-    <p><a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.subject ? ` — ${htmlText(q.subject)}` : ''}${q.year ? ` — ${htmlText(q.year)}` : ''}</p>
+  const heading = stripMarkdown(q.question).replace(/\s+/g, ' ').trim()
+  return renderPageShell(`${heading.length > 130 ? heading.slice(0, 129).trimEnd() + '…' : heading}`, `
+    <p>${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` ${htmlText(q.year)}` : ''}</p>
     ${paperLink}
     ${images ? `<figure>${images}</figure>` : ''}
     <section>
@@ -433,11 +553,12 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
       ${paragraph(q.question)}
       ${optionItems ? `<ol type="A">${optionItems}</ol>` : ''}
     </section>
-    <section>
-      <h2>Correct Answer</h2>
-      <p><strong>Option ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</strong></p>
-    </section>
-    ${solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
+    ${isDeleted
+      ? `<section><p>This question was dropped from the final answer key, so it has no correct option — marks were awarded to all candidates.</p></section>`
+      : isPending
+      ? `<section><h2>Correct Answer</h2><p>Official answer key awaited — solution will be updated.</p></section>`
+      : `<section><h2>Correct Answer</h2><p><strong>Option ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</strong></p></section>`}
+    ${!isDeleted && solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
     ${hindiSection}
     ${tags ? `<p><strong>Topics covered:</strong> ${tags}</p>` : ''}
   `, crumbs)
@@ -455,7 +576,7 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     bySubject.get(s)!.push(q)
   }
   const questionLi = (q: QuestionData) => `<li>
-      <a href="/question/${encodeURIComponent(q.slug)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 200)}</a>
+      <a href="${questionPath(q.urlCode ?? q.slug, q.question)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 200)}</a>
       <br /><small><strong>Answer:</strong> ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</small>
       ${q.explanation ? `<br /><small>${htmlText(q.explanation).slice(0, 240)}</small>` : ''}
     </li>`
@@ -527,10 +648,19 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(m => `<li><a href="/mock-test/${encodeURIComponent(m.slug)}">${htmlText(m.title)}</a> <small>${htmlText(m.difficulty)} - ${m.questions} questions</small></li>`)
     .join('')
   const subjects = (e.subjects ?? []).filter(Boolean).join(', ')
+  // Guide / blog cross-links — hand crawlers off to the editorial reference and
+  // info article for this exam, mirroring the cards the React page shows.
+  const guideHref = guidePathForExam(e.slug)
+  const blogHref = blogPathForExam(e.slug)
+  const resourceLinks = [
+    guideHref ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>` : '',
+    blogHref ? `<li><a href="${blogHref}">${htmlText(e.shortName)}: notification, dates, salary &amp; preparation</a></li>` : '',
+  ].join('')
   return renderPageShell(`${e.name} PYQ papers and mock tests`, `
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
+    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} guides &amp; info</h2><ul>${resourceLinks}</ul></section>` : ''}
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
@@ -581,7 +711,7 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
 }
 
 function isDynamicSeoPath(pathname: string): boolean {
-  return /^\/exam\/[^/]+(?:\/overview)?$/.test(pathname)
+  return /^\/exam\/[^/]+$/.test(pathname)
     || /^\/pyq\/[^/]+$/.test(pathname)
     || /^\/question\/[^/]+$/.test(pathname)
     || /^\/mock-test\/[^/]+$/.test(pathname)
@@ -601,36 +731,6 @@ function notFoundResponse(): Response {
 
 async function fetchMeta(pathname: string): Promise<PageMeta | null> {
   try {
-    const overviewMatch = pathname.match(/^\/exam\/([^/]+)\/overview$/)
-    if (overviewMatch) {
-      const slug = overviewMatch[1]
-      const e = await apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600)
-      if (!e) return null
-      const overviewCrumbs: Crumb[] = [
-        { name: 'Home', item: BASE },
-        { name: 'Exams', item: `${BASE}/exams` },
-        { name: e.shortName, item: `${BASE}/exam/${slug}` },
-        { name: 'Overview', item: `${BASE}/exam/${slug}/overview` },
-      ]
-      return {
-        title: `${e.shortName} Overview - Exam Pattern, Eligibility & PYQ | Ministry of Papers`,
-        description: `${e.shortName} overview - exam pattern, eligibility criteria, selection process, salary, and free PYQ with detailed explanations on Ministry of Papers.`,
-        contentHtml: renderPageShell(`${e.shortName} exam overview`, `
-          ${paragraph(e.description)}
-          <p><a href="/exam/${encodeURIComponent(slug)}">Browse ${htmlText(e.shortName)} PYQ papers and mock tests</a></p>
-        `, overviewCrumbs),
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'Course',
-          name: `${e.shortName} Exam Overview`,
-          description: e.description || `${e.name} exam pattern, eligibility, selection process, and free PYQ.`,
-          url: `${BASE}/exam/${slug}/overview`,
-          provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: breadcrumbJsonLd(overviewCrumbs),
-        },
-      }
-    }
-
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
@@ -657,7 +757,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         { name: e.shortName, item: `${BASE}/exam/${slug}` },
       ]
       return {
-        title: `${e.shortName} - Mock Tests & PYQ Papers | Ministry of Papers`,
+        title: titleFit(`${e.shortName} PYQ Papers & Free Mock Tests`),
         description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
         robots: examEmpty || thinBoard ? 'noindex, follow' : undefined,
         contentHtml: renderExamContent(e, papers ?? [], examMocks, subExams, examCrumbs),
@@ -697,7 +797,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         { name: 'Mock Tests', item: `${BASE}/mock-test/${examSlug}` },
       ]
       return {
-        title: `${e.shortName} Mock Tests - Free Full-Length Practice | Ministry of Papers`,
+        title: titleFit(`${e.shortName} Free Mock Tests - Full-Length Practice`),
         description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
         // Mocks are still feature-gated ("coming soon") in the app, so the page
         // a searcher would land on cannot actually be attempted. Keep it out of
@@ -775,9 +875,15 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
 
     const questionMatch = pathname.match(/^\/question\/([^/]+)$/)
     if (questionMatch) {
-      const slug = questionMatch[1]
-      const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${slug}`, 86400)
+      // URL is /question/<keywords>--<id>; fetch by the stable id after "--".
+      const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${questionRealSlug(questionMatch[1])}?v=2`, 86400)
       if (!q) return null
+      // Canonical keyword URL; 301 any bare/old/mismatched URL to it.
+      const canonicalPath = questionPath(q.urlCode ?? q.slug, q.question)
+      if (pathname !== canonicalPath) {
+        return { title: '', description: '', redirect: canonicalPath }
+      }
+      const qUrl = `${BASE}${canonicalPath}`
       // Built once: rendered visibly by renderQuestionContent AND declared in
       // JSON-LD, so the markup cannot claim a trail the page does not show.
       const crumbs: Crumb[] = [
@@ -786,11 +892,10 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         ...(q.paperSlug
           ? [
               { name: q.paper, item: `${BASE}${paperPath(q.paperSlug)}` },
-              { name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` },
+              { name: `Q${q.questionNo}`, item: qUrl },
             ]
-          : [{ name: `Q${q.questionNo}`, item: `${BASE}/question/${slug}` }]),
+          : [{ name: `Q${q.questionNo}`, item: qUrl }]),
       ]
-      const topic = questionTopic(q)
       // questions.exam_name holds the long official name ("UPSC Civil Services
       // Examination"); the exam record has a compact shortName ("UPSC CSE") that
       // leaves room for the topic keywords in the title.
@@ -805,30 +910,55 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       // description (Bing flags duplicates). The actual question is the last
       // line ending in '?', so prefer that when the text is multi-line.
       const qLines = q.question.split('\n').map((l) => stripMarkdown(l).trim()).filter(Boolean)
+      const multiline = qLines.length > 2
       const actualQuestion =
-        qLines.length > 2 ? ([...qLines].reverse().find((l) => l.endsWith('?')) ?? qLines[qLines.length - 1]) : qLines.join(' ')
+        multiline ? ([...qLines].reverse().find((l) => l.endsWith('?')) ?? qLines[0]) : qLines.join(' ')
+      // Curated tag first (67% of rows have one), else derive from the text.
+      const topic = questionTopic(q) || topicFromQuestion(qLines)
+      // The brand suffix is deliberately gone: 21 chars of " | Ministry of
+      // Papers" pushed the topic keywords past what Google renders, and Search
+      // now appends the site name itself.
+      const pageTitle = isGenericStem(actualQuestion, multiline)
+        ? questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic)
+        : actualQuestion.length > 65
+          ? actualQuestion.slice(0, 64).trimEnd() + '…'
+          : actualQuestion
+      // Descriptions lead with the FULL question text — the same source the URL
+      // keywords come from — not the trailing stem, which is identical across
+      // papers and gave every statement-list page one shared snippet.
+      const descTail = ` Answer (${q.answerKey}) with a full solution — ${examLabel} ${q.year}${q.subject ? ' ' + q.subject : ''}${topic ? ' · ' + topic : ''}.`
+      const leadRoom = Math.max(60, 158 - descTail.length)
+      const flatQuestion = qLines.join(' ')
+      const descLead =
+        flatQuestion.length > leadRoom ? flatQuestion.slice(0, leadRoom - 1).trimEnd() + '…' : flatQuestion
       return {
-        title: questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic),
-        description: `${q.examName} ${q.year}${q.subject ? ' ' + q.subject : ''} Q${q.questionNo}: ${actualQuestion.slice(0, 140)} — correct answer (${q.answerKey}) with detailed explanation.`,
+        title: pageTitle,
+        description: `${descLead}${descTail}`,
         contentHtml: renderQuestionContent(q, crumbs),
         jsonLd: [
           {
             '@context': 'https://schema.org',
             '@type': 'QAPage',
             name: `${q.examName} ${q.year} Q${q.questionNo} - Solved Answer`,
-            url: `${BASE}/question/${slug}`,
+            url: qUrl,
             inLanguage: q.translations?.hi ? ['en', 'hi'] : 'en',
             ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
             ...((q.tags ?? []).length ? { keywords: (q.tags ?? []).filter(Boolean).join(', ') } : {}),
             mainEntity: {
               '@type': 'Question',
               name: q.question.slice(0, 300),
+              text: q.question,
               answerCount: 1,
+              author: QA_AUTHOR,
+              datePublished: qaDate(q.year),
               ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
               acceptedAnswer: {
                 '@type': 'Answer',
                 text: answerText || `Correct option: ${q.answerKey}`,
-                url: `${BASE}/question/${slug}`,
+                url: qUrl,
+                author: QA_AUTHOR,
+                datePublished: qaDate(q.year),
+                upvoteCount: 1,
               },
             },
           },
@@ -848,7 +978,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         { name: guide.shortName, item: `${BASE}/guide/${slug}` },
       ]
       return {
-        title: `${guide.shortName} Syllabus & Exam Pattern | Ministry of Papers`,
+        title: titleFit(`${guide.shortName} Syllabus & Exam Pattern`),
         description: stripMarkdown(guide.tagline).slice(0, 160),
         contentHtml: renderGuideContent(slug, guide, guideCrumbs),
         jsonLd: {
@@ -877,7 +1007,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         { name: post.title, item: `${BASE}/blog/${slug}` },
       ]
       return {
-        title: `${post.title} | Ministry of Papers`,
+        title: titleFit(post.title),
         description: post.description,
         contentHtml: renderBlogContent(post, blogCrumbs),
         jsonLd: [
@@ -959,6 +1089,18 @@ export default {
     if (LEGACY_REDIRECTS[path]) {
       const dest = new URL(request.url)
       dest.pathname = LEGACY_REDIRECTS[path]
+      dest.search = ''
+      return Response.redirect(dest.toString(), 301)
+    }
+
+    // Retired /exam/:slug/overview pages → the exam guide (or the hub if no
+    // guide). Overview duplicated the guide's pattern/eligibility content, so
+    // it was removed to end the cannibalization; 301 preserves any earned rank.
+    const overviewRedirect = path.match(/^\/exam\/([^/]+)\/overview$/)
+    if (overviewRedirect) {
+      const slug = overviewRedirect[1]
+      const dest = new URL(request.url)
+      dest.pathname = postGuides[slug] ? `/guide/${slug}` : `/exam/${slug}`
       dest.search = ''
       return Response.redirect(dest.toString(), 301)
     }
@@ -1058,6 +1200,15 @@ export default {
 
       if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
       if (!meta) return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()
+
+      // Non-canonical URL (e.g. old bare /question/<id>) → 301 to the canonical
+      // keyword URL so search engines transfer ranking to the new address.
+      if (meta.redirect) {
+        const dest = new URL(request.url)
+        dest.pathname = meta.redirect
+        dest.search = ''
+        return Response.redirect(dest.toString(), 301)
+      }
 
       // Client-side tab/filter URLs (?tab=…, ?subject=…) are duplicates of the
       // clean canonical page → keep them out of the index.

@@ -177,16 +177,12 @@ type QuestionMeta = {
  * Falls back to truncated prefix when exam name is too long for a snippet.
  */
 export function questionSeoTitle(q: QuestionMeta): string {
+  // Lead with the question text — that is what users type into search, and it
+  // is the strongest ranking signal for a Q&A page (matches Testbook et al.).
+  // The exam/paper context lives in the H1, breadcrumb and on-page content.
   const brand = ` | ${BRAND}`
-  const budget = 70 - brand.length  // 49 chars for core
-  const prefix = `${q.examName}${q.year ? ` ${q.year}` : ''}${q.questionNo ? ` Q.${q.questionNo}` : ''}`
-  const snippetBudget = budget - prefix.length - 2  // -2 for ": "
-  if (snippetBudget >= 10) {
-    const snippet = truncate(strip(q.question), snippetBudget)
-    return `${prefix}: ${snippet}${brand}`
-  }
-  // Exam name too long for a snippet — just show truncated prefix
-  return `${truncate(prefix, budget)}${brand}`
+  const snippet = truncate(strip(q.question), 70 - brand.length)
+  return `${snippet}${brand}`
 }
 
 export function questionSeoDescription(q: QuestionMeta): string {
@@ -215,24 +211,6 @@ export function analyticsSeoDescription(a: AnalyticsMeta): string {
   if (a.avgAccPct) d += ` – avg accuracy ${a.avgAccPct}%`
   d += `. Subject mastery, percentile estimate, and cutoff comparison on ${BRAND}.`
   return truncate(d, 160)
-}
-
-// ── Exam Overview page ─────────────────────────────────────────────────────
-
-type ExamInfoMeta = {
-  shortName: string
-}
-
-/** JKSSB Overview – Exam Pattern, Eligibility & PYQ | Ministry of Papers */
-export function examInfoSeoTitle(e: ExamInfoMeta): string {
-  return `${e.shortName} Overview – Exam Pattern, Eligibility & PYQ | ${BRAND}`
-}
-
-export function examInfoSeoDescription(e: ExamInfoMeta): string {
-  return truncate(
-    `${e.shortName} overview — exam pattern, eligibility criteria, selection process, salary, and free PYQ with detailed explanations on ${BRAND}.`,
-    160,
-  )
 }
 
 // ── Paper attempt (exam hall) ──────────────────────────────────────────────

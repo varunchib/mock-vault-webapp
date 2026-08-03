@@ -2,6 +2,7 @@ import { ChevronRight, Clock3, Calendar } from 'lucide-react'
 import { Link, Navigate, useParams } from 'react-router-dom'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
+import { NotFound } from '../components/common/NotFound'
 import { blogPosts, blogToc, renderBlogHtml } from '../data/blogPosts'
 
 const BASE = 'https://ministryofpapers.com'
@@ -59,7 +60,7 @@ export function BlogPostPage() {
   })
 
   if (!slug) return <Navigate to="/" replace />
-  if (!post) return <Navigate to="/" replace />
+  if (!post) return <NotFound title="Article not found" message="This article isn't available — it may have moved. Browse the exams or read our other guides." />
 
   const toc = blogToc(post)
   const homeHref = isAuthenticated ? '/exams' : '/'

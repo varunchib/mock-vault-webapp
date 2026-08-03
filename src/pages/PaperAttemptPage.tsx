@@ -13,7 +13,7 @@ import {
   RotateCcw,
   XCircle,
 } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
@@ -52,15 +52,21 @@ function renderMath(text: string): string {
     .replace(/\n/g, '<br>')
 }
 
-function MathText({ text, className }: { text: string; className?: string }) {
+// Memoized so that re-rendering the page (e.g. tapping an MCQ option, which
+// updates answer state) does NOT re-run KaTeX for every option. renderMath is
+// synchronous and expensive on math-heavy papers (NEET) — the unmemoized
+// version caused a visible ~300ms tap lag on mobile. React.memo skips options
+// whose text is unchanged; useMemo caches the HTML for any that do re-render.
+const MathText = memo(function MathText({ text, className }: { text: string; className?: string }) {
+  const html = useMemo(() => renderMath(text), [text])
   return (
     <span
       className={className}
       // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: renderMath(text) }}
+      dangerouslySetInnerHTML={{ __html: html }}
     />
   )
-}
+})
 
 // ── Timer ──────────────────────────────────────────────────────
 

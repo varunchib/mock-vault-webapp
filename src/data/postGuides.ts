@@ -69,6 +69,16 @@ export type PostGuideData = {
   selectionProcess: string[]
   salary: { post: string; payScale: string; level: string }[]
   preparationTips: string[]
+
+  // Exam analysis — the guide's unique, rankable hook (distinct from the blog,
+  // which owns broad info). Section weightage is DERIVED automatically from
+  // examPattern marks (never hand-entered — so it can't drift from the pattern).
+  // These optional fields add exam-specific colour on top of that:
+  analysis?: {
+    intro?: string             // 1-2 lines framing where the marks/questions come from
+    topTopics?: { section: string; topics: string }[] // most-tested topics per high-weight section
+    difficulty?: string        // factual difficulty read (negative marking, time pressure, cutoffs)
+  }
 }
 
 // Reverse lookup: paper slug → guide slug
@@ -87,7 +97,8 @@ export const paperGuideMap: Record<string, string> = {
   'jkssb-wildlife-guard-2026-may-10':  'jkssb-wildlife-guard',
   'jkssb-veterinary-pharmacist-2025':  'jkssb-veterinary-pharmacist',
   'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb',
-  'ssc-cgl-2023-tier-1-all-shifts':    'ssc-cgl',
+  'ssc-cgl-2025-sep17-shift1':         'ssc-cgl',
+  'ssc-cgl-2025-sep12-shift1':         'ssc-cgl',
   'upsc-cse-prelims-2026-gs1':         'upsc-cse',
   'upsc-cse-prelims-2025-gs1':         'upsc-cse',
   'upsc-cse-prelims-2025-gs2':         'upsc-cse',
@@ -103,7 +114,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector (Executive) 2026 Syllabus & Exam Pattern (Advt. 02/2024)',
     shortName: 'JKSSB SI (Executive)',
     tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Executive) — J&K Police, Home Department — exam under Advertisement 02/2024. 100 questions, 200 marks, 6 sections, exam expected in 2026. Solved 2017 & 2022 previous year papers included.',
-    lastUpdated: '2026-07-19',
+    lastUpdated: '2026-08-03',
 
     examSlug: 'jkpsi',
 
@@ -123,9 +134,10 @@ export const postGuides: Record<string, PostGuideData> = {
       'A key change from earlier JKPSI exams: the 2024 syllabus removes the Law/Legal Knowledge section (IPC, CrPC, Evidence Act) and replaces it with Computer Proficiency (15 questions) and a dedicated Mathematical Abilities section. Candidates who prepared using the 2017 paper should note that Law questions will not appear. The 2017 paper (120 questions, −0.25 marking) remains available on Ministry of Papers as a practice resource for Reasoning, GK, and English sections.',
     ],
 
-    patternNotification: 'Official syllabus per JKSSB Notice dated 26.12.2024 (Advertisement Notification 02/2024). Exam dates not yet announced as of this update.',
+    patternNotification: 'Official syllabus per JKSSB Notice dated 26.12.2024 (Advertisement Notification 02/2024, Item No. 07). Written examination scheduled for 29 November 2026 per the JKSSB exam-date annexure.',
 
     quickFacts: [
+      { label: 'Exam Date', value: '29 November 2026' },
       { label: 'Advertisement', value: 'Notification 02/2024' },
       { label: 'Questions', value: '100 MCQs' },
       { label: 'Total Marks', value: '200 (2 per question)' },
@@ -256,7 +268,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector (Telecommunication) 2026 Syllabus & Exam Pattern (Advt. 11/2025)',
     shortName: 'JKSSB SI (Telecom)',
     tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Telecommunication) — J&K Police, Home Department — exam under Advertisement 11/2025. 100 questions, 200 marks, two parts (60 General + 140 Technical), exam expected in 2026.',
-    lastUpdated: '2026-07-19',
+    lastUpdated: '2026-08-03',
 
     examSlug: 'jkpsi-telecom',
 
@@ -273,9 +285,10 @@ export const postGuides: Record<string, PostGuideData> = {
       'Because Part B (140 of 200 marks) is technical, an engineering or diploma background in Electronics, Communication, Computer Science or IT is a strong advantage. Candidates should treat this as a technical exam first and a general-awareness exam second — mastering Communication Systems, Electronic Devices, Digital Electronics and Computer Networking is essential to clear the cut-off.',
     ],
 
-    patternNotification: 'Official syllabus per JKSSB Notice dated 09.04.2026 (Advertisement Notification 11/2025, dated 26.11.2025). Exam dates not yet announced as of this update.',
+    patternNotification: 'Official syllabus per JKSSB Notice dated 09.04.2026 (Advertisement Notification 11/2025, dated 26.11.2025, Item No. 272). Written examination scheduled for 23 December 2026 per the JKSSB exam-date annexure.',
 
     quickFacts: [
+      { label: 'Exam Date', value: '23 December 2026' },
       { label: 'Advertisement', value: 'Notification 11/2025' },
       { label: 'Questions', value: '100 MCQs' },
       { label: 'Total Marks', value: '200 (2 per question)' },
@@ -621,7 +634,8 @@ export const postGuides: Record<string, PostGuideData> = {
     examSlug: 'ssc-cgl',
 
     papers: [
-      { slug: 'ssc-cgl-2023-tier-1-all-shifts', title: 'SSC CGL 2023 Tier I — All Shifts Combined', year: '2023', questions: 100 },
+      { slug: 'ssc-cgl-2025-sep17-shift1', title: 'SSC CGL 2025 Tier I — 17 Sep 2025 (Shift 1)', year: '2025', questions: 100 },
+      { slug: 'ssc-cgl-2025-sep12-shift1', title: 'SSC CGL 2025 Tier I — 12 Sep 2025 (Shift 1)', year: '2025', questions: 100 },
     ],
 
     conductingBody: 'Staff Selection Commission (SSC)',
@@ -872,7 +886,7 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── IBPS PO ─────────────────────────────────────────────────────────────────
   'ibps-po': {
-    title: 'IBPS PO — Complete Syllabus & Exam Pattern 2025',
+    title: 'IBPS PO Syllabus, Exam Pattern & Section Weightage Analysis 2025',
     shortName: 'IBPS PO',
     tagline: 'IBPS Probationary Officer exam — Prelims & Mains syllabus, section-wise pattern, Banking Awareness topics, previous year papers.',
     lastUpdated: '2026-07-16',
@@ -971,6 +985,16 @@ export const postGuides: Record<string, PostGuideData> = {
       { section: 'Prelims Total', questions: 100, marks: 100, isTotal: true },
     ],
     examPatternNote: 'Prelims: 60 min total, 20 min per section. Mains: 155 MCQs (200 marks, 3 hr) + 2 Descriptive (25 marks, 30 min). Interview: 100 marks.',
+
+    analysis: {
+      intro: 'In Prelims, Reasoning and Quantitative Aptitude carry 35 marks each and English 30 — so the two non-English sections together decide 70% of the Prelims score. Reasoning and Quant are where the exam is won or lost.',
+      topTopics: [
+        { section: 'Reasoning Ability', topics: 'Puzzles & Seating Arrangement dominate (15–20 of the 35 questions), followed by Syllogism, Inequality, Blood Relations and Coding–Decoding.' },
+        { section: 'Quantitative Aptitude', topics: 'Data Interpretation is the highest-frequency area (2–3 sets), then Simplification/Approximation, Arithmetic word problems and Number Series.' },
+        { section: 'English Language', topics: 'Reading Comprehension carries the most questions, alongside Cloze Test, Error Spotting and Sentence Rearrangement.' },
+      ],
+      difficulty: 'Difficulty driver: strict 20-minute sectional timing with −0.25 negative marking means speed and accuracy matter more than syllabus coverage — the cutoff is set by how many you can attempt cleanly in the window, not by the hardest question.',
+    },
 
     eligibility: {
       age: '20–30 years. OBC: +3 years. SC/ST: +5 years. PwD: +10 years. Ex-Servicemen: +5 years.',
@@ -1800,7 +1824,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Finance Account Assistant (FAA) — Syllabus & Exam Pattern',
     shortName: 'JKSSB FAA',
     tagline: 'JKSSB Finance Account Assistant exam — J&K Financial Code, Treasury Code, Government Accounting. 120 MCQs, −0.25 negative marking. 2024 solved paper.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-08-03',
 
     examSlug: 'jkssb-faa',
 
@@ -1819,9 +1843,10 @@ export const postGuides: Record<string, PostGuideData> = {
       'The 2024 FAA paper (January 2024, 120 questions, fully solved) is on Ministry of Papers. The Finance section questions that year heavily tested the J&K Financial Code volumes, contingency expenditure rules, and government accounting classification (Major Head, Minor Head, Sub-head structure).',
     ],
 
-    patternNotification: 'Based on JKSSB Finance Account Assistant examination, January 2024 (637 vacancies). Result declared 2025.',
+    patternNotification: 'Official syllabus per JKSSB Notice No. JKSSB-COE0EXAM(UT)/47/2023-03(7202120) dated 23.12.2025, Annexure A, for Accounts Assistant (Finance) advertised vide Advertisement Notification No. 10 of 2025 dated 24.11.2025 (600 posts, Item No. 271). Written examination scheduled for 15 November 2026 (Sunday) per the JKSSB exam-date annexure. The previous cycle (January 2024, 637 vacancies) was declared in 2025.',
 
     quickFacts: [
+      { label: 'Exam Date', value: '15 November 2026 (Sunday)' },
       { label: 'Questions', value: '120 MCQs' },
       { label: 'Total Marks', value: '120 (1 mark each)' },
       { label: 'Duration', value: '2 hours' },
@@ -1832,73 +1857,154 @@ export const postGuides: Record<string, PostGuideData> = {
       { label: 'Domicile', value: 'J&K Domicile mandatory' },
     ],
 
+    // Official syllabus per JKSSB Notice No. JKSSB-COE0EXAM(UT)/47/2023-03(7202120)
+    // dated 23.12.2025, Annexure A, for Accounts Assistant (Finance) advertised
+    // vide Notification No. 10 of 2025 (600 posts). Section marks are taken
+    // verbatim from the notice and sum to 120.
     syllabus: [
       {
-        subject: 'Finance & Government Accounting (25–30 Qs) — Post-specific',
+        subject: 'General Knowledge with special reference to J&K UT (30 marks)',
         topics: [
-          'J&K Financial Code Volume I — General principles, definition of public money, custody of public moneys, appropriation of grants',
-          'J&K Financial Code Volume II — Departmental regulations, expenditure procedure, contingency expenditure',
-          'J&K Treasury Code — Treasury functions, cheque payments, treasury receipts, pension payments',
-          'Government Accounting — Double-entry principles, debit/credit, capital vs revenue expenditure',
-          'Classification of accounts — Consolidated Fund of India, Contingency Fund, Public Account (J&K)',
-          'Major Head, Minor Head, Sub-head, Detailed Head, Object Head structure',
-          'Pay & Allowances — Basic pay, DA (Dearness Allowance), HRA (House Rent Allowance), CCA, TA/DA rules',
-          'General Provident Fund (GPF) — Subscription, advance rules, final withdrawal, nomination',
-          'Pension — Types (superannuation, invalid, family pension), calculation basis, commutation',
-          'Appropriation Accounts — Surrender of savings, re-appropriation, excess over grants',
-          'Internal Audit — Objectives, types, inspection notes, audit objections',
-          'Bank Reconciliation Statement — Reconciling treasury balance with bank statement',
+          'Current events of national and international importance',
+          'Political & physical divisions of the world and India',
+          'Indian culture, heritage and the freedom struggle/movement',
+          'Transport & communication',
+          'Demography - census, its features and functions',
+          'Important rivers & lakes in India',
+          'Weather, climate, crops and means of transport of India',
+          'Environment, ecology & bio-diversity',
+          'J&K UT - history',
+          'J&K UT - economy',
+          'J&K UT - geography (weather, climate, crops, rivers, lakes, flora, fauna)',
+          'J&K UT - heritage & culture',
+          'J&K UT - important tourist destinations',
+          'J&K Reorganisation Act, 2019',
         ],
       },
       {
-        subject: 'Financial Rules & Procedures (20–25 Qs)',
+        subject: 'Accountancy and Book Keeping (30 marks)',
         topics: [
-          'J&K Budget Manual — Budget cycle, demands for grants, vote on account',
-          'Contract procedures — Tenders, Limited Tender Enquiry (LTE), Single Tender',
-          'Store purchase rules — Purchase Committee, GeM (Government e-Marketplace) in J&K',
-          'Advance procedures — Travelling Advance, House Building Advance, Vehicle Advance',
-          'Contingency expenditure — Drawing & Disbursing Officer (DDO) responsibilities',
-          'Bill preparation — Establishment bills, contingency bills, works bills',
-          'Treasury Single Account — Concept, operation in J&K',
+          'Introduction to financial accounting and its terms',
+          'Accounting equation and journal',
+          'Elements of double entry book keeping',
+          'Ledger accounts',
+          'Trial balance',
+          'Trading account',
+          'Profit & loss account and balance sheet',
+          'Cash book; financial audit',
+          'Bank reconciliation statement',
+          'Voucher approach in accounting',
+          'Partnership accounts',
+          'Financial management / financial statements',
+          'Concept of social accounting, social audit and single cash-based system of accounting',
+          'Public Financial Management System (PFMS)',
+          'Indian financial management system',
+          'Cost accounting',
+          'Cost management - budgetary control',
+          'Taxation and tax laws - direct and indirect',
+          'Developments in accounting',
         ],
       },
       {
-        subject: 'General Knowledge & J&K Current Affairs (25–30 Qs)',
+        subject: 'General English (10 marks)',
         topics: [
-          'J&K Finance — J&K Budget highlights, GSDP, major revenue sources',
-          'J&K History, Geography, Administration',
-          'Indian Economy — Union Budget highlights, RBI, banking basics',
-          'National & J&K Current Affairs',
+          'Tenses', 'Narration', 'Modals', 'Articles', 'Clauses',
+          'Rearranging jumbled sentences',
+          'Comprehension with blanks - phrases, pronouns, homonyms/homophones',
+          'Synonyms and antonyms',
+          'Pairs of words and their use in meaningful sentences',
+          'Idioms and phrases', 'Uses of prepositions', 'Active & passive voice',
         ],
       },
       {
-        subject: 'Reasoning Ability (15–20 Qs)',
+        subject: 'Statistics (10 marks)',
         topics: [
-          'Analogy, Series, Classification',
-          'Coding-Decoding, Blood Relations, Direction Sense',
-          'Syllogisms, Arrangement Puzzles',
-          'Non-Verbal Reasoning',
+          'Primary and secondary data; methods of collection',
+          'Preparation of questionnaires',
+          'Tabulation and compilation of data',
+          'Measures of central tendency',
+          'Theory of probability',
+          'Theory of attributes - basic concepts and applications',
+          'Theory of index numbers; wholesale and consumer price index numbers',
+          'Demography - census, its features and functions',
+          'Vital statistics - fertility measures, crude and specific fertility rates, gross and net reproduction rates, measures of mortality',
         ],
       },
       {
-        subject: 'English Language (10–15 Qs)',
+        subject: 'Mathematics (10 marks)',
         topics: [
-          'Grammar, Vocabulary, Sentence Correction',
-          'Comprehension, Fill in the Blanks',
-          'One-Word Substitution, Idioms & Phrases',
+          'Simple and compound interest',
+          'Linear equations with two variables',
+          'Permutations, combinations & binomial theorem',
+          'Limits & derivatives',
+          'Set theory - basic concepts and applications',
+          'Relations and functions',
+          'Matrices & determinants',
+          'Probability',
+          'Coordinate and three-dimensional geometry',
+          'Vectors',
+        ],
+      },
+      {
+        subject: 'General Economics (10 marks)',
+        topics: [
+          'Introduction to economics - basic concepts and principles',
+          'Fiscal & monetary policy - meaning, scope and methodology',
+          'Theory of consumer demand using the indifference curve technique',
+          'Demand analysis',
+          'Factor pricing - marginal productivity theory and Ricardian theory of rent',
+          'Pricing under various forms of market',
+          'Factors of production & laws of production',
+          'Characteristics and problems of a developing economy',
+          'Planning vs market economy; economic reforms in India',
+          'Concept of economic growth and its measurement',
+          'Concept & measurement of national income',
+          'Role of RBI',
+        ],
+      },
+      {
+        subject: 'General Science (10 marks)',
+        topics: [
+          "Newton's laws of motion; mass, weight, acceleration, velocity, speed",
+          'Electric current, power, energy, voltage',
+          'Chemical equations and their types',
+          'Metals and non-metals - physical & chemical properties',
+          'Conventional and non-conventional sources of energy (solar, tidal, biomass, wind)',
+          'Nutrition and its types; respiration; transport of water, food and minerals in plants',
+          'Communicable & non-communicable diseases',
+          'Vitamins and deficiency diseases',
+          'Ecosystem - components, food chains and food webs',
+          'Environmental pollution; ozone layer and its depletion; greenhouse effect',
+        ],
+      },
+      {
+        subject: 'Knowledge of Computers (10 marks)',
+        topics: [
+          'Basic applications of computers and their components',
+          'Fundamentals of computer science',
+          'Concept of open source technologies',
+          'Input & output devices',
+          'Operating systems',
+          'MS Word, MS Excel, MS Access, MS PowerPoint, PDF',
+          'Internet and e-mail',
+          'Computer virus and anti-virus',
+          'Hardware & software; CPU, peripherals, storage media; firmware and human-ware',
+          'Role of information technology in governance',
         ],
       },
     ],
-
     examPattern: [
-      { section: 'Finance & Government Accounting', questions: '25–30', marks: '25–30', note: '−0.25 per wrong' },
-      { section: 'Financial Rules & Procedures', questions: '20–25', marks: '20–25', note: '−0.25 per wrong' },
-      { section: 'General Knowledge & J&K Current Affairs', questions: '25–30', marks: '25–30', note: '−0.25 per wrong' },
-      { section: 'Reasoning Ability', questions: '15–20', marks: '15–20', note: '−0.25 per wrong' },
-      { section: 'English Language', questions: '10–15', marks: '10–15', note: '−0.25 per wrong' },
+      { section: 'General Knowledge with special reference to J&K UT', questions: 30, marks: 30 },
+      { section: 'Accountancy and Book Keeping', questions: 30, marks: 30 },
+      { section: 'General English', questions: 10, marks: 10 },
+      { section: 'Statistics', questions: 10, marks: 10 },
+      { section: 'Mathematics', questions: 10, marks: 10 },
+      { section: 'General Economics', questions: 10, marks: 10 },
+      { section: 'General Science', questions: 10, marks: 10 },
+      { section: 'Knowledge of Computers', questions: 10, marks: 10 },
       { section: 'Total', questions: 120, marks: 120, isTotal: true },
     ],
-    examPatternNote: 'Duration: 2 hours. 1 mark per question. −0.25 per wrong. A Commerce background gives significant advantage in Finance & Accounting sections.',
+    examPatternNote: 'Objective type, 120 marks, 2 hours, 1 mark per question. Section marks are as notified in Annexure A to JKSSB syllabus notice dated 23.12.2025 for Notification No. 10 of 2025 (600 posts). GK (J&K) and Accountancy carry 30 marks each - together half the paper - so a Commerce background plus solid J&K GK is the decisive combination.',
 
     eligibility: {
       age: '18–40 years (General). SC/ST: +5 years. OBC: +3 years. PwD: +10 years.',

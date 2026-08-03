@@ -11,6 +11,23 @@ const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 const TODAY = new Date().toISOString().split('T')[0]
 
+// Keyword-rich question URL: /question/<keywords>--<id> (mirrors src/lib/questionUrl.ts).
+function keywordify(text) {
+  return (text || '')
+    .replace(/\$[^$]*\$/g, ' ')
+    .replace(/[*_`#>~|]/g, ' ')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .split('-').filter(Boolean).slice(0, 12).join('-')
+    .slice(0, 80).replace(/-+$/g, '')
+}
+function questionPath(slug, questionText) {
+  const kw = keywordify(questionText)
+  return kw ? `/question/${kw}--${slug}` : `/question/${slug}`
+}
+
 // Exams that have a dedicated /exam/:slug/overview page. Keep in sync with examFaq.ts keys.
 const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bpsc', 'rssb', 'jkpsc', 'jkpsi'])
 
@@ -22,7 +39,9 @@ const GUIDE_SLUGS = [
 
 // Editorial /blog/:slug articles. Keep in sync with keys of src/data/blogPosts.ts.
 const BLOG_SLUGS = [
-  'ibps-po-exam',
+  'ibps-po-exam', 'ssc-cgl-exam', 'upsc-cse-exam', 'neet-ug-exam', 'bpsc-exam',
+  'jkpsc-jkcce-exam', 'rssb-patwari-exam', 'jkssb-sub-inspector-exam',
+  'jkssb-patwari-exam', 'jkssb-junior-assistant-exam',
 ]
 
 const PAPER_SEO_SLUGS = {
@@ -74,12 +93,12 @@ async function generate() {
       fetchData(`/api/v1/papers/${encodeURIComponent(paper.slug)}/questions`).catch(() => []),
     ),
   )
-  const questionSlugs = questionArrays
+  const questionUrls = questionArrays
     .flat()
     .filter(q => q && q.slug && (q.explanation ?? '').trim().length >= MIN_EXPLANATION)
-    .map(q => q.slug)
+    .map(q => questionPath(q.urlCode || q.slug, q.question))
 
-  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers, ${questionSlugs.length} solved questions`)
+  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers, ${questionUrls.length} solved questions`)
 
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),
@@ -88,14 +107,12 @@ async function generate() {
     url(`${BASE}/privacy`, '0.3', 'yearly'),
     url(`${BASE}/terms`, '0.3', 'yearly'),
     ...examSlugs.map(slug => url(`${BASE}/exam/${slug}`, '0.9')),
-    ...examSlugs
-      .filter(slug => EXAM_INFO_SLUGS.has(slug))
-      .map(slug => url(`${BASE}/exam/${slug}/overview`, '0.9', 'monthly')),
+    // /exam/:slug/overview retired (301 → /guide/:slug) — no longer emitted.
     ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
     ...BLOG_SLUGS.map(slug => url(`${BASE}/blog/${slug}`, '0.7', 'weekly')),
-    ...questionSlugs.map(slug => url(`${BASE}/question/${slug}`, '0.6', 'monthly')),
+    ...questionUrls.map(p => url(`${BASE}${p}`, '0.6', 'monthly')),
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`
