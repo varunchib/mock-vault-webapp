@@ -96,10 +96,16 @@ export function ExamCatalogPage() {
     // Browse the boards; search the whole catalog. Restricting search to boards
     // made sub-exams (JKSSB Patwari, Junior Assistant, ...) unfindable here even
     // though they have their own pages.
-    const pool = (q ? allExams : exams).filter(
+    //
+    // The category filter is applied AFTER searching, not before: searchExams
+    // reads the board/sub-exam relationship out of the list it is given, so
+    // handing it a category slice would hide the children that identify a board
+    // and boards would leak back into the results. Both are independent
+    // predicates, so the final set is identical either way.
+    const hits = q ? searchExams(allExams, q) : exams
+    return hits.filter(
       (e) => activeCategory === ALL || normalizeExamCategory(e.category) === activeCategory,
     )
-    return q ? searchExams(pool, q) : pool
   }, [exams, allExams, activeCategory, query])
 
   if (loading) return <HaloLoader label="Loading exams" />

@@ -8,14 +8,29 @@ import type { Exam } from './api'
  * subjects as well meant common words ("exam", "paper", "general") hit nearly
  * every exam via prose.
  *
+ * Boards are held back. Searching "upsc" used to return the UPSC *board* above
+ * UPSC CSE, and a board page is a hub that lists its sub-exams — so clicking
+ * the top result landed on something that reads like the catalog again rather
+ * than on the exam. Nobody sits a board; they sit an exam. Boards resurface
+ * only when nothing else matches, so a query aimed squarely at one ("Staff
+ * Selection Commission") still finds it instead of returning nothing.
+ *
+ * `exams` must be the FULL catalog — the board/sub-exam relationship is read
+ * from it, so a pre-filtered slice would hide the children that make a board a
+ * board. Filter by category after searching, not before.
+ *
  * Returns [] for an empty query — callers decide what to show when idle.
  */
 export function searchExams(exams: Exam[], query: string, limit?: number): Exam[] {
   const q = query.trim().toLowerCase()
   if (!q) return []
 
+  const boardSlugs = new Set(
+    exams.map((e) => e.boardSlug).filter((s): s is string => Boolean(s)),
+  )
   const tokens = q.split(/\s+/).filter(Boolean)
   const ranked: { exam: Exam; rank: number }[] = []
+  const boardMatches: { exam: Exam; rank: number }[] = []
 
   for (const exam of exams) {
     const short = exam.shortName.toLowerCase()
@@ -30,13 +45,18 @@ export function searchExams(exams: Exam[], query: string, limit?: number): Exam[
       short === q || name === q ? 0
         : short.startsWith(q) || name.startsWith(q) ? 1
           : 2
-    ranked.push({ exam, rank })
+    ;(boardSlugs.has(exam.slug) ? boardMatches : ranked).push({ exam, rank })
   }
 
   // Best match first; shorter names win ties so "UPSC CDS" outranks a longer
   // name that merely contains the same words.
-  ranked.sort((a, b) => a.rank - b.rank || a.exam.name.length - b.exam.name.length)
+  const byRank = (a: { exam: Exam; rank: number }, b: { exam: Exam; rank: number }) =>
+    a.rank - b.rank || a.exam.name.length - b.exam.name.length
+  ranked.sort(byRank)
 
-  const out = ranked.map((r) => r.exam)
+  // Only a board matched — show it rather than claiming there are no results.
+  const hits = ranked.length ? ranked : boardMatches.sort(byRank)
+
+  const out = hits.map((r) => r.exam)
   return limit ? out.slice(0, limit) : out
 }
