@@ -1,4 +1,4 @@
-import { BrowserRouter, useLocation } from 'react-router-dom'
+import { BrowserRouter, useLocation, useNavigationType } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
 import { AuthProvider } from './components/auth/AuthProvider'
 import { Footer } from './components/layout/Footer'
@@ -13,6 +13,32 @@ import { AppRoutes } from './routes/AppRoutes'
 // Routes that genuinely need the verified user before they can render. Only
 // these wait on the session check; every public/SEO page paints immediately.
 const AUTH_REQUIRED = /^\/(dashboard|admin|analytics|mock-attempt|paper-attempt)/
+
+// React Router does not reset scroll on navigation, so following a link from
+// the footer swapped the page content while leaving the viewport parked at the
+// bottom — the new page appeared to open already scrolled to its end, and the
+// reader had to scroll up to find the heading.
+//
+// The animation comes free from `html { scroll-behavior: smooth }` in
+// index.css, so 'auto' here resolves to smooth; 'instant' is the explicit
+// override used when the visitor has asked for reduced motion.
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  const navigationType = useNavigationType()
+
+  useEffect(() => {
+    // Back/forward: the browser restores the previous scroll position, which is
+    // what the reader expects. Overriding it would lose their place.
+    if (navigationType === 'POP') return
+    // A link to an in-page anchor should land on that anchor, not the top.
+    if (window.location.hash) return
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.scrollTo({ top: 0, left: 0, behavior: reduceMotion ? 'instant' : 'smooth' })
+  }, [pathname, navigationType])
+
+  return null
+}
 
 function AppChrome() {
   const location = useLocation()
@@ -95,6 +121,7 @@ export default function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <AppChrome />
       </BrowserRouter>
     </AuthProvider>
