@@ -78,44 +78,21 @@ export function blogToc(post: BlogPost): { id: string; text: string }[] {
 
 const ibpsPo: BlogPost = {
   slug: 'ibps-po-exam',
-  title: 'IBPS PO 2026: Notification, Dates, Vacancy & Salary',
-  h1: 'IBPS PO 2026: Notification, Eligibility, Salary & Preparation Strategy',
+  title: 'How to Prepare for IBPS PO 2026: Strategy & Study Plan',
+  h1: 'How to Prepare for IBPS PO 2026: Prelims to Interview',
   description:
-    'IBPS PO 2026 explained — notification timeline, eligibility, vacancy, salary and job profile, and a stage-by-stage preparation strategy. For the full section-wise syllabus and weightage analysis, see the linked IBPS PO guide.',
+    'An IBPS PO 2026 preparation strategy that works backwards from the interview - sectional cut-offs, a phased plan, speed drills, and how to review previous year papers.',
   excerpt:
     'Everything you need to crack IBPS PO 2026 in one place — the notification timeline, eligibility, exam pattern, section-wise syllabus, salary and job profile, and a stage-by-stage preparation plan built around previous year papers.',
-  category: 'Banking Exams',
+  category: 'Preparation Strategy',
   tags: ['IBPS PO', 'Bank PO', 'Banking Exams', 'IBPS', 'Probationary Officer'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-22',
-  updatedAt: '2026-07-22',
+  updatedAt: '2026-08-03',
   readMinutes: 12,
   blocks: [
     { t: 'p', text: 'The **IBPS PO (Probationary Officer)** exam is one of the most sought-after banking recruitment tests in India, offering a direct route to an officer-cadre job in the country\'s leading public sector banks. Every year lakhs of graduates compete for a few thousand posts, drawn by the **job security, respectable salary, and fast career growth** that a bank PO role offers. This complete guide covers everything about **IBPS PO 2026** — the notification timeline, eligibility, exam pattern, detailed syllabus, salary, job profile, and a realistic preparation strategy — so you can plan your attempt with clarity.' },
 
-    { t: 'h2', text: 'What is IBPS PO?' },
-    { t: 'p', text: 'IBPS PO is a national-level recruitment examination conducted by the **Institute of Banking Personnel Selection (IBPS)** to select **Probationary Officers** (also called Management Trainees) for participating **public sector and regional banks** — that is, every major government bank **except the State Bank of India**, which recruits separately through SBI PO. The recruitment runs under the **Common Recruitment Process (CRP PO/MT)**, so a single exam feeds officer vacancies across all participating banks.' },
-    { t: 'p', text: 'A Probationary Officer is an **entry-level bank officer** who, after a probation period of usually one to two years, is confirmed as an **Assistant Manager (Scale I)**. The role is a gateway to a long banking career with clear promotional milestones.' },
-
-    { t: 'h2', text: 'IBPS PO 2026 Notification & Important Dates' },
-    { t: 'p', text: 'IBPS follows a fixed annual calendar and typically releases the **IBPS PO notification around August**, with the Preliminary exam in **October–November** and the Main exam in **November–December**, followed by interviews early the next year. The exact **IBPS PO 2026 dates** are confirmed in the official notification published on **[ibps.in](https://www.ibps.in)** and the annual IBPS exam calendar. The indicative schedule below is based on the recurring cycle — always verify against the official notification.' },
-    { t: 'table', caption: 'IBPS PO 2026 tentative schedule (confirm on the official notification)', headers: ['Event', 'Tentative Period'], rows: [
-      ['Official notification released', 'August 2026'],
-      ['Online application window', 'August–September 2026'],
-      ['Prelims admit card', 'October 2026'],
-      ['Preliminary exam', 'October–November 2026'],
-      ['Prelims result', 'November 2026'],
-      ['Main exam', 'November–December 2026'],
-      ['Interview', 'January–February 2027'],
-      ['Provisional allotment', 'April 2027'],
-    ] },
-    { t: 'callout', title: 'Set an alert', text: 'Bookmark the official IBPS website and check the annual calendar in advance. Applications are open for a short window only, so keep your documents, photo and signature scans ready before the notification drops.' },
-
-    { t: 'h2', text: 'IBPS PO 2026 Vacancy' },
-    { t: 'p', text: 'The number of **IBPS PO vacancies** is announced in the notification and varies each year with the hiring needs of participating banks — recent cycles have ranged from around **3,000 to over 6,000 posts**. Vacancies are distributed across banks and reserved categories (SC, ST, OBC, EWS, PwBD) as per government norms, and additional posts are sometimes added later in the cycle.' },
-
-    { t: 'h2', text: 'IBPS PO Eligibility Criteria 2026' },
-    { t: 'p', text: 'Before applying, make sure you meet the **age, education and nationality** requirements as on the cut-off date specified in the notification.' },
     { t: 'h3', text: 'Age Limit' },
     { t: 'p', text: 'The age limit is generally **20 to 30 years** as on the notification cut-off date. Upper-age relaxation is provided as per government rules:' },
     { t: 'ul', items: [
@@ -129,16 +106,6 @@ const ibpsPo: BlogPost = {
     { t: 'h3', text: 'Nationality & Attempts' },
     { t: 'p', text: 'The candidate must be an **Indian citizen** (with other categories as specified in the notification). Notably, **there is no limit on the number of attempts** for IBPS PO — you can appear every year as long as you remain within the age limit.' },
 
-    { t: 'h2', text: 'IBPS PO Selection Process' },
-    { t: 'p', text: 'The selection process has **three stages**, and you must clear each to move to the next:' },
-    { t: 'ol', items: [
-      '**Preliminary Examination** — an online objective screening test (qualifying in nature).',
-      '**Main Examination** — an online objective test plus a descriptive (English) paper; marks count towards the final merit.',
-      '**Interview** — conducted by the participating banks / nodal bank, carrying 100 marks.',
-    ] },
-    { t: 'p', text: 'The **final merit list** is prepared from the **Main exam and Interview marks combined in an 80:20 ratio** — the Prelims score is only for screening and does not count in the final selection.' },
-
-    { t: 'h2', text: 'IBPS PO Exam Pattern 2026' },
     { t: 'h3', text: 'Preliminary Exam Pattern' },
     { t: 'p', text: 'The Prelims has **100 questions for 100 marks in 1 hour**, with separate (sectional) timing for each of the three sections. There is a **penalty of 0.25 marks for every wrong answer**.' },
     { t: 'table', caption: 'IBPS PO Prelims pattern', headers: ['Section', 'Questions', 'Marks', 'Time'], rows: [
@@ -159,15 +126,6 @@ const ibpsPo: BlogPost = {
     ] },
     { t: 'h3', text: 'Interview' },
     { t: 'p', text: 'Candidates who clear the Mains are called for an **Interview of 100 marks**. The qualifying mark is usually **40% (35% for reserved categories)**. Final selection is based on **Mains + Interview weighted 80:20**.' },
-
-    { t: 'h2', text: 'IBPS PO Syllabus 2026 — At a Glance' },
-    { t: 'p', text: 'The syllabus spans four areas — **Quantitative Aptitude, Reasoning Ability & Computer Aptitude, English Language, and General / Banking Awareness**. Prelims tests the first three; Mains adds Banking & General Awareness plus a Descriptive (letter and essay) paper.' },
-    { t: 'p', text: 'For the **complete section-wise topic list — and a weightage analysis showing exactly which sections and topics carry the most marks** — use the **[IBPS PO Syllabus, Pattern & Weightage Analysis guide](/guide/ibps-po)**. It is the definitive reference and stays in sync with the official pattern, so this post keeps to the overview and links there for the detail.' },
-
-    { t: 'h2', text: 'IBPS PO Salary 2026 & Job Profile' },
-    { t: 'p', text: 'A big reason IBPS PO is so popular is the attractive pay and perks. An IBPS PO joins at the **Junior Management Grade Scale-I (Assistant Manager)** with a **basic pay of around ₹48,480** under the revised scale. Including **Dearness Allowance (DA), House Rent Allowance (HRA), City Compensatory Allowance (CCA)** and other benefits, the **gross monthly salary works out to roughly ₹57,000–₹64,000**, varying with the posting city.' },
-    { t: 'p', text: 'Beyond the pay, benefits typically include **medical facilities, leased accommodation, pension/NPS, and concessional loans**. The role also offers a clear **promotion ladder**: Scale I (Assistant Manager) → Scale II (Manager) → Scale III (Senior Manager) → and further up to Chief Manager, AGM, DGM and General Manager for high performers.' },
-    { t: 'p', text: 'The **day-to-day job profile** of a PO includes customer service and relationship management, processing loans and advances, handling cash and clearing, cross-selling banking products, and general branch administration. It is a **generalist officer role** that builds a strong foundation across banking operations.' },
 
     { t: 'h2', text: 'IBPS PO Preparation Strategy 2026' },
     { t: 'p', text: 'Cracking IBPS PO is less about studying harder and more about **practising smart** — speed, accuracy and section management decide results. Here is a proven approach:' },
@@ -302,50 +260,25 @@ const sscCgl: BlogPost = {
 
 const upscCse: BlogPost = {
   slug: 'upsc-cse-exam',
-  title: 'UPSC CSE 2026: Notification, Exam Dates & Vacancy',
-  h1: 'UPSC CSE 2026: Notification, Exam Dates, Eligibility & How to Prepare',
+  title: 'How to Prepare for UPSC CSE 2026: Prelims-First Strategy',
+  h1: 'How to Prepare for UPSC CSE 2026: A Prelims-First Plan',
   description:
-    'UPSC Civil Services 2026 explained — 933 vacancies, Prelims on 24 May and Mains from 21 August, eligibility, attempts, the three-stage pattern, and a realistic preparation strategy. Full syllabus in the linked UPSC guide.',
+    'A UPSC CSE 2026 preparation strategy built prelims-first - what to read, how to sequence NCERTs and standard books, answer writing, and using previous year papers as the syllabus.',
   excerpt:
     'The UPSC Civil Services Examination 2026 notification is out with 933 vacancies for IAS, IPS, IFS and allied services. Here is the complete picture — Prelims and Mains dates, eligibility and attempts, the three-stage pattern, and how to build a preparation plan around previous year papers.',
-  category: 'UPSC & State PSC',
+  category: 'Preparation Strategy',
   tags: ['UPSC CSE', 'UPSC', 'Civil Services', 'IAS', 'IPS', 'UPSC 2026'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 12,
   blocks: [
     { t: 'p', text: 'The **UPSC Civil Services Examination (CSE)** is India\'s most competitive exam — the route to the **IAS, IPS, IFS** and other Group A and Group B central services. Lakhs apply each year for a few hundred posts, drawn by the responsibility, reach and prestige of a career in the civil services. This guide covers **UPSC CSE 2026** end to end: the notification, Prelims and Mains dates, eligibility and attempts, the three-stage pattern, and a preparation strategy grounded in previous year papers.' },
 
-    { t: 'h2', text: 'What is the UPSC Civil Services Exam?' },
-    { t: 'p', text: 'The **Union Public Service Commission (UPSC)** conducts the CSE annually to recruit officers for around two dozen services. The selection is a **three-stage process** — a screening **Preliminary** test, a written **Mains**, and a **Personality Test (Interview)** — spread across nearly a year. The same exam feeds every service; your service and cadre depend on your final rank and preferences.' },
-
-    { t: 'h2', text: 'UPSC CSE 2026 Notification & Important Dates' },
-    { t: 'p', text: 'The **UPSC CSE 2026 notification** was released on **14 January 2026**, with applications opening in early February. The **Prelims is on 24 May 2026** and the **Mains begins on 21 August 2026** (spanning 21, 22, 23, 29 and 30 August). Verify all dates on the official site **[upsc.gov.in](https://upsc.gov.in)**.' },
-    { t: 'table', caption: 'UPSC CSE 2026 schedule (per the official notification — confirm on upsc.gov.in)', headers: ['Event', 'Date'], rows: [
-      ['Notification released', '14 January 2026'],
-      ['Application window', 'February 2026'],
-      ['Preliminary Examination', '24 May 2026'],
-      ['Mains Examination', '21, 22, 23, 29 & 30 August 2026'],
-      ['Personality Test (Interview)', 'Early 2027'],
-    ] },
-
-    { t: 'h2', text: 'UPSC CSE 2026 Vacancy' },
-    { t: 'p', text: 'The 2026 notification announced **933 vacancies** across the participating services, including reserved-category and PwBD posts as per norms. The final number is confirmed in the notification and occasionally revised.' },
-
-    { t: 'h2', text: 'UPSC CSE Eligibility & Attempts' },
     { t: 'h3', text: 'Age Limit' },
     { t: 'p', text: 'A candidate must be **21 to 32 years** as on 1 August of the exam year, with upper-age relaxation for reserved categories (OBC +3, SC/ST +5, PwBD +10, and more as specified).' },
     { t: 'h3', text: 'Educational Qualification & Attempts' },
     { t: 'p', text: 'A **graduate degree** in any discipline from a recognised university is required. Number of attempts is capped by category — **6 for General, 9 for OBC, and unlimited (up to the age limit) for SC/ST** — with additional relaxations for PwBD candidates.' },
-
-    { t: 'h2', text: 'UPSC CSE Exam Pattern' },
-    { t: 'p', text: 'Prelims has two objective papers on the same day: **GS Paper I** (merit-deciding) and **CSAT Paper II** (qualifying, minimum 33%). Mains has nine descriptive papers, of which seven count for merit. There is **negative marking of one-third** in the Prelims objective papers.' },
-    { t: 'table', caption: 'UPSC CSE Prelims pattern', headers: ['Paper', 'Questions', 'Marks', 'Nature'], rows: [
-      ['GS Paper I', '100', '200', 'Merit-ranking'],
-      ['CSAT Paper II', '80', '200', 'Qualifying (33%)'],
-    ] },
-    { t: 'p', text: 'For the **complete Prelims and Mains syllabus, GS and CSAT breakdown, and a weightage analysis**, use the **[UPSC CSE Syllabus, Pattern & Weightage Analysis guide](/guide/upsc-cse)**.' },
 
     { t: 'h2', text: 'UPSC CSE Preparation Strategy 2026' },
     { t: 'ul', items: [
@@ -376,50 +309,20 @@ const upscCse: BlogPost = {
 
 const neetUg: BlogPost = {
   slug: 'neet-ug-exam',
-  title: 'NEET UG 2026: Exam Date, Eligibility & How to Prepare',
-  h1: 'NEET UG 2026: Exam Date, Eligibility, Pattern & How to Prepare',
+  title: 'How to Prepare for NEET UG 2026: NCERT-First Study Plan',
+  h1: 'How to Prepare for NEET UG 2026: An NCERT-First Plan',
   description:
-    'NEET UG 2026 explained — exam on 3 May 2026, 720 marks over 180 questions, eligibility, marking scheme, counselling and a subject-wise preparation strategy. Full syllabus in the linked NEET guide.',
+    'A NEET UG 2026 preparation strategy anchored on NCERT - subject-wise time split, revision cycles, error logs, and how to use previous year papers to find your weak chapters.',
   excerpt:
     'NEET UG 2026, conducted by the NTA, is the single entrance test for MBBS, BDS, AYUSH and allied medical courses across India. Here is the complete picture — exam date, eligibility, the 720-mark pattern, marking scheme, and a subject-wise preparation plan built on previous year papers.',
-  category: 'Medical Entrance',
+  category: 'Preparation Strategy',
   tags: ['NEET UG', 'NEET', 'Medical Entrance', 'MBBS', 'NTA', 'NEET 2026'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 10,
   blocks: [
     { t: 'p', text: 'The **NEET UG (National Eligibility cum Entrance Test — Undergraduate)** is the single national entrance exam for admission to **MBBS, BDS, BAMS, BHMS and allied medical courses** across India. Conducted by the **National Testing Agency (NTA)**, it is one of the most-taken exams in the country, with over 20 lakh candidates competing for medical seats each year. This guide covers **NEET UG 2026** completely — exam date, eligibility, the marking pattern, and a subject-wise preparation strategy.' },
-
-    { t: 'h2', text: 'What is NEET UG?' },
-    { t: 'p', text: 'NEET UG is a **pen-and-paper (OMR) medical entrance test** that decides admission to nearly all MBBS and BDS seats in government and private colleges, plus AYUSH and veterinary courses. A single score is used for **All India Quota and State Quota counselling**, so one exam determines your college and course based on rank, category and preferences.' },
-
-    { t: 'h2', text: 'NEET UG 2026 Exam Date & Important Dates' },
-    { t: 'p', text: 'NEET UG 2026 is scheduled for **3 May 2026, from 2:00 PM to 5:00 PM**. The application window ran from **8 February to 11 March 2026**. Confirm all dates and download your admit card from the official site **[neet.nta.nic.in](https://neet.nta.nic.in)**.' },
-    { t: 'table', caption: 'NEET UG 2026 schedule (per NTA — confirm on neet.nta.nic.in)', headers: ['Event', 'Date'], rows: [
-      ['Application window', '8 February – 11 March 2026'],
-      ['Admit card', 'Late April 2026'],
-      ['NEET UG 2026 exam', '3 May 2026 (2:00–5:00 PM)'],
-      ['Result & counselling', 'June 2026 onward'],
-    ] },
-
-    { t: 'h2', text: 'NEET UG 2026 Eligibility' },
-    { t: 'ul', items: [
-      '**Age:** minimum 17 years as on 31 December 2026.',
-      '**Qualification:** Class 12 (or appearing) with **Physics, Chemistry, Biology/Biotechnology and English**.',
-      '**Minimum marks in PCB:** 50% for General, 40% for OBC/SC/ST, and 45% for General-PwD (as per norms).',
-      '**Nationality:** Indian nationals, NRIs, OCIs, PIOs and foreign nationals are eligible per the prescribed rules.',
-    ] },
-
-    { t: 'h2', text: 'NEET UG Exam Pattern & Marking' },
-    { t: 'p', text: 'The paper has **180 questions to be answered out of 200**, split across Physics, Chemistry and Biology (Botany + Zoology). Each correct answer earns **+4** and each wrong answer **−1**, for a total of **720 marks** in **3 hours**.' },
-    { t: 'table', caption: 'NEET UG pattern — 720 marks, 3 hours', headers: ['Subject', 'Questions (answer)', 'Marks'], rows: [
-      ['Physics', '45', '180'],
-      ['Chemistry', '45', '180'],
-      ['Biology (Botany + Zoology)', '90', '360'],
-      ['Total', '180', '720'],
-    ] },
-    { t: 'p', text: 'For the **complete chapter-wise syllabus and a weightage analysis of high-yield topics**, use the **[NEET UG Syllabus, Pattern & Weightage Analysis guide](/guide/neet-ug)**.' },
 
     { t: 'h2', text: 'NEET UG Preparation Strategy 2026' },
     { t: 'ul', items: [
@@ -449,51 +352,25 @@ const neetUg: BlogPost = {
 
 const bpsc: BlogPost = {
   slug: 'bpsc-exam',
-  title: 'BPSC 2026: 71st & 72nd CCE Notification, Dates & Vacancy',
-  h1: 'BPSC CCE 2026: Notification, Exam Dates, Eligibility, Salary & Preparation',
+  title: 'How to Prepare for BPSC CCE: Strategy & Bihar GK Plan',
+  h1: 'How to Prepare for BPSC CCE: Strategy and Bihar-Specific GK',
   description:
-    'BPSC CCE 2026 explained — 71st CCE Mains in April and 72nd CCE with Prelims in July 2026, vacancies, eligibility, the three-stage pattern, salary and a preparation strategy. Full syllabus in the linked BPSC guide.',
+    'A BPSC CCE preparation strategy covering the Bihar-specific General Knowledge that decides the paper, a phased study plan, and how to review solved previous year papers.',
   excerpt:
     'The Bihar Public Service Commission conducts the Combined Competitive Examination (CCE) for prestigious state posts like SDM, DSP and BDO. Here is the complete picture of the current 71st and 72nd CCE cycles — dates, vacancies, eligibility, the exam pattern, salary and how to prepare with previous year papers.',
-  category: 'UPSC & State PSC',
+  category: 'Preparation Strategy',
   tags: ['BPSC', 'Bihar PSC', 'BPSC CCE', 'State PSC', 'BPSC 2026'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 11,
   blocks: [
     { t: 'p', text: 'The **BPSC Combined Competitive Examination (CCE)** is the Bihar Public Service Commission\'s flagship exam for **Group A and Group B state services** — coveted posts like **SDM (Deputy Collector), DSP, and Block Development Officer (BDO)**. It draws lakhs of aspirants across Bihar for its authority, reach and job security. This guide covers the current **71st and 72nd CCE** cycles: notifications, exam dates, vacancies, eligibility, the three-stage pattern, salary and a preparation plan.' },
 
-    { t: 'h2', text: 'What is the BPSC CCE?' },
-    { t: 'p', text: 'The **BPSC CCE** recruits officers for the Bihar state civil services through a **three-stage process** — a screening **Preliminary** exam, a written **Mains**, and an **Interview**. A single exam feeds many posts; the service you get depends on your final rank and post preferences. BPSC runs the exam in numbered cycles (e.g., 70th, 71st, 72nd CCE).' },
-
-    { t: 'h2', text: 'BPSC 71st & 72nd CCE 2026 — Important Dates' },
-    { t: 'p', text: 'Two cycles are active in 2026. The **71st CCE Mains** is scheduled for **25–30 April 2026** (for candidates who cleared the 71st Prelims). The **72nd CCE** notification has released for **1,186 vacancies**, with its **Preliminary exam on 26 July 2026**. Always confirm dates on the official site **[bpsc.bihar.gov.in](https://bpsc.bihar.gov.in)**.' },
-    { t: 'table', caption: 'BPSC CCE 2026 schedule (confirm on bpsc.bihar.gov.in)', headers: ['Cycle / Event', 'Date'], rows: [
-      ['71st CCE — Mains Examination', '25–30 April 2026'],
-      ['72nd CCE — Notification', 'Released (1,186 vacancies)'],
-      ['72nd CCE — Preliminary Exam', '26 July 2026'],
-      ['72nd CCE — Mains & Interview', 'Later in the cycle'],
-    ] },
-
-    { t: 'h2', text: 'BPSC Vacancy 2026' },
-    { t: 'p', text: 'The **72nd CCE** was notified for around **1,186 vacancies** across posts, while the earlier **71st CCE** carried well over 1,200 posts. Vacancies span roles such as SDM, DSP, Block Cooperative Officer, and various departmental officers, distributed across categories per Bihar reservation norms.' },
-
-    { t: 'h2', text: 'BPSC Eligibility' },
     { t: 'h3', text: 'Age Limit' },
     { t: 'p', text: 'The minimum age is generally **20–22 years** (post-dependent) and the upper limit is **37 years for General male candidates**, with relaxations: General female and BC/EBC **+3 years (40)**, and SC/ST **+5 years (42)**. Exact limits vary by post.' },
     { t: 'h3', text: 'Educational Qualification' },
     { t: 'p', text: 'A **Bachelor\'s degree** in any discipline from a recognised university is required. Final-year students can generally apply subject to producing proof of qualification at the Mains stage.' },
-
-    { t: 'h2', text: 'BPSC Exam Pattern' },
-    { t: 'p', text: 'The **Prelims** is a single objective paper — **General Studies, 150 questions, 150 marks, 2 hours** — and is qualifying. The **Mains** is descriptive (General Hindi qualifying, plus General Studies papers and an optional/essay component depending on the cycle), followed by the **Interview**. From recent cycles, BPSC applies **negative marking of one-third (0.33)** in the Prelims.' },
-    { t: 'table', caption: 'BPSC Prelims pattern', headers: ['Paper', 'Questions', 'Marks', 'Duration'], rows: [
-      ['General Studies (Objective)', '150', '150', '2 hours'],
-    ] },
-    { t: 'p', text: 'For the **complete Prelims and Mains syllabus and a weightage analysis**, use the **[BPSC Syllabus, Pattern & Weightage Analysis guide](/guide/bpsc)**.' },
-
-    { t: 'h2', text: 'BPSC Salary & Posts' },
-    { t: 'p', text: 'Most BPSC CCE posts fall in **Pay Level 9–10 (7th CPC)** with a pay range of roughly **₹56,100 to ₹1,77,500**, plus DA and allowances. Flagship posts like **SDM and DSP** carry the highest starting pay and the fastest career progression in the state administration.' },
 
     { t: 'h2', text: 'BPSC Preparation Strategy 2026' },
     { t: 'ul', items: [
@@ -523,36 +400,20 @@ const bpsc: BlogPost = {
 
 const jkpscJkcce: BlogPost = {
   slug: 'jkpsc-jkcce-exam',
-  title: 'JKPSC JKCCE 2026: Notification, Eligibility & Vacancy',
-  h1: 'JKPSC Combined Competitive Exam (JKCCE): Notification, Pattern & How to Prepare',
+  title: 'How to Prepare for JKPSC JKCCE: Strategy & J&K GK Plan',
+  h1: 'How to Prepare for JKPSC JKCCE: Strategy and J&K GK',
   description:
-    'JKPSC JKCCE explained — the J&K Combined Competitive Examination for KAS and allied services: three-stage pattern, eligibility, syllabus overview and preparation strategy, with links to solved previous year papers.',
+    'A JKPSC JKCCE preparation strategy focused on the J&K General Knowledge that carries the paper, plus a phased plan and how to review solved previous year papers.',
   excerpt:
     'The J&K Public Service Commission conducts the Combined Competitive Examination (JKCCE) for the Kashmir Administrative Service and allied posts. Here is the complete picture — the three-stage pattern, eligibility, syllabus overview and a preparation plan built on previous year papers.',
-  category: 'UPSC & State PSC',
+  category: 'Preparation Strategy',
   tags: ['JKPSC', 'JKCCE', 'KAS', 'Jammu Kashmir PSC', 'State PSC'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 9,
   blocks: [
     { t: 'p', text: 'The **JKPSC Combined Competitive Examination (JKCCE)** is the J&K Public Service Commission\'s premier exam for the **Kashmir Administrative Service (KAS)** and allied gazetted posts — the state\'s equivalent of the civil services. This guide covers the JKCCE end to end: the notification, three-stage pattern, eligibility, syllabus overview and a preparation strategy grounded in previous year papers.' },
-
-    { t: 'h2', text: 'What is the JKPSC JKCCE?' },
-    { t: 'p', text: 'The **JKCCE** recruits officers for the J&K administrative and allied services through a **three-stage process** — a screening **Preliminary** examination, a written **Mains**, and a **Viva-voce (Interview)**. A single exam feeds several services; the post you get depends on your final rank and preferences. It is conducted by the **Jammu & Kashmir Public Service Commission (JKPSC)**.' },
-
-    { t: 'h2', text: 'JKCCE Notification & Important Dates' },
-    { t: 'p', text: 'JKPSC releases the JKCCE notification on its official website **[jkpsc.nic.in](https://jkpsc.nic.in)**, followed by the Preliminary exam, then Mains and the Interview. Because the JKCCE cycle timing varies year to year, always confirm the current notification and dates on the official site.' },
-
-    { t: 'h2', text: 'JKCCE Eligibility' },
-    { t: 'ul', items: [
-      '**Education:** a **Bachelor\'s degree** in any discipline from a recognised university.',
-      '**Age:** generally **21 to 32 years** for the general category, with upper-age relaxation for reserved categories as per J&K rules.',
-      '**Domicile:** J&K domicile requirements apply as specified in the notification.',
-    ] },
-
-    { t: 'h2', text: 'JKCCE Exam Pattern' },
-    { t: 'p', text: 'The **Preliminary** exam is objective (General Studies) and qualifying — it screens candidates for the Mains. The **Mains** is descriptive with General Studies papers and an optional subject, followed by the **Interview**. For the **complete stage-wise syllabus and a weightage analysis**, use the **[JKCCE Syllabus, Pattern & Weightage Analysis guide](/guide/jkpsc)**.' },
 
     { t: 'h2', text: 'JKCCE Preparation Strategy' },
     { t: 'ul', items: [
@@ -580,36 +441,20 @@ const jkpscJkcce: BlogPost = {
 
 const rssbPatwari: BlogPost = {
   slug: 'rssb-patwari-exam',
-  title: 'Rajasthan Patwari 2026: Notification, Vacancy & Salary',
-  h1: 'Rajasthan Patwari (RSSB) 2026: Notification, Pattern, Salary & How to Prepare',
+  title: 'How to Prepare for Rajasthan Patwari: Strategy & Books',
+  h1: 'How to Prepare for Rajasthan Patwari: Strategy and Books',
   description:
-    'RSSB Rajasthan Patwari explained — the 2025 cycle (3,705 posts) results and the awaited 2026 notification, eligibility, exam pattern, salary and a preparation strategy, with links to solved previous year papers.',
+    'A Rajasthan Patwari (RSSB) preparation strategy - Rajasthan GK, computer knowledge, reasoning and maths, the books worth buying, and how to use solved previous year papers.',
   excerpt:
     'The Rajasthan Staff Selection Board (RSSB) recruits Patwaris — a coveted revenue-department post. The 2025 cycle filled 3,705 posts; a 2026 notification is awaited. Here is the complete picture — eligibility, exam pattern, salary and how to prepare with previous year papers.',
-  category: 'State Government Jobs',
+  category: 'Preparation Strategy',
   tags: ['RSSB Patwari', 'Rajasthan Patwari', 'RSMSSB', 'Rajasthan', 'Patwari'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 9,
   blocks: [
     { t: 'p', text: 'The **Rajasthan Patwari** exam, conducted by the **Rajasthan Staff Selection Board (RSSB, formerly RSMSSB)**, is one of the state\'s most popular recruitment tests — a stable revenue-department post with strong local demand. This guide covers the **RSSB Patwari** exam end to end: the recruitment cycle, eligibility, exam pattern, salary and a preparation strategy built on previous year papers.' },
-
-    { t: 'h2', text: 'RSSB Patwari Recruitment — Latest Cycle & Dates' },
-    { t: 'p', text: 'In the **2025 cycle**, RSSB recruited for **3,705 Patwari posts**; the written exam was held on **17 August 2025** across 38 districts for over 6.7 lakh registered candidates, and the **final result was declared on 31 December 2025**. A fresh **2026 notification** is awaited — track it on the official site **[rssb.rajasthan.gov.in](https://rssb.rajasthan.gov.in)**.' },
-    { t: 'callout', title: 'Preparing for 2026', text: 'With the 2025 cycle complete, now is the time to prepare for the next notification. The syllabus and pattern rarely change, so the 2025 paper is your best possible practice material.' },
-
-    { t: 'h2', text: 'RSSB Patwari Eligibility' },
-    { t: 'ul', items: [
-      '**Education:** a **Bachelor\'s degree** in any discipline from a recognised university, plus a basic computer qualification (O-level / COPA / RS-CIT or equivalent) as specified.',
-      '**Age:** generally **18 to 40 years**, with category-wise relaxation as per Rajasthan rules.',
-    ] },
-
-    { t: 'h2', text: 'RSSB Patwari Exam Pattern' },
-    { t: 'p', text: 'The Patwari exam is a single objective paper of **150 questions and 300 marks** (2 marks per question) in **3 hours**, covering General Science & Reasoning, Geography/History/Culture of Rajasthan, Hindi & English, and Basic Computer, with **negative marking of one-third**. For the **complete section-wise syllabus and a weightage analysis**, use the **[RSSB Patwari Syllabus, Pattern & Weightage Analysis guide](/guide/rssb)**.' },
-
-    { t: 'h2', text: 'RSSB Patwari Salary' },
-    { t: 'p', text: 'A Rajasthan Patwari is appointed in **Pay Matrix Level 5**, with a starting basic pay around **₹20,800** plus DA, HRA and other allowances — an in-hand salary of roughly **₹28,000–₹35,000 per month** depending on the posting, with a fixed lower pay during the probation period.' },
 
     { t: 'h2', text: 'RSSB Patwari Preparation Strategy' },
     { t: 'ul', items: [
@@ -637,33 +482,20 @@ const rssbPatwari: BlogPost = {
 
 const jkssbSi: BlogPost = {
   slug: 'jkssb-sub-inspector-exam',
-  title: 'JKSSB Sub Inspector 2026: Notification & Vacancy',
-  h1: 'JKSSB Sub Inspector 2026: Notification, Pattern, Syllabus & How to Prepare',
+  title: 'How to Prepare for JKSSB Sub Inspector: Strategy & PET',
+  h1: 'How to Prepare for JKSSB Sub Inspector: Written and Physical',
   description:
-    'JKSSB Sub Inspector explained — the latest recruitment, eligibility, the 100-question exam pattern, syllabus overview and a preparation strategy, with links to solved previous year papers.',
+    'A JKSSB Sub Inspector preparation strategy covering both halves - the written paper section by section, and building for the physical test alongside it.',
   excerpt:
     'JKSSB recruits Sub Inspectors (Executive) for the J&K Police under the Home Department. Here is the complete picture of the latest recruitment — eligibility, the revised exam pattern, syllabus overview and how to prepare with previous year papers.',
-  category: 'State Government Jobs',
+  category: 'Preparation Strategy',
   tags: ['JKSSB', 'Sub Inspector', 'JKPSI', 'J&K Police', 'Jammu Kashmir'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 9,
   blocks: [
     { t: 'p', text: 'The **JKSSB Sub Inspector (Executive)** exam recruits officers for the **Jammu & Kashmir Police** under the Home Department — a uniformed, authority-carrying post that draws heavy competition across J&K. This guide covers the exam end to end: the latest recruitment, eligibility, the revised exam pattern, syllabus overview and a preparation strategy built on previous year papers.' },
-
-    { t: 'h2', text: 'JKSSB Sub Inspector Recruitment & Dates' },
-    { t: 'p', text: 'The latest **JKSSB Sub Inspector recruitment (2026)** was notified for **104 posts**, with the application window open from **4 February to 12 March 2026**. An earlier cycle under Advertisement 02/2024 carried a larger number of vacancies. Because dates and vacancy counts change per notification, always confirm on the official site **[jkssb.nic.in](https://jkssb.nic.in)**.' },
-
-    { t: 'h2', text: 'JKSSB Sub Inspector Eligibility' },
-    { t: 'ul', items: [
-      '**Education:** a **Bachelor\'s degree** in any discipline from a recognised university.',
-      '**Age:** as specified in the notification (with category-wise relaxations per J&K rules).',
-      '**Physical standards:** height, chest and physical endurance/efficiency test requirements apply, as detailed in the notification.',
-    ] },
-
-    { t: 'h2', text: 'JKSSB Sub Inspector Exam Pattern' },
-    { t: 'p', text: 'The written examination consists of **100 objective MCQs for 200 marks** (2 marks each) in **120 minutes**, with **negative marking of 0.5** per wrong answer. The 2024 syllabus revision replaced the earlier Law section with **Computer Proficiency** and a dedicated **Mathematical Abilities** section, alongside Reasoning, General Awareness, Quantitative Aptitude and English. For the **complete section-wise syllabus and a weightage analysis**, use the **[JKSSB Sub Inspector Syllabus, Pattern & Weightage Analysis guide](/guide/jkpsi)**.' },
 
     { t: 'h2', text: 'JKSSB Sub Inspector Preparation Strategy' },
     { t: 'ul', items: [
@@ -691,32 +523,20 @@ const jkssbSi: BlogPost = {
 
 const jkssbPatwari: BlogPost = {
   slug: 'jkssb-patwari-exam',
-  title: 'JKSSB Patwari 2026: Notification, Eligibility & Vacancy',
-  h1: 'JKSSB Patwari 2026: Notification, Pattern, Syllabus & How to Prepare',
+  title: 'How to Prepare for JKSSB Patwari: Strategy & Study Plan',
+  h1: 'How to Prepare for JKSSB Patwari: A Realistic Study Plan',
   description:
-    'JKSSB Patwari explained — eligibility, the exam pattern, syllabus overview and a preparation strategy for the J&K revenue-department post, with links to solved previous year papers.',
+    'A JKSSB Patwari preparation strategy - J&K GK, computers, maths and reasoning in the right order, plus how to turn solved previous year papers into marks.',
   excerpt:
     'JKSSB recruits Patwaris for the J&K revenue department — a stable, locally-posted government job. Here is the complete picture — eligibility, the exam pattern, syllabus overview and how to prepare with previous year papers.',
-  category: 'State Government Jobs',
+  category: 'Preparation Strategy',
   tags: ['JKSSB', 'JKSSB Patwari', 'Patwari', 'Jammu Kashmir', 'Revenue Department'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 8,
   blocks: [
     { t: 'p', text: 'The **JKSSB Patwari** exam recruits Patwaris for the **Jammu & Kashmir revenue department** — a stable, locally-posted government job in high demand across the union territory. This guide covers eligibility, the exam pattern, syllabus overview and a preparation strategy built on previous year papers.' },
-
-    { t: 'h2', text: 'JKSSB Patwari Recruitment & Dates' },
-    { t: 'p', text: 'JKSSB conducts Patwari recruitment as vacancies arise, listed on its annual exam calendar. As per the **2026 calendar**, the Patwari exam is scheduled but specific dates are confirmed closer to the exam — always check the official site **[jkssb.nic.in](https://jkssb.nic.in)** for the current notification.' },
-
-    { t: 'h2', text: 'JKSSB Patwari Eligibility' },
-    { t: 'ul', items: [
-      '**Education:** a **Bachelor\'s degree** from a recognised university, with a basic computer qualification as specified.',
-      '**Age & Domicile:** as per the notification and J&K domicile rules, with category-wise age relaxations.',
-    ] },
-
-    { t: 'h2', text: 'JKSSB Patwari Exam Pattern' },
-    { t: 'p', text: 'The written exam is objective (OMR), typically **120 questions**, covering General Knowledge (with J&K focus), General Science, Mathematics, Reasoning, English, and Basic Computer, with negative marking as specified. For the **complete section-wise syllabus and a weightage analysis**, use the **[JKSSB Patwari Syllabus, Pattern & Weightage Analysis guide](/guide/jkssb-patwari)**.' },
 
     { t: 'h2', text: 'JKSSB Patwari Preparation Strategy' },
     { t: 'ul', items: [
@@ -744,37 +564,20 @@ const jkssbPatwari: BlogPost = {
 
 const jkssbJa: BlogPost = {
   slug: 'jkssb-junior-assistant-exam',
-  title: 'JKSSB Junior Assistant 2026: 343 Vacancies & Exam Date',
-  h1: 'JKSSB Junior Assistant 2026: Vacancy, Exam Date, Pattern & How to Prepare',
+  title: 'How to Prepare for JKSSB Junior Assistant: Typing & Plan',
+  h1: 'How to Prepare for JKSSB Junior Assistant: Written and Typing',
   description:
-    'JKSSB Junior Assistant 2026 explained — 343 vacancies, written exam on 19 April 2026 and skill test on 7 July, eligibility, exam pattern and a preparation strategy, with links to solved previous year papers.',
+    'A JKSSB Junior Assistant preparation strategy covering the written paper and the typing test together, with a phased plan and how to review solved previous year papers.',
   excerpt:
     'JKSSB recruits Junior Assistants — a clerical J&K government post with a written exam plus a typing skill test. The 2026 cycle carries 343 vacancies with the written exam on 19 April 2026. Here is the complete picture — eligibility, pattern and how to prepare with previous year papers.',
-  category: 'State Government Jobs',
+  category: 'Preparation Strategy',
   tags: ['JKSSB', 'Junior Assistant', 'Jammu Kashmir', 'Clerical Jobs', 'JKSSB 2026'],
   author: 'Ministry of Papers',
   publishedAt: '2026-07-27',
-  updatedAt: '2026-07-27',
+  updatedAt: '2026-08-03',
   readMinutes: 8,
   blocks: [
     { t: 'p', text: 'The **JKSSB Junior Assistant** exam recruits clerical staff across Jammu & Kashmir government departments — a stable entry-level post that pairs a written exam with a **typing/skill test**. This guide covers the **2026 cycle** end to end: vacancies, exam date, eligibility, pattern and a preparation strategy built on previous year papers.' },
-
-    { t: 'h2', text: 'JKSSB Junior Assistant 2026 — Vacancy & Dates' },
-    { t: 'p', text: 'The **2026 recruitment** carries **343 Junior Assistant vacancies**. The **written (OMR) exam is scheduled for 19 April 2026** (revised from an earlier April date), and the **skill test is set for 7 July 2026**. Confirm all dates on the official site **[jkssb.nic.in](https://jkssb.nic.in)**.' },
-    { t: 'table', caption: 'JKSSB Junior Assistant 2026 schedule (confirm on jkssb.nic.in)', headers: ['Event', 'Date'], rows: [
-      ['Vacancies', '343'],
-      ['Written (OMR) exam', '19 April 2026'],
-      ['Skill (typing) test', '7 July 2026'],
-    ] },
-
-    { t: 'h2', text: 'JKSSB Junior Assistant Eligibility' },
-    { t: 'ul', items: [
-      '**Education:** a **Bachelor\'s degree** from a recognised university, with the computer/typing qualification specified in the notification.',
-      '**Age & Domicile:** as per the notification and J&K domicile rules, with category-wise age relaxations.',
-    ] },
-
-    { t: 'h2', text: 'JKSSB Junior Assistant Exam Pattern' },
-    { t: 'p', text: 'Selection has two stages: an **objective (OMR) written test** covering General Knowledge (J&K focus), General Science, Mathematics, Reasoning, English and Basic Computer, followed by a qualifying **typing/skill test**. For the **complete section-wise syllabus and a weightage analysis**, use the **[JKSSB Junior Assistant Syllabus, Pattern & Weightage Analysis guide](/guide/jkssb-junior-assistant)**.' },
 
     { t: 'h2', text: 'JKSSB Junior Assistant Preparation Strategy' },
     { t: 'ul', items: [
