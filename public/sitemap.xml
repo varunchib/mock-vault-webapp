@@ -349,7 +349,7 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/guide/bpsc</loc>
+    <loc>https://ministryofpapers.com/guide/bpsc-cce</loc>
     <lastmod>2026-08-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -361,13 +361,13 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/guide/jkpsc</loc>
+    <loc>https://ministryofpapers.com/guide/jkcce</loc>
     <lastmod>2026-08-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://ministryofpapers.com/guide/rssb</loc>
+    <loc>https://ministryofpapers.com/guide/rssb-patwari</loc>
     <lastmod>2026-08-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>

@@ -88,7 +88,7 @@ export const paperGuideMap: Record<string, string> = {
   'jkpsi-2022':                        'jkpsi',
   'jkpsi-2017':                        'jkpsi',
   'jkpsi-telecom-2026':                'jkpsi-telecom',
-  'bpsc-70th-cce-prelims-2024-gs':     'bpsc',
+  'bpsc-70th-cce-prelims-2024-gs':     'bpsc-cce',
   'ibps-po-pre-2025-aug-23-shift-1':   'ibps-po',
   'jkpsc-jkcce-prelims-2025-gs1-set-b':'jkpsc',
   'jkssb-patwari-2024-sep1-set-a':     'jkssb-patwari',
@@ -96,7 +96,7 @@ export const paperGuideMap: Record<string, string> = {
   'jkssb-finance-accounts-2024-paper': 'jkssb-faa',
   'jkssb-wildlife-guard-2026-may-10':  'jkssb-wildlife-guard',
   'jkssb-veterinary-pharmacist-2025':  'jkssb-veterinary-pharmacist',
-  'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb',
+  'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb-patwari',
   'ssc-cgl-2025-sep17-shift1':         'ssc-cgl',
   'ssc-cgl-2025-sep12-shift1':         'ssc-cgl',
   'upsc-cse-prelims-2026-gs1':         'upsc-cse',
@@ -1001,13 +1001,13 @@ export const postGuides: Record<string, PostGuideData> = {
   },
 
   // ─── BPSC CCE ────────────────────────────────────────────────────────────────
-  bpsc: {
+  'bpsc-cce': {
     title: 'BPSC Combined Competitive Examination (CCE) — Syllabus & Exam Pattern',
     shortName: 'BPSC CCE',
     tagline: 'Bihar Public Service Commission CCE — Prelims syllabus, 150 GS questions, no negative marking. Previous year papers with solutions.',
     lastUpdated: '2026-07-16',
 
-    examSlug: 'bpsc',
+    examSlug: 'bpsc-cce',
 
     papers: [
       { slug: 'bpsc-70th-cce-prelims-2024-gs', title: 'BPSC 70th CCE Prelims 2024 — General Studies', year: '2024', questions: 150 },
@@ -1267,7 +1267,7 @@ export const postGuides: Record<string, PostGuideData> = {
   },
 
   // ─── JKPSC ───────────────────────────────────────────────────────────────────
-  jkpsc: {
+  'jkcce': {
     title: 'JKPSC JKCCE — Official Syllabus, Exam Pattern & Previous Year Papers',
     shortName: 'JKPSC',
     tagline: 'JKPSC Combined Competitive Examination (JKCCE) — GS Paper I & CSAT syllabus, Prelims pattern, and solved papers for J&K Gazetted Officer recruitment.',
@@ -1400,13 +1400,13 @@ export const postGuides: Record<string, PostGuideData> = {
   },
 
   // ─── RSSB (Rajasthan Patwari) ────────────────────────────────────────────────
-  rssb: {
+  'rssb-patwari': {
     title: 'RSSB Patwari — Official Syllabus & Exam Pattern 2025',
     shortName: 'RSSB Patwari',
     tagline: 'Rajasthan Staff Selection Board Patwari exam — 150 questions, 300 marks, −0.67 negative marking. Official syllabus, Rajasthan GK topics, and solved 2025 paper.',
     lastUpdated: '2026-07-16',
 
-    examSlug: 'rssb',
+    examSlug: 'rssb-patwari',
 
     papers: [
       { slug: 'rsmssb-patwari-2025-aug17-shift1-spz8', title: 'RSSB Patwari 2025 (17 Aug, Shift 1 — SPZ8)', year: '2025', questions: 150 },

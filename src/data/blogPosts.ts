@@ -381,7 +381,7 @@ const bpsc: BlogPost = {
     ] },
 
     { t: 'h2', text: 'Practise with BPSC Previous Year Papers' },
-    { t: 'p', text: 'The most efficient BPSC prep is solving real papers. On Ministry of Papers you can attempt **[BPSC previous year papers](/exam/bpsc)** — every question solved and explained, free. Start with the **[BPSC 70th CCE Prelims 2024 GS paper](/pyq/bpsc-70th-cce-prelims-2024-gs)**, then use the **[BPSC guide](/guide/bpsc)** for the full syllabus and weightage.' },
+    { t: 'p', text: 'The most efficient BPSC prep is solving real papers. On Ministry of Papers you can attempt **[BPSC previous year papers](/exam/bpsc-cce)** — every question solved and explained, free. Start with the **[BPSC 70th CCE Prelims 2024 GS paper](/pyq/bpsc-70th-cce-prelims-2024-gs)**, then use the **[BPSC guide](/guide/bpsc-cce)** for the full syllabus and weightage.' },
   ],
   faqs: [
     { q: 'When is the BPSC 72nd CCE Prelims 2026?', a: 'The BPSC 72nd CCE Preliminary exam is scheduled for 26 July 2026. The 71st CCE Mains is scheduled for 25–30 April 2026. Confirm on bpsc.bihar.gov.in.' },
@@ -393,7 +393,7 @@ const bpsc: BlogPost = {
   ],
   related: [
     { label: 'BPSC Exam Hub — Solved PYQs', href: '/exam/bpsc' },
-    { label: 'BPSC Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/bpsc' },
+    { label: 'BPSC Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/bpsc-cce' },
     { label: 'BPSC 70th CCE Prelims 2024 — Solved Paper', href: '/pyq/bpsc-70th-cce-prelims-2024-gs' },
   ],
 }
@@ -424,7 +424,7 @@ const jkpscJkcce: BlogPost = {
     ] },
 
     { t: 'h2', text: 'Practise with JKCCE Previous Year Papers' },
-    { t: 'p', text: 'On Ministry of Papers you can attempt **[JKPSC JKCCE previous year papers](/exam/jkpsc)** — every question solved with a detailed explanation, free. Start with the **[JKCCE Prelims 2025 GS Paper I (Set B)](/pyq/jkpsc-jkcce-prelims-2025-gs1-set-b)**, then use the **[JKCCE guide](/guide/jkpsc)** for the full syllabus.' },
+    { t: 'p', text: 'On Ministry of Papers you can attempt **[JKPSC JKCCE previous year papers](/exam/jkcce)** — every question solved with a detailed explanation, free. Start with the **[JKCCE Prelims 2025 GS Paper I (Set B)](/pyq/jkpsc-jkcce-prelims-2025-gs1-set-b)**, then use the **[JKCCE guide](/guide/jkcce)** for the full syllabus.' },
   ],
   faqs: [
     { q: 'What is the JKPSC JKCCE exam?', a: 'The JKCCE (Combined Competitive Examination) is conducted by the J&K Public Service Commission to recruit officers for the Kashmir Administrative Service and allied posts, through Prelims, Mains and an Interview.' },
@@ -434,7 +434,7 @@ const jkpscJkcce: BlogPost = {
   ],
   related: [
     { label: 'JKPSC JKCCE Exam Hub — Solved PYQs', href: '/exam/jkpsc' },
-    { label: 'JKCCE Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/jkpsc' },
+    { label: 'JKCCE Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/jkcce' },
     { label: 'JKCCE Prelims 2025 — GS Paper I (Set B)', href: '/pyq/jkpsc-jkcce-prelims-2025-gs1-set-b' },
   ],
 }
@@ -465,7 +465,7 @@ const rssbPatwari: BlogPost = {
     ] },
 
     { t: 'h2', text: 'Practise with Rajasthan Patwari Previous Year Papers' },
-    { t: 'p', text: 'On Ministry of Papers you can attempt the **[Rajasthan Patwari previous year papers](/exam/rssb)** — solved with detailed explanations, free. Start with the **[RSSB Patwari 2025 (17 Aug, Shift 1) solved paper](/pyq/rsmssb-patwari-2025-aug17-shift1-spz8)**, then use the **[RSSB Patwari guide](/guide/rssb)** for the full syllabus.' },
+    { t: 'p', text: 'On Ministry of Papers you can attempt the **[Rajasthan Patwari previous year papers](/exam/rssb-patwari)** — solved with detailed explanations, free. Start with the **[RSSB Patwari 2025 (17 Aug, Shift 1) solved paper](/pyq/rsmssb-patwari-2025-aug17-shift1-spz8)**, then use the **[RSSB Patwari guide](/guide/rssb-patwari)** for the full syllabus.' },
   ],
   faqs: [
     { q: 'Is there a Rajasthan Patwari 2026 notification?', a: 'The 2025 cycle (3,705 posts, exam on 17 August 2025) concluded with results on 31 December 2025. A fresh 2026 notification is awaited — track rssb.rajasthan.gov.in.' },
@@ -475,7 +475,7 @@ const rssbPatwari: BlogPost = {
   ],
   related: [
     { label: 'Rajasthan Patwari Exam Hub — Solved PYQs', href: '/exam/rssb' },
-    { label: 'RSSB Patwari Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/rssb' },
+    { label: 'RSSB Patwari Syllabus, Pattern & Weightage Analysis Guide', href: '/guide/rssb-patwari' },
     { label: 'RSSB Patwari 2025 (17 Aug, Shift 1) — Solved Paper', href: '/pyq/rsmssb-patwari-2025-aug17-shift1-spz8' },
   ],
 }
