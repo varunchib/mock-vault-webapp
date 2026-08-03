@@ -114,7 +114,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector (Executive) 2026 Syllabus & Exam Pattern (Advt. 02/2024)',
     shortName: 'JKSSB SI (Executive)',
     tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Executive) — J&K Police, Home Department — exam under Advertisement 02/2024. 100 questions, 200 marks, 6 sections, exam expected in 2026. Solved 2017 & 2022 previous year papers included.',
-    lastUpdated: '2026-07-19',
+    lastUpdated: '2026-08-03',
 
     examSlug: 'jkpsi',
 
@@ -134,9 +134,10 @@ export const postGuides: Record<string, PostGuideData> = {
       'A key change from earlier JKPSI exams: the 2024 syllabus removes the Law/Legal Knowledge section (IPC, CrPC, Evidence Act) and replaces it with Computer Proficiency (15 questions) and a dedicated Mathematical Abilities section. Candidates who prepared using the 2017 paper should note that Law questions will not appear. The 2017 paper (120 questions, −0.25 marking) remains available on Ministry of Papers as a practice resource for Reasoning, GK, and English sections.',
     ],
 
-    patternNotification: 'Official syllabus per JKSSB Notice dated 26.12.2024 (Advertisement Notification 02/2024). Exam dates not yet announced as of this update.',
+    patternNotification: 'Official syllabus per JKSSB Notice dated 26.12.2024 (Advertisement Notification 02/2024, Item No. 07). Written examination scheduled for 29 November 2026 per the JKSSB exam-date annexure.',
 
     quickFacts: [
+      { label: 'Exam Date', value: '29 November 2026' },
       { label: 'Advertisement', value: 'Notification 02/2024' },
       { label: 'Questions', value: '100 MCQs' },
       { label: 'Total Marks', value: '200 (2 per question)' },
@@ -267,7 +268,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector (Telecommunication) 2026 Syllabus & Exam Pattern (Advt. 11/2025)',
     shortName: 'JKSSB SI (Telecom)',
     tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Telecommunication) — J&K Police, Home Department — exam under Advertisement 11/2025. 100 questions, 200 marks, two parts (60 General + 140 Technical), exam expected in 2026.',
-    lastUpdated: '2026-07-19',
+    lastUpdated: '2026-08-03',
 
     examSlug: 'jkpsi-telecom',
 
@@ -284,9 +285,10 @@ export const postGuides: Record<string, PostGuideData> = {
       'Because Part B (140 of 200 marks) is technical, an engineering or diploma background in Electronics, Communication, Computer Science or IT is a strong advantage. Candidates should treat this as a technical exam first and a general-awareness exam second — mastering Communication Systems, Electronic Devices, Digital Electronics and Computer Networking is essential to clear the cut-off.',
     ],
 
-    patternNotification: 'Official syllabus per JKSSB Notice dated 09.04.2026 (Advertisement Notification 11/2025, dated 26.11.2025). Exam dates not yet announced as of this update.',
+    patternNotification: 'Official syllabus per JKSSB Notice dated 09.04.2026 (Advertisement Notification 11/2025, dated 26.11.2025, Item No. 272). Written examination scheduled for 23 December 2026 per the JKSSB exam-date annexure.',
 
     quickFacts: [
+      { label: 'Exam Date', value: '23 December 2026' },
       { label: 'Advertisement', value: 'Notification 11/2025' },
       { label: 'Questions', value: '100 MCQs' },
       { label: 'Total Marks', value: '200 (2 per question)' },
@@ -1822,7 +1824,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Finance Account Assistant (FAA) — Syllabus & Exam Pattern',
     shortName: 'JKSSB FAA',
     tagline: 'JKSSB Finance Account Assistant exam — J&K Financial Code, Treasury Code, Government Accounting. 120 MCQs, −0.25 negative marking. 2024 solved paper.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-08-03',
 
     examSlug: 'jkssb-faa',
 
@@ -1841,9 +1843,10 @@ export const postGuides: Record<string, PostGuideData> = {
       'The 2024 FAA paper (January 2024, 120 questions, fully solved) is on Ministry of Papers. The Finance section questions that year heavily tested the J&K Financial Code volumes, contingency expenditure rules, and government accounting classification (Major Head, Minor Head, Sub-head structure).',
     ],
 
-    patternNotification: 'Based on JKSSB Finance Account Assistant examination, January 2024 (637 vacancies). Result declared 2025.',
+    patternNotification: 'Pattern based on the JKSSB Finance Account Assistant examination of January 2024 (637 vacancies, result declared 2025). Current cycle: Accounts Assistant (Finance Department) advertised vide Notification No. 10 of 2025 dated 24.11.2025, Item No. 271. Written examination scheduled for 15 November 2026 (Sunday) per the JKSSB exam-date annexure.',
 
     quickFacts: [
+      { label: 'Exam Date', value: '15 November 2026 (Sunday)' },
       { label: 'Questions', value: '120 MCQs' },
       { label: 'Total Marks', value: '120 (1 mark each)' },
       { label: 'Duration', value: '2 hours' },
