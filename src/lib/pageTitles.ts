@@ -177,16 +177,12 @@ type QuestionMeta = {
  * Falls back to truncated prefix when exam name is too long for a snippet.
  */
 export function questionSeoTitle(q: QuestionMeta): string {
+  // Lead with the question text — that is what users type into search, and it
+  // is the strongest ranking signal for a Q&A page (matches Testbook et al.).
+  // The exam/paper context lives in the H1, breadcrumb and on-page content.
   const brand = ` | ${BRAND}`
-  const budget = 70 - brand.length  // 49 chars for core
-  const prefix = `${q.examName}${q.year ? ` ${q.year}` : ''}${q.questionNo ? ` Q.${q.questionNo}` : ''}`
-  const snippetBudget = budget - prefix.length - 2  // -2 for ": "
-  if (snippetBudget >= 10) {
-    const snippet = truncate(strip(q.question), snippetBudget)
-    return `${prefix}: ${snippet}${brand}`
-  }
-  // Exam name too long for a snippet — just show truncated prefix
-  return `${truncate(prefix, budget)}${brand}`
+  const snippet = truncate(strip(q.question), 70 - brand.length)
+  return `${snippet}${brand}`
 }
 
 export function questionSeoDescription(q: QuestionMeta): string {

@@ -78,7 +78,7 @@ export function blogToc(post: BlogPost): { id: string; text: string }[] {
 
 const ibpsPo: BlogPost = {
   slug: 'ibps-po-exam',
-  title: 'IBPS PO 2026: Notification, Exam Dates, Eligibility, Salary & How to Prepare',
+  title: 'IBPS PO 2026: Notification, Dates, Vacancy & Salary',
   h1: 'IBPS PO 2026: Notification, Eligibility, Salary & Preparation Strategy',
   description:
     'IBPS PO 2026 explained — notification timeline, eligibility, vacancy, salary and job profile, and a stage-by-stage preparation strategy. For the full section-wise syllabus and weightage analysis, see the linked IBPS PO guide.',
@@ -212,7 +212,7 @@ const ibpsPo: BlogPost = {
 
 const sscCgl: BlogPost = {
   slug: 'ssc-cgl-exam',
-  title: 'SSC CGL 2026: Notification, Exam Dates, Vacancy, Eligibility, Salary & Preparation',
+  title: 'SSC CGL 2026: Notification, Exam Dates, Vacancy & Salary',
   h1: 'SSC CGL 2026: Notification, Exam Dates, Vacancy, Salary & How to Prepare',
   description:
     'SSC CGL 2026 explained — 12,256 vacancies, Tier 1 & Tier 2 exam dates, eligibility, salary by post, and a stage-by-stage preparation strategy. Full syllabus and weightage in the linked SSC CGL guide.',
@@ -298,7 +298,7 @@ const sscCgl: BlogPost = {
 
 const upscCse: BlogPost = {
   slug: 'upsc-cse-exam',
-  title: 'UPSC CSE 2026: Notification, Prelims & Mains Dates, Eligibility, Vacancy & Preparation',
+  title: 'UPSC CSE 2026: Notification, Exam Dates & Vacancy',
   h1: 'UPSC CSE 2026: Notification, Exam Dates, Eligibility & How to Prepare',
   description:
     'UPSC Civil Services 2026 explained — 933 vacancies, Prelims on 24 May and Mains from 21 August, eligibility, attempts, the three-stage pattern, and a realistic preparation strategy. Full syllabus in the linked UPSC guide.',
@@ -372,7 +372,7 @@ const upscCse: BlogPost = {
 
 const neetUg: BlogPost = {
   slug: 'neet-ug-exam',
-  title: 'NEET UG 2026: Exam Date, Eligibility, Pattern, Marks, Syllabus & Preparation',
+  title: 'NEET UG 2026: Exam Date, Eligibility & How to Prepare',
   h1: 'NEET UG 2026: Exam Date, Eligibility, Pattern & How to Prepare',
   description:
     'NEET UG 2026 explained — exam on 3 May 2026, 720 marks over 180 questions, eligibility, marking scheme, counselling and a subject-wise preparation strategy. Full syllabus in the linked NEET guide.',
@@ -445,7 +445,7 @@ const neetUg: BlogPost = {
 
 const bpsc: BlogPost = {
   slug: 'bpsc-exam',
-  title: 'BPSC 2026: 71st & 72nd CCE Notification, Exam Dates, Vacancy, Eligibility & Salary',
+  title: 'BPSC 2026: 71st & 72nd CCE Notification, Dates & Vacancy',
   h1: 'BPSC CCE 2026: Notification, Exam Dates, Eligibility, Salary & Preparation',
   description:
     'BPSC CCE 2026 explained — 71st CCE Mains in April and 72nd CCE with Prelims in July 2026, vacancies, eligibility, the three-stage pattern, salary and a preparation strategy. Full syllabus in the linked BPSC guide.',
@@ -519,7 +519,7 @@ const bpsc: BlogPost = {
 
 const jkpscJkcce: BlogPost = {
   slug: 'jkpsc-jkcce-exam',
-  title: 'JKPSC JKCCE 2026: Notification, Exam Pattern, Eligibility, Syllabus & Preparation',
+  title: 'JKPSC JKCCE 2026: Notification, Eligibility & Vacancy',
   h1: 'JKPSC Combined Competitive Exam (JKCCE): Notification, Pattern & How to Prepare',
   description:
     'JKPSC JKCCE explained — the J&K Combined Competitive Examination for KAS and allied services: three-stage pattern, eligibility, syllabus overview and preparation strategy, with links to solved previous year papers.',
@@ -576,7 +576,7 @@ const jkpscJkcce: BlogPost = {
 
 const rssbPatwari: BlogPost = {
   slug: 'rssb-patwari-exam',
-  title: 'Rajasthan Patwari (RSSB) 2026: Notification, Vacancy, Exam Pattern, Salary & Preparation',
+  title: 'Rajasthan Patwari 2026: Notification, Vacancy & Salary',
   h1: 'Rajasthan Patwari (RSSB) 2026: Notification, Pattern, Salary & How to Prepare',
   description:
     'RSSB Rajasthan Patwari explained — the 2025 cycle (3,705 posts) results and the awaited 2026 notification, eligibility, exam pattern, salary and a preparation strategy, with links to solved previous year papers.',
@@ -633,7 +633,7 @@ const rssbPatwari: BlogPost = {
 
 const jkssbSi: BlogPost = {
   slug: 'jkssb-sub-inspector-exam',
-  title: 'JKSSB Sub Inspector 2026: Notification, Vacancy, Exam Pattern, Syllabus & Preparation',
+  title: 'JKSSB Sub Inspector 2026: Notification & Vacancy',
   h1: 'JKSSB Sub Inspector 2026: Notification, Pattern, Syllabus & How to Prepare',
   description:
     'JKSSB Sub Inspector explained — the latest recruitment, eligibility, the 100-question exam pattern, syllabus overview and a preparation strategy, with links to solved previous year papers.',
@@ -687,7 +687,7 @@ const jkssbSi: BlogPost = {
 
 const jkssbPatwari: BlogPost = {
   slug: 'jkssb-patwari-exam',
-  title: 'JKSSB Patwari 2026: Notification, Exam Pattern, Eligibility, Syllabus & Preparation',
+  title: 'JKSSB Patwari 2026: Notification, Eligibility & Vacancy',
   h1: 'JKSSB Patwari 2026: Notification, Pattern, Syllabus & How to Prepare',
   description:
     'JKSSB Patwari explained — eligibility, the exam pattern, syllabus overview and a preparation strategy for the J&K revenue-department post, with links to solved previous year papers.',
@@ -740,7 +740,7 @@ const jkssbPatwari: BlogPost = {
 
 const jkssbJa: BlogPost = {
   slug: 'jkssb-junior-assistant-exam',
-  title: 'JKSSB Junior Assistant 2026: 343 Vacancies, Exam Date, Pattern, Syllabus & Preparation',
+  title: 'JKSSB Junior Assistant 2026: 343 Vacancies & Exam Date',
   h1: 'JKSSB Junior Assistant 2026: Vacancy, Exam Date, Pattern & How to Prepare',
   description:
     'JKSSB Junior Assistant 2026 explained — 343 vacancies, written exam on 19 April 2026 and skill test on 7 July, eligibility, exam pattern and a preparation strategy, with links to solved previous year papers.',

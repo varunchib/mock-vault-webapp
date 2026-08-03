@@ -28,6 +28,7 @@ export type QuestionTranslation = {
 
 export type Question = {
   slug: string;
+  urlCode?: string;
   examSlug: string;
   paperSlug?: string;
   examName: string;
