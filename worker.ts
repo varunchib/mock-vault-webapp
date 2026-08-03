@@ -149,6 +149,10 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   // not exist. The guides carry the evergreen syllabus and the solved papers.
   '/blog/jkssb-patwari-exam': '/guide/jkssb-patwari',
   '/blog/jkssb-junior-assistant-exam': '/guide/jkssb-junior-assistant',
+  // A board has no syllabus or pattern of its own - JKSSB runs 10 different
+  // exams with 10 different papers - so a board-level guide could only restate
+  // its children. The hub at /exam/jkssb is the page that aggregates them.
+  '/guide/jkssb': '/exam/jkssb',
 }
 
 const STATIC_META: Record<string, PageMeta> = {
