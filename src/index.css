@@ -8886,7 +8886,9 @@ footer {
 /* New main content area */
 .vault-main-new {
   padding: 22px 24px 60px;
-  min-height: calc(100vh - 58px);
+  /* 58px topbar + ~53px footer — keeps the shell exactly one viewport tall so
+     the new footer does not introduce a scrollbar on short pages. */
+  min-height: calc(100vh - 111px);
 }
 
 /* Collapse sidebar at 1120px — hide user details text */
@@ -17715,4 +17717,41 @@ html {
   color: var(--ink);
   font-size: 11px;
   font-weight: 700;
+}
+
+/* ── Signed-in shell footer ───────────────────────────────────────────────
+   Minimal by design: the sidebar already handles navigation, so this only
+   carries the legal/contact links that must be reachable from every page.
+   min-height on .vault-main-new is reduced to account for it, so the footer
+   sits below the fold on short pages instead of forcing a scrollbar. */
+.vault-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 18px;
+  padding: 16px 24px;
+  border-top: 1px solid var(--line);
+  color: var(--ink4);
+  font-size: 12.5px;
+}
+
+.vault-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.vault-footer a {
+  color: var(--ink3);
+  text-decoration: none;
+}
+
+.vault-footer a:hover {
+  color: var(--blue);
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .vault-footer { justify-content: center; text-align: center; }
 }
