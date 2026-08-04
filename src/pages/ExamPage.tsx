@@ -246,9 +246,13 @@ export function ExamPage() {
 
   // Mocks are a separate entity and deliberately do NOT roll up to a board the
   // way papers and questions do: a mock belongs to the exam it was written for.
-  // (The Mocks tab currently renders a coming-soon panel; the count still
-  // feeds the tab label.)
-  const examMocks = useMemo(() => allMocks.filter((m) => m.examSlug === slug), [allMocks, slug])
+  // Empty series are excluded outright — mocks.questions counts the question
+  // rows actually attached, so a shell with none never reaches the tab count,
+  // the header badge or the listing.
+  const examMocks = useMemo(
+    () => allMocks.filter((m) => m.examSlug === slug && m.questions > 0),
+    [allMocks, slug],
+  )
 
   const filteredPapers = useMemo(() => {
     const q = paperSearch.trim().toLowerCase()
@@ -679,14 +683,33 @@ export function ExamPage() {
         </div>
       )}
 
-      {/* ── Mock Tests — under development, gated for everyone ── */}
+      {/* ── Mock Tests — listed when this exam has a populated series,
+             "coming soon" while its mocks are still empty shells ── */}
       {activeTab === 'mocks' && (
         <div className="ep-tab-body">
           <div className="ep-papers-head">
             <h2>Mock tests</h2>
           </div>
 
-          <MocksComingSoon />
+          {examMocks.length === 0 ? (
+            <MocksComingSoon />
+          ) : (
+            <div className="ep-mocks-list">
+              {examMocks.map((mock) => (
+                <Link key={mock.slug} to={`/mock-test/${mock.examSlug}`} className="ep-resource-card">
+                  <span className="ep-resource-icon"><FileText size={18} /></span>
+                  <span className="ep-resource-copy">
+                    <strong>{mock.title}</strong>
+                    <small>
+                      {mock.questions} questions · {mock.durationMinutes} min · {mock.difficulty}
+                      {mock.isFree ? ' · Free' : ''}
+                    </small>
+                  </span>
+                  <ChevronRight size={15} className="ep-resource-chev" />
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       )}
 

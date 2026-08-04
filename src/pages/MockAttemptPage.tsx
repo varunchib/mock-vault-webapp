@@ -240,19 +240,10 @@ function ResultScreen({
 }
 
 // ── Main page ─────────────────────────────────────────────────────────────
+// Gated on CONTENT rather than a global flag: a mock that holds questions can
+// be attempted, one that is still an empty shell shows "coming soon" — including
+// on a direct URL, so an old link can never drop someone into a blank attempt.
 export function MockAttemptPage() {
-  // Mocks are under development — gate the attempt flow, including direct URLs.
-  return (
-    <section className="public-page">
-      <div className="public-shell">
-        <MocksComingSoon showBrowseLink />
-      </div>
-    </section>
-  )
-}
-
-// Original attempt flow, restored when mocks launch.
-export function MockAttemptPageDisabled() {
   const navigate = useNavigate()
   const { slug } = useParams()
   const { user } = useAuth()
@@ -373,6 +364,18 @@ export function MockAttemptPageDisabled() {
   if (!slug) return <Navigate to="/mock-test" replace />
   if (loading) return <HaloLoader label="Loading mock" />
   if (error || !mock) return <Navigate to="/mock-test" replace />
+
+  // The mock exists but carries no questions — there is nothing to attempt, so
+  // show "coming soon" instead of an empty timer running down over a blank paper.
+  if (questions.length === 0) {
+    return (
+      <section className="public-page">
+        <div className="public-shell">
+          <MocksComingSoon showBrowseLink />
+        </div>
+      </section>
+    )
+  }
 
   const handleSubmit = () => {
     remainingAtSubmitRef.current = remainingSeconds

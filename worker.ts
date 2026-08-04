@@ -646,6 +646,9 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
     .join('')
   const mockLinks = mocks
+    // Empty series are not linked: the page they lead to shows "coming soon",
+    // so advertising them here would hand crawlers a dead end.
+    .filter(m => (m.questions ?? 0) > 0)
     .slice(0, 20)
     .map(m => `<li><a href="/mock-test/${encodeURIComponent(m.slug)}">${htmlText(m.title)}</a> <small>${htmlText(m.difficulty)} - ${m.questions} questions</small></li>`)
     .join('')
@@ -806,7 +809,9 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
         apiJson<MockData[]>(`${API}/api/v1/mocks`, 3600),
         apiJson<PaperData[]>(`${API}/api/v1/exams/${examSlug}/papers`, 3600),
       ])
-      const examMocks = (allMocks ?? []).filter(m => m.examSlug === examSlug)
+      // Only series that actually hold questions — an empty shell must not be
+      // advertised to crawlers any more than it is shown to readers.
+      const examMocks = (allMocks ?? []).filter(m => m.examSlug === examSlug && (m.questions ?? 0) > 0)
       const mockCrumbs: Crumb[] = [
         { name: 'Home', item: BASE },
         { name: 'Exams', item: `${BASE}/exams` },

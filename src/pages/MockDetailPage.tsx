@@ -18,19 +18,11 @@ import { MocksComingSoon } from '../components/common/MocksComingSoon'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { normalizeExamCategory } from './DashboardPage'
 
+// Mocks are gated on CONTENT, not on a global flag: an exam whose mocks are
+// still empty shells shows "coming soon", while an exam with a real, populated
+// mock shows it. mocks.questions is the count of question rows actually
+// attached to the mock, so an empty series can never be advertised.
 export function MockDetailPage() {
-  // Mocks are under development — gate the whole page, including direct URLs.
-  return (
-    <section className="public-page">
-      <div className="public-shell">
-        <MocksComingSoon showBrowseLink />
-      </div>
-    </section>
-  )
-}
-
-// Original page, restored when mocks launch.
-export function MockDetailPageDisabled() {
   const navigate = useNavigate()
   const { slug } = useParams()
   const { isAuthenticated } = useAuth()
@@ -63,7 +55,9 @@ export function MockDetailPageDisabled() {
         if (!resolvedExam) { setError(true); return }
 
         setExam(resolvedExam)
-        setExamMocks(mocks.filter((m) => m.examSlug === resolvedExamSlug))
+        // Only mocks that actually hold questions. A series with none cannot be
+        // attempted, so listing it would promise something the app can't honour.
+        setExamMocks(mocks.filter((m) => m.examSlug === resolvedExamSlug && m.questions > 0))
         setExamPapers(papers.filter((p) => p.examSlug === resolvedExamSlug))
       })
       .catch(() => { if (!cancelled) setError(true) })
@@ -160,6 +154,18 @@ export function MockDetailPageDisabled() {
   }
 
   if (error || !exam) return <Navigate to="/exams" replace />
+
+  // Exam exists but every one of its mocks is still empty — say so plainly
+  // rather than rendering a "Free Mock Tests" page with nothing to attempt.
+  if (examMocks.length === 0) {
+    return (
+      <section className="public-page">
+        <div className="public-shell">
+          <MocksComingSoon showBrowseLink />
+        </div>
+      </section>
+    )
+  }
 
   const openMock = (mock: MockItem) => {
     if (!isAuthenticated) { setLoginOpen(true); return }
