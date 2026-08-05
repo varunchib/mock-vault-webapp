@@ -4024,6 +4024,7 @@ footer {
 }
 
 .pyq-option-list button span {
+  font-size: 14px;
   width: 32px;
   height: 32px;
   display: inline-flex;
@@ -4040,7 +4041,7 @@ footer {
 .pyq-paper-question-list strong,
 .pyp-sober-card a {
   color: var(--ink);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -4588,7 +4589,8 @@ footer {
   background: var(--surface);
   text-align: left;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 16px;
+  line-height: 1.6;
   color: var(--ink);
   width: 100%;
   transition: border-color .12s, background .12s;
@@ -4781,7 +4783,7 @@ footer {
 
 .pyq-explanation strong {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: .05em;
@@ -11910,8 +11912,13 @@ html {
 }
 .pa-mark-btn.active { border-color: #7c3aed; background: #f5f3ff; color: #7c3aed; }
 
+/* The attempt screen is the most demanding reading surface in the app: a timed
+   paper, often on a phone. Question text was 15px and the options below it only
+   14px — options set smaller than the question they answer, when they are what
+   a candidate re-reads most carefully. Both are raised, and no step of the
+   reading path is now allowed below 15px at any breakpoint. */
 .pa-q-text {
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.7;
   color: var(--ink);
   margin-bottom: 20px;
@@ -11930,7 +11937,8 @@ html {
   border-radius: 10px;
   background: var(--line2);
   color: var(--ink);
-  font-size: 14px;
+  font-size: 15.5px;
+  line-height: 1.6;
   text-align: left;
   cursor: pointer;
   transition: border-color .15s, background .15s;
@@ -15189,7 +15197,7 @@ html {
 
 /* Instruction line: "Find the part...", "Select the sentence..." */
 .qr-instruction {
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 600;
   color: var(--ink2);
   font-style: italic;
@@ -17630,9 +17638,9 @@ html {
   .pa-question-scroll { padding: 14px 14px 10px; -webkit-overflow-scrolling: touch; }
   .pa-q-header { gap: 8px; margin-bottom: 12px; }
   .pa-q-subject { margin-left: 0; }
-  .pa-q-text { font-size: 15px; line-height: 1.6; }
+  .pa-q-text { font-size: 16px; line-height: 1.65; }
 
-  .pa-option { padding: 12px; gap: 10px; font-size: 14px; }
+  .pa-option { padding: 12px; gap: 10px; font-size: 15.5px; }
   .pa-option:hover { border-color: var(--line); background: var(--line2); }
 
   .pa-q-actions { padding: 10px 12px; gap: 8px; flex-wrap: wrap; }
@@ -17668,8 +17676,8 @@ html {
   .pa-palette-btn { font-size: 10px; }
 
   .pa-question-scroll { padding: 12px 11px 8px; }
-  .pa-q-text { font-size: 14.5px; }
-  .pa-option { padding: 11px 10px; font-size: 13.5px; gap: 8px; }
+  .pa-q-text { font-size: 15.5px; }
+  .pa-option { padding: 11px 10px; font-size: 15px; gap: 8px; }
   .pa-q-actions { padding: 8px 10px; }
   .pa-nav-btn { height: 42px; padding: 0 10px; font-size: 12px; }
 
