@@ -15030,10 +15030,19 @@ html {
   min-width: 0;
 }
 .ea2-lb-score {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--ink3);
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--ink);
   flex-shrink: 0;
+  /* Marks line up across rows regardless of digit widths. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* The denominator is context, not the score — keep it quieter than the mark. */
+.ea2-lb-score small {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
 }
 .ea2-lb-you {
   font-size: 10px;
@@ -15207,6 +15216,133 @@ html {
 .qr-text {
   white-space: pre-wrap;
   line-height: 1.6;
+}
+
+/* The opening line IS the question — it carries the most weight on the card. */
+.qr-lead {
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+/* Column header for a list block: "List-I (Coal Field)", "(Pass) — (State)" */
+.qr-colhead {
+  margin-top: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink2);
+}
+
+/* Assertion / Reason / Statement — a labelled claim, not another paragraph.
+   The rule down the left is what separates the two claims at a glance. */
+.qr-claim {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-left: 3px solid var(--blue-border);
+  border-radius: 0 6px 6px 0;
+  background: var(--blue-bg);
+  line-height: 1.55;
+}
+
+/* 13px, not 12: an uppercase letter-spaced label at 12px sits below what reads
+   comfortably on a phone, and this one names the claim underneath it. */
+.qr-claim-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+/* The A&R boilerplate that introduces the two claims — present for context,
+   but it should not compete with the claims themselves. */
+.qr-preamble {
+  font-size: 0.875rem;
+  color: var(--ink3);
+  line-height: 1.5;
+}
+
+.qr-claim-body {
+  white-space: pre-wrap;
+}
+
+/* Numbered / lettered statement list: the marker sits in its own column so the
+   text of every item starts on the same left edge. */
+.qr-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 2px 0;
+  padding: 0;
+  list-style: none;
+}
+
+.qr-item {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  line-height: 1.55;
+}
+
+.qr-item-marker {
+  flex: 0 0 auto;
+  min-width: 1.35em;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink2);
+}
+
+.qr-item-body {
+  white-space: pre-wrap;
+}
+
+/* Closing rubric ("Select the correct answer…") — present but recessive. */
+.qr-directive {
+  margin-top: 2px;
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--ink3);
+  line-height: 1.5;
+}
+
+/* Match-the-following: the two headed lists side by side, so the reader can
+   run across them instead of scrolling one past the other. */
+.qr-pairgrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 22px;
+  margin: 2px 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.qr-pairgrid-col {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.qr-pairgrid .qr-colhead {
+  margin-top: 0;
+  padding-bottom: 4px;
+  border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 560px) {
+  /* stacking beats squeezing two columns into a phone width */
+  .qr-pairgrid { grid-template-columns: 1fr; gap: 14px; }
+}
+
+@media (max-width: 480px) {
+  .qr-claim { padding: 7px 10px; }
+  .qr-item { gap: 8px; }
 }
 
 /* Highlighted / bold keyword in question text (**word**) */
@@ -17763,3 +17899,1855 @@ html {
 @media (max-width: 560px) {
   .vault-footer { justify-content: center; text-align: center; }
 }
+
+/* ── Related questions ────────────────────────────────────────────────────
+   Question pages used to link only up to their exam and paper, leaving ~3,000
+   of them as near-orphans in the link graph. This block links them sideways,
+   so it must render as real anchors in the markup, not a JS-only widget. */
+.rq { margin-top: 22px; }
+
+.rq-h {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+
+.rq-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 8px;
+}
+
+.rq-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  height: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  text-decoration: none;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.rq-item:hover,
+.rq-item:focus-visible {
+  border-color: var(--blue);
+  background: var(--line2);
+}
+
+.rq-q {
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 500;
+  /* Stems vary from a few words to several lines; clamp so every card in the
+     grid keeps the same height and the meta line stays readable. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.rq-meta {
+  font-size: 0.75rem;
+  color: var(--ink3);
+  font-weight: 600;
+  margin-top: auto;
+}
+
+@media (max-width: 480px) {
+  .rq-list { grid-template-columns: 1fr; }
+  .rq-q { font-size: 0.9375rem; }
+}
+
+/* An unpublished mock series is listed rather than hidden, so it needs to read
+   as plainly unavailable — not merely as a card that failed to respond. */
+.ep-resource-card.is-empty,
+.mock-series-card.is-empty {
+  opacity: 0.62;
+  cursor: default;
+}
+
+.ep-resource-card.is-empty:hover {
+  border-color: var(--line);
+  background: var(--surface);
+  transform: none;
+}
+
+.ep-resource-flag {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--line2);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink3);
+  white-space: nowrap;
+}
+
+.mock-series-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* ── Mock hub refinements ─────────────────────────────────────────────────
+   With one series the auto-fill grid left a single narrow card marooned
+   against a wide empty track. Give a lone card room to be the page's subject
+   instead of an orphan in a layout built for many. */
+.mock-series-grid.is-single {
+  grid-template-columns: minmax(0, 460px);
+}
+
+.mock-series-grid.is-single .mock-series-card {
+  padding: 20px;
+}
+
+.mock-series-grid.is-single .mock-series-card strong {
+  font-size: 1.125rem;
+}
+
+/* The hub is a short page; without a floor it ended in a large band of dead
+   space above the footer on tall viewports. */
+.mock-hub-page .public-shell {
+  padding-bottom: 32px;
+}
+
+.mock-hub-page .ep-faq {
+  margin-top: 4px;
+}
+
+.mock-hub-footnote {
+  margin-top: 18px;
+}
+
+.mock-hub-papers {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.mock-hub-paper-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mock-hub-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.mock-hub-all:hover { text-decoration: underline; }
+
+/* ── Test list (Testbook-style rows) ──────────────────────────────────────
+   A row per test rather than a card grid: the decision a candidate makes is
+   "can I sit this now?", which is answered by questions / marks / minutes and
+   a single Start button — not by a paragraph of description. Rows also keep a
+   long series scannable, where cards force scrolling. */
+.tb-test-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface);
+}
+
+.tb-test-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-bottom: 1px solid var(--line);
+}
+
+.tb-test-row:last-child { border-bottom: none; }
+.tb-test-row:hover { background: var(--line2); }
+.tb-test-row.is-empty { opacity: 0.62; }
+.tb-test-row.is-empty:hover { background: transparent; }
+
+.tb-test-main {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+  flex: 1;
+}
+
+.tb-test-titleline {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-wrap: wrap;
+}
+
+.tb-test-titleline strong {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.tb-tag {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tb-tag.free { background: #e8f6ee; color: #127a45; }
+.tb-tag.premium { background: #fff3e0; color: #9a5b12; }
+
+.tb-test-stats {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8125rem;
+  color: var(--ink3);
+  font-weight: 600;
+}
+
+/* Dot separators between stats, the way exam platforms set this line. */
+.tb-test-stats span + span::before {
+  content: '·';
+  margin-right: 8px;
+  color: var(--ink3);
+}
+
+.tb-test-level { color: var(--blue); }
+
+.tb-test-subjects {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.tb-test-subjects span {
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--line2);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink3);
+}
+
+.tb-test-action { flex-shrink: 0; }
+
+.tb-start {
+  padding: 9px 22px;
+  border-radius: 8px;
+  border: 1px solid var(--solid);
+  background: var(--solid);
+  color: var(--white);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.tb-start:hover { opacity: 0.86; }
+
+.tb-start:disabled {
+  background: transparent;
+  color: var(--ink3);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+
+@media (max-width: 620px) {
+  .tb-test-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .tb-test-action { width: 100%; }
+  .tb-start { width: 100%; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .tb-tag.free { background: #12291d; color: #4cc182; }
+  .tb-tag.premium { background: #2a2114; color: #d9a353; }
+}
+
+/* ── Mock test series (inside the exam page's Mock Tests tab) ──────────────
+   One card per test. The stat line — questions, marks, minutes — is the whole
+   decision a candidate makes before starting, so it sits directly under the
+   title with the primary action opposite it. */
+.mt-wrap { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+
+.mt-levels { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.mt-level {
+  padding: 7px 15px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--ink2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.mt-level span { color: var(--ink4); font-weight: 600; }
+.mt-level:hover { border-color: var(--ink4); }
+
+.mt-level.active {
+  background: var(--solid);
+  border-color: var(--solid);
+  color: var(--white);
+}
+
+.mt-level.active span { color: var(--white); opacity: 0.7; }
+
+.mt-list { display: flex; flex-direction: column; gap: 12px; }
+
+.mt-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mt-card:hover { border-color: var(--ink4); }
+.mt-card.is-locked { opacity: 0.64; }
+.mt-card.is-locked:hover { border-color: var(--line); }
+
+.mt-card-body {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+}
+
+.mt-card-info { display: flex; flex-direction: column; gap: 7px; flex: 1; min-width: 0; }
+
+.mt-free {
+  align-self: flex-start;
+  padding: 2px 9px;
+  border-radius: 4px;
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.mt-card-info h3 {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.mt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-size: 0.8125rem;
+  color: var(--ink3);
+  font-weight: 600;
+}
+
+.mt-meta span { display: inline-flex; align-items: center; gap: 5px; }
+.mt-meta svg { color: var(--ink4); flex-shrink: 0; }
+
+.mt-card-cta { flex-shrink: 0; }
+
+.mt-start {
+  padding: 10px 26px;
+  border-radius: 8px;
+  border: 1px solid var(--solid);
+  background: var(--solid);
+  color: var(--white);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s ease;
+}
+
+.mt-start:hover { opacity: 0.86; }
+
+.mt-start:disabled {
+  background: transparent;
+  color: var(--ink3);
+  border-color: var(--line);
+  cursor: not-allowed;
+}
+
+/* The secondary strip: context you want available but never competing with
+   the stat line above it. */
+.mt-card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 14px;
+  padding: 9px 18px;
+  border-top: 1px solid var(--line);
+  background: var(--surface-2);
+  font-size: 0.75rem;
+  color: var(--ink3);
+  font-weight: 600;
+}
+
+.mt-level-tag { color: var(--blue); }
+.mt-subjects { min-width: 0; }
+.mt-neg { margin-left: auto; }
+
+@media (max-width: 620px) {
+  .mt-card-body { flex-direction: column; align-items: stretch; gap: 13px; }
+  .mt-card-cta { width: 100%; }
+  .mt-start { width: 100%; }
+  .mt-neg { margin-left: 0; }
+}
+
+/* Category tabs — level 1. A mature series has more categories than fit a row,
+   so this scrolls horizontally with arrows that appear only when there is
+   something to scroll to. */
+.mt-cats {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.mt-cat-scroll {
+  display: flex;
+  gap: 2px;
+  /* A flex item defaults to min-width:auto, so this row refused to shrink below
+     its content and pushed the whole PAGE wider instead of scrolling itself. */
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.mt-cat-scroll::-webkit-scrollbar { display: none; }
+
+.mt-cat {
+  flex-shrink: 0;
+  padding: 11px 16px;
+  border: none;
+  background: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink3);
+  cursor: pointer;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.mt-cat span { font-size: 0.8125rem; color: var(--ink4); }
+.mt-cat:hover { color: var(--ink); }
+
+.mt-cat.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 700;
+}
+
+.mt-cat.active span { color: var(--blue); }
+
+.mt-cat-nav {
+  position: absolute;
+  top: 0;
+  bottom: 1px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 6px;
+  border: none;
+  cursor: pointer;
+  color: var(--ink2);
+}
+
+.mt-cat-nav.left {
+  left: 0;
+  background: linear-gradient(to right, var(--paper) 62%, transparent);
+}
+
+.mt-cat-nav.right {
+  right: 0;
+  background: linear-gradient(to left, var(--paper) 62%, transparent);
+}
+
+.mt-cat-nav:hover { color: var(--ink); }
+
+/* ── TCS iON exam shell ───────────────────────────────────────────────────
+   The live-exam surface for previous year papers AND mocks. Modelled on the
+   TCS iON delivery platform used for SSC / IBPS / JKSSB, so a candidate meets
+   the same layout, wording and colour coding here as on exam day.
+
+   This deliberately does NOT follow the marketing site's theme: an exam client
+   is a fixed, high-contrast, light environment, and a candidate practising for
+   a real sitting should not get a dark-mode variant of it. */
+.pa-attempt-page {
+  --exam-ink: #1b2430;
+  --exam-line: #cdd6e0;
+  --exam-head: #1f3050;
+  --exam-blue: #1d5fb8;
+  --exam-answered: #16a34a;
+  --exam-notanswered: #d64545;
+  --exam-notvisited: #d8dee6;
+  --exam-marked: #7b3fb5;
+  background: #eef1f5;
+  color: var(--exam-ink);
+}
+
+/* Header ---------------------------------------------------------------- */
+.pa-attempt-page .pa-topbar {
+  background: var(--exam-head);
+  color: #fff;
+  border-bottom: 3px solid var(--exam-blue);
+}
+
+.pa-attempt-page .pa-topbar-left strong { color: #fff; }
+.pa-attempt-page .pa-topbar-left small { color: #b9c6d8; }
+
+.pa-attempt-page .pa-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 4px;
+  background: #ffffff;
+  color: var(--exam-head);
+  border: 1px solid #ffffff;
+}
+
+.pa-timer-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #5b6b80;
+}
+
+.pa-timer-value {
+  font-size: 1rem;
+  font-weight: 800;
+  /* Digits must not reflow as the clock ticks. */
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+.pa-attempt-page .pa-timer.warning {
+  background: #fdecec;
+  border-color: var(--exam-notanswered);
+}
+
+.pa-attempt-page .pa-timer.warning .pa-timer-value { color: var(--exam-notanswered); }
+
+/* Section bar ----------------------------------------------------------- */
+.pa-attempt-page .pa-subject-tabs {
+  background: #dfe6ee;
+  border-bottom: 1px solid var(--exam-line);
+  align-items: stretch;
+  gap: 0;
+}
+
+.pa-sections-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #5b6b80;
+  flex-shrink: 0;
+}
+
+.pa-attempt-page .pa-subject-tab {
+  border-radius: 0;
+  border: 1px solid var(--exam-line);
+  border-bottom: none;
+  background: #f2f5f9;
+  color: #3d4d61;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 9px 16px;
+}
+
+.pa-attempt-page .pa-subject-tab.active {
+  background: #fff;
+  color: var(--exam-blue);
+  font-weight: 800;
+  box-shadow: inset 0 3px 0 var(--exam-blue);
+}
+
+.pa-attempt-page .pa-subject-tab-count {
+  background: #e6ecf4;
+  color: #4a5b70;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-attempt-page .pa-subject-tab.active .pa-subject-tab-count {
+  background: var(--exam-blue);
+  color: #fff;
+}
+
+/* Question panel -------------------------------------------------------- */
+.pa-attempt-page .pa-question-panel {
+  background: #fff;
+  border-right: 1px solid var(--exam-line);
+}
+
+.pa-attempt-page .pa-q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--exam-line);
+}
+
+.pa-attempt-page .pa-q-num {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  color: var(--exam-ink);
+}
+
+.pa-q-marks {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-q-marks em {
+  font-style: normal;
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: #e7f6ed;
+  color: var(--exam-answered);
+}
+
+.pa-q-marks b {
+  padding: 2px 8px;
+  border-radius: 3px;
+  background: #fdecec;
+  color: var(--exam-notanswered);
+}
+
+.pa-attempt-page .pa-q-text {
+  color: var(--exam-ink);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Options: numbered radio rows, as the real client renders them ---------- */
+.pa-attempt-page .pa-options {
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pa-attempt-page .pa-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--exam-ink);
+}
+
+.pa-attempt-page .pa-option:hover { background: #f4f7fb; }
+
+.pa-attempt-page .pa-option.selected {
+  background: #eaf2fd;
+  border-color: var(--exam-blue);
+}
+
+.pa-attempt-page .pa-option input[type='radio'] {
+  margin: 3px 0 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--exam-blue);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.pa-attempt-page .pa-opt-key {
+  font-weight: 700;
+  color: #43566d;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.pa-opt-text { min-width: 0; }
+
+/* Action bar ------------------------------------------------------------ */
+.pa-attempt-page .pa-q-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: #f2f5f9;
+  border-top: 1px solid var(--exam-line);
+  padding: 10px 16px;
+}
+
+.pa-actions-left,
+.pa-actions-right { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.pa-attempt-page .pa-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 9px 15px;
+  border-radius: 4px;
+  border: 1px solid #9fb0c4;
+  background: #fff;
+  color: #2b3a4d;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pa-attempt-page .pa-nav-btn:hover:not(:disabled) { background: #e9eff7; }
+
+.pa-attempt-page .pa-nav-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.pa-attempt-page .pa-nav-btn.primary {
+  background: var(--exam-blue);
+  border-color: var(--exam-blue);
+  color: #fff;
+}
+
+.pa-attempt-page .pa-nav-btn.primary:hover:not(:disabled) { background: #17509c; }
+
+/* Right panel ----------------------------------------------------------- */
+.pa-attempt-page .pa-palette-panel {
+  background: #f7f9fc;
+  border-left: 1px solid var(--exam-line);
+}
+
+.pa-legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 10px;
+  padding: 12px;
+  background: #fff;
+  border: 1px solid var(--exam-line);
+  border-radius: 4px;
+  font-size: 0.75rem;
+  color: #35455a;
+  font-weight: 600;
+}
+
+.pa-legend span {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  line-height: 1.35;
+}
+
+.pa-legend span.wide { grid-column: 1 / -1; flex-wrap: wrap; }
+
+.pa-legend em {
+  font-style: normal;
+  font-weight: 500;
+  color: #6b7c92;
+  font-size: 0.6875rem;
+  flex-basis: 100%;
+  padding-left: 20px;
+}
+
+/* The five palette shapes. TCS distinguishes states by SHAPE as well as
+   colour, so the palette stays readable for colour-blind candidates. */
+.pa-legend-dot {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  display: inline-block;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+}
+
+.pa-legend-dot.answered { background: var(--exam-answered); border-radius: 0 0 8px 8px; }
+.pa-legend-dot.visited { background: var(--exam-notanswered); border-radius: 8px 8px 0 0; }
+.pa-legend-dot.not-visited { background: var(--exam-notvisited); border-radius: 2px; }
+.pa-legend-dot.marked { background: var(--exam-marked); border-radius: 50%; }
+.pa-legend-dot.answered-marked {
+  background: var(--exam-marked);
+  border-radius: 50%;
+  position: relative;
+}
+
+.pa-legend-dot.answered-marked::after {
+  content: '';
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--exam-answered);
+  border: 1px solid #fff;
+}
+
+.pa-palette-section {
+  margin-top: 12px;
+  padding: 8px 10px;
+  background: #dfe6ee;
+  border: 1px solid var(--exam-line);
+  border-radius: 3px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #35455a;
+}
+
+.pa-palette-section strong { color: var(--exam-ink); }
+
+.pa-attempt-page .pa-palette-grid {
+  gap: 8px;
+  padding: 12px 0;
+}
+
+.pa-attempt-page .pa-palette-btn {
+  width: 38px;
+  height: 34px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 2px;
+  background: var(--exam-notvisited);
+  color: #2b3a4d;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.pa-attempt-page .pa-palette-btn.answered {
+  background: var(--exam-answered);
+  color: #fff;
+  border-radius: 0 0 12px 12px;
+}
+
+.pa-attempt-page .pa-palette-btn.visited {
+  background: var(--exam-notanswered);
+  color: #fff;
+  border-radius: 12px 12px 0 0;
+}
+
+.pa-attempt-page .pa-palette-btn.marked,
+.pa-attempt-page .pa-palette-btn.answered-marked {
+  background: var(--exam-marked);
+  color: #fff;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  position: relative;
+}
+
+.pa-attempt-page .pa-palette-btn.answered-marked::after {
+  content: '';
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--exam-answered);
+  border: 1.5px solid #fff;
+}
+
+.pa-attempt-page .pa-palette-btn.current {
+  outline: 2px solid var(--exam-head);
+  outline-offset: 2px;
+}
+
+.pa-attempt-page .pa-submit-palette-btn {
+  background: var(--exam-answered);
+  border-color: var(--exam-answered);
+  color: #fff;
+  font-weight: 800;
+}
+
+.pa-attempt-page .pa-submit-topbar-btn {
+  background: var(--exam-answered);
+  border-color: var(--exam-answered);
+  color: #fff;
+}
+
+@media (max-width: 900px) {
+  .pa-legend { grid-template-columns: 1fr; }
+  .pa-attempt-page .pa-q-actions { justify-content: stretch; }
+  .pa-actions-left,
+  .pa-actions-right { flex: 1 1 100%; }
+  .pa-actions-right { justify-content: flex-end; }
+}
+
+/* ── Exam instruction screens ────────────────────────────────────────────
+   Shown before the clock starts. Deliberately plain, light and high-contrast:
+   these are rules a candidate has to read quickly under pressure, so the page
+   stays close to the delivery software they will meet on exam day rather than
+   to the marketing site. */
+.pa-gi {
+  --exam-line: #d5dde5;
+  --exam-blue: #1d5fb8;
+  --exam-answered: #16a34a;
+  --exam-notanswered: #d64545;
+  --exam-notvisited: #ffffff;
+  --exam-marked: #7b3fb5;
+  --exam-cyan: #29b6d8;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  color: #222;
+  font-size: 13.5px;
+  line-height: 1.62;
+}
+
+/* Header: our own mark, then the test name — the same slot the delivery
+   software gives the exam body's logo. */
+.pa-gi-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 9px 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--exam-line);
+}
+
+.pa-gi-logo { flex-shrink: 0; }
+
+.pa-gi-testname {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #3d3d3d;
+}
+
+.pa-gi-body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  align-items: stretch;
+  min-height: 0;
+}
+
+.pa-gi-main {
+  padding: 16px 20px 26px;
+  overflow-y: auto;
+  border-right: 1px solid var(--exam-line);
+}
+
+.pa-gi-main h1 {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: #222;
+}
+
+.pa-gi-main h2 {
+  font-size: 0.875rem;
+  font-weight: 700;
+  margin: 16px 0 6px;
+  color: #222;
+}
+
+/* Declaration screen: the paper's name is the page's subject, centred. */
+.pa-gi-testtitle {
+  text-align: center;
+  font-size: 1.625rem !important;
+  font-weight: 700;
+  margin: 14px 0 22px !important;
+}
+
+.pa-gi-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.8125rem;
+  margin-bottom: 18px;
+}
+
+.pa-gi-readhead { margin-top: 0 !important; }
+
+.pa-gi-list {
+  margin: 0;
+  padding-left: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pa-gi-list > li { padding-left: 2px; }
+
+.pa-gi-sublist {
+  list-style: decimal;
+  margin: 7px 0 0;
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.pa-gi-para { margin: 11px 0 0; }
+
+/* Palette key, drawn with the same shapes used inside the exam so the symbols
+   are already familiar when the clock starts. */
+.pa-gi-symbols {
+  list-style: none;
+  margin: 9px 0 0;
+  padding-left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.pa-gi-symbols li {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.pa-gi-symbols .pa-legend-dot {
+  width: 22px;
+  height: 21px;
+  flex-shrink: 0;
+}
+
+.pa-gi-symbols .pa-legend-dot.not-visited { border: 1px solid #9aa6b2; }
+
+.pa-gi-red { color: #d92b2b; margin: 8px 0 0; }
+
+/* Lower band on the declaration screen — language, then the consent tick. */
+.pa-gi-band {
+  border-top: 1px solid var(--exam-line);
+  padding: 12px 20px 14px;
+  background: #fff;
+}
+
+.pa-gi-lang {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.pa-gi-lang select {
+  padding: 3px 6px;
+  border: 1px solid #767676;
+  border-radius: 2px;
+  font: inherit;
+  background: #fff;
+}
+
+.pa-gi-declhead {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  margin: 14px 0 7px;
+}
+
+.pa-gi-declare {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.pa-gi-declare input {
+  margin: 2px 0 0;
+  width: 14px;
+  height: 14px;
+  accent-color: var(--exam-blue);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+/* Candidate panel */
+.pa-gi-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 26px 16px;
+  background: #eef4f8;
+}
+
+.pa-gi-avatar {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--exam-cyan);
+  color: #fff;
+}
+
+.pa-gi-side strong {
+  font-size: 1.125rem;
+  font-weight: 500;
+  text-align: center;
+  color: #333;
+}
+
+/* Footer */
+/* Three tracks so the primary action sits dead centre with the back control
+   pinned left, exactly as the delivery software lays it out. A flex row with
+   auto margins put them side by side instead. */
+.pa-gi-foot {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px;
+  border-top: 1px solid var(--exam-line);
+  background: #fff;
+}
+
+.pa-gi-foot > :first-child { justify-self: start; }
+.pa-gi-foot > :last-child { justify-self: end; }
+.pa-gi-foot > :nth-child(2) { justify-self: center; }
+
+.pa-gi-back {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--exam-blue);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.pa-gi-back:hover { text-decoration: underline; }
+
+.pa-gi-next,
+.pa-gi-prev,
+.pa-gi-begin {
+  padding: 7px 20px;
+  border-radius: 3px;
+  border: 1px solid #93cfe3;
+  background: #cfe9f3;
+  color: #14506b;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pa-gi-next:hover:not(:disabled),
+.pa-gi-prev:hover,
+.pa-gi-begin:hover:not(:disabled) { background: #b9e0ee; }
+
+
+/* Centred, as the reference places it. */
+.pa-gi-begin {
+  background: #7fd0e8;
+  border-color: #7fd0e8;
+  color: #fff;
+  font-weight: 700;
+}
+
+.pa-gi-foot-spacer { flex: 1; }
+
+.pa-gi-begin:disabled {
+  background: #dfe6ea;
+  border-color: #dfe6ea;
+  color: #98a5ad;
+  cursor: not-allowed;
+}
+
+@media (max-width: 780px) {
+  .pa-gi-body { grid-template-columns: minmax(0, 1fr); }
+  .pa-gi-main { border-right: none; }
+  .pa-gi-side {
+    flex-direction: row;
+    justify-content: flex-start;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--exam-line);
+    order: -1;
+  }
+  .pa-gi-avatar { width: 44px; height: 44px; }
+  .pa-gi-avatar svg { width: 24px; height: 24px; }
+  .pa-gi-side strong { font-size: 0.9375rem; }
+  .pa-gi-testtitle { font-size: 1.25rem !important; }
+  .pa-gi-foot-spacer { display: none; }
+}
+
+/* ── Exam window, reference layout ───────────────────────────────────────
+   Overrides the earlier navy treatment: white chrome, a boxed clock, and the
+   pale-blue rail the delivery software uses. Loaded after the base exam shell
+   so these win without raising specificity. */
+.pa-attempt-page {
+  --exam-cyan: #29b6d8;
+  --exam-cyan-dark: #1a9cbd;
+  --exam-rail: #d9ecf6;
+  --exam-rail-head: #b9dcee;
+  background: #fff;
+}
+
+.pa-attempt-page .pa-topbar {
+  background: #fff;
+  color: #222;
+  border-bottom: 1px solid #d5dde5;
+  align-items: center;
+}
+
+/* The base rule stacks this column (exam name over title); here the logo and
+   the test name sit on one row, so the direction has to be reset explicitly. */
+.pa-attempt-page .pa-topbar-left {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* The base bar has no vertical padding — fine for two lines of small text,
+   too tight once a logo sits in it. */
+.pa-attempt-page .pa-topbar { padding: 7px 16px; }
+
+.pa-hall-logo { flex-shrink: 0; }
+
+.pa-hall-testname {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #3d3d3d;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Boxed clock digits */
+.pa-clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 10px;
+  border: 1px solid #d5dde5;
+  border-radius: 3px;
+  background: #fff;
+}
+
+.pa-clock-label { font-size: 0.8125rem; font-weight: 700; color: #222; }
+.pa-clock-part { display: inline-flex; align-items: center; gap: 5px; }
+
+.pa-clock-part b {
+  min-width: 26px;
+  padding: 3px 5px;
+  border-radius: 2px;
+  background: #eef2f6;
+  color: #222;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-clock-part i { font-style: normal; color: #7b8794; }
+.pa-clock.warning .pa-clock-part b { background: #fdecec; color: #c62828; }
+
+.pa-ghost-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--exam-cyan);
+  border-radius: 3px;
+  background: #fff;
+  color: var(--exam-cyan-dark);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.pa-ghost-btn:hover { background: #eaf7fb; }
+.pa-ghost-btn.wide { width: 100%; }
+
+/* Section bar */
+.pa-attempt-page .pa-subject-tabs { background: #f1f4f7; }
+
+.pa-attempt-page .pa-subject-tab {
+  background: transparent;
+  border: none;
+  color: #2c3e50;
+  border-radius: 3px;
+  margin: 5px 2px;
+  padding: 7px 14px;
+}
+
+.pa-attempt-page .pa-subject-tab.active {
+  background: #21788f;
+  color: #fff;
+  box-shadow: none;
+}
+
+.pa-attempt-page .pa-subject-tab.active .pa-subject-tab-count {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Question header tools */
+.pa-q-tools {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pa-q-tool {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  color: #5b6b80;
+}
+
+.pa-q-tool small { font-weight: 600; }
+
+.pa-q-tool select {
+  padding: 3px 6px;
+  border: 1px solid #c3ccd6;
+  border-radius: 2px;
+  font: inherit;
+  background: #fff;
+}
+
+.pa-q-time {
+  font-size: 0.8125rem;
+  color: #222;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-report-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: none;
+  background: none;
+  padding: 0;
+  color: #d97706;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pa-report-btn:hover { text-decoration: underline; }
+
+/* Right rail */
+.pa-attempt-page .pa-palette-panel {
+  background: var(--exam-rail);
+  border-left: 1px solid #c2dced;
+}
+
+.pa-side-user {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-bottom: 10px;
+}
+
+.pa-side-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--exam-cyan);
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.pa-side-user strong { font-size: 0.875rem; color: #1b2430; }
+
+/* Status counts: a badge carrying the number, then its label. */
+.pa-attempt-page .pa-legend {
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  font-size: 0.6875rem;
+  color: #1b2430;
+}
+
+.pa-attempt-page .pa-legend span { align-items: center; }
+
+.pa-count {
+  min-width: 19px;
+  height: 19px;
+  padding: 0 4px;
+  border-radius: 3px;
+  display: inline-grid;
+  place-items: center;
+  font-style: normal;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.pa-count.answered { background: var(--exam-answered); }
+.pa-count.not-answered { background: var(--exam-notanswered); }
+.pa-count.marked { background: var(--exam-marked); }
+.pa-count.answered-marked { background: var(--exam-marked); }
+.pa-count.not-visited { background: #fff; color: #1b2430; border: 1px solid #9aa6b2; }
+
+.pa-attempt-page .pa-palette-section {
+  background: var(--exam-rail-head);
+  border: none;
+  border-radius: 0;
+  color: #17414f;
+  font-size: 0.75rem;
+}
+
+/* Palette: fixed five-wide grid, as the reference lays it out. */
+.pa-attempt-page .pa-palette-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 7px;
+}
+
+.pa-attempt-page .pa-palette-btn {
+  width: 100%;
+  height: 30px;
+  background: #fff;
+  border: 1px solid #7b8794;
+  border-radius: 3px;
+  color: #1b2430;
+}
+
+.pa-attempt-page .pa-palette-btn.marked,
+.pa-attempt-page .pa-palette-btn.answered-marked {
+  width: 100%;
+  height: 30px;
+  border-radius: 999px;
+}
+
+.pa-attempt-page .pa-palette-btn.answered { border-radius: 3px 3px 12px 12px; }
+.pa-attempt-page .pa-palette-btn.visited { border-radius: 12px 12px 3px 3px; }
+
+.pa-attempt-page .pa-palette-btn.current {
+  outline: 2px solid #21788f;
+  outline-offset: 1px;
+}
+
+.pa-side-tools { display: flex; gap: 8px; margin-top: 12px; }
+
+.pa-attempt-page .pa-submit-palette-btn {
+  background: var(--exam-cyan);
+  border-color: var(--exam-cyan);
+  color: #fff;
+  border-radius: 3px;
+}
+
+.pa-attempt-page .pa-submit-palette-btn:hover { background: var(--exam-cyan-dark); }
+
+/* Action bar */
+.pa-attempt-page .pa-q-actions { background: #fff; }
+
+.pa-attempt-page .pa-nav-btn {
+  background: #cfe9f3;
+  border-color: #a9d8e8;
+  color: #14506b;
+  border-radius: 3px;
+}
+
+.pa-attempt-page .pa-nav-btn:hover:not(:disabled) { background: #b9e0ee; }
+
+.pa-attempt-page .pa-nav-btn.primary {
+  background: var(--exam-cyan);
+  border-color: var(--exam-cyan);
+  color: #fff;
+}
+
+.pa-attempt-page .pa-nav-btn.primary:hover:not(:disabled) { background: var(--exam-cyan-dark); }
+
+/* Modals */
+.pa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 25, 35, 0.45);
+}
+
+.pa-modal {
+  width: min(460px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: #fff;
+  border-radius: 6px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: #1b2430;
+}
+
+.pa-modal.wide { width: min(680px, 100%); }
+
+.pa-modal h2 { margin: 0; font-size: 1rem; font-weight: 800; }
+
+.pa-modal-field { display: flex; flex-direction: column; gap: 5px; font-size: 0.8125rem; font-weight: 600; }
+
+.pa-modal-field select,
+.pa-modal-field textarea {
+  padding: 8px 10px;
+  border: 1px solid #c3ccd6;
+  border-radius: 4px;
+  font: inherit;
+  font-weight: 400;
+  background: #fff;
+  resize: vertical;
+}
+
+.pa-modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+@media (max-width: 900px) {
+  .pa-attempt-page .pa-legend { grid-template-columns: 1fr 1fr; }
+  .pa-q-tools { gap: 10px; }
+}
+
+/* ── Exam integrity: no selecting, copying or dragging during an attempt ──
+   Scoped to the live exam surfaces only — every solved question page on the
+   rest of the site stays fully selectable. Form controls keep their normal
+   behaviour so typing in the report box still works. */
+.pa-attempt-page,
+.pa-gi {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.pa-attempt-page input,
+.pa-attempt-page textarea,
+.pa-attempt-page select,
+.pa-gi input,
+.pa-gi textarea,
+.pa-gi select {
+  -webkit-user-select: auto;
+  user-select: auto;
+}
+
+.pa-attempt-page img { -webkit-user-drag: none; pointer-events: none; }
+
+/* ── Exam screens on a phone ─────────────────────────────────────────────
+   The palette cannot sit beside the question at this width, and stacking it
+   above pushed the question below the fold — so it becomes a drawer reached
+   from the action bar, where a thumb already is. */
+.pa-palette-toggle { display: none; }
+.pa-palette-close { display: none; }
+.pa-palette-backdrop { display: none; }
+
+@media (max-width: 860px) {
+  /* Header: mark only, and the clock stays — it is the one thing a candidate
+     must never lose sight of. The old rule hid it entirely. */
+  .pa-attempt-page .pa-topbar {
+    padding: 6px 10px;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .pa-attempt-page .pa-topbar-center { display: block; flex-shrink: 0; }
+  .pa-hall-testname { display: none; }
+  .pa-hall-logo .logo-words { display: none; }
+
+  .pa-clock { padding: 4px 7px; gap: 5px; }
+  .pa-clock-label { display: none; }
+  .pa-clock-part b { min-width: 21px; font-size: 0.75rem; padding: 2px 3px; }
+
+  .pa-attempt-page .pa-topbar-right .pa-ghost-btn {
+    padding: 6px 9px;
+    font-size: 0.6875rem;
+  }
+
+  /* Sections scroll rather than wrap or clip. */
+  .pa-attempt-page .pa-subject-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: none;
+  }
+  .pa-attempt-page .pa-subject-tabs::-webkit-scrollbar { display: none; }
+  .pa-attempt-page .pa-subject-tab { flex-shrink: 0; }
+  .pa-sections-label { display: none; }
+
+  /* Question gets the full width. */
+  .pa-attempt-body { grid-template-columns: 1fr; }
+
+  .pa-attempt-page .pa-palette-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(320px, 88vw);
+    max-height: none;
+    order: 0;
+    z-index: 55;
+    transform: translateX(101%);
+    transition: transform 0.22s ease;
+    overflow-y: auto;
+    box-shadow: -8px 0 24px rgba(15, 25, 35, 0.18);
+    border-left: 1px solid #c2dced;
+    border-bottom: none;
+  }
+
+  .pa-attempt-page .pa-palette-panel.is-open { transform: translateX(0); }
+
+  .pa-palette-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 54;
+    border: none;
+    padding: 0;
+    background: rgba(15, 25, 35, 0.42);
+  }
+
+  .pa-palette-close {
+    display: block;
+    align-self: flex-end;
+    border: none;
+    background: none;
+    font-size: 26px;
+    line-height: 1;
+    padding: 0 4px 4px;
+    color: #35455a;
+    cursor: pointer;
+  }
+
+  .pa-palette-toggle { display: inline-flex; }
+
+  /* Action bar: two even rows rather than four cramped buttons. */
+  .pa-attempt-page .pa-q-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 9px 10px;
+  }
+
+  .pa-actions-left,
+  .pa-actions-right { display: contents; }
+
+  .pa-attempt-page .pa-nav-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
+
+  /* Five buttons in two columns leaves the primary action alone on the last
+     row — give it the full width it deserves. */
+  .pa-attempt-page .pa-nav-btn.primary { grid-column: 1 / -1; }
+
+  /* Question header stacks so the tools never crowd the number. */
+  .pa-attempt-page .pa-q-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
+  }
+
+  .pa-q-tools { gap: 10px; font-size: 0.6875rem; }
+
+  .pa-attempt-page .pa-legend { grid-template-columns: 1fr 1fr; font-size: 0.6875rem; }
+
+  /* Instruction screens */
+  .pa-gi-main { padding: 14px 14px 20px; }
+  .pa-gi-list { padding-left: 20px; }
+  .pa-gi-sublist { padding-left: 18px; }
+  .pa-gi-meta { flex-direction: column; gap: 4px; }
+  .pa-gi-foot { padding: 10px 12px; gap: 8px; }
+  .pa-gi-next, .pa-gi-prev, .pa-gi-begin { padding: 9px 14px; }
+}
+
+@media (max-width: 420px) {
+  .pa-attempt-page .pa-palette-grid { grid-template-columns: repeat(5, 1fr); }
+  .pa-attempt-page .pa-q-text { font-size: 0.9375rem; }
+  .pa-attempt-page .pa-option { padding: 10px 8px; font-size: 0.9375rem; }
+  .pa-gi-testtitle { font-size: 1.125rem !important; }
+}
+
+/* ── Review mode: the same exam screen with the key revealed ─────────────
+   Reached from "View solutions" on the analytics page. No timer, no
+   fullscreen, nothing to submit — the layout is kept identical so a candidate
+   revisits the paper exactly as they sat it. */
+.pa-review-flag {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 3px;
+  background: #eef4f8;
+  border: 1px solid #cdd6e0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: #35455a;
+}
+
+.pa-attempt-page .pa-option.is-correct {
+  background: #e9f7ee;
+  border-color: var(--exam-answered);
+}
+
+.pa-attempt-page .pa-option.is-wrong {
+  background: #fdecec;
+  border-color: var(--exam-notanswered);
+}
+
+.pa-opt-tag {
+  margin-left: auto;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pa-opt-tag.correct { background: var(--exam-answered); color: #fff; }
+.pa-opt-tag.wrong { background: var(--exam-notanswered); color: #fff; }
+
+.pa-review-explanation {
+  margin-top: 20px;
+  padding: 16px 18px;
+  border: 1px solid var(--exam-line);
+  border-left: 3px solid var(--exam-blue);
+  border-radius: 0 6px 6px 0;
+  background: #f7f9fc;
+}
+
+.pa-review-explanation h3 {
+  margin: 0 0 10px;
+  font-size: 0.875rem;
+  font-weight: 800;
+  color: var(--exam-blue);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+@media (max-width: 620px) {
+  .pa-opt-tag { margin-left: 0; }
+  .pa-review-explanation { padding: 13px 14px; }
+}
+
+/* ── Water / mirror image words (reasoning papers) ────────────────────────
+   [[water:MARKET]] and [[mirror:MARKET]] render as real, selectable text under
+   a CSS transform instead of an image. The word stays indexable and inherits
+   the theme colour, which an <img> or text-in-SVG cannot do. inline-block is
+   required — transforms do not apply to inline boxes. */
+.mv-water-image,
+.mv-mirror-image {
+  display: inline-block;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.mv-water-image  { transform: scaleY(-1); }
+.mv-mirror-image { transform: scaleX(-1); }
+.mv-rotate-image { display: inline-block; font-weight: 600; letter-spacing: 0.06em;
+                   white-space: nowrap; transform: rotate(180deg); }
+
+/* The GIVEN figure in a water-image question: the word set larger, standing on
+   the hatched surface line the paper prints to show where the reflection is
+   taken. currentColor throughout, so it follows the theme like the text it is. */
+.mv-waterline {
+  display: inline-block;
+  position: relative;
+  font-size: 1.6em;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.3;
+  padding: 0 0.08em 0.24em;
+  margin: 0.15em 0 0.9em;
+  border-bottom: 2px solid currentColor;
+  white-space: nowrap;
+}
+.mv-waterline::after {          /* the diagonal hatching under the rule */
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 0.42em;
+  background: repeating-linear-gradient(115deg,
+    currentColor 0 1.5px, transparent 1.5px 7px);
+}
+
+/* Inline line-art figures ([[fig:key]]). Drawn in the page's own ink via
+   currentColor, so they follow light/dark automatically — which an <img>
+   can never do, since page CSS cannot reach inside it. */
+.mv-figure-wrap { display: block; margin: 0.9rem 0; }
+.mv-figure {
+  display: block;
+  width: auto;
+  height: auto;
+  /* Both caps are needed: a wide figure is limited by width, a tall one by
+     height. With only max-width, the two-square Q31 figure (viewBox 104x204)
+     rendered 340px wide and ~660px tall and swamped the question. */
+  max-width: min(100%, 420px);
+  max-height: 230px;
+  color: inherit;
+}
+.mv-figure-missing { color: var(--red, #b91c1c); font-style: italic; }
+/* Figures that sit inside an option row must stay small enough that the option
+   letter and the diagram read as one line, not a diagram with a letter beside it. */
+/* An SVG sized only by max-* collapses to 0x0 when its container has no width
+   of its own — which is exactly what happened inside the option rows. Give the
+   small variant an explicit height and let the viewBox aspect supply the width. */
+.mv-figure-sm {
+  display: inline-block;
+  height: 78px;
+  width: auto;
+  max-width: 100%;
+  max-height: none;
+  vertical-align: middle;
+}
+.mv-figure-wrap:has(.mv-figure-sm) { display: inline-block; margin: 0.1rem 0; vertical-align: middle; }

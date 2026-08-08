@@ -88,6 +88,9 @@ export type PaperAttemptResult = {
   negativeMarking?: number
   timeTakenSeconds: number
   subjects: SubjectResult[]
+  /** questionSlug -> chosen option key. Needed to show, in review, which
+   *  option the candidate actually picked rather than only the right one. */
+  answers?: Record<string, string>
 }
 
 export function readPaperResults(): PaperAttemptResult[] {

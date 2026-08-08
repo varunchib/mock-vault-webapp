@@ -8,10 +8,10 @@ import {
   Search,
   X,
 } from 'lucide-react'
-import { Link, Navigate, useParams, useSearchParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { LoginModal } from '../components/auth/LoginModal'
-import { MocksComingSoon } from '../components/common/MocksComingSoon'
+import { MockTestList } from '../components/common/MockTestList'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { guidePathForExam } from '../lib/examLinks'
 import {
@@ -37,7 +37,8 @@ import { subExamsOf } from '../lib/examTree'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { ExplanationText } from '../components/common/ExplanationText'
-import { examFaqs, type FaqItem } from '../data/examFaq'
+import { examFaqs } from '../data/examFaq'
+import { FaqAccordion } from '../components/common/FaqAccordion'
 import { postGuides } from '../data/postGuides'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
@@ -72,14 +73,25 @@ function getDisplayDate(paper: { heldOn?: string; shift: string; year: string })
 
 const FREE_QUESTION_LIMIT = 10
 const PAGE_SIZE = 15
+
+// Editorial bookkeeping, not something a reader should be offered as a filter.
+// Topical tags that merely mention figures ("Figure Series", "Venn Diagrams",
+// "Counting Figures") are genuine sub-topics and deliberately not listed here.
+const INTERNAL_TAGS = new Set(['Worked Solution', 'diagram-pending'])
 // Collapse the sub-exam grid past this many. The grid is 4-up on desktop, so 8
 // is exactly two full rows. Pagination would be wrong here: the largest board
 // has 7 sub-exams, so page 2 would hold a single chip.
 const SUBEXAM_COLLAPSE_AT = 8
 
-function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagClick: (tag: string) => void }) {
+function SubjectMCQ({ q, idx, topics, onTagClick }: {
+  q: Question; idx: number; topics: string[]; onTagClick: (tag: string) => void
+}) {
   const [selected, setSelected] = useState<string | null>(null)
   const answered = selected !== null
+  // q.tags[0] is whatever happens to come first, which is usually the board
+  // ("RSMSSB") rather than anything about the question. Show the first tag that
+  // survived the sub-topic filter, and no chip at all when none did.
+  const topicTag = q.tags.find((t) => topics.includes(t))
 
   function pick(key: string) {
     if (answered) return
@@ -90,9 +102,9 @@ function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagCli
     <div className="sq-card">
       <div className="sq-card-head">
         <span className="sq-q-num">Q{idx + 1}</span>
-        {q.tags[0] && (
-          <button type="button" className="sq-tag sq-tag-btn" onClick={() => onTagClick(q.tags[0])}>
-            {q.tags[0]}
+        {topicTag && (
+          <button type="button" className="sq-tag sq-tag-btn" onClick={() => onTagClick(topicTag)}>
+            {topicTag}
           </button>
         )}
         <span className="sq-source">{q.paper}{q.year ? ` · ${q.year}` : ' · PYQ'}</span>
@@ -130,37 +142,11 @@ function SubjectMCQ({ q, idx, onTagClick }: { q: Question; idx: number; onTagCli
   )
 }
 
-function FaqAccordion({ items }: { items: FaqItem[] }) {
-  const [open, setOpen] = useState<number | null>(null)
-  return (
-    <section className="ep-faq" aria-label="Frequently Asked Questions">
-      <h2 className="ep-faq-title">Frequently Asked Questions</h2>
-      <dl className="ep-faq-list">
-        {items.map((item, i) => (
-          <div className={`ep-faq-item${open === i ? ' open' : ''}`} key={i}>
-            <dt>
-              <button
-                type="button"
-                className="ep-faq-q"
-                aria-expanded={open === i}
-                onClick={() => setOpen(open === i ? null : i)}
-              >
-                {item.q}
-                <ChevronDown size={15} className="ep-faq-chevron" />
-              </button>
-            </dt>
-            {open === i && <dd className="ep-faq-a">{item.a}</dd>}
-          </div>
-        ))}
-      </dl>
-    </section>
-  )
-}
-
 export function ExamPage() {
   const { slug } = useParams()
   const [searchParams] = useSearchParams()
   const { isAuthenticated } = useAuth()
+  const navigate = useNavigate()
 
   const initialTab = (searchParams.get('tab') as Tab | null) ?? 'papers'
   const initialSubject = searchParams.get('subject')
@@ -253,6 +239,15 @@ export function ExamPage() {
     () => allMocks.filter((m) => m.examSlug === slug && m.questions > 0),
     [allMocks, slug],
   )
+  // The listing shows every series for the exam, populated or not, with its
+  // real question count — the header badge and tab count above still report
+  // only the attemptable ones, so neither number promises more than exists.
+  const examMocksAll = useMemo(
+    () => allMocks
+      .filter((m) => m.examSlug === slug)
+      .sort((a, b) => (b.questions > 0 ? 1 : 0) - (a.questions > 0 ? 1 : 0)),
+    [allMocks, slug],
+  )
 
   const filteredPapers = useMemo(() => {
     const q = paperSearch.trim().toLowerCase()
@@ -302,12 +297,59 @@ export function ExamPage() {
     return paperQuestions.filter((q) => q.subject.toLowerCase() === selectedSubject.toLowerCase())
   }, [paperQuestions, selectedSubject])
 
-  // Sub-topics available for the selected subject (from tags)
+  // Sub-topics available for the selected subject.
+  //
+  // Every question also carries paper metadata as tags — board, post, year,
+  // shift and zone (e.g. "RSMSSB", "Patwari", "2025", "Shift 1", "SPZ8") — plus
+  // the subject's own name. Those sat in this list as if they were sub-topics,
+  // so the RSMSSB Patwari English section offered "2025" and "SPZ8" as filters.
+  //
+  // A real sub-topic GROUPS questions, which gives two bounds without needing a
+  // hard-coded vocabulary:
+  //   • it cannot be on every question — such a tag filters nothing, and that is
+  //     exactly what paper metadata and the subject's own name look like;
+  //   • it must be on at least two — some papers tag every question uniquely
+  //     ("SSC CGL 17 Sep 2025 Q76"), which otherwise produced one dead chip per
+  //     question (80 of them on NEET Botany).
+  //
+  // A tag repeating the subject's own name is also dropped: a "Quantitative
+  // Aptitude" chip inside Quantitative Aptitude reads like "show everything" but
+  // silently filters to whichever questions happened to carry the generic tag.
+  //
+  // The counts must be taken PER PAPER, because this hub aggregates every paper
+  // for the exam. "2017" sits on all of the 2017 paper but only a slice of the
+  // subject once other years are included, so a whole-subject count lets it
+  // through — which is how JKPSI kept offering "2017" and "JKSSB" as topics.
+  // A tag covering an entire paper's block describes the paper, not the topic.
   const availableTopics = useMemo(() => {
-    const set = new Set<string>()
-    subjectQuestions.forEach((q) => q.tags.forEach((t) => set.add(t)))
-    return [...set].sort()
-  }, [subjectQuestions])
+    if (!subjectQuestions.length) return []
+    const papers = new Map<string, { size: number; tags: Map<string, number> }>()
+    for (const q of subjectQuestions) {
+      const key = q.paperSlug ?? q.paper ?? ''
+      let p = papers.get(key)
+      if (!p) { p = { size: 0, tags: new Map() }; papers.set(key, p) }
+      p.size += 1
+      for (const t of q.tags) p.tags.set(t, (p.tags.get(t) ?? 0) + 1)
+    }
+    const total = new Map<string, number>()
+    const wholePaper = new Map<string, boolean>()
+    for (const p of papers.values()) {
+      for (const [tag, n] of p.tags) {
+        total.set(tag, (total.get(tag) ?? 0) + n)
+        const covers = n === p.size
+        wholePaper.set(tag, wholePaper.has(tag) ? wholePaper.get(tag)! && covers : covers)
+      }
+    }
+    return [...total.entries()]
+      .filter(([tag, n]) =>
+        n >= 2
+        && n < subjectQuestions.length
+        && !INTERNAL_TAGS.has(tag)
+        && !wholePaper.get(tag)
+        && tag.toLowerCase() !== (selectedSubject ?? '').toLowerCase())
+      .map(([tag]) => tag)
+      .sort()
+  }, [subjectQuestions, selectedSubject])
 
   const filteredSubjectQuestions = useMemo(() => {
     setVisibleCount(PAGE_SIZE)
@@ -544,15 +586,20 @@ export function ExamPage() {
           PYQ Papers
           {papers.length > 0 && <span className="ep-tab-count">{papers.length}</span>}
         </button>
-        <button
-          className={`ep-tab${activeTab === 'mocks' ? ' active' : ''}`}
-          type="button"
-          onClick={() => { setActiveTab('mocks'); setSelectedSubject(null) }}
-        >
-          <ClipboardList size={14} />
-          Mock Tests
-          {examMocks.length > 0 && <span className="ep-tab-count">{examMocks.length}</span>}
-        </button>
+        {/* No mock series at all for this exam means no tab: an empty tab is
+            noise, and on a BOARD page (an aggregator of exams) it used to be
+            wrong outright — a mock belongs to an exam, never to a board. */}
+        {examMocksAll.length > 0 && (
+          <button
+            className={`ep-tab${activeTab === 'mocks' ? ' active' : ''}`}
+            type="button"
+            onClick={() => { setActiveTab('mocks'); setSelectedSubject(null) }}
+          >
+            <ClipboardList size={14} />
+            Mock Tests
+            {examMocks.length > 0 && <span className="ep-tab-count">{examMocks.length}</span>}
+          </button>
+        )}
         <button
           className={`ep-tab${activeTab === 'subjects' ? ' active' : ''}`}
           type="button"
@@ -691,25 +738,16 @@ export function ExamPage() {
             <h2>Mock tests</h2>
           </div>
 
-          {examMocks.length === 0 ? (
-            <MocksComingSoon />
-          ) : (
-            <div className="ep-mocks-list">
-              {examMocks.map((mock) => (
-                <Link key={mock.slug} to={`/mock-test/${mock.examSlug}`} className="ep-resource-card">
-                  <span className="ep-resource-icon"><FileText size={18} /></span>
-                  <span className="ep-resource-copy">
-                    <strong>{mock.title}</strong>
-                    <small>
-                      {mock.questions} questions · {mock.durationMinutes} min · {mock.difficulty}
-                      {mock.isFree ? ' · Free' : ''}
-                    </small>
-                  </span>
-                  <ChevronRight size={15} className="ep-resource-chev" />
-                </Link>
-              ))}
-            </div>
-          )}
+          {/* The test series lives here, not on a /mock-test page of its own:
+              a candidate picks the exam first, then chooses between papers and
+              tests, so a separate URL split one exam across two pages. */}
+          <MockTestList
+            mocks={examMocksAll}
+            onStart={(mock) => {
+              if (!isAuthenticated) { setLoginOpen(true); return }
+              navigate(`/mock-attempt/${mock.slug}`)
+            }}
+          />
         </div>
       )}
 
@@ -781,7 +819,7 @@ export function ExamPage() {
             <>
               <div className="sq-list">
                 {visibleSubjectQuestions.map((q, i) => (
-                  <SubjectMCQ key={q.slug} q={q} idx={i} onTagClick={setTopicFilter} />
+                  <SubjectMCQ key={q.slug} q={q} idx={i} topics={availableTopics} onTagClick={setTopicFilter} />
                 ))}
               </div>
 

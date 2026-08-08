@@ -214,6 +214,64 @@ function isInstructionLine(line: string): boolean {
   return (line.endsWith(':') || INSTRUCTION_RE.test(line.trim())) && !line.includes('/')
 }
 
+// ── Structural line roles ────────────────────────────────────────────────────
+// Every line of a multi-line question used to render as the same paragraph, so
+// an Assertion & Reason question read as four visually identical lines and a
+// statement list gave the eye nothing to latch onto. Each role below now gets
+// its own treatment.
+
+// "Assertion (A): …", "Reason (R): …", "Statement I: …"
+const LABELLED_RE =
+  /^((?:Assertion|Reason)\s*\([AR]\)|Statement\s*(?:[-–—]\s*)?(?:I{1,3}|IV|[1-4])|Statement\s*\([A-D]\))\s*:\s*([\s\S]+)$/i
+
+// "1. Kathmandu", "A. Appalachian", "2) Nathu La", and the Roman-numeral
+// statement lists UPSC uses ("I. There is wide occurrence of spindle-whorls…").
+// Roman numerals are matched case-sensitively as whole markers so ordinary
+// prose starting with a capital letter is not mistaken for a list item; the
+// "two consecutive items" rule below is the real safeguard.
+const ITEM_RE = /^(\d{1,2}|[A-H]|[IVX]{1,4}|[ivx]{1,4})[.)]\s+(.+)$/
+
+// A whole line that is nothing but bold — a column header such as
+// "**List-I (Coal Field)**" or "**(Pass) — (State/Union Territory)**"
+const HEADER_ONLY_RE = /^\*\*(.+?)\*\*$/
+
+// The closing rubric: "Select the correct answer from the code given below:"
+const DIRECTIVE_RE = /^(select|choose|mark|identify|use|answer|code)\b/i
+
+function isDirectiveLine(line: string): boolean {
+  return line.endsWith(':') && DIRECTIVE_RE.test(line.trim())
+}
+
+// "Given below are two statements, one is labelled as Assertion (A) and the
+// other as Reason (R)." — boilerplate that opens every A&R question. It read at
+// the same size and weight as the two claims it introduces, which gave the
+// least important line on the card equal footing with the most important ones.
+function isClaimPreamble(line: string): boolean {
+  return /assertion/i.test(line) && /reason/i.test(line) && !LABELLED_RE.test(line)
+}
+
+function LabelledStatement({ label, body }: { label: string; body: string }) {
+  return (
+    <div className="qr-claim">
+      <span className="qr-claim-label">{label}</span>
+      <span className="qr-claim-body">{renderInline(body)}</span>
+    </div>
+  )
+}
+
+function ItemList({ items }: { items: Array<{ marker: string; body: string }> }) {
+  return (
+    <ul className="qr-items">
+      {items.map((it, i) => (
+        <li key={i} className="qr-item">
+          <span className="qr-item-marker">{it.marker}</span>
+          <span className="qr-item-body">{renderInline(it.body)}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function isErrorSentence(line: string): boolean {
   return /\(\d+\)/.test(line) && line.includes('/')
 }
@@ -250,24 +308,89 @@ function MultilineText({ text, className }: { text: string; className?: string }
 
   const hasInstruction = rawLines.length > 1 && isInstructionLine(rawLines[0])
 
+  // Parsed into blocks first (rather than emitted line by line) so that a
+  // header followed by its list can be recognised as one unit — which is what
+  // lets two such units sit side by side in a match-the-following question.
+  type Block =
+    | { k: 'lead' | 'text' | 'directive' | 'error' | 'analogy' | 'preamble'; line: string }
+    | { k: 'colhead'; label: string }
+    | { k: 'items'; items: Array<{ marker: string; body: string }> }
+    | { k: 'claim'; label: string; body: string }
+
+  const blocks: Block[] = []
+  for (let i = 0; i < rawLines.length; i++) {
+    const line = rawLines[i]
+
+    if (i === 0 && isClaimPreamble(line)) { blocks.push({ k: 'preamble', line }); continue }
+    if (i === 0 && hasInstruction) { blocks.push({ k: 'lead', line }); continue }
+    if (isErrorSentence(line)) { blocks.push({ k: 'error', line }); continue }
+    if (ANALOGY_RE.test(line)) { blocks.push({ k: 'analogy', line }); continue }
+
+    const header = line.match(HEADER_ONLY_RE)
+    if (header) { blocks.push({ k: 'colhead', label: header[1] }); continue }
+
+    const labelled = line.match(LABELLED_RE)
+    if (labelled) { blocks.push({ k: 'claim', label: labelled[1], body: labelled[2] }); continue }
+
+    // A numbered/lettered list, but only when at least two such lines run
+    // together — a lone "A. P. J. Abdul Kalam was…" is prose, not a list.
+    if (ITEM_RE.test(line)) {
+      const items: Array<{ marker: string; body: string }> = []
+      let j = i
+      for (; j < rawLines.length; j++) {
+        const m = rawLines[j].match(ITEM_RE)
+        if (!m) break
+        items.push({ marker: m[1], body: m[2] })
+      }
+      if (items.length >= 2) { blocks.push({ k: 'items', items }); i = j - 1; continue }
+    }
+
+    if (isDirectiveLine(line)) { blocks.push({ k: 'directive', line }); continue }
+    blocks.push({ k: 'text', line })
+  }
+
+  const nodes: React.ReactNode[] = []
+  for (let i = 0; i < blocks.length; i++) {
+    const b = blocks[i]
+
+    // Two headed lists back to back are a match-the-following pair: show them
+    // as columns so the eye can run across the two lists instead of scrolling.
+    if (b.k === 'colhead' && blocks[i + 1]?.k === 'items' &&
+        blocks[i + 2]?.k === 'colhead' && blocks[i + 3]?.k === 'items') {
+      const [h1, l1, h2, l2] = blocks.slice(i, i + 4) as
+        [Extract<Block, { k: 'colhead' }>, Extract<Block, { k: 'items' }>,
+         Extract<Block, { k: 'colhead' }>, Extract<Block, { k: 'items' }>]
+      nodes.push(
+        <div key={i} className="qr-pairgrid">
+          {[[h1, l1], [h2, l2]].map(([h, l], c) => (
+            <div key={c} className="qr-pairgrid-col">
+              <div className="qr-colhead">
+                {renderInline((h as Extract<Block, { k: 'colhead' }>).label)}
+              </div>
+              <ItemList items={(l as Extract<Block, { k: 'items' }>).items} />
+            </div>
+          ))}
+        </div>,
+      )
+      i += 3
+      continue
+    }
+
+    switch (b.k) {
+      case 'lead': nodes.push(<p key={i} className="qr-lead">{renderInline(b.line)}</p>); break
+      case 'preamble': nodes.push(<p key={i} className="qr-preamble">{renderInline(b.line)}</p>); break
+      case 'error': nodes.push(<ErrorSentence key={i} text={b.line} />); break
+      case 'analogy': nodes.push(<AnalogyDisplay key={i} analogy={b.line} />); break
+      case 'colhead': nodes.push(<div key={i} className="qr-colhead">{renderInline(b.label)}</div>); break
+      case 'claim': nodes.push(<LabelledStatement key={i} label={b.label} body={b.body} />); break
+      case 'items': nodes.push(<ItemList key={i} items={b.items} />); break
+      case 'directive': nodes.push(<p key={i} className="qr-directive">{renderInline(b.line)}</p>); break
+      default: nodes.push(<p key={i} className="qr-text">{renderInline(b.line)}</p>)
+    }
+  }
+
   return (
-    <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
-      {rawLines.map((line, i) => {
-        if (i === 0 && hasInstruction) {
-          return <p key={i} className="qr-instruction">{renderInline(line)}</p>
-        }
-        if (isErrorSentence(line)) {
-          return <ErrorSentence key={i} text={line} />
-        }
-        // Analogy line within multi-line question
-        if (ANALOGY_RE.test(line)) {
-          return <AnalogyDisplay key={i} analogy={line} />
-        }
-        return (
-          <p key={i} className="qr-text">{renderInline(line)}</p>
-        )
-      })}
-    </div>
+    <div className={['qr-multiline', className].filter(Boolean).join(' ')}>{nodes}</div>
   )
 }
 

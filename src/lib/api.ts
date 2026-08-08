@@ -46,6 +46,16 @@ export type Question = {
   translations?: Partial<Record<"en" | "hi", QuestionTranslation>>;
 };
 
+/** Trimmed question shape for the "Related questions" links. */
+export type RelatedQuestion = {
+  urlCode: string;
+  question: string;
+  subject: string;
+  examName: string;
+  examSlug: string;
+  year: string;
+};
+
 export type Paper = {
   slug: string;
   examSlug: string;
@@ -75,6 +85,8 @@ export type MockItem = {
   isFree: boolean;
   subjects: string[];
   negativeMarking: number;
+  /** Not derivable from question count — some papers are 2 marks/question. */
+  maxMarks?: number;
 };
 
 export type CutoffCategory = {
@@ -278,6 +290,10 @@ export async function fetchPaperQuestions(slug: string): Promise<Question[]> {
 
 export function fetchQuestionBySlug(slug: string): Promise<Question> {
   return requestJson<Question>(`/api/v1/questions/${encodeURIComponent(slug)}`);
+}
+
+export function fetchRelatedQuestions(slug: string): Promise<RelatedQuestion[]> {
+  return requestJson<RelatedQuestion[]>(`/api/v1/questions/${encodeURIComponent(slug)}/related`);
 }
 
 export function fetchMockCatalog(): Promise<MockItem[]> {
@@ -565,6 +581,9 @@ export type LeaderboardEntry = {
   userId: string
   name: string
   scorePct: number
+  /** Raw numbers behind the ratio, so the board can show "4/100". */
+  correct: number
+  total: number
   isMe: boolean
 }
 
