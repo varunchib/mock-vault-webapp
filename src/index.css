@@ -12133,10 +12133,9 @@ html {
 .pa-palette-btn.marked { background: #c4b5fd; color: #4c1d95; }
 .pa-palette-btn.answered-marked { background: #a855f7; color: #fff; }
 .pa-palette-btn.wrong { background: var(--red-border); color: #7f1d1d; }
-/* Review mode recolours the palette by outcome rather than by attempt
-   state: solid green for right, solid red for wrong, grey for skipped. */
-.pa-palette-btn.correct { background: var(--exam-answered); color: #fff; }
-.pa-attempt-page .pa-palette-btn.wrong { background: var(--exam-notanswered); color: #fff; }
+/* Review-mode palette colours are defined with the exam-hall statuses further
+   down, NOT here: at this specificity the base `.pa-attempt-page
+   .pa-palette-btn` rule below wins on source order and repaints them. */
 .pa-count.correct { background: var(--exam-answered); color: #fff; }
 .pa-count.wrong { background: var(--exam-notanswered); color: #fff; }
 .pa-palette-btn.current { outline: 2.5px solid var(--blue); outline-offset: 1px; }
@@ -19377,6 +19376,26 @@ html {
 
 .pa-attempt-page .pa-palette-btn.answered { border-radius: 3px 3px 12px 12px; }
 .pa-attempt-page .pa-palette-btn.visited { border-radius: 12px 12px 3px 3px; }
+
+/* Review mode recolours the palette by OUTCOME rather than attempt state.
+   These must come after the `.pa-attempt-page .pa-palette-btn` rule above,
+   which sets `background: #fff`. Written earlier in the file as plain
+   `.pa-palette-btn.correct` it lost on source order at equal specificity, so
+   every correct answer rendered white while the legend still counted it —
+   which read as "my answers were never saved". */
+.pa-attempt-page .pa-palette-btn.correct {
+  background: var(--exam-answered);
+  border-color: var(--exam-answered);
+  color: #fff;
+  border-radius: 3px 3px 12px 12px;
+}
+
+.pa-attempt-page .pa-palette-btn.wrong {
+  background: var(--exam-notanswered);
+  border-color: var(--exam-notanswered);
+  color: #fff;
+  border-radius: 12px 12px 3px 3px;
+}
 
 .pa-attempt-page .pa-palette-btn.current {
   outline: 2px solid #21788f;
