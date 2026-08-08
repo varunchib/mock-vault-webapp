@@ -19765,3 +19765,16 @@ html {
   vertical-align: middle;
 }
 .mv-figure-wrap:has(.mv-figure-sm) { display: inline-block; margin: 0.1rem 0; vertical-align: middle; }
+/* Review could not load the answer sheet. Saying so is better than a palette of
+   blank chips, which reads as "you skipped every question". */
+.pa-review-noanswers {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--exam-line);
+  border-left: 3px solid var(--exam-notanswered);
+  border-radius: 0 5px 5px 0;
+  background: #fff7f7;
+  font-size: 12.5px;
+  line-height: 1.55;
+  color: var(--ink2);
+}

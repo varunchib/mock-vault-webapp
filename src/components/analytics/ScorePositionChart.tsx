@@ -16,13 +16,18 @@ type Props = {
   officialCutoffLabel?: string
 }
 
-/** Round a rough step up to a "nice" 1/2/5 × 10ⁿ value, for clean Y ticks. */
+/**
+ * Round a rough step up to a "nice" 1/2/5 × 10ⁿ value, for clean Y ticks.
+ *
+ * Floored at 1: the axis counts students, and with only a handful of attempts
+ * rough/4 falls below 1 and the axis read "0, 0.5, 1, 1.5, 2" — half a student.
+ */
 function niceStep(rough: number): number {
   if (rough <= 0) return 1
   const mag = Math.pow(10, Math.floor(Math.log10(rough)))
   const norm = rough / mag
   const nice = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10
-  return nice * mag
+  return Math.max(1, Math.round(nice * mag))
 }
 
 /**

@@ -15,6 +15,7 @@ import { useAuth } from '../context/useAuth'
 import {
   APIError,
   fetchActiveLiveAttempts,
+  fetchAttemptAnswers,
   fetchMockBySlug,
   fetchMockQuestions,
   fetchPaperBySlug,
@@ -168,6 +169,9 @@ export function PaperAttemptPage() {
   const [confirmSubmit, setConfirmSubmit] = useState(false)
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const [activeSubject, setActiveSubject] = useState<string | null>(null)
+  // True when review has no answer sheet to show — better to say so than to
+  // render a palette of blank chips that reads as "you skipped everything".
+  const [answersUnavailable, setAnswersUnavailable] = useState(false)
 
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [exiting, setExiting] = useState(false)
@@ -241,7 +245,20 @@ export function PaperAttemptPage() {
         // fullscreen, nothing to submit.
         if (isReview) {
           const saved = readPaperResults().find((r) => r.paperSlug === record.slug)
-          if (saved?.answers) setAnswers(saved.answers)
+          if (saved?.answers && Object.keys(saved.answers).length) {
+            setAnswers(saved.answers)
+          } else {
+            // Nothing stored in THIS browser — the attempt was sat elsewhere, or
+            // predates local answer capture. The server keeps the real answer
+            // sheet, so fall back to it rather than showing a blank palette that
+            // implies every question was skipped.
+            const remote = await fetchAttemptAnswers(record.slug).catch(() => null)
+            if (remote?.answers && Object.keys(remote.answers).length) {
+              setAnswers(remote.answers)
+            } else {
+              setAnswersUnavailable(true)
+            }
+          }
           setExamStarted(true)
           // The live attempt scopes the palette to one section at a time; review
           // has to do the same, or the sidebar dumps all 100 questions into one
@@ -1320,7 +1337,13 @@ export function PaperAttemptPage() {
             <strong>{user?.name ?? 'Candidate'}</strong>
           </div>
 
-          {isReview ? (
+          {isReview && answersUnavailable ? (
+            <p className="pa-review-noanswers">
+              Your answer sheet for this attempt could not be loaded, so the palette
+              cannot show which questions you got right. The correct option and the
+              solution are still shown on every question.
+            </p>
+          ) : isReview ? (
             <div className="pa-legend">
               <span><i className="pa-count correct">{reviewTally.correct}</i>Correct</span>
               <span><i className="pa-count wrong">{reviewTally.wrong}</i>Wrong</span>

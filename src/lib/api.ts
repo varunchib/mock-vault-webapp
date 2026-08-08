@@ -440,6 +440,19 @@ export function syncLiveAttempt(params: {
   });
 }
 
+/**
+ * Responses from the caller's most recent completed attempt.
+ *
+ * Review mode used to read these from localStorage alone, so a solved paper
+ * reopened on another device — or from the admin panel — showed an empty
+ * answer sheet in which every question looked skipped.
+ */
+export function fetchAttemptAnswers(slug: string): Promise<{ answers: Record<string, string> }> {
+  return requestJson<{ answers: Record<string, string> }>(
+    `/api/v1/activity/attempt/answers?slug=${encodeURIComponent(slug)}`,
+  );
+}
+
 export function fetchActiveLiveAttempts(): Promise<ActiveAttempt[]> {
   return requestJson<ActiveAttempt[]>("/api/v1/activity/attempt/active");
 }
