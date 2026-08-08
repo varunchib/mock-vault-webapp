@@ -490,14 +490,36 @@ export function PaperAttemptPage() {
     const marksPerQSave = savedMaxMarks / questions.length
     const rawScore = parseFloat((correct * marksPerQSave - wrong * negMark).toFixed(2))
 
-    if (attemptId) {
-      const submitPayload = { attemptId, paperSlug: paper.slug, correct, wrong, skipped, timeTakenSeconds: timeTaken, answers }
-      submitLiveAttempt(submitPayload).catch(async (err) => {
+    // The server copy is the only one that survives a change of device, so a
+    // missing attemptId must not mean "don't record it". startLiveAttempt fails
+    // silently (a blip at the moment the exam opened is enough), and every such
+    // attempt used to reach submit with nowhere to go but localStorage — which
+    // is why finished papers could reopen with an empty answer sheet.
+    void (async () => {
+      let id = attemptId
+      if (!id) {
+        try {
+          const started = await startLiveAttempt({
+            paperSlug: paper.slug,
+            examSlug: paper.examSlug,
+            paperTitle: paper.title,
+            examName: paper.examName ?? '',
+            totalQuestions: questions.length,
+            durationSeconds: (paper.durationMinutes > 0 ? paper.durationMinutes : 120) * 60,
+          })
+          id = started?.attemptId ?? null
+        } catch { /* offline or signed out — the local copy still stands */ }
+      }
+      if (!id) return
+      const submitPayload = { attemptId: id, paperSlug: paper.slug, correct, wrong, skipped, timeTakenSeconds: timeTaken, answers }
+      try {
+        await submitLiveAttempt(submitPayload)
+      } catch (err) {
         if (err instanceof APIError && err.status === 401) {
           try { await refreshAuthSession(); await submitLiveAttempt(submitPayload) } catch { /* silent */ }
         }
-      })
-    }
+      }
+    })()
 
     savePaperResult({
       paperSlug: paper.slug,
