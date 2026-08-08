@@ -1,5 +1,3 @@
-import 'katex/dist/katex.min.css'
-import katex from 'katex'
 import {
   AlertTriangle,
   ChevronLeft,
@@ -8,10 +6,11 @@ import {
   UserRound,
   Play,
 } from 'lucide-react'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
+import { MathText } from '../components/common/MathText'
 import { useAuth } from '../context/useAuth'
 import {
   APIError,
@@ -37,36 +36,11 @@ import { paperPath } from '../lib/paperSeo'
 import { usePageMeta } from '../lib/usePageMeta'
 import { paperAttemptSeoTitle } from '../lib/pageTitles'
 
-// ── KaTeX inline/block renderer ────────────────────────────────
-
-function renderMath(text: string): string {
-  return text
-    .replace(/\$\$(.+?)\$\$/gs, (_, expr) => {
-      try { return katex.renderToString(expr, { displayMode: true, throwOnError: false }) }
-      catch { return expr }
-    })
-    .replace(/\$(.+?)\$/g, (_, expr) => {
-      try { return katex.renderToString(expr, { displayMode: false, throwOnError: false }) }
-      catch { return expr }
-    })
-    .replace(/\n/g, '<br>')
-}
-
-// Memoized so that re-rendering the page (e.g. tapping an MCQ option, which
-// updates answer state) does NOT re-run KaTeX for every option. renderMath is
-// synchronous and expensive on math-heavy papers (NEET) — the unmemoized
-// version caused a visible ~300ms tap lag on mobile. React.memo skips options
-// whose text is unchanged; useMemo caches the HTML for any that do re-render.
-const MathText = memo(function MathText({ text, className }: { text: string; className?: string }) {
-  const html = useMemo(() => renderMath(text), [text])
-  return (
-    <span
-      className={className}
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  )
-})
+// Question and option text render through the SHARED MathText, not a local
+// copy. The local one handled only $math$ and newlines, so **bold** showed
+// its asterisks and the [[fig:]] / [[water:]] tokens rendered as raw markup
+// inside the exam hall. It also imported KaTeX eagerly; the shared component
+// loads it on demand, only for text that actually contains math.
 
 // ── Timer ──────────────────────────────────────────────────────
 
@@ -269,6 +243,11 @@ export function PaperAttemptPage() {
           const saved = readPaperResults().find((r) => r.paperSlug === record.slug)
           if (saved?.answers) setAnswers(saved.answers)
           setExamStarted(true)
+          // The live attempt scopes the palette to one section at a time; review
+          // has to do the same, or the sidebar dumps all 100 questions into one
+          // grid instead of the section you are actually reading.
+          const subjects = new Set((qs ?? []).map((q) => q.subject))
+          if (subjects.size > 1) setActiveSubject((qs ?? [])[0]?.subject ?? null)
         }
         const existing = liveAttempts.find((a) => a.paperSlug === slug)
         if (existing) {
@@ -939,6 +918,23 @@ export function PaperAttemptPage() {
     goNext()
   }
 
+  // Review legend counts, over the section currently shown in the palette so
+  // the numbers match the boxes beneath them.
+  // Plain computation, not a useMemo: this sits after the early returns, where a
+  // hook would break the rules-of-hooks ordering, and it is one pass over at
+  // most a few hundred questions.
+  const reviewTally = (() => {
+    const scope = activeSubject ? questions.filter((q) => q.subject === activeSubject) : questions
+    let correct = 0, wrong = 0, skipped = 0
+    for (const q of scope) {
+      const chosen = answers[q.slug]
+      if (!chosen) skipped++
+      else if (chosen === q.answerKey) correct++
+      else wrong++
+    }
+    return { correct, wrong, skipped }
+  })()
+
   // Questions visible in palette (filtered by active subject)
   const paletteEntries = activeSubject
     ? questions.map((q, i) => ({ q, i })).filter(({ q }) => q.subject === activeSubject)
@@ -1175,7 +1171,7 @@ export function PaperAttemptPage() {
                   </div>
                 )}
                 <div className="pa-q-text">
-                  <MathText text={localizedCurrent?.question ?? currentQuestion.question} />
+                  <QuestionRenderer text={localizedCurrent?.question ?? currentQuestion.question} />
                 </div>
 
                 {currentQuestion.answerKey === 'Deleted' ? (
@@ -1324,13 +1320,21 @@ export function PaperAttemptPage() {
             <strong>{user?.name ?? 'Candidate'}</strong>
           </div>
 
-          <div className="pa-legend">
-            <span><i className="pa-count answered">{answeredOnlyCount}</i>Answered</span>
-            <span><i className="pa-count marked">{markedOnlyCount}</i>Marked</span>
-            <span><i className="pa-count not-visited">{notVisitedCount}</i>Not Visited</span>
-            <span><i className="pa-count answered-marked">{answeredMarkedCount}</i>Marked and answered</span>
-            <span><i className="pa-count not-answered">{notAnsweredCount}</i>Not Answered</span>
-          </div>
+          {isReview ? (
+            <div className="pa-legend">
+              <span><i className="pa-count correct">{reviewTally.correct}</i>Correct</span>
+              <span><i className="pa-count wrong">{reviewTally.wrong}</i>Wrong</span>
+              <span><i className="pa-count not-visited">{reviewTally.skipped}</i>Skipped</span>
+            </div>
+          ) : (
+            <div className="pa-legend">
+              <span><i className="pa-count answered">{answeredOnlyCount}</i>Answered</span>
+              <span><i className="pa-count marked">{markedOnlyCount}</i>Marked</span>
+              <span><i className="pa-count not-visited">{notVisitedCount}</i>Not Visited</span>
+              <span><i className="pa-count answered-marked">{answeredMarkedCount}</i>Marked and answered</span>
+              <span><i className="pa-count not-answered">{notAnsweredCount}</i>Not Answered</span>
+            </div>
+          )}
 
           <div className="pa-palette-section">
             SECTION : <strong>{activeSubject ?? paper.examName}</strong>
@@ -1338,7 +1342,14 @@ export function PaperAttemptPage() {
 
           <div className="pa-palette-grid">
             {paletteEntries.map(({ q, i }, n) => {
-              const status = getStatus(q.slug, currentQuestion?.slug ?? '', answers, marked, visited)
+              // In review the attempt statuses (answered / marked / not visited)
+              // no longer tell you anything useful — what matters is whether you
+              // got it right. Green for correct, red for wrong, grey for skipped.
+              const status = isReview
+                ? (!answers[q.slug]
+                    ? 'not-visited'
+                    : answers[q.slug] === q.answerKey ? 'correct' : 'wrong')
+                : getStatus(q.slug, currentQuestion?.slug ?? '', answers, marked, visited)
               return (
                 <button
                   key={q.slug}
@@ -1362,12 +1373,15 @@ export function PaperAttemptPage() {
             </div>
           )}
 
-          <button type="button" className="pa-submit-palette-btn" onClick={() => setConfirmSubmit(true)}>
-            Submit Test
-          </button>
+          {/* Nothing to submit in review — the attempt is already finished. */}
+          {!isReview && (
+            <button type="button" className="pa-submit-palette-btn" onClick={() => setConfirmSubmit(true)}>
+              Submit Test
+            </button>
+          )}
 
           <button type="button" className="pa-exit-link" onClick={handleExit} disabled={exiting}>
-            {exiting ? 'Saving…' : 'Exit Paper'}
+            {exiting ? 'Saving…' : isReview ? 'Close Solutions' : 'Exit Paper'}
           </button>
         </aside>
       </div>

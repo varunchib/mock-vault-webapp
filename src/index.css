@@ -12133,6 +12133,12 @@ html {
 .pa-palette-btn.marked { background: #c4b5fd; color: #4c1d95; }
 .pa-palette-btn.answered-marked { background: #a855f7; color: #fff; }
 .pa-palette-btn.wrong { background: var(--red-border); color: #7f1d1d; }
+/* Review mode recolours the palette by outcome rather than by attempt
+   state: solid green for right, solid red for wrong, grey for skipped. */
+.pa-palette-btn.correct { background: var(--exam-answered); color: #fff; }
+.pa-attempt-page .pa-palette-btn.wrong { background: var(--exam-notanswered); color: #fff; }
+.pa-count.correct { background: var(--exam-answered); color: #fff; }
+.pa-count.wrong { background: var(--exam-notanswered); color: #fff; }
 .pa-palette-btn.current { outline: 2.5px solid var(--blue); outline-offset: 1px; }
 
 .pa-submit-palette-btn {
@@ -19663,6 +19669,14 @@ html {
   border-radius: 0 6px 6px 0;
   background: #f7f9fc;
 }
+
+.pa-review-explanation :where(p, li, span, div) {
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+.pa-review-explanation h4 { font-size: 0.9375rem; margin: 14px 0 6px; }
+.pa-review-explanation ul, .pa-review-explanation ol { padding-left: 1.15rem; }
+.pa-review-explanation li { margin-bottom: 6px; }
 
 .pa-review-explanation h3 {
   margin: 0 0 10px;
