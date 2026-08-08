@@ -5,6 +5,7 @@ import { homePathForUser, isAdminUser } from '../context/admin'
 import { useAuth } from '../context/useAuth'
 import { hasSessionHint } from '../lib/sessionHint'
 import { HaloLoader } from '../components/common/HaloLoader'
+import { RouteErrorBoundary } from '../components/common/RouteErrorBoundary'
 
 // Eager — public SEO pages must render fast on any cold URL
 import { LandingPage }       from '../pages/LandingPage'
@@ -33,7 +34,13 @@ const Loader = () => (
 )
 
 function Lazy({ children }: { children: ReactNode }) {
-  return <Suspense fallback={<Loader />}>{children}</Suspense>
+  // The boundary sits OUTSIDE Suspense: the failure happens while the chunk is
+  // being fetched, and a boundary inside the fallback would never see it.
+  return (
+    <RouteErrorBoundary>
+      <Suspense fallback={<Loader />}>{children}</Suspense>
+    </RouteErrorBoundary>
+  )
 }
 
 

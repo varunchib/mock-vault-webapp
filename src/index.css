@@ -19778,3 +19778,13 @@ html {
   line-height: 1.55;
   color: var(--ink2);
 }
+
+/* Shown only when a route chunk fails twice — a stale chunk after a deploy
+   self-heals on the first reload, so reaching this means something else. */
+.route-error { max-width: 30rem; margin: 12vh auto; padding: 0 1.25rem; text-align: center; }
+.route-error h1 { font-size: 1.25rem; margin: 0 0 0.6rem; }
+.route-error p { color: var(--ink3); line-height: 1.65; margin: 0 0 1.1rem; }
+.route-error button {
+  padding: 0.6rem 1.15rem; border-radius: 8px; border: 1px solid var(--line);
+  background: var(--ink); color: var(--white); font-weight: 600; cursor: pointer;
+}
