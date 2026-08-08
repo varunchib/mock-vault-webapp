@@ -16,6 +16,7 @@ import {
   APIError,
   fetchActiveLiveAttempts,
   fetchAttemptAnswers,
+  fetchAdminAttemptAnswers,
   fetchMockBySlug,
   fetchMockQuestions,
   fetchPaperBySlug,
@@ -252,7 +253,14 @@ export function PaperAttemptPage() {
             // predates local answer capture. The server keeps the real answer
             // sheet, so fall back to it rather than showing a blank palette that
             // implies every question was skipped.
-            const remote = await fetchAttemptAnswers(record.slug).catch(() => null)
+            // ?user=<id> means an admin is inspecting someone else's attempt.
+            // The admin route is separate and admin-guarded, so an ordinary
+            // reader adding the parameter simply gets their own sheet.
+            const asUser = searchParams.get('user')
+            const remote = await (asUser
+              ? fetchAdminAttemptAnswers(asUser, record.slug)
+              : fetchAttemptAnswers(record.slug)
+            ).catch(() => null)
             if (remote?.answers && Object.keys(remote.answers).length) {
               setAnswers(remote.answers)
             } else {

@@ -458,7 +458,11 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
               {attemptedPapers.map(r => (
                 <Link
                   key={r.slug}
-                  to={`/${r.type === 'mock' ? 'mock' : 'paper'}-attempt/${r.slug}?review=1`}
+                  // asUserId is set only when an admin is inspecting someone
+                  // else's analytics. Without it the review page fetched the
+                  // ADMIN's own answer sheet and showed an empty palette for a
+                  // paper the other person had actually answered.
+                  to={`/${r.type === 'mock' ? 'mock' : 'paper'}-attempt/${r.slug}?review=1${asUserId ? `&user=${encodeURIComponent(asUserId)}` : ''}`}
                   className="an2-solution-row"
                 >
                   <span className="an2-solution-title">{r.title}</span>

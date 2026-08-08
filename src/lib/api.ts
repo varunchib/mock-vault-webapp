@@ -776,6 +776,13 @@ export function fetchAdminUserAnalytics(id: string): Promise<AdminUserAnalytics>
   return requestJson(`/api/v1/admin/users/${encodeURIComponent(id)}/analytics`)
 }
 
+/** Admin-only: the answer sheet from another user's latest attempt at a paper. */
+export function fetchAdminAttemptAnswers(userId: string, slug: string): Promise<{ answers: Record<string, string> }> {
+  return requestJson<{ answers: Record<string, string> }>(
+    `/api/v1/admin/users/${encodeURIComponent(userId)}/attempt-answers?slug=${encodeURIComponent(slug)}`,
+  )
+}
+
 export function updateAdminUserStatus(id: string, isActive: boolean): Promise<{ message: string }> {
   return requestJson(`/api/v1/admin/users/${encodeURIComponent(id)}/status`, {
     method: 'PATCH',
