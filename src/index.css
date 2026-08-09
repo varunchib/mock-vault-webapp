@@ -937,6 +937,15 @@ h1 {
   max-width: 900px;
 }
 
+/* With Premium hidden the lone free card would stretch across half a 900px
+   grid and sit against the left edge, reading as a broken two-column layout.
+   One column, centred, at the width the card was designed for. */
+.access-grid.is-single {
+  grid-template-columns: minmax(0, 460px);
+  justify-content: center;
+  max-width: 100%;
+}
+
 .access-card {
   border-radius: var(--radius-lg);
   padding: 36px;
