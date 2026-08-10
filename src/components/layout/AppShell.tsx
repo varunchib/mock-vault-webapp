@@ -11,7 +11,7 @@ import {
   Search,
   X,
 } from 'lucide-react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { homePathForUser } from '../../context/admin'
 import { useAuth } from '../../context/useAuth'
 import { fetchExamCatalog, type Exam } from '../../lib/api'
@@ -329,6 +329,21 @@ export function AppShell({ children }: { children: ReactNode }) {
           <main className="vault-main-new">
             {children}
           </main>
+
+          {/* Signed-in users had no footer at all, so Privacy, Terms and a way
+              to make contact were unreachable once they logged in. Deliberately
+              minimal rather than the marketing footer: the sidebar already
+              covers navigation, so this only carries the legal and contact
+              links every page is expected to expose. */}
+          <footer className="vault-footer">
+            <span>&copy; {new Date().getFullYear()} Ministry of Papers</span>
+            <nav aria-label="Legal and support">
+              <Link to="/about">About</Link>
+              <Link to="/privacy">Privacy</Link>
+              <Link to="/terms">Terms</Link>
+              <a href="mailto:hello@ministryofpapers.com">Contact</a>
+            </nav>
+          </footer>
         </div>
 
         {/* Search overlay — replaces the old always-on topbar input */}

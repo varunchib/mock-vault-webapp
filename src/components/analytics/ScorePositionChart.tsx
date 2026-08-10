@@ -16,13 +16,18 @@ type Props = {
   officialCutoffLabel?: string
 }
 
-/** Round a rough step up to a "nice" 1/2/5 × 10ⁿ value, for clean Y ticks. */
+/**
+ * Round a rough step up to a "nice" 1/2/5 × 10ⁿ value, for clean Y ticks.
+ *
+ * Floored at 1: the axis counts students, and with only a handful of attempts
+ * rough/4 falls below 1 and the axis read "0, 0.5, 1, 1.5, 2" — half a student.
+ */
 function niceStep(rough: number): number {
   if (rough <= 0) return 1
   const mag = Math.pow(10, Math.floor(Math.log10(rough)))
   const norm = rough / mag
   const nice = norm <= 1 ? 1 : norm <= 2 ? 2 : norm <= 5 ? 5 : 10
-  return nice * mag
+  return Math.max(1, Math.round(nice * mag))
 }
 
 /**
@@ -34,7 +39,7 @@ function niceStep(rough: number): number {
  * stays a constant, readable size on every screen instead of scaling with the
  * chart.
  */
-export function ScorePositionChart({ dist, userPct: _userPct, totalMarks, officialCutoffPct, officialCutoffLabel }: Props) {
+export function ScorePositionChart({ dist, userPct, totalMarks, officialCutoffPct, officialCutoffLabel }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null)
   const [w, setW] = useState(560)
   useLayoutEffect(() => {
@@ -87,13 +92,20 @@ export function ScorePositionChart({ dist, userPct: _userPct, totalMarks, offici
   const cutLabel = hasOfficial ? `${officialCutoffLabel ?? 'Official'} cutoff` : 'Est. cutoff'
 
   const clampX = (cx: number, halfW: number) => Math.max(PAD.left + halfW, Math.min(W - PAD.right - halfW, cx))
+
+  // Where the viewer sits on the curve. Anchored to their band's centre rather
+  // than their exact marks so the marker lands ON the plotted point instead of
+  // floating just off the line.
+  const hasUser = Number.isFinite(userPct) && userPct >= 0
+  const userBand = Math.min(nB - 1, Math.max(0, Math.floor((userPct / 100) * nB)))
+  const userCount = counts[userBand] ?? 0
   const fmt = (m: number) => (total <= 100 ? `${Math.round(m)}%` : Math.round(m).toString())
   const fmtK = (n: number) => (n >= 1000 ? `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k` : n.toLocaleString('en-IN'))
 
   return (
     <div ref={wrapRef}>
       <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} className="an2-trend-svg" role="img"
-        aria-label={`Marks distribution of ${dist.totalUsers} students`}>
+        aria-label={`Marks distribution of ${dist.totalUsers} students${hasUser ? `, with your score of ${Math.round(userPct)}% marked` : ''}`}>
         {/* Y gridlines — number of students */}
         {yTicks.map(v => (
           <g key={v}>
@@ -124,6 +136,28 @@ export function ScorePositionChart({ dist, userPct: _userPct, totalMarks, offici
           <circle key={i} cx={x(p.marks)} cy={y(p.count)} r={narrow ? 2.8 : 3.4} fill="#22b8e6" style={{ stroke: 'var(--surface)' }} strokeWidth={1.2} />
         ))}
 
+        {/* "You" — the viewer's own point on the curve, drawn after the line so
+            it sits above it, and before the cut-off so the cut-off label wins
+            if the two happen to land in the same place. */}
+        {hasUser && (() => {
+          const ux = x(centre(userBand))
+          const uy = y(userCount)
+          const lx = clampX(ux, 19)
+          // Flip the pill below the dot when the point is high enough that the
+          // label would otherwise collide with the cut-off row or clip the top.
+          const above = uy - PAD.top > 34
+          const py = above ? uy - 24 : uy + 10
+          return (
+            <g>
+              <circle cx={ux} cy={uy} r={narrow ? 4.4 : 5.4} fill="var(--blue)"
+                style={{ stroke: 'var(--surface)' }} strokeWidth={2} />
+              <rect x={lx - 17} y={py - 9} width={34} height={17} rx={8.5} fill="var(--blue)" />
+              <text x={lx} y={py + 3.5} textAnchor="middle" fontSize={narrow ? 9 : 10}
+                fontWeight={700} fill="#fff">You</text>
+            </g>
+          )
+        })()}
+
         {/* Cut-off — thin vertical marker at the cut-off marks, tiny ✕ + label at top */}
         {cutMarks != null && (() => {
           const cx = x(cutMarks)
@@ -145,6 +179,9 @@ export function ScorePositionChart({ dist, userPct: _userPct, totalMarks, offici
 
       <div className="an2-legend-row">
         <span className="an2-legend-key"><i style={{ background: '#22b8e6' }} /> Students ({dist.totalUsers.toLocaleString('en-IN')})</span>
+        {hasUser && (
+          <span className="an2-legend-key"><i style={{ background: 'var(--blue)' }} /> You <strong>{fmt((userPct / 100) * total)}</strong></span>
+        )}
         {cutMarks != null && (
           <span className="an2-legend-key"><i className="an2-legend-x" style={{ color: cutColor }}>✕</i> {cutLabel} <strong>{fmt(cutMarks)}</strong></span>
         )}

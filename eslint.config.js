@@ -6,7 +6,10 @@ import tseslint from 'typescript-eslint'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'node_modules']),
+  // .wrangler holds generated dev/deploy bundles (our own source, already
+  // linted, concatenated with vendor code). Linting them reported ~110 phantom
+  // no-undef errors that reappeared after every `wrangler dev` run.
+  globalIgnores(['dist', 'node_modules', '.wrangler']),
   js.configs.recommended,
   ...tseslint.configs.recommended,
   reactHooks.configs.flat.recommended,
@@ -19,6 +22,16 @@ export default defineConfig([
       parserOptions: {
         sourceType: 'module',
       },
+    },
+  },
+  // Build-time scripts run in Node, not the browser — they legitimately use
+  // console/process/fetch, which the browser-globals block above doesn't define.
+  {
+    files: ['scripts/**/*.{js,mjs}'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      globals: globals.node,
+      parserOptions: { sourceType: 'module' },
     },
   },
 ])

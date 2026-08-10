@@ -7,7 +7,6 @@ import { readAllResults, type CombinedResult } from '../lib/mockActivity'
 import { examCutoffs, estimatePercentile } from '../data/examCutoffs'
 import { fetchExamCatalog, fetchExamCutoffs, fetchLeaderboard, fetchPaperCatalog, fetchScoreDistribution, type Exam, type ExamCutoffSet, type LeaderboardEntry, type Paper, type ScoreDistribution } from '../lib/api'
 import { remapToPaperExam } from '../lib/remapExam'
-import { paperPath } from '../lib/paperSeo'
 import { useAuth } from '../context/useAuth'
 import { SubjectStrength } from '../components/analytics/SubjectStrength'
 import { ScoreTrendChart, type TrendPoint } from '../components/analytics/ScoreTrendChart'
@@ -34,13 +33,23 @@ function scoreClass(pct: number): 'good' | 'mid' | 'bad' {
 const MEDALS = ['🥇', '🥈', '🥉']
 
 function LeaderboardPanel({
-  top10, userRank, userName, viewerBestPct,
-}: { top10: LeaderboardEntry[]; userRank: number; userName: string; viewerBestPct: number }) {
+  top10, userRank, userName, viewerBestPct, viewerBestCorrect, viewerBestTotal,
+}: {
+  top10: LeaderboardEntry[]
+  userRank: number
+  userName: string
+  viewerBestPct: number
+  viewerBestCorrect: number
+  viewerBestTotal: number
+}) {
   // The server board can lag behind (or miss a 0-correct attempt) — if the
   // viewer has local attempts but isn't on the board, show them anyway so the
   // panel never says "No attempts yet" to someone who just attempted.
   const rows: LeaderboardEntry[] = top10.length === 0 && viewerBestPct >= 0
-    ? [{ userId: 'me', name: userName, scorePct: viewerBestPct, rank: 1, isMe: true }]
+    ? [{
+        userId: 'me', name: userName, scorePct: viewerBestPct,
+        correct: viewerBestCorrect, total: viewerBestTotal, rank: 1, isMe: true,
+      }]
     : top10
   const userInTop10 = rows.some(e => e.isMe)
   const soloViewer = rows.length === 1 && rows[0].isMe
@@ -63,7 +72,11 @@ function LeaderboardPanel({
               {entry.rank <= 3 ? MEDALS[entry.rank - 1] : entry.rank}
             </span>
             <span className="ea2-lb-name" title={entry.name}>{entry.name}</span>
-            <span className="ea2-lb-score">{entry.scorePct}%</span>
+            {/* Marks, not a percentage: the board ranks on correct/total, so
+                showing that pair is both truer and more legible. */}
+            <span className="ea2-lb-score" title={`${entry.scorePct}%`}>
+              {entry.correct}<small>/{entry.total}</small>
+            </span>
             {entry.isMe && <span className="ea2-lb-you">You</span>}
           </li>
         ))}
@@ -79,7 +92,9 @@ function LeaderboardPanel({
           <div className="ea2-lb-row ea2-lb-row--me ea2-lb-row--user">
             <span className="ea2-lb-rank">{userRank.toLocaleString('en-IN')}</span>
             <span className="ea2-lb-name" title={userName}>{userName}</span>
-            <span className="ea2-lb-score">{viewerBestPct}%</span>
+            <span className="ea2-lb-score" title={`${viewerBestPct}%`}>
+              {viewerBestCorrect}<small>/{viewerBestTotal}</small>
+            </span>
             <span className="ea2-lb-you">You</span>
           </div>
         </>
@@ -183,7 +198,15 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
     const avgAccPct = Math.round((Math.max(0, avgScore) / avgMax) * 100)
     const percentiles = results.map(r => estimatePercentile(r.correct, r.totalQuestions, examSlug)).filter(p => p > 0)
     const avgPercentile = percentiles.length ? Math.round(percentiles.reduce((s, p) => s + p, 0) / percentiles.length) : 0
-    return { totalTime, avgScore, bestScore, avgAccPct, bestPct, avgPercentile }
+    // The attempt that produced bestScore, so the leaderboard can show the
+    // same marks the rest of the page reports rather than a re-derived figure.
+    const bestIdx = marksData.findIndex(m => m.net === bestScore)
+    const bestResult = results[bestIdx] ?? results[0]
+    return {
+      totalTime, avgScore, bestScore, avgAccPct, bestPct, avgPercentile,
+      bestCorrect: bestResult.correct,
+      bestTotal: bestResult.totalQuestions,
+    }
   }, [results, examSlug])
 
   // Merge API + static cutoffs
@@ -372,6 +395,8 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
           userRank={leaderboard?.userRank ?? -1}
           userName={userName}
           viewerBestPct={summary.bestPct}
+          viewerBestCorrect={summary.bestCorrect}
+          viewerBestTotal={summary.bestTotal}
         />
       </div>
 
@@ -428,8 +453,18 @@ export function ExamAnalyticsPage({ source }: { source?: ExamAnalyticsSource } =
               </div>
             </div>
             <div className="an2-solutions-list">
+              {/* Reopen the attempt itself. paperPath() builds /pyq/<slug>,
+                  which does not exist for a mock — that was the error. */}
               {attemptedPapers.map(r => (
-                <Link key={r.slug} to={paperPath(r.slug)} className="an2-solution-row">
+                <Link
+                  key={r.slug}
+                  // asUserId is set only when an admin is inspecting someone
+                  // else's analytics. Without it the review page fetched the
+                  // ADMIN's own answer sheet and showed an empty palette for a
+                  // paper the other person had actually answered.
+                  to={`/${r.type === 'mock' ? 'mock' : 'paper'}-attempt/${r.slug}?review=1${asUserId ? `&user=${encodeURIComponent(asUserId)}` : ''}`}
+                  className="an2-solution-row"
+                >
                   <span className="an2-solution-title">{r.title}</span>
                   <span className="an2-solution-cta">View solutions →</span>
                 </Link>

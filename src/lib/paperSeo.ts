@@ -71,6 +71,19 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
     review:
       'The JKSSB Wildlife Guard written exam was held on 8 March 2026 in OMR mode with 120 questions for 120 marks in 2 hours, with negative marking of 0.25 per wrong answer. The paper covered Mathematics, Reasoning, English, General Knowledge, J&K Studies and Wildlife & Ecology. Use this fully solved previous year paper to check the answer key for every question, study the exam analysis and difficulty level, and attempt the complete paper online in a timed, exam-like interface.',
   },
+  // HPRCA (Himachal Pradesh Rajya Chayan Aayog) now recruits Patwari, so the
+  // board name candidates search for is HPRCA even though the 2019 sitting was
+  // conducted by the HP Revenue Department. Both terms appear in the copy.
+  'hp-patwari-2019': {
+    apiSlug: 'hp-patwari-2019',
+    canonicalSlug: 'hp-patwari-question-paper-2019',
+    title: 'HP Patwari Question Paper 2019 - Solved, Answer Key',
+    h1: 'HP Patwari Question Paper 2019',
+    description:
+      'Fully solved HP Patwari question paper 2019, held on 17 November 2019 - all 100 questions with the answer key, Hindi, English, Maths and Himachal GK, with detailed explanations, free.',
+    review:
+      'The HP Patwari exam of 17 November 2019 was a 100-question screening test for 1194 Patwari posts, covering Hindi, General English, Quantitative Aptitude and General Knowledge with a strong Himachal Pradesh GK component. Use this fully solved paper to check the answer key, see the real difficulty level of the Himachal GK section, and practise every question with a detailed explanation. Patwari recruitment in Himachal is now conducted by HPRCA (Himachal Pradesh Rajya Chayan Aayog), which makes this the most recent full-length HP Patwari paper available for practice.',
+  },
   'jkssb-patwari-2024-sep1-set-a': {
     apiSlug: 'jkssb-patwari-2024-sep1-set-a',
     canonicalSlug: 'jkssb-patwari-question-paper-2024',

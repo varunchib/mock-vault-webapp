@@ -1,28 +1,27 @@
-import 'katex/dist/katex.min.css'
-import katex from 'katex'
 import {
   AlertTriangle,
-  BookOpen,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
-  Clock3,
-  Flag,
   Maximize2,
+  UserRound,
   Play,
-  RotateCcw,
-  XCircle,
 } from 'lucide-react'
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
+import { MathText } from '../components/common/MathText'
 import { useAuth } from '../context/useAuth'
 import {
   APIError,
   fetchActiveLiveAttempts,
+  fetchAttemptAnswers,
+  fetchAdminAttemptAnswers,
+  fetchMockBySlug,
+  fetchMockQuestions,
   fetchPaperBySlug,
   fetchPaperQuestions,
+  submitReport,
   refreshAuthSession,
   startLiveAttempt,
   syncLiveAttempt,
@@ -31,44 +30,48 @@ import {
   type Paper,
   type Question,
 } from '../lib/api'
-import { savePaperResult } from '../lib/mockActivity'
+import { savePaperResult, readPaperResults } from '../lib/mockActivity'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
+import { ExplanationText } from '../components/common/ExplanationText'
+import { Logo } from '../components/ui/Logo'
 import { paperPath } from '../lib/paperSeo'
 import { usePageMeta } from '../lib/usePageMeta'
 import { paperAttemptSeoTitle } from '../lib/pageTitles'
 
-// ── KaTeX inline/block renderer ────────────────────────────────
-
-function renderMath(text: string): string {
-  return text
-    .replace(/\$\$(.+?)\$\$/gs, (_, expr) => {
-      try { return katex.renderToString(expr, { displayMode: true, throwOnError: false }) }
-      catch { return expr }
-    })
-    .replace(/\$(.+?)\$/g, (_, expr) => {
-      try { return katex.renderToString(expr, { displayMode: false, throwOnError: false }) }
-      catch { return expr }
-    })
-    .replace(/\n/g, '<br>')
-}
-
-// Memoized so that re-rendering the page (e.g. tapping an MCQ option, which
-// updates answer state) does NOT re-run KaTeX for every option. renderMath is
-// synchronous and expensive on math-heavy papers (NEET) — the unmemoized
-// version caused a visible ~300ms tap lag on mobile. React.memo skips options
-// whose text is unchanged; useMemo caches the HTML for any that do re-render.
-const MathText = memo(function MathText({ text, className }: { text: string; className?: string }) {
-  const html = useMemo(() => renderMath(text), [text])
-  return (
-    <span
-      className={className}
-      // eslint-disable-next-line react/no-danger
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  )
-})
+// Question and option text render through the SHARED MathText, not a local
+// copy. The local one handled only $math$ and newlines, so **bold** showed
+// its asterisks and the [[fig:]] / [[water:]] tokens rendered as raw markup
+// inside the exam hall. It also imported KaTeX eagerly; the shared component
+// loads it on demand, only for text that actually contains math.
 
 // ── Timer ──────────────────────────────────────────────────────
+
+// A mock carries everything the attempt environment needs except year/shift,
+// which are properties of a real sitting and simply do not apply.
+async function mockAsPaper(slug: string): Promise<Paper> {
+  const m = await fetchMockBySlug(slug)
+  return {
+    slug: m.slug,
+    examSlug: m.examSlug,
+    examName: m.examName,
+    title: m.title,
+    year: '',
+    shift: '',
+    description: m.description,
+    questions: m.questions,
+    subjects: m.subjects,
+    negativeMarking: m.negativeMarking,
+    sourceUrl: '',
+    durationMinutes: m.durationMinutes,
+    maxMarks: m.maxMarks ?? m.questions,
+  }
+}
+
+// Always mm:ss — used for the per-question timer, which never runs to hours.
+function formatClock(sec: number) {
+  const m = Math.floor(sec / 60)
+  return `${String(m).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`
+}
 
 function formatTime(s: number) {
   const h = Math.floor(s / 3600)
@@ -124,7 +127,8 @@ const DEFAULT_DURATION = 120 * 60
 export function PaperAttemptPage() {
   const navigate = useNavigate()
   const { slug } = useParams()
-  const { isAuthenticated } = useAuth()
+  const [searchParams] = useSearchParams()
+  const { isAuthenticated, user } = useAuth()
 
   const [paper, setPaper] = useState<Paper | null>(null)
   const [questions, setQuestions] = useState<Question[]>([])
@@ -132,6 +136,25 @@ export function PaperAttemptPage() {
   const [error, setError] = useState(false)
 
   const [examStarted, setExamStarted] = useState(false)
+  // ?review=1 reopens a finished attempt: same exam layout, answers and
+  // explanations revealed, no timer, no fullscreen.
+  const isReview = searchParams.get('review') === '1'
+  const [introStep, setIntroStep] = useState<'instructions' | 'declaration'>('instructions')
+  const [declared, setDeclared] = useState(false)
+  const [reportOpen, setReportOpen] = useState(false)
+  const [reportType, setReportType] = useState('Wrong answer key')
+  const [reportDetails, setReportDetails] = useState('')
+  const [reportSent, setReportSent] = useState(false)
+  const [showInstructions, setShowInstructions] = useState(false)
+  // Seconds spent on the question currently open; resets on every move, the
+  // way the delivery software reports per-question time.
+  const [questionSeconds, setQuestionSeconds] = useState(0)
+  // On a phone the palette cannot sit beside the question, and stacking it
+  // above pushed the question itself below the fold. It becomes a drawer.
+  const [paletteOpen, setPaletteOpen] = useState(false)
+  // Stamped by the effect below on mount and on every question change, so it
+  // never has to call Date.now() during render.
+  const questionStartedAtRef = useRef(0)
   const [startingExam, setStartingExam] = useState(false)
 
   const [attemptId, setAttemptId] = useState<string | null>(null)
@@ -145,10 +168,11 @@ export function PaperAttemptPage() {
   const [remainingSeconds, setRemainingSeconds] = useState(DEFAULT_DURATION)
   const [submitted, setSubmitted] = useState(false)
   const [confirmSubmit, setConfirmSubmit] = useState(false)
-  const [reviewMode, setReviewMode] = useState(false)
-  const [reviewIndex, setReviewIndex] = useState(0)
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const [activeSubject, setActiveSubject] = useState<string | null>(null)
+  // True when review has no answer sheet to show — better to say so than to
+  // render a palette of blank chips that reads as "you skipped everything".
+  const [answersUnavailable, setAnswersUnavailable] = useState(false)
 
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [exiting, setExiting] = useState(false)
@@ -160,6 +184,20 @@ export function PaperAttemptPage() {
   const [, forceResumeTick] = useState(0)
 
   useEffect(() => { submittedRef.current = submitted }, [submitted])
+
+  // Wall-clock based rather than a tick count: moving to another question just
+  // restamps the ref, and the next tick recomputes from it. Counting ticks
+  // drifted whenever the tab was backgrounded and throttled.
+  useEffect(() => { questionStartedAtRef.current = Date.now() }, [currentIndex])
+
+  useEffect(() => {
+    if (!examStarted || submitted) return
+    const id = window.setInterval(
+      () => setQuestionSeconds(Math.floor((Date.now() - questionStartedAtRef.current) / 1000)),
+      1000,
+    )
+    return () => window.clearInterval(id)
+  }, [examStarted, submitted])
 
   useEffect(() => {
     if (!resumeDetected || examStarted) return
@@ -177,20 +215,65 @@ export function PaperAttemptPage() {
     canonicalPath: slug ? `/paper-attempt/${slug}` : '/paper-attempt',
   })
 
-  // ── Load paper + questions; detect active live attempt ───────────
+  // ── Load the paper (or mock) + questions; detect active live attempt ──
+  //
+  // Mocks run in this exact environment rather than a second one of their own:
+  // same intro screen, fullscreen enforcement, palette, timer, resume and
+  // result screen. A mock is loaded as a Paper-shaped record — every field this
+  // page reads exists on a mock too, apart from year/shift, which a mock simply
+  // does not have. That also keeps the dashboard's resume link working, since
+  // it points every live attempt at /paper-attempt/<slug>.
   useEffect(() => {
     if (!slug) return
     let cancelled = false
     const load = async () => {
       try {
-        const [paperData, qs, liveAttempts] = await Promise.all([
-          fetchPaperBySlug(slug),
-          fetchPaperQuestions(slug),
+        // Resolve what this slug IS before fetching its questions. The papers
+        // endpoint answers 200 with null for an unknown slug rather than
+        // erroring, so a .catch() fallback would silently load an empty exam.
+        const paperData = await fetchPaperBySlug(slug).catch(() => null)
+        const record = paperData ?? (await mockAsPaper(slug))
+        const [qs, liveAttempts] = await Promise.all([
+          paperData ? fetchPaperQuestions(slug) : fetchMockQuestions(slug),
           fetchActiveLiveAttempts().catch(() => [] as ActiveAttempt[]),
         ])
         if (cancelled) return
-        setPaper(paperData)
-        setQuestions(qs)
+        setPaper(record)
+        setQuestions(qs ?? [])
+
+        // Review reopens a finished attempt: restore the responses that were
+        // saved with the result and go straight in — no intro, no timer, no
+        // fullscreen, nothing to submit.
+        if (isReview) {
+          const saved = readPaperResults().find((r) => r.paperSlug === record.slug)
+          if (saved?.answers && Object.keys(saved.answers).length) {
+            setAnswers(saved.answers)
+          } else {
+            // Nothing stored in THIS browser — the attempt was sat elsewhere, or
+            // predates local answer capture. The server keeps the real answer
+            // sheet, so fall back to it rather than showing a blank palette that
+            // implies every question was skipped.
+            // ?user=<id> means an admin is inspecting someone else's attempt.
+            // The admin route is separate and admin-guarded, so an ordinary
+            // reader adding the parameter simply gets their own sheet.
+            const asUser = searchParams.get('user')
+            const remote = await (asUser
+              ? fetchAdminAttemptAnswers(asUser, record.slug)
+              : fetchAttemptAnswers(record.slug)
+            ).catch(() => null)
+            if (remote?.answers && Object.keys(remote.answers).length) {
+              setAnswers(remote.answers)
+            } else {
+              setAnswersUnavailable(true)
+            }
+          }
+          setExamStarted(true)
+          // The live attempt scopes the palette to one section at a time; review
+          // has to do the same, or the sidebar dumps all 100 questions into one
+          // grid instead of the section you are actually reading.
+          const subjects = new Set((qs ?? []).map((q) => q.subject))
+          if (subjects.size > 1) setActiveSubject((qs ?? [])[0]?.subject ?? null)
+        }
         const existing = liveAttempts.find((a) => a.paperSlug === slug)
         if (existing) {
           resumeFetchedAtMs.current = Date.now()
@@ -415,14 +498,36 @@ export function PaperAttemptPage() {
     const marksPerQSave = savedMaxMarks / questions.length
     const rawScore = parseFloat((correct * marksPerQSave - wrong * negMark).toFixed(2))
 
-    if (attemptId) {
-      const submitPayload = { attemptId, paperSlug: paper.slug, correct, wrong, skipped, timeTakenSeconds: timeTaken, answers }
-      submitLiveAttempt(submitPayload).catch(async (err) => {
+    // The server copy is the only one that survives a change of device, so a
+    // missing attemptId must not mean "don't record it". startLiveAttempt fails
+    // silently (a blip at the moment the exam opened is enough), and every such
+    // attempt used to reach submit with nowhere to go but localStorage — which
+    // is why finished papers could reopen with an empty answer sheet.
+    void (async () => {
+      let id = attemptId
+      if (!id) {
+        try {
+          const started = await startLiveAttempt({
+            paperSlug: paper.slug,
+            examSlug: paper.examSlug,
+            paperTitle: paper.title,
+            examName: paper.examName ?? '',
+            totalQuestions: questions.length,
+            durationSeconds: (paper.durationMinutes > 0 ? paper.durationMinutes : 120) * 60,
+          })
+          id = started?.attemptId ?? null
+        } catch { /* offline or signed out — the local copy still stands */ }
+      }
+      if (!id) return
+      const submitPayload = { attemptId: id, paperSlug: paper.slug, correct, wrong, skipped, timeTakenSeconds: timeTaken, answers }
+      try {
+        await submitLiveAttempt(submitPayload)
+      } catch (err) {
         if (err instanceof APIError && err.status === 401) {
           try { await refreshAuthSession(); await submitLiveAttempt(submitPayload) } catch { /* silent */ }
         }
-      })
-    }
+      }
+    })()
 
     savePaperResult({
       paperSlug: paper.slug,
@@ -440,7 +545,18 @@ export function PaperAttemptPage() {
       negativeMarking: negMark > 0 ? negMark : undefined,
       timeTakenSeconds: timeTaken,
       subjects: subjectScores,
+      answers,
     })
+
+    // Straight to the exam's analytics rather than the interim score card:
+    // it carries the same score plus the trend across attempts, the cutoff
+    // comparison and the per-question solutions. savePaperResult writes to
+    // localStorage synchronously, so the result is already there to read.
+    if (document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => undefined)
+    }
+    // replace, so Back does not land the candidate inside a finished exam.
+    navigate(`/analytics/${paper.examSlug}`, { replace: true })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitted])
 
@@ -471,20 +587,11 @@ export function PaperAttemptPage() {
   const currentQuestion = questions[currentIndex]
   const localizedCurrent = currentQuestion ? getLocalizedQuestion(currentQuestion, language) : null
   const hasHindiQuestions = questions.some(hasHindi)
-  const activeQuestions = questions.filter((q) => q.answerKey !== 'Deleted')
   const answeredCount = Object.keys(answers).length
-  const markedCount = Object.values(marked).filter(Boolean).length
-  const timeTaken = Math.floor((Date.now() - startTimeRef.current) / 1000)
 
   const filteredIndex = useMemo(
     () => currentQuestion ? filteredQuestions.findIndex((q) => q.slug === currentQuestion.slug) : -1,
     [filteredQuestions, currentQuestion],
-  )
-
-  const results = useMemo(
-    () => computeResults(questions, answers),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [submitted, questions, answers],
   )
 
   if (!slug || !isAuthenticated) return <Navigate to="/" replace />
@@ -492,6 +599,18 @@ export function PaperAttemptPage() {
   if (error || !paper) return <Navigate to={paperPath(slug)} replace />
 
   // ── Pre-exam screen (intro for new, compact resume card for ongoing) ──
+  // Quoted on the instruction screens as well as in the exam hall, so both are
+  // derived before the intro screen returns early.
+  //
+  // Marks per question come from the paper's own total: a 200-mark,
+  // 100-question paper is +2 each, not the assumed +1.
+  const marksPerQuestion = questions.length > 0 && paper.maxMarks > 0
+    ? Math.round((paper.maxMarks / questions.length) * 100) / 100
+    : 1
+  // Option count is read from the paper rather than hard-coded — banking papers
+  // run to five options where most state exams use four.
+  const optionCount = questions[0]?.options.length ?? 4
+
   if (!examStarted) {
     const durationMins = paper.durationMinutes > 0 ? paper.durationMinutes : 120
     const hasNeg = (paper.negativeMarking ?? 0) > 0
@@ -543,77 +662,216 @@ export function PaperAttemptPage() {
     }
 
     return (
-      <div className="pa-intro-page">
-        <div className="pa-intro-card">
-          <span className="pa-intro-exam-badge">{paper.examName}</span>
-          <h1 className="pa-intro-title">{paper.title}</h1>
+      <div className="pa-gi">
+        <header className="pa-gi-top">
+          <Logo to={paperPath(paper.slug)} className="pa-gi-logo" />
+          <span className="pa-gi-testname">{paper.title}</span>
+        </header>
 
-          <div className="pa-intro-stats">
-            <div className="pa-intro-stat">
-              <strong>{questions.length}</strong>
-              <span>Questions</span>
-            </div>
-            <div className="pa-intro-stat">
-              <strong>{durationMins}</strong>
-              <span>Minutes</span>
-            </div>
-            {paper.maxMarks > 0 && (
-              <div className="pa-intro-stat">
-                <strong>{paper.maxMarks}</strong>
-                <span>Max Marks</span>
-              </div>
+        <div className="pa-gi-body">
+          <main className="pa-gi-main">
+            {introStep === 'instructions' ? (
+              <>
+                <h1>General Instructions:</h1>
+                <ol className="pa-gi-list">
+                  <li>
+                    The countdown timer at the top right of the screen will display the
+                    time remaining for you to complete the examination. When the timer
+                    reaches zero, the examination will end by itself. You need not
+                    terminate the examination or submit your paper.
+                  </li>
+                  <li>
+                    The Question Palette displayed on the right side of screen will show
+                    the status of each question using one of the following symbols:
+                    <ul className="pa-gi-symbols">
+                      <li><i className="pa-legend-dot not-visited" />You have not visited the question yet.</li>
+                      <li><i className="pa-legend-dot visited" />You have not answered the question.</li>
+                      <li><i className="pa-legend-dot answered" />You have answered the question.</li>
+                      <li><i className="pa-legend-dot marked" />You have NOT answered the question, but have marked the question for review.</li>
+                      <li><i className="pa-legend-dot answered-marked" />You have answered the question, but marked it for review.</li>
+                    </ul>
+                  </li>
+                </ol>
+
+                <p className="pa-gi-para">
+                  The <strong>Mark For Review</strong> status for a question simply
+                  indicates that you would like to look at that question again. If a
+                  question is answered, but marked for review, then the answer will be
+                  considered for evaluation unless the status is modified by the candidate.
+                </p>
+
+                <h2>Navigating to a Question :</h2>
+                <ol className="pa-gi-list" start={3}>
+                  <li>
+                    To answer a question, do the following:
+                    <ol className="pa-gi-sublist">
+                      <li>
+                        Click on the question number in the Question Palette at the right of
+                        your screen to go to that numbered question directly. Note that using
+                        this option does NOT save your answer to the current question.
+                      </li>
+                      <li>
+                        Click on <strong>Save &amp; Next</strong> to save your answer for the
+                        current question and then go to the next question.
+                      </li>
+                      <li>
+                        Click on <strong>Mark for Review &amp; Next</strong> to save your answer
+                        for the current question, also mark it for review, and then go to the
+                        next question.
+                      </li>
+                    </ol>
+                  </li>
+                </ol>
+
+                <p className="pa-gi-para">
+                  Note that your answer for the current question will not be saved, if you
+                  navigate to another question directly by clicking on a question number
+                  without saving the answer to the previous question.
+                </p>
+
+                <h2>Answering a Question :</h2>
+                <ol className="pa-gi-list" start={4}>
+                  <li>
+                    Procedure for answering a multiple choice (MCQ) type question:
+                    <ol className="pa-gi-sublist">
+                      <li>
+                        Choose one answer from the {optionCount} options given below the
+                        question, click on the bubble placed before the chosen option.
+                      </li>
+                      <li>
+                        To deselect your chosen answer, click on the bubble of the chosen
+                        option again or click on the <strong>Clear Response</strong> button.
+                      </li>
+                      <li>To change your chosen answer, click on the bubble of another option.</li>
+                      <li>To save your answer, you MUST click on <strong>Save &amp; Next</strong>.</li>
+                    </ol>
+                  </li>
+                  <li>
+                    To mark a question for review, click on <strong>Mark for Review &amp; Next</strong>.
+                    If an answer is selected for a question that is <strong>Marked for Review</strong>,
+                    that answer will be considered in the evaluation unless the status is
+                    modified by the candidate.
+                  </li>
+                  <li>
+                    To change your answer to a question that has already been answered, first
+                    select that question for answering and then follow the procedure for
+                    answering that type of question.
+                  </li>
+                  {subjectList.length > 1 && (
+                    <li>
+                      This paper has <strong>{subjectList.length} sections</strong>. Use the
+                      section bar above the question to move between them. The Question
+                      Palette always shows the section you are currently in.
+                    </li>
+                  )}
+                </ol>
+              </>
+            ) : (
+              <>
+                <h1 className="pa-gi-testtitle">{paper.title}</h1>
+                <div className="pa-gi-meta">
+                  <span>Duration: <strong>{durationMins} Mins</strong></span>
+                  {paper.maxMarks > 0 && (
+                    <span>Maximum Marks: <strong>{paper.maxMarks}</strong></span>
+                  )}
+                </div>
+
+                <h2 className="pa-gi-readhead">Read the following instructions carefully.</h2>
+                <ol className="pa-gi-list">
+                  <li>
+                    The test {subjectList.length > 1
+                      ? <>contains <strong>{subjectList.length} sections</strong> having </>
+                      : <>contains </>}
+                    <strong>{questions.length} questions</strong>.
+                  </li>
+                  <li>
+                    Each question has <strong>{optionCount} options</strong> out of which
+                    only one is correct.
+                  </li>
+                  <li>You have to finish the test in <strong>{durationMins} minutes</strong>.</li>
+                  <li>
+                    You will be awarded <strong>{marksPerQuestion} mark{marksPerQuestion !== 1 ? 's' : ''}</strong>{' '}
+                    for each correct answer
+                    {hasNeg
+                      ? <> and <strong>{paper.negativeMarking}</strong> will be deducted for each wrong answer.</>
+                      : <>.</>}
+                  </li>
+                  <li>There is no negative marking for the questions that you have not attempted.</li>
+                  <li>
+                    Your progress is saved as you go. If the browser closes, you can resume
+                    this attempt from your Dashboard before the timer runs out.
+                  </li>
+                </ol>
+              </>
             )}
-            {hasNeg && (
-              <div className="pa-intro-stat pa-intro-stat-neg">
-                <strong>-{paper.negativeMarking}</strong>
-                <span>Negative</span>
-              </div>
-            )}
-            {subjectList.length > 1 && (
-              <div className="pa-intro-stat">
-                <strong>{subjectList.length}</strong>
-                <span>Subjects</span>
-              </div>
-            )}
-          </div>
+          </main>
 
-          <div className="pa-intro-instructions">
-            <h3>Before you begin</h3>
-            <ul>
-              <li>The timer starts the moment you click <strong>Start Exam</strong>.</li>
-              <li>Each question has four options — select the best answer.</li>
-              {hasNeg && (
-                <li><strong>{paper.negativeMarking} mark{paper.negativeMarking !== 1 ? 's' : ''}</strong> will be deducted for each wrong answer. Skipped questions carry no penalty.</li>
-              )}
-              {subjectList.length > 1 && (
-                <li>Questions are grouped by subject. Use the subject tabs to jump to any section.</li>
-              )}
-              <li>You can <strong>Mark for Review</strong> and come back to any question before submitting.</li>
-              <li>Your progress is saved to the cloud. If you close the tab, resume from your Dashboard.</li>
-            </ul>
-          </div>
-
-          <div className="pa-intro-fs-warn">
-            <Maximize2 size={16} />
-            <div>
-              <strong>Fullscreen mode</strong>
-              <p>The exam will open in fullscreen for a distraction-free experience.</p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            className="pa-intro-start-btn"
-            onClick={handleStartExam}
-            disabled={startingExam || questions.length === 0}
-          >
-            {startingExam ? 'Starting…' : 'Start Exam →'}
-          </button>
-
-          <Link className="pa-intro-back-link" to={paperPath(paper.slug)}>
-            ← Back to paper
-          </Link>
+          <aside className="pa-gi-side">
+            <div className="pa-gi-avatar"><UserRound size={52} strokeWidth={1.6} /></div>
+            <strong>{user?.name ?? 'Candidate'}</strong>
+          </aside>
         </div>
+
+        {introStep === 'declaration' && (
+          <div className="pa-gi-band">
+            {hasHindiQuestions && (
+              <>
+                <div className="pa-gi-lang">
+                  <label htmlFor="pa-gi-lang-select">Choose your default language:</label>
+                  <select
+                    id="pa-gi-lang-select"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value as QuestionLanguage)}
+                  >
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी</option>
+                  </select>
+                </div>
+                <p className="pa-gi-red">
+                  Please note all questions will appear in your default language. This
+                  language can be changed for a particular question later on.
+                </p>
+              </>
+            )}
+
+            <h3 className="pa-gi-declhead">Declaration:</h3>
+            <label className="pa-gi-declare">
+              <input
+                type="checkbox"
+                checked={declared}
+                onChange={(e) => setDeclared(e.target.checked)}
+              />
+              <span>I have understood and agree to all the instructions.</span>
+            </label>
+          </div>
+        )}
+
+        <footer className="pa-gi-foot">
+          {introStep === 'instructions' ? (
+            <>
+              <Link className="pa-gi-back" to={paperPath(paper.slug)}>&larr; Go to Tests</Link>
+              <span />
+              <button type="button" className="pa-gi-next" onClick={() => setIntroStep('declaration')}>
+                Next
+              </button>
+            </>
+          ) : (
+            <>
+              <button type="button" className="pa-gi-prev" onClick={() => setIntroStep('instructions')}>
+                Previous
+              </button>
+              <button
+                type="button"
+                className="pa-gi-begin"
+                onClick={handleStartExam}
+                disabled={!declared || startingExam || questions.length === 0}
+              >
+                {startingExam ? 'Starting…' : 'I am ready to begin'}
+              </button>
+              <span className="pa-gi-foot-spacer" />
+            </>
+          )}
+        </footer>
       </div>
     )
   }
@@ -658,253 +916,71 @@ export function PaperAttemptPage() {
   }
 
   const timerWarning = remainingSeconds < 300
-  const showFsWarning = !isFullscreen && !submitted
+  const showFsWarning = !isFullscreen && !submitted && !isReview
   const hasSubjectTabs = subjectList.length > 1
 
   // ── Submission summary ─────────────────────────────────────────
-  if (submitted && !reviewMode) {
-    const activeCount = activeQuestions.length
-    const negMark = paper.negativeMarking ?? 0
-    const maxMarks = paper.maxMarks > 0 ? paper.maxMarks : activeCount
-    const marksPerQ = parseFloat((maxMarks / activeCount).toFixed(4))
-    const earnedMarks = parseFloat((results.correct * marksPerQ).toFixed(2))
-    const lostMarks = parseFloat((results.wrong * negMark).toFixed(2))
-    const netMarks = parseFloat((earnedMarks - lostMarks).toFixed(2))
-    const deletedCount = questions.length - activeCount
-    const subjectMarks = (s: { correct: number; wrong: number }) =>
-      parseFloat((s.correct * marksPerQ - s.wrong * negMark).toFixed(2))
-    return (
-      <div className="pa-result-page">
-        <header className="pa-result-header">
-          <CheckCircle2 size={20} className="pa-result-icon" />
-          <div className="pa-result-header-text">
-            <small>{paper.examName}</small>
-            <h1>{paper.title}</h1>
-          </div>
-        </header>
-
-        <div className="pa-result-body">
-          <section className="pa-score-panel">
-            <div className="pa-score-ring">
-              <strong className={netMarks < 0 ? 'pa-score-neg' : ''}>{netMarks}</strong>
-              <span>/ {maxMarks}</span>
-            </div>
-            <p className="pa-score-label">marks scored</p>
-
-            <div className="pa-score-stats">
-              <div className="pa-stat pa-stat--c">
-                <span>+{earnedMarks}</span>
-                <small>Earned</small>
-                <em>{results.correct} correct</em>
-              </div>
-              <div className="pa-stat pa-stat--w">
-                <span>{lostMarks > 0 ? `−${lostMarks}` : '0'}</span>
-                <small>Deducted</small>
-                <em>{results.wrong} wrong</em>
-              </div>
-              <div className="pa-stat pa-stat--s">
-                <span>{results.skipped}</span>
-                <small>Skipped</small>
-                <em>&nbsp;</em>
-              </div>
-            </div>
-
-            <div className="pa-score-meta">
-              <p className="pa-time-taken">Time: {formatTime(timeTaken)}</p>
-              <p className="pa-negmark-note">+{marksPerQ}/correct{negMark > 0 ? ` · −${negMark}/wrong` : ''}</p>
-              {deletedCount > 0 && (
-                <p className="pa-negmark-note">{deletedCount} Q deleted (excluded)</p>
-              )}
-            </div>
-          </section>
-
-          <section className="pa-subject-panel">
-            {results.subjectScores.length > 0 ? (
-              // Six columns with long subject names ("General Knowledge & Current
-              // Affairs") overflow a ~393px phone. Scroll the table itself rather
-              // than letting it push the whole page sideways — same treatment as
-              // .ov-table-wrap and .qr-table-wrap.
-              <div className="pa-subject-table-wrap">
-                <table className="pa-subject-table">
-                  <thead>
-                    <tr><th>Subject</th><th>Qs</th><th>✓</th><th>✗</th><th>—</th><th>Marks</th></tr>
-                  </thead>
-                  <tbody>
-                    {results.subjectScores.map((s) => {
-                      const sm = subjectMarks(s)
-                      return (
-                        <tr key={s.subject}>
-                          <td>{s.subject}</td>
-                          <td>{s.total}</td>
-                          <td className="correct">{s.correct}</td>
-                          <td className="wrong">{s.wrong}</td>
-                          <td className="skipped">{s.skipped}</td>
-                          <td className={sm < 0 ? 'wrong' : sm > 0 ? 'correct' : ''}>{sm}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <div className="pa-subject-empty">No subject breakdown available</div>
-            )}
-          </section>
-        </div>
-
-        <footer className="pa-result-footer">
-          <button type="button" className="pa-btn-review" onClick={() => { setReviewMode(true); setReviewIndex(0) }}>
-            <BookOpen size={15} /> Review Answers
-          </button>
-          <button type="button" className="pa-btn-secondary" onClick={() => navigate(paperPath(paper.slug))}>
-            Back to Paper
-          </button>
-          <button type="button" className="pa-btn-secondary" onClick={() => navigate(`/exam/${paper.examSlug}`)}>
-            Back to Exam
-          </button>
-        </footer>
-      </div>
-    )
+  // The effect above navigates to analytics the moment a result is saved; this
+  // stands in for the one frame between commit and route change.
+  if (submitted) {
+    return <HaloLoader label="Submitting — opening your analysis" />
   }
 
-  // ── Review mode ────────────────────────────────────────────────
-  if (submitted && reviewMode) {
-    const rq = questions[reviewIndex]
-    const localizedReview = rq ? getLocalizedQuestion(rq, language) : null
-    const chosen = rq ? answers[rq.slug] : undefined
-    const isCorrect = rq && chosen === rq.answerKey
-
-    return (
-      <div className="pa-attempt-page">
-        <header className="pa-topbar">
-          <div className="pa-topbar-left">
-            <small>{paper.examName}</small>
-            <strong>{paper.title} — Review</strong>
-          </div>
-          <div className="pa-topbar-right">
-            {hasHindiQuestions && (
-              <div className="pyq-language-toggle compact" aria-label="Question language">
-                <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
-                <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
-              </div>
-            )}
-            <span className="pa-review-badge">Review mode</span>
-            <button type="button" className="pa-exit-btn" onClick={() => setReviewMode(false)}>
-              Back to results
-            </button>
-          </div>
-        </header>
-
-        <div className="pa-attempt-body">
-          <section className="pa-question-panel">
-            <div className="pa-question-scroll">
-              <div className="pa-q-header">
-                <span className="pa-q-num">Q{reviewIndex + 1} <small>of {questions.length}</small></span>
-                {rq?.subject && (
-                  <Link
-                    className="pa-q-subject pa-q-subject-link"
-                    to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(rq.subject)}`}
-                    rel="nofollow"
-                  >
-                    {rq.subject}
-                  </Link>
-                )}
-              </div>
-
-              {rq && (
-                <>
-                  {localizedReview?.passage && (
-                    <div className="pyq-passage">
-                      <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
-                      <QuestionRenderer text={localizedReview.passage} />
-                    </div>
-                  )}
-                  <div className="pa-q-text"><MathText text={localizedReview?.question ?? rq.question} /></div>
-
-                  {rq.answerKey === 'Deleted' ? (
-                    <div className="pa-deleted-notice">
-                      <span className="pa-deleted-badge">Deleted Question</span>
-                      <p>{rq.explanation}</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="pa-options">
-                        {(localizedReview?.options ?? rq.options).map((opt) => {
-                          const isChosen = chosen === opt.key
-                          const isCorrectOpt = opt.key === rq.answerKey
-                          let cls = 'pa-option'
-                          if (isCorrectOpt) cls += ' correct'
-                          else if (isChosen && !isCorrect) cls += ' wrong'
-                          return (
-                            <div key={opt.key} className={cls}>
-                              <span className="pa-opt-key">{opt.key}</span>
-                              <MathText text={opt.text} />
-                              {isCorrectOpt && <CheckCircle2 size={14} className="pa-opt-check" />}
-                            </div>
-                          )
-                        })}
-                      </div>
-
-                      {!chosen && (
-                        <div className="pa-not-attempted">Not attempted · Correct answer: <strong>{rq.answerKey}</strong></div>
-                      )}
-
-                      {rq.explanation && (
-                        <div className="pa-explanation">
-                          <strong>Explanation</strong>
-                          <MathText text={rq.explanation} />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </>
-              )}
-            </div>
-
-            <footer className="pa-q-actions">
-              <button type="button" className="pa-nav-btn" onClick={() => setReviewIndex((i) => Math.max(0, i - 1))} disabled={reviewIndex === 0}>
-                <ChevronLeft size={16} /> Previous
-              </button>
-              <span className="pa-q-progress">{reviewIndex + 1} / {questions.length}</span>
-              <button type="button" className="pa-nav-btn" onClick={() => setReviewIndex((i) => Math.min(questions.length - 1, i + 1))} disabled={reviewIndex >= questions.length - 1}>
-                Next <ChevronRight size={16} />
-              </button>
-            </footer>
-          </section>
-
-          <aside className="pa-palette-panel">
-            <div className="pa-palette-legend">
-              <span className="pa-legend-dot answered" /><span>Correct</span>
-              <span className="pa-legend-dot wrong" /><span>Wrong</span>
-              <span className="pa-legend-dot visited" /><span>Skipped</span>
-            </div>
-            <div className="pa-palette-grid">
-              {questions.map((q, i) => {
-                const ch = answers[q.slug]
-                let cls = 'pa-palette-btn'
-                if (q.answerKey === 'Deleted') cls += ' deleted'
-                else if (!ch) cls += ' visited'
-                else if (ch === q.answerKey) cls += ' answered'
-                else cls += ' wrong'
-                if (i === reviewIndex) cls += ' current'
-                return (
-                  <button key={q.slug} type="button" className={cls} onClick={() => setReviewIndex(i)}>
-                    {i + 1}
-                  </button>
-                )
-              })}
-            </div>
-            <button type="button" className="pa-back-results-btn" onClick={() => setReviewMode(false)}>
-              <RotateCcw size={14} /> Back to results
-            </button>
-          </aside>
-        </div>
-      </div>
-    )
-  }
+  // The interim score card and its review screen used to live here. Submitting
+  // now goes straight to the exam's analytics, which carries the same score
+  // plus the trend, cutoff comparison and per-question solutions — so both
+  // screens were unreachable and have been removed rather than left as dead
+  // code behind an `if (false)`.
 
   // ── Exam hall ──────────────────────────────────────────────────
   const notAttempted = questions.length - answeredCount
+
+  // TCS iON's legend reports five mutually exclusive states that always sum to
+  // the paper length. "Not Answered" means seen-and-skipped, which is why
+  // visiting is tracked separately from answering.
+  const markedOnlyCount = questions.filter((q) => marked[q.slug] && !answers[q.slug]).length
+  const answeredMarkedCount = questions.filter((q) => marked[q.slug] && answers[q.slug]).length
+  // "Answered" excludes the marked ones — they are reported on their own row.
+  // answeredCount stays inclusive because scoring counts every response.
+  const answeredOnlyCount = answeredCount - answeredMarkedCount
+  const notAnsweredCount = questions.filter(
+    (q) => !answers[q.slug] && !marked[q.slug]
+      && (visited.has(q.slug) || q.slug === currentQuestion?.slug)).length
+  const notVisitedCount = Math.max(
+    0, questions.length - answeredOnlyCount - answeredMarkedCount
+       - markedOnlyCount - notAnsweredCount)
+
+
+  const clearResponse = () => {
+    if (!currentQuestion) return
+    setAnswers((cur) => {
+      const next = { ...cur }
+      delete next[currentQuestion.slug]
+      return next
+    })
+  }
+
+  const markForReviewAndNext = () => {
+    toggleMarked()
+    goNext()
+  }
+
+  // Review legend counts, over the section currently shown in the palette so
+  // the numbers match the boxes beneath them.
+  // Plain computation, not a useMemo: this sits after the early returns, where a
+  // hook would break the rules-of-hooks ordering, and it is one pass over at
+  // most a few hundred questions.
+  const reviewTally = (() => {
+    const scope = activeSubject ? questions.filter((q) => q.subject === activeSubject) : questions
+    let correct = 0, wrong = 0, skipped = 0
+    for (const q of scope) {
+      const chosen = answers[q.slug]
+      if (!chosen) skipped++
+      else if (chosen === q.answerKey) correct++
+      else wrong++
+    }
+    return { correct, wrong, skipped }
+  })()
 
   // Questions visible in palette (filtered by active subject)
   const paletteEntries = activeSubject
@@ -912,7 +988,108 @@ export function PaperAttemptPage() {
     : questions.map((q, i) => ({ q, i }))
 
   return (
-    <div className={`pa-attempt-page${hasSubjectTabs ? ' has-subjects' : ''}`}>
+    <div
+      className={`pa-attempt-page${hasSubjectTabs ? ' has-subjects' : ''}`}
+      // Exam-integrity measures, scoped to a live attempt only: the solved
+      // question pages elsewhere on the site stay fully copyable.
+      onContextMenu={(e) => e.preventDefault()}
+      onCopy={(e) => e.preventDefault()}
+      onCut={(e) => e.preventDefault()}
+      onDragStart={(e) => e.preventDefault()}
+    >
+      {/* Report a problem with this question — posts to the same endpoint the
+          public question pages use, so admins see one queue. */}
+      {reportOpen && currentQuestion && (
+        <div className="pa-modal-overlay" role="dialog" aria-modal="true" aria-label="Report question">
+          <div className="pa-modal">
+            <h2>Report Question {filteredIndex + 1}</h2>
+            {reportSent ? (
+              <>
+                <p>Thanks — this question has been flagged for review.</p>
+                <div className="pa-modal-actions">
+                  <button type="button" className="pa-nav-btn primary" onClick={() => { setReportOpen(false); setReportSent(false) }}>
+                    Close
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <label className="pa-modal-field">
+                  <span>What is wrong?</span>
+                  <select value={reportType} onChange={(e) => setReportType(e.target.value)}>
+                    <option>Wrong answer key</option>
+                    <option>Question text is unclear or incomplete</option>
+                    <option>Options are wrong or duplicated</option>
+                    <option>Explanation is incorrect</option>
+                    <option>Image or diagram missing</option>
+                    <option>Something else</option>
+                  </select>
+                </label>
+                <label className="pa-modal-field">
+                  <span>Details (optional)</span>
+                  <textarea
+                    rows={3}
+                    value={reportDetails}
+                    onChange={(e) => setReportDetails(e.target.value)}
+                    placeholder="Tell us what you noticed"
+                  />
+                </label>
+                <div className="pa-modal-actions">
+                  <button type="button" className="pa-nav-btn" onClick={() => setReportOpen(false)}>Cancel</button>
+                  <button
+                    type="button"
+                    className="pa-nav-btn primary"
+                    onClick={() => {
+                      void submitReport({
+                        questionSlug: currentQuestion.slug,
+                        questionNo: String(filteredIndex + 1),
+                        paperSlug: paper.slug,
+                        reportType,
+                        details: reportDetails,
+                      }).catch(() => undefined)
+                      setReportSent(true)
+                      setReportDetails('')
+                    }}
+                  >
+                    Submit Report
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Instructions, re-openable mid-exam without losing the attempt. */}
+      {showInstructions && (
+        <div className="pa-modal-overlay" role="dialog" aria-modal="true" aria-label="Instructions">
+          <div className="pa-modal wide">
+            <h2>General Instructions</h2>
+            <ol className="pa-gi-list">
+              <li>The countdown timer at the top shows the time remaining. When it reaches zero the test ends by itself.</li>
+              <li>
+                The Question Palette shows the status of every question:
+                <ul className="pa-gi-symbols">
+                  <li><i className="pa-legend-dot not-visited" />Not visited yet.</li>
+                  <li><i className="pa-legend-dot visited" />Seen but not answered.</li>
+                  <li><i className="pa-legend-dot answered" />Answered.</li>
+                  <li><i className="pa-legend-dot marked" />Marked for review, not answered.</li>
+                  <li><i className="pa-legend-dot answered-marked" />Answered and marked for review.</li>
+                </ul>
+              </li>
+              <li>An answered question that is marked for review is still evaluated.</li>
+              <li><strong>Save &amp; Next</strong> stores your answer and moves on; <strong>Clear Response</strong> removes it.</li>
+              <li>Selecting a question from the palette does not save the answer to the question you are leaving.</li>
+            </ol>
+            <div className="pa-modal-actions">
+              <button type="button" className="pa-nav-btn primary" onClick={() => setShowInstructions(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Fullscreen warning */}
       {showFsWarning && (
         <button type="button" className="pa-fullscreen-warn" onClick={enterFullscreen}>
@@ -939,36 +1116,42 @@ export function PaperAttemptPage() {
       {/* Top bar */}
       <header className="pa-topbar">
         <div className="pa-topbar-left">
-          <small>{paper.examName}</small>
-          <strong>{paper.title}</strong>
+          <Logo to={paperPath(paper.slug)} className="pa-hall-logo" />
+          <span className="pa-hall-testname">{paper.title}</span>
         </div>
         <div className="pa-topbar-center">
-          <div className={`pa-timer${timerWarning ? ' warning' : ''}`}>
-            <Clock3 size={15} />
-            <span>{formatTime(remainingSeconds)}</span>
+          {isReview ? (
+            <span className="pa-review-flag">Reviewing your attempt</span>
+          ) : (
+          /* Boxed digits, as the delivery software renders the clock. */
+          <div className={`pa-clock${timerWarning ? ' warning' : ''}`}>
+            <span className="pa-clock-label">Time Left</span>
+            {formatTime(remainingSeconds).split(':').map((part, i, all) => (
+              <span key={i} className="pa-clock-part">
+                <b>{part}</b>
+                {i < all.length - 1 && <i>:</i>}
+              </span>
+            ))}
           </div>
+          )}
         </div>
         <div className="pa-topbar-right">
-          {hasHindiQuestions && (
-            <div className="pyq-language-toggle compact" aria-label="Question language">
-              <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
-              <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
-            </div>
-          )}
-          {!isFullscreen && (
-            <button type="button" className="pa-fs-btn" onClick={enterFullscreen} title="Enter fullscreen">
-              <Maximize2 size={15} />
+          {isReview ? (
+            <Link className="pa-ghost-btn" to={`/analytics/${paper.examSlug}`}>
+              Back to analysis
+            </Link>
+          ) : (
+            <button type="button" className="pa-ghost-btn" onClick={enterFullscreen}>
+              {isFullscreen ? 'Exit Full Screen' : 'Switch Full Screen'}
             </button>
           )}
-          <button type="button" className="pa-submit-topbar-btn" onClick={() => setConfirmSubmit(true)}>
-            Submit Paper
-          </button>
         </div>
       </header>
 
       {/* Subject tabs bar */}
       {hasSubjectTabs && (
         <nav className="pa-subject-tabs" aria-label="Question subjects">
+          <span className="pa-sections-label">Sections</span>
           {subjectList.map((s) => (
             <button
               key={s.name}
@@ -990,16 +1173,40 @@ export function PaperAttemptPage() {
         <section className="pa-question-panel">
           <div className="pa-question-scroll">
             <div className="pa-q-header">
-              <span className="pa-q-num">
-                Q{currentIndex + 1} <small>of {questions.length}</small>
-              </span>
-              {currentQuestion?.subject && (
-                <span className="pa-q-subject">{currentQuestion.subject}</span>
-              )}
-              <button type="button" className={`pa-mark-btn${marked[currentQuestion?.slug ?? ''] ? ' active' : ''}`} onClick={toggleMarked}>
-                <Flag size={13} />
-                {marked[currentQuestion?.slug ?? ''] ? 'Marked' : 'Mark for Review'}
-              </button>
+              <span className="pa-q-num">Question No. {filteredIndex + 1}</span>
+              <div className="pa-q-tools">
+                <span className="pa-q-tool">
+                  <small>Marks</small>
+                  <span className="pa-q-marks">
+                    <em>+{marksPerQuestion}</em>
+                    {paper.negativeMarking > 0 && <b>&minus;{paper.negativeMarking}</b>}
+                  </span>
+                </span>
+                {/* Time-on-question is a live-exam measure; in review there is
+                    no clock running, so showing one would be noise. */}
+                {!isReview && (
+                  <span className="pa-q-tool">
+                    <small>Time</small>
+                    <strong className="pa-q-time">{formatClock(questionSeconds)}</strong>
+                  </span>
+                )}
+                {hasHindiQuestions && (
+                  <span className="pa-q-tool inline">
+                    <small>View in</small>
+                    <select
+                      value={language}
+                      onChange={(e) => setLanguage(e.target.value as QuestionLanguage)}
+                      aria-label="Question language"
+                    >
+                      <option value="en">English</option>
+                      <option value="hi">हिन्दी</option>
+                    </select>
+                  </span>
+                )}
+                <button type="button" className="pa-report-btn" onClick={() => setReportOpen(true)}>
+                  <AlertTriangle size={13} /> Report
+                </button>
+              </div>
             </div>
 
             {currentQuestion ? (
@@ -1011,7 +1218,7 @@ export function PaperAttemptPage() {
                   </div>
                 )}
                 <div className="pa-q-text">
-                  <MathText text={localizedCurrent?.question ?? currentQuestion.question} />
+                  <QuestionRenderer text={localizedCurrent?.question ?? currentQuestion.question} />
                 </div>
 
                 {currentQuestion.answerKey === 'Deleted' ? (
@@ -1021,29 +1228,47 @@ export function PaperAttemptPage() {
                   </div>
                 ) : (
                   <>
-                    <div className="pa-options">
-                      {(localizedCurrent?.options ?? currentQuestion.options).map((opt) => {
+                    <ol className="pa-options">
+                      {(localizedCurrent?.options ?? currentQuestion.options).map((opt, oi) => {
                         const chosen = answers[currentQuestion.slug] === opt.key
                         return (
-                          <button
-                            key={opt.key}
-                            type="button"
-                            className={`pa-option${chosen ? ' selected' : ''}`}
-                            onClick={() => chooseOption(opt.key)}
-                          >
-                            <span className="pa-opt-key">{opt.key}</span>
-                            <MathText text={opt.text} />
-                          </button>
+                          <li key={opt.key}>
+                            <label
+                              className={[
+                                'pa-option',
+                                chosen ? 'selected' : '',
+                                // In review the key is revealed: the right option is
+                                // always marked, and a wrong pick is marked too.
+                                isReview && opt.key === currentQuestion.answerKey ? 'is-correct' : '',
+                                isReview && chosen && opt.key !== currentQuestion.answerKey ? 'is-wrong' : '',
+                              ].filter(Boolean).join(' ')}
+                            >
+                              <input
+                                type="radio"
+                                name={`q-${currentQuestion.slug}`}
+                                checked={chosen}
+                                disabled={isReview}
+                                onChange={() => chooseOption(opt.key)}
+                              />
+                              <span className="pa-opt-key">{oi + 1}.</span>
+                              <span className="pa-opt-text"><MathText text={opt.text} /></span>
+                              {isReview && opt.key === currentQuestion.answerKey && (
+                                <span className="pa-opt-tag correct">Correct</span>
+                              )}
+                              {isReview && chosen && opt.key !== currentQuestion.answerKey && (
+                                <span className="pa-opt-tag wrong">Your answer</span>
+                              )}
+                            </label>
+                          </li>
                         )
                       })}
-                    </div>
+                    </ol>
 
-                    {answers[currentQuestion.slug] && (
-                      <button type="button" className="pa-clear-btn" onClick={() => {
-                        setAnswers((cur) => { const next = { ...cur }; delete next[currentQuestion.slug]; return next })
-                      }}>
-                        Clear response
-                      </button>
+                    {isReview && currentQuestion.explanation && (
+                      <div className="pa-review-explanation">
+                        <h3>Solution</h3>
+                        <ExplanationText text={currentQuestion.explanation} />
+                      </div>
                     )}
                   </>
                 )}
@@ -1057,57 +1282,159 @@ export function PaperAttemptPage() {
           </div>
 
           <footer className="pa-q-actions">
-            <button type="button" className="pa-nav-btn" onClick={goPrev} disabled={filteredIndex <= 0}>
-              <ChevronLeft size={16} /> Previous
-            </button>
-            <span className="pa-q-progress">
-              {filteredIndex + 1} / {filteredQuestions.length}
-              {activeSubject && hasSubjectTabs && <small> in {activeSubject}</small>}
-            </span>
-            <button type="button" className="pa-nav-btn primary" onClick={goNext} disabled={filteredIndex >= filteredQuestions.length - 1}>
-              Save &amp; Next <ChevronRight size={16} />
-            </button>
+            {isReview ? (
+              <>
+                <div className="pa-actions-left">
+                  <button
+                    type="button"
+                    className="pa-nav-btn pa-palette-toggle"
+                    onClick={() => setPaletteOpen(true)}
+                  >
+                    Palette ({filteredIndex + 1}/{filteredQuestions.length})
+                  </button>
+                </div>
+                <div className="pa-actions-right">
+                  <button type="button" className="pa-nav-btn" onClick={goPrev} disabled={filteredIndex <= 0}>
+                    <ChevronLeft size={15} /> Previous
+                  </button>
+                  <button
+                    type="button"
+                    className="pa-nav-btn primary"
+                    onClick={goNext}
+                    disabled={filteredIndex >= filteredQuestions.length - 1}
+                  >
+                    Next <ChevronRight size={15} />
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+            <div className="pa-actions-left">
+              <button
+                type="button"
+                className="pa-nav-btn pa-palette-toggle"
+                onClick={() => setPaletteOpen(true)}
+              >
+                Palette ({filteredIndex + 1}/{filteredQuestions.length})
+              </button>
+              <button type="button" className="pa-nav-btn" onClick={markForReviewAndNext}>
+                Mark for Review &amp; Next
+              </button>
+              <button
+                type="button"
+                className="pa-nav-btn"
+                onClick={clearResponse}
+                disabled={!currentQuestion || !answers[currentQuestion.slug]}
+              >
+                Clear Response
+              </button>
+            </div>
+            <div className="pa-actions-right">
+              <button type="button" className="pa-nav-btn" onClick={goPrev} disabled={filteredIndex <= 0}>
+                <ChevronLeft size={15} /> Previous
+              </button>
+              <button type="button" className="pa-nav-btn primary" onClick={goNext}>
+                Save &amp; Next <ChevronRight size={15} />
+              </button>
+            </div>
+              </>
+            )}
           </footer>
         </section>
 
         {/* Question palette */}
-        <aside className="pa-palette-panel">
-          <div className="pa-palette-stats">
-            <div className="pa-stat-chip answered"><CheckCircle2 size={12} />{answeredCount}</div>
-            <div className="pa-stat-chip marked"><Flag size={12} />{markedCount}</div>
-            <div className="pa-stat-chip wrong"><XCircle size={12} />{questions.length - answeredCount}</div>
+        {/* Backdrop only exists while the drawer is open on small screens. */}
+        {paletteOpen && (
+          <button
+            type="button"
+            className="pa-palette-backdrop"
+            aria-label="Close question palette"
+            onClick={() => setPaletteOpen(false)}
+          />
+        )}
+
+        <aside className={`pa-palette-panel${paletteOpen ? ' is-open' : ''}`}>
+          <button
+            type="button"
+            className="pa-palette-close"
+            onClick={() => setPaletteOpen(false)}
+            aria-label="Close question palette"
+          >
+            &times;
+          </button>
+          <div className="pa-side-user">
+            <span className="pa-side-avatar"><UserRound size={18} /></span>
+            <strong>{user?.name ?? 'Candidate'}</strong>
           </div>
 
-          <div className="pa-palette-legend">
-            <span className="pa-legend-dot answered" /><span>Answered</span>
-            <span className="pa-legend-dot not-visited" /><span>Not visited</span>
-            <span className="pa-legend-dot visited" /><span>Visited</span>
-            <span className="pa-legend-dot marked" /><span>Marked</span>
-            <span className="pa-legend-dot answered-marked" /><span>Ans+Marked</span>
+          {isReview && answersUnavailable ? (
+            <p className="pa-review-noanswers">
+              Your answer sheet for this attempt could not be loaded, so the palette
+              cannot show which questions you got right. The correct option and the
+              solution are still shown on every question.
+            </p>
+          ) : isReview ? (
+            <div className="pa-legend">
+              <span><i className="pa-count correct">{reviewTally.correct}</i>Correct</span>
+              <span><i className="pa-count wrong">{reviewTally.wrong}</i>Wrong</span>
+              <span><i className="pa-count not-visited">{reviewTally.skipped}</i>Skipped</span>
+            </div>
+          ) : (
+            <div className="pa-legend">
+              <span><i className="pa-count answered">{answeredOnlyCount}</i>Answered</span>
+              <span><i className="pa-count marked">{markedOnlyCount}</i>Marked</span>
+              <span><i className="pa-count not-visited">{notVisitedCount}</i>Not Visited</span>
+              <span><i className="pa-count answered-marked">{answeredMarkedCount}</i>Marked and answered</span>
+              <span><i className="pa-count not-answered">{notAnsweredCount}</i>Not Answered</span>
+            </div>
+          )}
+
+          <div className="pa-palette-section">
+            SECTION : <strong>{activeSubject ?? paper.examName}</strong>
           </div>
 
           <div className="pa-palette-grid">
-            {paletteEntries.map(({ q, i }) => {
-              const status = getStatus(q.slug, currentQuestion?.slug ?? '', answers, marked, visited)
+            {paletteEntries.map(({ q, i }, n) => {
+              // In review the attempt statuses (answered / marked / not visited)
+              // no longer tell you anything useful — what matters is whether you
+              // got it right. Green for correct, red for wrong, grey for skipped.
+              const status = isReview
+                ? (!answers[q.slug]
+                    ? 'not-visited'
+                    : answers[q.slug] === q.answerKey ? 'correct' : 'wrong')
+                : getStatus(q.slug, currentQuestion?.slug ?? '', answers, marked, visited)
               return (
                 <button
                   key={q.slug}
                   type="button"
                   className={`pa-palette-btn ${status}${i === currentIndex ? ' current' : ''}`}
-                  onClick={() => goTo(i)}
+                  onClick={() => { goTo(i); setPaletteOpen(false) }}
                 >
-                  {i + 1}
+                  {/* Numbered within the section, as TCS does — the palette
+                      of a 4-question section reads 1-4, not 1, 5, 9, 19. */}
+                  {n + 1}
                 </button>
               )
             })}
           </div>
 
-          <button type="button" className="pa-submit-palette-btn" onClick={() => setConfirmSubmit(true)}>
-            Submit Paper
-          </button>
+          {!isReview && (
+            <div className="pa-side-tools">
+              <button type="button" className="pa-ghost-btn wide" onClick={() => setShowInstructions(true)}>
+                Instructions
+              </button>
+            </div>
+          )}
+
+          {/* Nothing to submit in review — the attempt is already finished. */}
+          {!isReview && (
+            <button type="button" className="pa-submit-palette-btn" onClick={() => setConfirmSubmit(true)}>
+              Submit Test
+            </button>
+          )}
 
           <button type="button" className="pa-exit-link" onClick={handleExit} disabled={exiting}>
-            {exiting ? 'Saving…' : 'Exit Paper'}
+            {exiting ? 'Saving…' : isReview ? 'Close Solutions' : 'Exit Paper'}
           </button>
         </aside>
       </div>

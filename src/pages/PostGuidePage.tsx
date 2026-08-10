@@ -143,7 +143,7 @@ export function PostGuidePage() {
 
           {/* Exam Analysis — section weightage derived from the pattern above,
               so "which section carries the most marks" is always accurate. This
-              is the guide's unique hook; the blog owns broad info instead. */}
+              is the guide's unique hook. */}
           {weightage.length > 0 && (
             <section className="pg-section" aria-labelledby="analysis-heading">
               <h2 id="analysis-heading">Exam Analysis: Section Weightage</h2>

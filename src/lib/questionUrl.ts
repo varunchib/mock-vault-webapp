@@ -5,21 +5,34 @@
 // /question/<id> links can be 301-redirected to the canonical keyword URL —
 // no backend or database change needed.
 
-/** Turn question text into a short, hyphenated keyword slug for the URL. */
+/**
+ * Turn question text into a short, hyphenated keyword slug for the URL.
+ *
+ * MUST stay byte-identical to keywordify() in
+ * mock-vault-webservice/internal/httpapi/server.go — Go builds the sitemap URL
+ * and this builds the canonical link, so any divergence makes the sitemap
+ * advertise a URL the page itself disowns ("Page with redirect" in Search
+ * Console). Both sides are pinned by the same fixtures: score_test.go's
+ * TestKeywordify and scripts/check-keywordify.mjs.
+ */
 export function keywordify(text: string): string {
-  return (text || '')
+  const words = (text || '')
     .replace(/\$[^$]*\$/g, ' ')   // drop inline LaTeX math
     .replace(/[*_`#>~|]/g, ' ')   // drop markdown marks
     .toLowerCase()
     .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')  // non-alphanumerics → hyphen
+    // Devanagari (U+0900–U+097F) is kept alongside a-z0-9 so Hindi questions get
+    // real keywords instead of collapsing to the bare id.
+    .replace(/[^a-z0-9ऀ-ॿ]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .split('-')
     .filter(Boolean)
     .slice(0, 12)                 // cap the number of words
     .join('-')
-    .slice(0, 80)
-    .replace(/-+$/g, '')
+  // Cap by CODE POINTS, not UTF-16 units, to match Go's rune cap. For pure-ASCII
+  // text this is identical to the previous .slice(0, 80), so English URLs are
+  // unchanged.
+  return Array.from(words).slice(0, 80).join('').replace(/-+$/g, '')
 }
 
 /** Canonical path for a question: /question/<keywords>--<id> (falls back to /question/<id>). */

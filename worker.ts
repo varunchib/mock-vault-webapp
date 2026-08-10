@@ -2,10 +2,10 @@
 // structured data for public SEO routes while keeping the user-facing SPA fast.
 
 import { postGuides } from './src/data/postGuides'
-import { blogPosts, renderBlogHtml } from './src/data/blogPosts'
+import { figureSvg, figures } from './src/data/figures'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 import { questionPath, questionRealSlug } from './src/lib/questionUrl'
-import { blogPathForExam, guidePathForExam } from './src/lib/examLinks'
+import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 
 interface Env {
@@ -64,6 +64,15 @@ type MockData = {
   difficulty: string
   isFree: boolean
   subjects?: string[]
+}
+
+type RelatedQuestionData = {
+  urlCode: string
+  question: string
+  subject: string
+  examName: string
+  examSlug: string
+  year: string
 }
 
 type QuestionData = {
@@ -143,12 +152,21 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/tests': '/exams',
   '/practice': '/exams',
   '/attempted': '/analytics',
-  // Retired: JKSSB Patwari's last paper was September 2024 and JKSSB Junior
-  // Assistant is already at skill-test stage - neither appears on the JKSSB
-  // exam-date annexure, so a "how to prepare" article implied a cycle that does
-  // not exist. The guides carry the evergreen syllabus and the solved papers.
+  // The blog is retired in full. Every article restated what the exam's guide
+  // already covers in more depth (syllabus, pattern, eligibility, dates), so
+  // the two pages competed for the same queries and the thinner one diluted
+  // the guide. Each article 301s to the guide for the same exam, which keeps
+  // the accumulated link equity instead of dropping it on a 404.
   '/blog/jkssb-patwari-exam': '/guide/jkssb-patwari',
   '/blog/jkssb-junior-assistant-exam': '/guide/jkssb-junior-assistant',
+  '/blog/ibps-po-exam': '/guide/ibps-po',
+  '/blog/ssc-cgl-exam': '/guide/ssc-cgl',
+  '/blog/upsc-cse-exam': '/guide/upsc-cse',
+  '/blog/neet-ug-exam': '/guide/neet-ug',
+  '/blog/bpsc-exam': '/guide/bpsc-cce',
+  '/blog/jkpsc-jkcce-exam': '/guide/jkcce',
+  '/blog/rssb-patwari-exam': '/guide/rssb-patwari',
+  '/blog/jkssb-sub-inspector-exam': '/guide/jkpsi',
   // A board has no syllabus or pattern of its own - JKSSB runs 10 different
   // exams with 10 different papers - so a board-level guide could only restate
   // its children. The hub at /exam/jkssb is the page that aggregates them.
@@ -243,12 +261,29 @@ const STATIC_META: Record<string, PageMeta> = {
 // Bump to invalidate ALL edge-cached API responses at once (the query param
 // changes the Cloudflare cache key, forcing a fresh origin fetch). Needed once
 // to flush ~500 stale cached 404s; the API ignores unknown query params.
-const API_CACHE_VERSION = '2'
+//
+// Bumped to '3' after repairing 152 questions stuck on "Pending official key"
+// and rewriting 33 explanations: question responses are edge-cached for 86400s,
+// so without this the corrected pages would have stayed invisible to crawlers
+// for up to a day — exactly the window in which the Search Console fixes are
+// being validated. Bumped to '4' after normalising the tag vocabulary.
+const API_CACHE_VERSION = '14'
 
-function apiFetch(url: string, cacheTtl: number): Promise<Response> {
+// Every SSR subrequest leaves the Worker from the same Cloudflare egress
+// address, so the API's per-IP rate limiter (120/min on the public endpoints)
+// saw ALL prerendering — every crawler, every page — as one client. A question
+// page costs ~3 subrequests, so the whole site could only be prerendered ~40
+// times a minute; past that the API returned 429, apiJson turned that into
+// null, and the Worker reported 404. That is what put 53 live question pages
+// into Search Console as "Not found (404)".
+//
+// Forwarding the real visitor IP puts each client back in its own bucket, which
+// is what the limiter was always meant to do.
+function apiFetch(url: string, cacheTtl: number, clientIp?: string): Promise<Response> {
   const versioned = url + (url.includes('?') ? '&' : '?') + '_cv=' + API_CACHE_VERSION
   return fetch(versioned, {
     signal: AbortSignal.timeout(API_TIMEOUT_MS),
+    headers: clientIp ? { 'X-Forwarded-For': clientIp } : undefined,
     cf: {
       cacheEverything: true,
       // Cache 2xx for the full TTL, but NEVER pin a 404/5xx for hours. A single
@@ -262,10 +297,32 @@ function apiFetch(url: string, cacheTtl: number): Promise<Response> {
   } as RequestInit)
 }
 
-async function apiJson<T>(url: string, cacheTtl: number): Promise<T | null> {
-  const res = await apiFetch(url, cacheTtl)
-  if (!res.ok) return null
-  return res.json() as Promise<T>
+// The API failing to answer is NOT the same as the resource not existing, and
+// conflating the two is what made crawlers see 404 on live pages. Only a 404/410
+// means "absent"; a 429, a 5xx, a timeout or unparseable JSON means "ask again
+// later", and must surface as 503 so Google retries instead of deindexing.
+class TransientApiError extends Error {}
+
+async function apiJson<T>(url: string, cacheTtl: number, clientIp?: string): Promise<T | null> {
+  let res: Response
+  try {
+    res = await apiFetch(url, cacheTtl, clientIp)
+  } catch {
+    throw new TransientApiError(`unreachable: ${url}`)
+  }
+  if (res.status === 404 || res.status === 410) return null
+  if (!res.ok) throw new TransientApiError(`${res.status}: ${url}`)
+  try {
+    return (await res.json()) as T
+  } catch {
+    throw new TransientApiError(`bad json: ${url}`)
+  }
+}
+
+// Companion data that enriches a page but must never sink it — a missing
+// related-questions list is worth rendering the page without.
+function apiJsonOptional<T>(url: string, cacheTtl: number, clientIp?: string): Promise<T | null> {
+  return apiJson<T>(url, cacheTtl, clientIp).catch(() => null)
 }
 
 function esc(s: string): string {
@@ -289,8 +346,25 @@ function mathToText(s: string): string {
     .replace(/\\[a-zA-Z]+/g, '') // drop any other LaTeX command
     .replace(/[${}]/g, '')       // drop $ delimiters and leftover braces
 }
+// [[water:MARKET]] carries a visual instruction that plain text cannot show, so
+// in a <title>, a meta description or JSON-LD it reduces to the bare word —
+// "MARKET" reads correctly in a SERP, "[[water:MARKET]]" does not.
+// 'waterline' must precede 'water' in the alternation, or 'water' matches first
+// and leaves a stray "line:" behind.
+const FLIP_RE = /\[\[(waterline|water|mirror|rotate):([^\]\n]+)\]\]/g
+
 function stripMarkdown(s: string): string {
   return mathToText(s)
+    // A figure has no words of its own, so in plain-text contexts (title, meta
+    // description, JSON-LD) it becomes its <title> — the only description of the
+    // geometry that exists. Dropping it would leave those questions describing
+    // a diagram that is nowhere in the text.
+    .replace(/\[\[fig:([^\]\n]+)\]\]/g, (whole, key: string) => figures[key]?.title ?? whole)
+    .replace(FLIP_RE, (_m: string, axis: string, word: string) =>
+      axis === 'waterline'
+        // The given figure, not a transform — in plain text it is just the word.
+        ? word
+        : `${word} (${axis === 'water' ? 'water image' : axis === 'mirror' ? 'mirror image' : 'rotated 180 degrees'})`)
     .replace(/!\[[^\]]*]\([^)]+\)/g, '')
     .replace(/\[([^\]]+)]\([^)]+\)/g, '$1')
     .replace(/[*_`#>]/g, '')
@@ -298,19 +372,130 @@ function stripMarkdown(s: string): string {
     .trim()
 }
 
+// stripMarkdown collapses every run of whitespace, which is right for a title
+// or a meta description but wrong for structured-data question text: a
+// statement list or a match-the-following grid run onto one line reads as a
+// single sentence. This strips the same markers line by line so the numbered
+// items, List-I/List-II rows and A&R statements keep their own lines.
+function stripMarkdownKeepLines(s: string): string {
+  return String(s ?? '')
+    .split('\n')
+    .map((line) => stripMarkdown(line))
+    .join('\n')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+// The one line that identifies a question page — used for both the <h1> and the
+// <title>, and mirrored by QuestionPage on the client so a crawler and a reader
+// see the same heading.
+//
+// Prefer the line that is actually being asked. Assertion & Reason items have
+// none (no line ends in "?") and their last line is the rubric shared by every
+// such question, so fall back to the Assertion, which is the substance and is
+// unique per question. Without this, all 20 A&R pages in a paper shared one
+// title: "Given below are two statements, one is labelled as Assertion (A)…".
+//
+// Passage-led comprehension items are the third case: they ask their question
+// as a stem ending in ":" rather than "?", so neither rule above fires and the
+// first line wins — which is the passage header. That made 52 indexed pages
+// render <h1>Passage for Questions (1-5)</h1> instead of the question. Prefer
+// the last stem line, skipping rubric boilerplate that identifies nothing.
+//
+// Two guards keep this from making things worse. Trailing labels like
+// "Conclusions:" or "Statements:" also end in ":" but name nothing, so they are
+// excluded by RUBRIC_LINE and by a six-word floor — without the floor, 22 pages
+// regressed from a real first line to a bare "Conclusions:".
+const RUBRIC_LINE =
+  /^(select|choose|consider|options?|codes?|conclusions?|statements?|directions?|instructions?|read|study|answer)\b/i
+// A line consisting solely of a flip/figure token, e.g. "[[waterline:MARKET]]".
+const FIGURE_ONLY = /^\[\[(?:fig|waterline|water|mirror|rotate):[^\]\n]+\]\]$/
+const STEM_MIN_WORDS = 6
+
+function substantiveQuestionLine(question: string): string {
+  // Figure-only lines are dropped BEFORE stripMarkdown, because stripping turns
+  // "[[waterline:MARKET]]" into the bare word "MARKET", after which it is
+  // indistinguishable from real question text and lands in the <h1>.
+  const lines = question
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l && !l.startsWith('|') && !FIGURE_ONLY.test(l))
+    .map((l) => stripMarkdown(l).trim())
+    .filter(Boolean)
+  if (!lines.length) return stripMarkdown(question)
+  if (lines.length <= 2) return lines.join(' ')
+  const asked = [...lines].reverse().find((l) => l.endsWith('?'))
+  if (asked) return asked
+  const assertion = lines.find((l) => /^Assertion\s*\(A\)\s*:/i.test(l))
+  if (assertion) return assertion.replace(/^Assertion\s*\(A\)\s*:\s*/i, '')
+  const stem = [...lines]
+    .reverse()
+    .find((l) => l.endsWith(':') && !RUBRIC_LINE.test(l) && l.split(/\s+/).length >= STEM_MIN_WORDS)
+  if (stem) return stem
+  return lines[0]
+}
+
 function htmlText(s: string | number | undefined | null): string {
   return esc(stripMarkdown(String(s ?? '')))
 }
 
+const FLIP_CLASS: Record<string, string> = {
+  water: 'mv-water-image', mirror: 'mv-mirror-image', rotate: 'mv-rotate-image',
+  waterline: 'mv-waterline',
+}
+const FLIP_ARIA: Record<string, string> = {
+  water: 'shown as a water image (flipped top to bottom)',
+  mirror: 'shown as a mirror image (flipped left to right)',
+  rotate: 'shown rotated by 180 degrees',
+  waterline: 'printed above a water surface line',
+}
+
+// Options carrying a flip token must keep it as a transform, not be flattened.
+// stripMarkdown would render all four MARKET options as the identical word
+// "MARKET", leaving a crawler four indistinguishable choices.
+function optionHtml(s: string): string {
+  const src = String(s ?? '')
+  if (!src.includes('[[')) return htmlText(src)
+  // Figure tokens first: a crawler that renders CSS sees the same drawing a
+  // reader does, and the <title> inside gives non-rendering consumers a real
+  // description instead of nothing.
+  if (src.includes('[[fig:')) {
+    return src.replace(/\[\[fig:([^\]\n]+)\]\]/g, (whole, key: string) => figureSvg(key) ?? whole)
+      .split(/(<svg[\s\S]*?<\/svg>)/)
+      .map((part) => (part.startsWith('<svg') ? part : htmlText(part)))
+      .join('')
+  }
+  const re = /\[\[(waterline|water|mirror|rotate):([^\]\n]+)\]\]/g
+  let out = '', last = 0, m: RegExpExecArray | null
+  while ((m = re.exec(src)) !== null) {
+    out += esc(src.slice(last, m.index))
+    out += `<span class="${FLIP_CLASS[m[1]]}" role="img" aria-label="${esc(m[2])}, ${FLIP_ARIA[m[1]]}">${esc(m[2])}</span>`
+    last = re.lastIndex
+  }
+  return out + esc(src.slice(last))
+}
+
 function paragraph(s: string | undefined | null): string {
-  const clean = htmlText(s)
-  return clean ? `<p>${clean}</p>` : ''
+  // optionHtml, despite the name, is the shared "escape but keep flip tokens as
+  // spans" renderer — the question stem needs it too, or the given figure in a
+  // water-image question flattens to a bare word for crawlers.
+  const clean = optionHtml(String(s ?? ''))
+  return clean.trim() ? `<p>${clean}</p>` : ''
 }
 
 // inlineFmt escapes text then applies **bold**, matching how the React app
 // (MathText) renders it, so explanations look identical to users and to Google.
 function inlineFmt(s: string): string {
-  return esc(String(s)).replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  return esc(String(s))
+    .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+    // Mirrors MathText's 'flip' token so a crawler sees the same markup a
+    // reader does — real text under a transform, not an image.
+    .replace(/\[\[water:([^\]\n]+)\]\]/g,
+      '<span class="mv-water-image" role="img" aria-label="$1, shown as a water image (flipped top to bottom)">$1</span>')
+    .replace(/\[\[mirror:([^\]\n]+)\]\]/g,
+      '<span class="mv-mirror-image" role="img" aria-label="$1, shown as a mirror image (flipped left to right)">$1</span>')
+    .replace(/\[\[rotate:([^\]\n]+)\]\]/g,
+      '<span class="mv-rotate-image" role="img" aria-label="$1, shown rotated by 180 degrees">$1</span>')
 }
 
 // richText renders explanation content with a light structure — headings,
@@ -522,13 +707,13 @@ function renderPageShell(title: string, children: string, crumbs: Crumb[] = []):
   </article>`
 }
 
-function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
+function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: RelatedQuestionData[] = []): string {
   const isDeleted = String(q.answerKey).toLowerCase() === 'deleted'
   const isPending = String(q.answerKey).toLowerCase() === 'pending'
   const optionItems = (q.options ?? [])
     .map(opt => {
       const correct = !isDeleted && !isPending && String(opt.key).toUpperCase() === String(q.answerKey).toUpperCase()
-      return `<li${correct ? ' class="correct"' : ''}><strong>${htmlText(opt.key)}.</strong> ${htmlText(opt.text)}${correct ? ' <strong>(Correct answer)</strong>' : ''}</li>`
+      return `<li${correct ? ' class="correct"' : ''}><strong>${htmlText(opt.key)}.</strong> ${optionHtml(opt.text)}${correct ? ' <strong>(Correct answer)</strong>' : ''}</li>`
     })
     .join('')
   const tags = (q.tags ?? [])
@@ -559,7 +744,23 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
 
   const solution = richText(q.explanation)
 
-  const heading = stripMarkdown(q.question).replace(/\s+/g, ' ').trim()
+  // Real anchors, rendered server-side. This is the whole point of the block:
+  // question pages linked only up to their exam and paper, so ~3,000 of them
+  // sat at the edge of the link graph with nothing pointing sideways.
+  const relatedSection = related.length
+    ? `<nav aria-label="Related questions"><h2>Related questions</h2><ul>${related
+        .map((r) => {
+          const label = substantiveQuestionLine(r.question) || r.question
+          const meta = [r.subject, r.examName && `${r.examName}${r.year ? ' ' + r.year : ''}`]
+            .filter(Boolean).join(' · ')
+          return `<li><a href="${questionPath(r.urlCode, label)}">${htmlText(label).slice(0, 160)}</a>${
+            meta ? ` — ${htmlText(meta)}` : ''
+          }</li>`
+        })
+        .join('')}</ul></nav>`
+    : ''
+
+  const heading = substantiveQuestionLine(q.question)
   return renderPageShell(`${heading.length > 130 ? heading.slice(0, 129).trimEnd() + '…' : heading}`, `
     <p>${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` ${htmlText(q.year)}` : ''}</p>
     ${paperLink}
@@ -577,6 +778,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = []): string {
     ${!isDeleted && solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
     ${hindiSection}
     ${tags ? `<p><strong>Topics covered:</strong> ${tags}</p>` : ''}
+    ${relatedSection}
   `, crumbs)
 }
 
@@ -625,28 +827,6 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
   `, crumbs)
 }
 
-function renderBlogContent(post: (typeof blogPosts)[string], crumbs: Crumb[] = []): string {
-  // renderBlogHtml is shared with BlogPostPage, so bots and users see identical body HTML.
-  const body = renderBlogHtml(post)
-  const faqs = post.faqs.length
-    ? `<section><h2>Frequently Asked Questions</h2><dl>${post.faqs
-        .map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`)
-        .join('')}</dl></section>`
-    : ''
-  const related = post.related.length
-    ? `<section><h2>Related on Ministry of Papers</h2><ul>${post.related
-        .map(r => `<li><a href="${esc(r.href)}">${htmlText(r.label)}</a></li>`)
-        .join('')}</ul></section>`
-    : ''
-  return renderPageShell(post.h1, `
-    <p><small>Updated <time datetime="${esc(post.updatedAt)}">${htmlText(post.updatedAt)}</time> · ${post.readMinutes} min read</small></p>
-    <p>${htmlText(post.excerpt)}</p>
-    ${body}
-    ${faqs}
-    ${related}
-  `, crumbs)
-}
-
 function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], subExams: ExamData[] = [], crumbs: Crumb[] = []): string {
   // Sub-exam links so a board renders as a real hub for bots — matching the
   // "Exams under this board" section the React page shows humans. Without these,
@@ -660,41 +840,29 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
     .join('')
   const mockLinks = mocks
+    // Empty series are still not linked for crawlers: the mock hub is noindex
+    // and an unpublished series has nothing to attempt, so a link here would be
+    // a dead end. The app lists them (marked "Not published") because a visitor
+    // benefits from seeing what is planned; a crawler does not.
+    .filter(m => (m.questions ?? 0) > 0)
     .slice(0, 20)
     .map(m => `<li><a href="/mock-test/${encodeURIComponent(m.slug)}">${htmlText(m.title)}</a> <small>${htmlText(m.difficulty)} - ${m.questions} questions</small></li>`)
     .join('')
   const subjects = (e.subjects ?? []).filter(Boolean).join(', ')
-  // Guide / blog cross-links — hand crawlers off to the editorial reference and
-  // info article for this exam, mirroring the cards the React page shows.
+  // Guide cross-link — hands crawlers off to the editorial reference for this
+  // exam, mirroring the card the React page shows.
   const guideHref = guidePathForExam(e.slug)
-  const blogHref = blogPathForExam(e.slug)
-  const resourceLinks = [
-    guideHref ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>` : '',
-    blogHref ? `<li><a href="${blogHref}">${htmlText(e.shortName)}: notification, dates, salary &amp; preparation</a></li>` : '',
-  ].join('')
+  const resourceLinks = guideHref
+    ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`
+    : ''
   return renderPageShell(`${e.name} PYQ papers and mock tests`, `
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
-    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} guides &amp; info</h2><ul>${resourceLinks}</ul></section>` : ''}
+    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} exam guide</h2><ul>${resourceLinks}</ul></section>` : ''}
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
-  `, crumbs)
-}
-
-function renderMockContent(exam: ExamData, mocks: MockData[], papers: PaperData[], crumbs: Crumb[] = []): string {
-  const mockItems = mocks
-    .map(m => `<li><strong>${htmlText(m.title)}</strong><br />${htmlText(m.description)}<br /><small>${m.questions} questions - ${m.durationMinutes} minutes - ${htmlText(m.difficulty)}</small></li>`)
-    .join('')
-  const paperLinks = papers
-    .slice(0, 10)
-    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a></li>`)
-    .join('')
-  return renderPageShell(`${exam.shortName} mock tests`, `
-    ${paragraph(exam.description)}
-    ${mockItems ? `<section><h2>Available mock tests</h2><ul>${mockItems}</ul></section>` : '<p>No published mock tests are available for this exam yet.</p>'}
-    ${paperLinks ? `<section><h2>Related PYQ papers</h2><ul>${paperLinks}</ul></section>` : ''}
   `, crumbs)
 }
 
@@ -734,27 +902,62 @@ function isDynamicSeoPath(pathname: string): boolean {
     || /^\/guide\/[^/]+$/.test(pathname)
 }
 
-function notFoundResponse(): Response {
+// A 404 on a dynamic SEO path is *inferred*: the Worker asks the API and says
+// "not found" when the answer doesn't come back. That inference is wrong every
+// time the API merely blips — a deploy, a container restart, a query slower
+// than API_TIMEOUT_MS — and at `max-age=300` Cloudflare pinned the wrong answer
+// at the edge for five minutes, serving 404 for live pages long after the API
+// recovered. (Observed in production: flushing the catalog cache while the
+// webservice restarted made every /pyq page 404 to crawlers, and it stayed that
+// way through repeated requests because the edge had cached it.)
+//
+// apiFetch already caps *upstream* error caching at 5s for exactly this reason;
+// 'inferred' does the same for the response we hand back, so a transient
+// failure self-heals on the next crawl instead of outliving the outage. 5s
+// rather than no-store still damps a bot hammering bogus URLs during an outage.
+//
+// 'decided' is for paths that are gone by decision rather than by inference —
+// the retired /blog articles — where no API call is involved, nothing can blip,
+// and there is no reason to make crawlers re-ask every time.
+// 503 is the honest answer when the API did not respond: it tells a crawler the
+// page still exists and to come back, and Google will not drop an indexed URL
+// for it. A 404 in the same situation is what caused the deindexing.
+function serviceUnavailableResponse(): Response {
+  return new Response(
+    '<!doctype html><title>503 Service Unavailable</title><h1>503 Service Unavailable</h1>',
+    {
+      status: 503,
+      headers: {
+        'content-type': 'text/html; charset=UTF-8',
+        'retry-after': '120',
+        'cache-control': 'no-store',
+      },
+    },
+  )
+}
+
+function notFoundResponse(certainty: 'inferred' | 'decided' = 'inferred'): Response {
   return new Response('<!doctype html><title>404 Not Found</title><h1>404 Not Found</h1>', {
     status: 404,
     headers: {
       'content-type': 'text/html; charset=UTF-8',
       'x-robots-tag': 'noindex',
-      'cache-control': 'public, max-age=300',
+      'cache-control': certainty === 'decided' ? 'public, max-age=300' : 'public, max-age=5',
     },
   })
 }
 
-async function fetchMeta(pathname: string): Promise<PageMeta | null> {
+async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta | null> {
   try {
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
     if (examMatch) {
       const slug = examMatch[1]
       const [e, papers, mocks, allExams] = await Promise.all([
-        apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600),
-        apiJson<PaperData[]>(`${API}/api/v1/exams/${slug}/papers`, 3600),
-        apiJson<MockData[]>(`${API}/api/v1/mocks`, 3600),
-        apiJson<ExamData[]>(`${API}/api/v1/exams`, 3600),
+        apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600, clientIp),
+        // Strict for the same reason: an exam hub with no paper list is thin.
+        apiJson<PaperData[]>(`${API}/api/v1/exams/${slug}/papers`, 3600, clientIp),
+        apiJsonOptional<MockData[]>(`${API}/api/v1/mocks`, 3600, clientIp),
+        apiJsonOptional<ExamData[]>(`${API}/api/v1/exams`, 3600, clientIp),
       ])
       if (!e) return null
       const examMocks = (mocks ?? []).filter(m => m.examSlug === slug)
@@ -789,51 +992,20 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       }
     }
 
+    // /mock-test/<exam> no longer has a page: the test series moved into the
+    // exam page's Mock Tests tab, so one exam is no longer split across two
+    // URLs. The route stays as a redirect for existing links and bookmarks —
+    // and since the old page was noindex, nothing is lost from the index.
     const mockMatch = pathname.match(/^\/mock-test\/([^/]+)$/)
     if (mockMatch) {
       const slug = mockMatch[1]
       let examSlug = slug
-      let e = await apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600)
-      if (!e) {
-        const m = await apiJson<MockData>(`${API}/api/v1/mocks/${slug}`, 3600)
+      if (!(await apiJson<ExamData>(`${API}/api/v1/exams/${slug}`, 3600, clientIp))) {
+        const m = await apiJson<MockData>(`${API}/api/v1/mocks/${slug}`, 3600, clientIp)
         if (!m) return null
         examSlug = m.examSlug
-        e = await apiJson<ExamData>(`${API}/api/v1/exams/${examSlug}`, 3600)
-        if (!e) return null
       }
-      const [allMocks, papers] = await Promise.all([
-        apiJson<MockData[]>(`${API}/api/v1/mocks`, 3600),
-        apiJson<PaperData[]>(`${API}/api/v1/exams/${examSlug}/papers`, 3600),
-      ])
-      const examMocks = (allMocks ?? []).filter(m => m.examSlug === examSlug)
-      const mockCrumbs: Crumb[] = [
-        { name: 'Home', item: BASE },
-        { name: 'Exams', item: `${BASE}/exams` },
-        { name: e.shortName, item: `${BASE}/exam/${examSlug}` },
-        { name: 'Mock Tests', item: `${BASE}/mock-test/${examSlug}` },
-      ]
-      return {
-        title: titleFit(`${e.shortName} Free Mock Tests - Full-Length Practice`),
-        description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
-        // Mocks are still feature-gated ("coming soon") in the app, so the page
-        // a searcher would land on cannot actually be attempted. Keep it out of
-        // the index until mocks launch — indexing a "Free Practice" page that
-        // shows "coming soon" is thin/misleading content. Remove this line (and
-        // re-enable the mock_exam sitemap entry) when mocks go live.
-        robots: 'noindex, follow',
-        contentHtml: renderMockContent(e, examMocks, papers ?? [], mockCrumbs),
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'LearningResource',
-          name: `${e.shortName} Mock Tests - Free Full-Length Practice`,
-          description: `Free full-length mock tests for ${e.name}. Real exam pattern, automatic scoring, detailed solutions.`,
-          url: `${BASE}/mock-test/${examSlug}`,
-          learningResourceType: 'Practice Test',
-          educationalUse: 'Practice',
-          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: breadcrumbJsonLd(mockCrumbs),
-        },
-      }
+      return { title: '', description: '', redirect: `/exam/${encodeURIComponent(examSlug)}` }
     }
 
     const paperMatch = pathname.match(/^\/pyq\/([^/]+)$/)
@@ -841,8 +1013,13 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       const requestSlug = paperMatch[1]
       const slug = apiPaperSlug(requestSlug)
       const [p, questions] = await Promise.all([
-        apiJson<PaperData>(`${API}/api/v1/papers/${slug}`, 3600),
-        apiJson<QuestionData[]>(`${API}/api/v1/papers/${slug}/questions`, 3600),
+        apiJson<PaperData>(`${API}/api/v1/papers/${slug}`, 3600, clientIp),
+        // Strict: the question list IS the paper page. Degrading to an empty
+        // page would serve Google a thin duplicate of every other paper and
+        // earn a lasting "crawled - currently not indexed"; a 503 costs one
+        // retry and no quality judgement. A genuinely empty paper still
+        // returns 200 with [], so this only trips on a real failure.
+        apiJson<QuestionData[]>(`${API}/api/v1/papers/${slug}/questions`, 3600, clientIp),
       ])
       if (!p) return null
       const override = paperSeoOverride(p.slug)
@@ -892,7 +1069,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
     const questionMatch = pathname.match(/^\/question\/([^/]+)$/)
     if (questionMatch) {
       // URL is /question/<keywords>--<id>; fetch by the stable id after "--".
-      const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${questionRealSlug(questionMatch[1])}?v=2`, 86400)
+      const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${questionRealSlug(questionMatch[1])}?v=2`, 86400, clientIp)
       if (!q) return null
       // Canonical keyword URL; 301 any bare/old/mismatched URL to it.
       const canonicalPath = questionPath(q.urlCode ?? q.slug, q.question)
@@ -915,10 +1092,20 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       // questions.exam_name holds the long official name ("UPSC Civil Services
       // Examination"); the exam record has a compact shortName ("UPSC CSE") that
       // leaves room for the topic keywords in the title.
-      const exam = await apiJson<ExamData>(`${API}/api/v1/exams/${q.examSlug}`, 86400)
+      // Fetched in parallel with the exam record — it is an extra subrequest on
+      // every crawl of every question page, so it must not add a serial hop.
+      // Cached 6h upstream; a failure just omits the block.
+      const [exam, related] = await Promise.all([
+        apiJsonOptional<ExamData>(`${API}/api/v1/exams/${q.examSlug}`, 86400, clientIp),
+        apiJsonOptional<RelatedQuestionData[]>(
+          `${API}/api/v1/questions/${encodeURIComponent(q.urlCode ?? q.slug)}/related`, 21600, clientIp),
+      ])
       const examLabel = exam?.shortName || q.examName
       const answerText = [
-        q.answer ? `Correct answer: ${q.answer}.` : `Correct option: ${q.answerKey}.`,
+        // stripMarkdown, not the raw value: an answer stored as a flip token
+        // ("[[water:MARKET]]") must reach structured data as readable prose
+        // ("MARKET (water image)"), never as the markup itself.
+        q.answer ? `Correct answer: ${stripMarkdown(q.answer)}.` : `Correct option: ${q.answerKey}.`,
         stripMarkdown(q.explanation ?? ''),
       ].filter(Boolean).join(' ').slice(0, 1000)
       // For reading-passage questions the stored text begins with the shared
@@ -927,8 +1114,7 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       // line ending in '?', so prefer that when the text is multi-line.
       const qLines = q.question.split('\n').map((l) => stripMarkdown(l).trim()).filter(Boolean)
       const multiline = qLines.length > 2
-      const actualQuestion =
-        multiline ? ([...qLines].reverse().find((l) => l.endsWith('?')) ?? qLines[0]) : qLines.join(' ')
+      const actualQuestion = substantiveQuestionLine(q.question)
       // Curated tag first (67% of rows have one), else derive from the text.
       const topic = questionTopic(q) || topicFromQuestion(qLines)
       // The brand suffix is deliberately gone: 21 chars of " | Ministry of
@@ -944,13 +1130,19 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       // papers and gave every statement-list page one shared snippet.
       const descTail = ` Answer (${q.answerKey}) with a full solution — ${examLabel} ${q.year}${q.subject ? ' ' + q.subject : ''}${topic ? ' · ' + topic : ''}.`
       const leadRoom = Math.max(60, 158 - descTail.length)
-      const flatQuestion = qLines.join(' ')
+      // Lead with the identifying line, then the rest of the stem. Joining the
+      // lines in source order opened every Assertion & Reason snippet with the
+      // same boilerplate sentence, so 20 pages in a paper shared a lead.
+      const flatQuestion = [
+        actualQuestion,
+        ...qLines.filter((l) => !l.includes(actualQuestion)),
+      ].join(' ').replace(/\s+/g, ' ').trim()
       const descLead =
         flatQuestion.length > leadRoom ? flatQuestion.slice(0, leadRoom - 1).trimEnd() + '…' : flatQuestion
       return {
         title: pageTitle,
         description: `${descLead}${descTail}`,
-        contentHtml: renderQuestionContent(q, crumbs),
+        contentHtml: renderQuestionContent(q, crumbs, related ?? []),
         jsonLd: [
           {
             '@context': 'https://schema.org',
@@ -961,9 +1153,13 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
             ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
             ...((q.tags ?? []).length ? { keywords: (q.tags ?? []).filter(Boolean).join(', ') } : {}),
             mainEntity: {
+              // Both fields carried the raw stored text, so the markdown the
+              // page renders as bold ("**List-I (Coal Field)**") reached Google
+              // as literal asterisks. name is the one-line form; text keeps the
+              // line structure so multi-part questions stay readable.
               '@type': 'Question',
-              name: q.question.slice(0, 300),
-              text: q.question,
+              name: flatQuestion.slice(0, 300),
+              text: stripMarkdownKeepLines(q.question),
               answerCount: 1,
               author: QA_AUTHOR,
               datePublished: qaDate(q.year),
@@ -1012,48 +1208,10 @@ async function fetchMeta(pathname: string): Promise<PageMeta | null> {
       }
     }
 
-    const blogMatch = pathname.match(/^\/blog\/([^/]+)$/)
-    if (blogMatch) {
-      const slug = blogMatch[1]
-      const post = blogPosts[slug]
-      if (!post) return null
-      const blogCrumbs: Crumb[] = [
-        { name: 'Home', item: BASE },
-        { name: 'Blog', item: `${BASE}/blog` },
-        { name: post.title, item: `${BASE}/blog/${slug}` },
-      ]
-      return {
-        title: titleFit(post.title),
-        description: post.description,
-        contentHtml: renderBlogContent(post, blogCrumbs),
-        jsonLd: [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'BlogPosting',
-            headline: post.h1,
-            description: post.description,
-            url: `${BASE}/blog/${slug}`,
-            datePublished: post.publishedAt,
-            dateModified: post.updatedAt,
-            author: { '@type': 'Organization', name: post.author, url: BASE },
-            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
-            articleSection: post.category,
-            keywords: post.tags.join(', '),
-            mainEntityOfPage: { '@type': 'WebPage', '@id': `${BASE}/blog/${slug}` },
-          },
-          {
-            '@context': 'https://schema.org',
-            '@type': 'FAQPage',
-            mainEntity: post.faqs.map(f => ({
-              '@type': 'Question',
-              name: f.q,
-              acceptedAnswer: { '@type': 'Answer', text: f.a },
-            })),
-          },
-        ],
-      }
-    }
-  } catch {
+  } catch (err) {
+    // A blanket catch here used to turn every upstream hiccup into null, which
+    // the handler then rendered as 404. Transient failures must propagate.
+    if (err instanceof TransientApiError) throw err
     return null
   }
 
@@ -1109,6 +1267,15 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
+    // The blog is retired. Known articles 301 above; anything else under /blog
+    // is gone for good and must say so with a real status. Falling through to
+    // the SPA returned 200 with an empty shell that client-redirects to "/",
+    // which Google classifies as a Soft 404 — the one blog-related error that
+    // would actually show up in Search Console.
+    if (path === '/blog' || path.startsWith('/blog/')) {
+      return notFoundResponse('decided')
+    }
+
     // Retired /exam/:slug/overview pages → the exam guide (or the hub if no
     // guide). Overview duplicated the guide's pattern/eligibility content, so
     // it was removed to end the cannibalization; 301 preserves any earned rank.
@@ -1155,7 +1322,7 @@ export default {
         // immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=4`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=5`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
@@ -1211,11 +1378,13 @@ export default {
     try {
       const [baseRes, meta] = await Promise.all([
         env.ASSETS.fetch(indexRequest),
-        fetchMeta(path),
+        fetchMeta(path, request.headers.get('CF-Connecting-IP') ?? undefined),
       ])
 
       if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
-      if (!meta) return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()
+      // A dynamic path resolves through the API, so a miss here may just be an
+      // outage; an unknown static path is simply not a route we serve.
+      if (!meta) return notFoundResponse(isDynamicSeoPath(path) ? 'inferred' : 'decided')
 
       // Non-canonical URL (e.g. old bare /question/<id>) → 301 to the canonical
       // keyword URL so search engines transfer ranking to the new address.
@@ -1252,7 +1421,12 @@ export default {
       if (meta.robots) headers.set('X-Robots-Tag', meta.robots)
       return new Response(enhanced, { status: 200, headers })
     } catch {
-      return isDynamicSeoPath(path) ? notFoundResponse() : notFoundResponse()
+      // Reaching here means something threw — a failed fetch, a rate-limited
+      // API, a bad payload. That is never a statement about the URL, so it must
+      // not be answered with 404: the genuine "no such page" path is the
+      // `if (!meta)` branch above, which is reached only when the API actually
+      // said the resource was absent. Answering 503 keeps indexed URLs indexed.
+      return serviceUnavailableResponse()
     }
   },
 }

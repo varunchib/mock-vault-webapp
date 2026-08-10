@@ -6,7 +6,7 @@ import { NotFound } from '../components/common/NotFound'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { MathText } from '../components/common/MathText'
 import { ExplanationText } from '../components/common/ExplanationText'
-import { fetchQuestionBySlug, type Question } from '../lib/api'
+import { fetchQuestionBySlug, fetchRelatedQuestions, type Question, type RelatedQuestion } from '../lib/api'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -14,6 +14,7 @@ import { questionSeoTitle, questionSeoDescription } from '../lib/pageTitles'
 import { env } from '../lib/env'
 import { paperPath } from '../lib/paperSeo'
 import { questionPath, questionRealSlug } from '../lib/questionUrl'
+import { questionHeadingLine } from '../lib/questionHeading'
 
 // Renders solution text with headings/bullets/nesting (identical to how the
 // SSR/Worker renders it), falling back to paragraphs for plain text.
@@ -28,6 +29,7 @@ function SolutionText({ text }: { text: string }) {
 export function QuestionPage() {
   const { slug } = useParams()
   const [question, setQuestion] = useState<Question | null>(null)
+  const [related, setRelated] = useState<RelatedQuestion[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const { isAuthenticated } = useAuth()
@@ -43,6 +45,12 @@ export function QuestionPage() {
       .then(setQuestion)
       .catch(() => setError(true))
       .finally(() => setLoading(false))
+    // Related questions are supplementary: a failure here leaves the block out
+    // rather than failing the page, and it must not clear the previous list
+    // until the new one arrives or the section would flicker on navigation.
+    fetchRelatedQuestions(questionRealSlug(slug))
+      .then(setRelated)
+      .catch(() => setRelated([]))
   }, [slug])
 
   // Swap any bare/old URL for the canonical keyword URL without a reload, so the
@@ -131,10 +139,7 @@ export function QuestionPage() {
   // H1 = the question itself (Testbook-style). For multi-line / passage /
   // match-table items use the actual question line (last line ending in "?")
   // so the heading isn't a passage line or a table row.
-  const qLines = localized.question.split('\n').map(l => l.trim()).filter(l => l && !l.startsWith('|'))
-  const heading = (qLines.length > 2
-    ? ([...qLines].reverse().find(l => l.replace(/[*_]/g, '').trim().endsWith('?')) ?? qLines[qLines.length - 1])
-    : qLines.join(' ')) || localized.question
+  const heading = questionHeadingLine(localized.question) || localized.question
   const questionIsMultiline = localized.question.includes('\n')
   const subjectHref = `/exam/${question.examSlug}?tab=subjects&subject=${encodeURIComponent(question.subject ?? '')}`
 
@@ -278,6 +283,27 @@ export function QuestionPage() {
             </div>
           )}
         </article>
+
+        {related.length > 0 && (
+          <aside className="rq" aria-labelledby="rq-h">
+            <h2 className="rq-h" id="rq-h">Related questions</h2>
+            <ul className="rq-list">
+              {related.map(r => {
+                const label = questionHeadingLine(r.question) || r.question
+                return (
+                  <li key={r.urlCode}>
+                    <Link className="rq-item" to={questionPath(r.urlCode, label)}>
+                      <span className="rq-q"><MathText text={label} /></span>
+                      <span className="rq-meta">
+                        {r.subject}{r.subject && r.examName ? ' · ' : ''}{r.examName}{r.year ? ` ${r.year}` : ''}
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </aside>
+        )}
 
       </div>
     </section>

@@ -148,5 +148,5 @@ export const testimonials: Testimonial[] = [
 export const footerColumns = [
   { title: 'Exams', links: ['UPSC CSE', 'SSC CGL / CHSL', 'IBPS PO / Clerk', 'NEET UG', 'JEE Main', 'State PSCs'] },
   { title: 'Platform', links: ['Mock Tests', 'PYQ Search', 'Answer Keys', 'Study Planner', 'Leaderboard'] },
-  { title: 'Company', links: ['About', 'Blog', 'For Institutes', 'Privacy Policy', 'Contact Us'] },
+  { title: 'Company', links: ['About', 'For Institutes', 'Privacy Policy', 'Contact Us'] },
 ] as const

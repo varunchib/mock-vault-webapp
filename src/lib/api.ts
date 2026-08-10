@@ -46,6 +46,16 @@ export type Question = {
   translations?: Partial<Record<"en" | "hi", QuestionTranslation>>;
 };
 
+/** Trimmed question shape for the "Related questions" links. */
+export type RelatedQuestion = {
+  urlCode: string;
+  question: string;
+  subject: string;
+  examName: string;
+  examSlug: string;
+  year: string;
+};
+
 export type Paper = {
   slug: string;
   examSlug: string;
@@ -75,6 +85,8 @@ export type MockItem = {
   isFree: boolean;
   subjects: string[];
   negativeMarking: number;
+  /** Not derivable from question count — some papers are 2 marks/question. */
+  maxMarks?: number;
 };
 
 export type CutoffCategory = {
@@ -280,6 +292,10 @@ export function fetchQuestionBySlug(slug: string): Promise<Question> {
   return requestJson<Question>(`/api/v1/questions/${encodeURIComponent(slug)}`);
 }
 
+export function fetchRelatedQuestions(slug: string): Promise<RelatedQuestion[]> {
+  return requestJson<RelatedQuestion[]>(`/api/v1/questions/${encodeURIComponent(slug)}/related`);
+}
+
 export function fetchMockCatalog(): Promise<MockItem[]> {
   return requestJson<MockItem[]>("/api/v1/mocks");
 }
@@ -424,6 +440,19 @@ export function syncLiveAttempt(params: {
   });
 }
 
+/**
+ * Responses from the caller's most recent completed attempt.
+ *
+ * Review mode used to read these from localStorage alone, so a solved paper
+ * reopened on another device — or from the admin panel — showed an empty
+ * answer sheet in which every question looked skipped.
+ */
+export function fetchAttemptAnswers(slug: string): Promise<{ answers: Record<string, string> }> {
+  return requestJson<{ answers: Record<string, string> }>(
+    `/api/v1/activity/attempt/answers?slug=${encodeURIComponent(slug)}`,
+  );
+}
+
 export function fetchActiveLiveAttempts(): Promise<ActiveAttempt[]> {
   return requestJson<ActiveAttempt[]>("/api/v1/activity/attempt/active");
 }
@@ -565,6 +594,9 @@ export type LeaderboardEntry = {
   userId: string
   name: string
   scorePct: number
+  /** Raw numbers behind the ratio, so the board can show "4/100". */
+  correct: number
+  total: number
   isMe: boolean
 }
 
@@ -742,6 +774,13 @@ export type AdminUserAnalytics = {
 
 export function fetchAdminUserAnalytics(id: string): Promise<AdminUserAnalytics> {
   return requestJson(`/api/v1/admin/users/${encodeURIComponent(id)}/analytics`)
+}
+
+/** Admin-only: the answer sheet from another user's latest attempt at a paper. */
+export function fetchAdminAttemptAnswers(userId: string, slug: string): Promise<{ answers: Record<string, string> }> {
+  return requestJson<{ answers: Record<string, string> }>(
+    `/api/v1/admin/users/${encodeURIComponent(userId)}/attempt-answers?slug=${encodeURIComponent(slug)}`,
+  )
 }
 
 export function updateAdminUserStatus(id: string, isActive: boolean): Promise<{ message: string }> {

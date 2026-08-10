@@ -70,9 +70,9 @@ export type PostGuideData = {
   salary: { post: string; payScale: string; level: string }[]
   preparationTips: string[]
 
-  // Exam analysis — the guide's unique, rankable hook (distinct from the blog,
-  // which owns broad info). Section weightage is DERIVED automatically from
-  // examPattern marks (never hand-entered — so it can't drift from the pattern).
+  // Exam analysis — the guide's unique, rankable hook. Section weightage is
+  // DERIVED automatically from examPattern marks (never hand-entered — so it
+  // can't drift from the pattern).
   // These optional fields add exam-specific colour on top of that:
   analysis?: {
     intro?: string             // 1-2 lines framing where the marks/questions come from
