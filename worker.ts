@@ -1355,6 +1355,19 @@ export default {
           headers.set('x-robots-tag', 'all')
           return new Response(res.body, { status: res.status, headers })
         }
+        // A missing file-like path must 404, not answer 200 with the SPA shell.
+        // wrangler's not_found_handling is "single-page-application", so an asset
+        // miss returns index.html with status 200 — a soft 404 on every absent
+        // asset. Bing probes /favicon.png and similar filenames when resolving a
+        // site icon, and a 200 HTML page there muddles that lookup.
+        //
+        // This branch only handles paths whose last segment contains a dot and
+        // does not end in .html, so an HTML body here can only be the fallback:
+        // a real asset at such a path is CSS, JS, an image or a text file.
+        const servedHtml = (res.headers.get('content-type') ?? '').includes('text/html')
+        if (res.status === 200 && servedHtml) {
+          return notFoundResponse('decided')
+        }
         return res
       } catch {
         return new Response('Not Found', { status: 404 })
