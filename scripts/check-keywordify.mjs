@@ -55,6 +55,20 @@ if (questionPath('abc123', '') !== '/question/abc123') {
   console.error('FAIL  empty keywords must fall back to the bare id path')
 }
 
+// Regression: the Worker compares the request's URL.pathname against
+// questionPath(). URL.pathname is percent-encoded, so a Devanagari canonical is
+// never string-equal to the incoming path unless the Worker decodes first. When
+// it did not, every Hindi question page 301-redirected to itself forever.
+// This asserts the round-trip the Worker now relies on.
+for (const [input] of CASES) {
+  const canonical = questionPath('5fc551ed62', input)
+  const asPathname = new URL(`https://x.test${canonical}`).pathname // percent-encodes
+  if (decodeURIComponent(asPathname) !== canonical) {
+    failed++
+    console.error(`FAIL  encode/decode round-trip broken for ${JSON.stringify(canonical)}\n      pathname=${asPathname}\n      decoded =${decodeURIComponent(asPathname)}`)
+  }
+}
+
 if (failed) {
   console.error(`\n${failed} keywordify parity check(s) failed`)
   process.exit(1)

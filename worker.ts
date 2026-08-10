@@ -1073,7 +1073,18 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       if (!q) return null
       // Canonical keyword URL; 301 any bare/old/mismatched URL to it.
       const canonicalPath = questionPath(q.urlCode ?? q.slug, q.question)
-      if (pathname !== canonicalPath) {
+      // Compare DECODED paths. URL.pathname is percent-encoded, so a Devanagari
+      // canonical (/question/कठोर-…) never equals the incoming
+      // /question/%E0%A4%95%E0%A4%A0… and every Hindi question page 301s to
+      // itself forever. Decoding both sides makes the comparison meaningful;
+      // assigning the raw path to dest.pathname re-encodes it on the way out.
+      let decodedPathname = pathname
+      try {
+        decodedPathname = decodeURIComponent(pathname)
+      } catch {
+        // Malformed escape sequence — fall back to the raw path rather than throw.
+      }
+      if (decodedPathname !== canonicalPath) {
         return { title: '', description: '', redirect: canonicalPath }
       }
       const qUrl = `${BASE}${canonicalPath}`
