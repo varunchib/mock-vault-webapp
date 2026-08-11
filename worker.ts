@@ -268,7 +268,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '17'
+const API_CACHE_VERSION = '18'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -422,10 +422,21 @@ function substantiveQuestionLine(question: string): string {
   // Figure-only lines are dropped BEFORE stripMarkdown, because stripping turns
   // "[[waterline:MARKET]]" into the bare word "MARKET", after which it is
   // indistinguishable from real question text and lands in the <h1>.
+  // Data-table rows are content, never a heading. A leading-"|" test is not
+  // enough: these papers write rows as "6 | 4 | 2 | 12 | ?" with no outer
+  // pipes, so the last row of a "find the missing value" table ends in "?" and
+  // would win the "line that is asked" rule. splitTableBlocks is the same
+  // detector the renderers use, so a line is skipped here exactly when it is
+  // drawn as a table row there. Must match questionHeading.ts.
+  const tableLines = new Set<string>()
+  for (const seg of splitTableBlocks(question)) {
+    if (seg.kind === 'table') for (const row of seg.rows) tableLines.add(row.join(' | ').trim())
+  }
   const lines = question
     .split('\n')
     .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith('|') && !FIGURE_ONLY.test(l))
+    .filter((l) => l && !l.startsWith('|') && !FIGURE_ONLY.test(l)
+      && !tableLines.has(l.split('|').map((c) => c.trim()).join(' | ')))
     .map((l) => stripMarkdown(l).trim())
     .filter(Boolean)
   if (!lines.length) return stripMarkdown(question)
