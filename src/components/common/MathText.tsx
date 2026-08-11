@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react'
 
+import { splitTableBlocks } from '../../lib/textTables'
 import { figureSvg } from '../../data/figures'
 
 // KaTeX (~270 KB JS + its CSS) is only needed when text actually contains math.
@@ -64,8 +65,9 @@ type Token =
   | { kind: 'bold-italic';  content: string }
   | { kind: 'flip';         content: string; axis: FlipAxis }
   | { kind: 'figure';       content: string }
+  | { kind: 'table';        rows: string[][] }
 
-function tokenize(text: string): Token[] {
+function tokenizeInline(text: string): Token[] {
   const tokens: Token[] = []
   let i = 0
 
@@ -192,6 +194,20 @@ function renderKatex(latex: string, displayMode: boolean): string | null {
 }
 
 function MathTextImpl({ text, className }: { text: string; className?: string }) {
+/**
+ * Splits the text into table blocks and everything else, so a pipe-delimited
+ * grid becomes a real <table> instead of a run of unreadable lines. Everything
+ * that is not a table goes through the inline tokenizer unchanged.
+ */
+function tokenize(text: string): Token[] {
+  const out: Token[] = []
+  for (const seg of splitTableBlocks(text)) {
+    if (seg.kind === 'table') out.push({ kind: 'table', rows: seg.rows })
+    else if (seg.content) out.push(...tokenizeInline(seg.content))
+  }
+  return out
+}
+
   // Hooks must run unconditionally, so all the early-exit decisions are derived
   // here rather than returning before them.
   const tokens = useMemo(() => {
@@ -199,7 +215,7 @@ function MathTextImpl({ text, className }: { text: string; className?: string })
     // '[[' must be in this fast-path check too: a bare "[[water:MARKET]]" has
     // neither $ nor *, so without it the token would never be parsed and the
     // raw markup would render as literal text.
-    if (!(text.includes('$') || text.includes('*') || text.includes('[['))) return null
+    if (!(text.includes('$') || text.includes('*') || text.includes('[[') || text.includes('|'))) return null
     return tokenize(text)
   }, [text])
 
@@ -267,6 +283,25 @@ function MathTextImpl({ text, className }: { text: string; className?: string })
               {tok.content}
             </span>
           )
+        case 'table': {
+          // First row is the header in every paper that carries one of these
+          // (a frequency class, a column label, a matrix index row).
+          const [head, ...body] = tok.rows
+          return (
+            <span key={i} className="mv-table-wrap">
+              <table className="mv-table">
+                <thead>
+                  <tr>{head.map((c, j) => <th key={j} scope="col">{c}</th>)}</tr>
+                </thead>
+                <tbody>
+                  {body.map((row, r) => (
+                    <tr key={r}>{row.map((c, j) => <td key={j}>{c}</td>)}</tr>
+                  ))}
+                </tbody>
+              </table>
+            </span>
+          )
+        }
         case 'text':
         default:
           return <React.Fragment key={i}>{tok.content}</React.Fragment>

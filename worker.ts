@@ -3,6 +3,7 @@
 
 import { postGuides } from './src/data/postGuides'
 import { figureSvg, figures } from './src/data/figures'
+import { splitTableBlocks, tableToText } from './src/lib/textTables'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 import { questionPath, questionRealSlug } from './src/lib/questionUrl'
 import { guidePathForExam } from './src/lib/examLinks'
@@ -267,7 +268,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '16'
+const API_CACHE_VERSION = '17'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -354,7 +355,12 @@ function mathToText(s: string): string {
 const FLIP_RE = /\[\[(waterline|water|mirror|rotate):([^\]\n]+)\]\]/g
 
 function stripMarkdown(s: string): string {
-  return mathToText(s)
+  // A table's rows read as gibberish once the pipes are stripped ("5 2 3 10 40"),
+  // so in plain-text contexts each row becomes a comma-separated list instead.
+  const flattened = splitTableBlocks(String(s ?? ''))
+    .map((seg) => (seg.kind === 'table' ? tableToText(seg.rows) : seg.content))
+    .join('\n')
+  return mathToText(flattened)
     // A figure has no words of its own, so in plain-text contexts (title, meta
     // description, JSON-LD) it becomes its <title> — the only description of the
     // geometry that exists. Dropping it would leave those questions describing
@@ -475,12 +481,31 @@ function optionHtml(s: string): string {
   return out + esc(src.slice(last))
 }
 
+function tableHtml(rows: string[][]): string {
+  const [head, ...body] = rows
+  const th = head.map((c) => `<th scope="col">${esc(c)}</th>`).join('')
+  const tr = body
+    .map((row) => `<tr>${row.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`)
+    .join('')
+  return `<div class="mv-table-wrap"><table class="mv-table">`
+    + `<thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`
+}
+
 function paragraph(s: string | undefined | null): string {
   // optionHtml, despite the name, is the shared "escape but keep flip tokens as
   // spans" renderer — the question stem needs it too, or the given figure in a
   // water-image question flattens to a bare word for crawlers.
-  const clean = optionHtml(String(s ?? ''))
-  return clean.trim() ? `<p>${clean}</p>` : ''
+  //
+  // Pipe-delimited tables are lifted out first and emitted as real <table>
+  // markup, matching MathText. A frequency table left as raw lines is
+  // unreadable to a reader and meaningless to a crawler.
+  return splitTableBlocks(String(s ?? ''))
+    .map((seg) => {
+      if (seg.kind === 'table') return tableHtml(seg.rows)
+      const clean = optionHtml(seg.content)
+      return clean.trim() ? `<p>${clean}</p>` : ''
+    })
+    .join('')
 }
 
 // inlineFmt escapes text then applies **bold**, matching how the React app

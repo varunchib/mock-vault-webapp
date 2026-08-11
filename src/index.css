@@ -19793,6 +19793,61 @@ html {
   vertical-align: middle;
 }
 .mv-figure-wrap:has(.mv-figure-sm) { display: inline-block; margin: 0.1rem 0; vertical-align: middle; }
+
+/* Data tables inside a question (frequency distributions, letter matrices,
+   value grids). These arrive from the source as pipe-delimited lines; rendered
+   as text the columns do not line up and on a phone a row wraps mid-cell into
+   nonsense, so they are promoted to real <table> markup.
+
+   The wrapper is what makes them safe on mobile: the table may scroll
+   sideways inside its own box, but the page body never does. */
+.mv-table-wrap {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0.9rem 0;
+  /* A faint edge tells the reader the box is scrollable when it is cut off. */
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+}
+.mv-table {
+  border-collapse: collapse;
+  width: auto;
+  min-width: 100%;
+  /* Digits in a column must line up or a frequency table is hard to read. */
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: inherit;
+}
+.mv-table th,
+.mv-table td {
+  border: 1px solid var(--border, #e2e8f0);
+  border-left: 0;
+  border-top: 0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.mv-table tr > *:first-child { border-left: 0; }
+.mv-table tr:last-child > * { border-bottom: 0; }
+.mv-table th {
+  font-weight: 600;
+  background: var(--surface-2, rgba(127, 127, 127, 0.08));
+}
+/* Zebra striping earns its keep on a 5x5 letter matrix, where the eye has to
+   track along a row to a numbered column. */
+.mv-table tbody tr:nth-child(even) { background: rgba(127, 127, 127, 0.04); }
+
+@media (max-width: 640px) {
+  /* Smaller, tighter cells so a five-column matrix fits a phone without
+     scrolling at all; anything wider still scrolls inside the wrapper.
+     Kept at 0.875rem — below that the digits stop being comfortably legible. */
+  .mv-table { font-size: 0.875rem; }
+  .mv-table th,
+  .mv-table td { padding: 0.4rem 0.5rem; }
+}
 /* Review could not load the answer sheet. Saying so is better than a palette of
    blank chips, which reads as "you skipped every question". */
 .pa-review-noanswers {
