@@ -271,7 +271,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '19'
+const API_CACHE_VERSION = '21'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
