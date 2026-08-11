@@ -79,6 +79,9 @@ type RelatedQuestionData = {
 type QuestionData = {
   slug: string
   urlCode?: string
+  /** Shared reading-comprehension text, kept out of `question` so the heading
+   *  and the URL keywords come from the question actually asked. */
+  passage?: string
   question: string
   examName: string
   examSlug: string
@@ -268,7 +271,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '18'
+const API_CACHE_VERSION = '19'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -801,6 +804,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
     <p>${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` ${htmlText(q.year)}` : ''}</p>
     ${paperLink}
     ${images ? `<figure>${images}</figure>` : ''}
+    ${q.passage ? `<section><h2>Passage</h2>${paragraph(q.passage)}</section>` : ''}
     <section>
       <h2>Question</h2>
       ${paragraph(q.question)}
@@ -1206,7 +1210,11 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
               // line structure so multi-part questions stay readable.
               '@type': 'Question',
               name: flatQuestion.slice(0, 300),
-              text: stripMarkdownKeepLines(q.question),
+              // The passage is part of what is being asked; without it the
+              // Q&A entry is a question about a text that is nowhere present.
+              text: stripMarkdownKeepLines(q.passage ? `${q.passage}
+
+${q.question}` : q.question),
               answerCount: 1,
               author: QA_AUTHOR,
               datePublished: qaDate(q.year),

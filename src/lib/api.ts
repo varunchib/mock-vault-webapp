@@ -36,6 +36,9 @@ export type Question = {
   paper: string;
   subject: string;
   questionNo: string;
+  /** Shared reading-comprehension text, when the question belongs to an RC or
+   *  cloze set. Rendered as its own block so `question` stays the question. */
+  passage?: string;
   question: string;
   options: QuestionOption[];
   answerKey: string;
