@@ -4766,6 +4766,14 @@ footer {
 
 .pyq-result.correct { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
 .pyq-result.wrong   { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+/* A dropped question has no correct option, so its result banner must read as
+   neutral information rather than as a pass/fail verdict. */
+.pyq-result.deleted { background: var(--surface-2, #f4f4f5); color: var(--text-muted, #52525b); border: 1px dashed var(--border, #d4d4d8); font-weight: 500; }
+:root:not([data-theme="light"]) .pyq-result.deleted { background: #27272a; color: #a1a1aa; border-color: #3f3f46; }
+:root[data-theme="dark"] .pyq-result.deleted { background: #27272a; color: #a1a1aa; border-color: #3f3f46; }
+
+/* Affiliation notice — small print, but must stay legible. */
+.footer-affiliation { margin-top: .75rem; font-size: .78rem; line-height: 1.55; opacity: .78; max-width: 78ch; }
 
 .pyq-expl-btn {
   height: 32px;

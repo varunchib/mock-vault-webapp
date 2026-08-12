@@ -866,7 +866,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
       : isPending
       ? `<section><h2>Correct Answer</h2><p>Official answer key awaited — solution will be updated.</p></section>`
       : `<section><h2>Correct Answer</h2><p><strong>Option ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</strong></p></section>`}
-    ${!isDeleted && solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
+    ${solution ? `<section><h2>Detailed Solution &amp; Explanation</h2>${solution}</section>` : ''}
     ${hindiSection}
     ${tags ? `<p><strong>Topics covered:</strong> ${tags}</p>` : ''}
     ${relatedSection}

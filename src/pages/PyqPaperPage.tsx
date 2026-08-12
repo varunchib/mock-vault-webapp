@@ -329,23 +329,21 @@ export function PyqPaperPage() {
 
               <QuestionRenderer className="pyq-q-text" text={localized.question} />
 
-              {isDeleted ? (
-                <div className="pyq-deleted-notice">
-                  <strong>This question was officially deleted by {paper.examSlug.split('-')[0].toUpperCase()}</strong>
-                  <p>{q.explanation}</p>
-                </div>
-              ) : (
+              {(
                 <>
                   <div className="pyq-options">
                     {localized.options.map((opt, i) => {
                       const label = OPTION_LABELS[i] ?? opt.key
                       const isChosen = chosen === opt.key
-                      const isCorrectOpt = opt.key === q.answerKey
+                      // A dropped question has no correct option, so nothing is
+                      // marked right or wrong — but it is still attemptable and
+                      // still shows its solution, which explains the drop.
+                      const isCorrectOpt = !isDeleted && opt.key === q.answerKey
 
                       let cls = 'pyq-option'
                       if (isRevealed) {
                         if (isCorrectOpt) cls += ' correct'
-                        else if (isChosen && !isCorrect) cls += ' wrong'
+                        else if (isChosen && !isCorrect && !isDeleted) cls += ' wrong'
                       } else if (isChosen) {
                         cls += ' chosen'
                       }
@@ -386,9 +384,15 @@ export function PyqPaperPage() {
                       </button>
                     ) : (
                       <>
-                        <div className={`pyq-result ${isCorrect ? 'correct' : 'wrong'}`}>
-                          {isCorrect ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
-                        </div>
+                        {isDeleted ? (
+                          <div className="pyq-result deleted">
+                            Dropped from the final answer key — marks were awarded to all candidates
+                          </div>
+                        ) : (
+                          <div className={`pyq-result ${isCorrect ? 'correct' : 'wrong'}`}>
+                            {isCorrect ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
+                          </div>
+                        )}
                         {q.explanation && (
                           <button
                             type="button"

@@ -269,8 +269,9 @@ export function QuestionPage() {
             </div>
           )}
 
-          {/* Detailed solution — hidden for deleted questions */}
-          {!isDeleted && question.explanation && (
+          {/* Shown for dropped questions too: the solution is what explains why
+              the board dropped it, which is exactly what a reader wants there. */}
+          {question.explanation && (
             <div className="pyq-solution">
               <h2 className="pyq-solution-title">Detailed Solution</h2>
               <SolutionText text={question.explanation} />

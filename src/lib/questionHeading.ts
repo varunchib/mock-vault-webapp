@@ -93,6 +93,23 @@ function expandGenericHeading(lines: string[], heading: string): string {
 }
 
 export function questionHeadingLine(question: string): string {
+  // Every rule below can return a line that identifies nothing, so the rescue
+  // is applied to the result rather than inside one branch. worker.ts wraps
+  // substantiveQuestionLine() the same way; if only some paths were rescued
+  // here, a crawler and a reader would see different headings on the same page.
+  const lines = headingLines(question)
+  return expandGenericHeading(lines, pickHeadingLine(question))
+}
+
+function headingLines(question: string): string[] {
+  const inTable = tableRowKeys(question)
+  return question
+    .split('\n')
+    .map(l => l.trim())
+    .filter(l => l && !l.startsWith('|') && !FIGURE_ONLY.test(l) && !inTable.has(rowKey(l)))
+}
+
+function pickHeadingLine(question: string): string {
   const inTable = tableRowKeys(question)
   const lines = question
     .split('\n')
@@ -105,7 +122,7 @@ export function questionHeadingLine(question: string): string {
   if (lines.length <= 2) return lines.join(' ')
 
   const asked = [...lines].reverse().find(l => l.replace(/[*_]/g, '').trim().endsWith('?'))
-  if (asked) return expandGenericHeading(lines, asked)
+  if (asked) return asked
 
   const assertion = lines.find(l => /^\**\s*Assertion\s*\(A\)\s*:/i.test(l))
   if (assertion) return assertion.replace(/^\**\s*Assertion\s*\(A\)\s*:\s*/i, '')
@@ -116,5 +133,5 @@ export function questionHeadingLine(question: string): string {
   })
   if (stem) return stem
 
-  return expandGenericHeading(lines, lines[0])
+  return lines[0]
 }

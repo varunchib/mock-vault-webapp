@@ -75,7 +75,22 @@ export function Footer() {
           {' · '}
           <Link to="/terms">Terms</Link>
           {' · '}
-          UPSC · SSC · IBPS · State PSCs · NEET · JEE
+          <Link to="/disclaimer">Disclaimer</Link>
+          {' · '}
+          <Link to="/contact">Contact</Link>
+        </p>
+        {/* Required before AdSense review, and simply accurate: the site uses
+            the names of recruiting bodies to say which paper a question came
+            from, which is nominative use, not endorsement. */}
+        <p className="footer-affiliation">
+          Ministry of Papers is an independent educational resource and is
+          <strong> not affiliated with, endorsed by, or sponsored by </strong>
+          JKSSB, JKPSC, UPSC, SSC, IBPS, RRB, NTA or any government body,
+          recruitment board or examination authority. Exam names, logos and
+          trademarks belong to their respective owners and are used here only to
+          identify the examination a question paper relates to. Question papers
+          and answer keys are reproduced from publicly released official
+          documents for study purposes.
         </p>
       </div>
     </footer>
