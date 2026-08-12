@@ -15431,18 +15431,45 @@ html {
 
 /* ── KaTeX math rendering ───────────────────────────────────────────────── */
 
+/* Maths is set slightly larger than the surrounding prose. At 1em a stacked
+   fraction has to fit its numerator and denominator inside one line-height, so
+   each digit renders at roughly half the body size and becomes hard to read —
+   worst on the long simplification questions where several fractions sit in a
+   row. The bump costs nothing in layout because KaTeX reserves the vertical
+   space anyway. */
 .math-inline .katex {
-  font-size: 1em;
+  font-size: 1.15em;
+}
+
+/* Fractions written inline still render in "text" style, which stacks them
+   tightly. Forcing display style gives them full-height numerators and
+   denominators, matching how they appear in the printed paper. */
+.math-inline .katex .mfrac {
+  font-size: 1.06em;
 }
 
 .math-block {
   display: block;
   overflow-x: auto;
-  padding: 6px 0;
+  padding: 10px 0;
+}
+
+/* Display maths carries a whole expression on its own line, so it can afford
+   to be larger again. overflow-x on the wrapper keeps a long expression
+   scrolling inside its own box rather than widening the page on a phone. */
+.math-block .katex {
+  font-size: 1.32em;
 }
 
 .math-block .katex-display {
   margin: 0;
+}
+
+@media (max-width: 640px) {
+  /* Hold the increase on small screens but ease it slightly, so a long
+     expression needs less sideways scrolling. */
+  .math-inline .katex { font-size: 1.1em; }
+  .math-block .katex  { font-size: 1.2em; }
 }
 
 /* ── QuestionRenderer: analogy display ─────────────────────────────────── */

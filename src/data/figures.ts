@@ -651,6 +651,52 @@ export const figures: Record<string, Figure> = {
       <line x1="60" y1="62" x2="43" y2="45"/>
       <polygon points="36,38 49,41 38,51" fill="currentColor" stroke="none"/>`,
   },
+
+  // ── RRB NTPC UG, 7 May 2026 Shift 1 ──────────────────────────────────────
+  // Q78 — three-set Venn diagram. The section counts exist only inside an image
+  // in the source PDF, so without this drawing the question cannot be answered.
+  // Drawn rather than flattened to a table, because the overlaps ARE the
+  // question: the reader has to see which regions lie inside both Employees
+  // and German Speakers.
+  'rrb-ntpc-2026-may07-s1-q78': {
+    title:
+      'A Venn diagram of three overlapping ellipses labelled Employees, Male and '
+      + 'German Speakers. Employees alone contains 54; Employees and Male together '
+      + '25; Male alone 43; Employees and German Speakers together 28; the centre, '
+      + 'common to all three, 17; Male and German Speakers together 26; and German '
+      + 'Speakers alone 15.',
+    viewBox: '0 0 440 320',
+    body: `
+      <ellipse cx="160" cy="140" rx="112" ry="76"/>
+      <ellipse cx="292" cy="132" rx="100" ry="72"/>
+      <ellipse cx="218" cy="208" rx="112" ry="70"/>
+      <g fill="currentColor" stroke="none" font-size="17" text-anchor="middle"
+         font-family="serif">
+        <text x="102" y="128">54</text>
+        <text x="228" y="120">25</text>
+        <text x="342" y="136">43</text>
+        <text x="158" y="205">28</text>
+        <text x="230" y="176">17</text>
+        <text x="284" y="212">26</text>
+        <text x="212" y="258">15</text>
+      </g>
+      <g fill="currentColor" stroke="none" font-size="16" font-family="sans-serif"
+         font-weight="600">
+        <text x="14" y="44">Employees</text>
+        <text x="284" y="28">Male</text>
+        <text x="322" y="288">German</text>
+        <text x="322" y="306">Speakers</text>
+      </g>
+      <g>
+        <line x1="62" y1="54" x2="62" y2="74"/>
+        <line x1="62" y1="74" x2="94" y2="84"/>
+        <polygon points="92,77 106,86 90,92" fill="currentColor" stroke="none"/>
+        <line x1="300" y1="38" x2="300" y2="58"/>
+        <polygon points="294,56 306,56 300,68" fill="currentColor" stroke="none"/>
+        <line x1="318" y1="280" x2="288" y2="264"/>
+        <polygon points="294,259 281,261 288,272" fill="currentColor" stroke="none"/>
+      </g>`,
+  },
 }
 
 /** Inline <svg> markup for a figure key, or null when the key is unknown. */
