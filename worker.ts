@@ -513,11 +513,27 @@ function paragraph(s: string | undefined | null): string {
   // Pipe-delimited tables are lifted out first and emitted as real <table>
   // markup, matching MathText. A frequency table left as raw lines is
   // unreadable to a reader and meaningless to a crawler.
+  //
+  // Each LINE becomes its own <p>. Emitting the whole segment as a single <p>
+  // collapsed every newline, so a stem stored as
+  //
+  //     Arrange the following ... in chronological order:
+  //     i. Indonesia
+  //     ii. India
+  //
+  // reached crawlers as one run-on sentence, while readers saw it correctly --
+  // MultilineText in the React app has always rendered line by line. The two
+  // must agree, and the structured form is far easier to parse besides.
   return splitTableBlocks(String(s ?? ''))
     .map((seg) => {
       if (seg.kind === 'table') return tableHtml(seg.rows)
-      const clean = optionHtml(seg.content)
-      return clean.trim() ? `<p>${clean}</p>` : ''
+      return seg.content
+        .split(/\r?\n/)
+        .map((line) => {
+          const clean = optionHtml(line)
+          return clean.trim() ? `<p>${clean}</p>` : ''
+        })
+        .join('')
     })
     .join('')
 }
