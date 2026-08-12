@@ -81,18 +81,55 @@ async function generate() {
   // the same >=300-char gate the IndexNow submit-all endpoint uses: a fully
   // solved question deserves its own indexed URL, but a bare stub would be thin
   // content and waste crawl budget. Fetch per paper (indexable papers only).
+  // Fetched a few at a time rather than all at once. Firing one request per
+  // paper in parallel trips the API's rate limiter, and the failures used to be
+  // swallowed by a bare `.catch(() => [])` -- a whole paper would drop out of
+  // the sitemap while the build still reported success. That is how a live,
+  // fully solved paper silently stops being submitted for indexing.
   const MIN_EXPLANATION = 100
-  const questionArrays = await Promise.all(
-    indexablePapers.map(paper =>
-      fetchData(`/api/v1/papers/${encodeURIComponent(paper.slug)}/questions`).catch(() => []),
-    ),
-  )
+  const CONCURRENCY = 4
+  const failed = []
+
+  async function questionsFor(paper) {
+    const path = `/api/v1/papers/${encodeURIComponent(paper.slug)}/questions`
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        return await fetchData(path)
+      } catch (err) {
+        if (attempt === 3) {
+          failed.push(`${paper.slug} (${err.message})`)
+          return []
+        }
+        await new Promise(r => setTimeout(r, 400 * attempt))
+      }
+    }
+    return []
+  }
+
+  const questionArrays = []
+  for (let i = 0; i < indexablePapers.length; i += CONCURRENCY) {
+    const batch = indexablePapers.slice(i, i + CONCURRENCY)
+    questionArrays.push(...await Promise.all(batch.map(questionsFor)))
+  }
+
+  // A paper that resolved to zero questions is either genuinely empty or a
+  // failure we did not catch; either way it must not pass unnoticed.
+  const emptyPapers = indexablePapers
+    .filter((paper, i) => questionArrays[i].length === 0)
+    .map(paper => paper.slug)
+
   const questionUrls = questionArrays
     .flat()
     .filter(q => q && q.slug && (q.explanation ?? '').trim().length >= MIN_EXPLANATION)
     .map(q => questionPath(q.urlCode || q.slug, q.question))
 
   console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers, ${questionUrls.length} solved questions`)
+  if (emptyPapers.length) console.warn(`  NOTE: no questions returned for: ${emptyPapers.join(', ')}`)
+  if (failed.length) {
+    // Writing a sitemap that is quietly missing a paper is worse than not
+    // writing one: the stale file stays in place and nobody finds out.
+    throw new Error(`question fetch failed for ${failed.length} paper(s): ${failed.join('; ')}`)
+  }
 
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),

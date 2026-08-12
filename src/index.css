@@ -15431,18 +15431,45 @@ html {
 
 /* ── KaTeX math rendering ───────────────────────────────────────────────── */
 
+/* Maths is set slightly larger than the surrounding prose. At 1em a stacked
+   fraction has to fit its numerator and denominator inside one line-height, so
+   each digit renders at roughly half the body size and becomes hard to read —
+   worst on the long simplification questions where several fractions sit in a
+   row. The bump costs nothing in layout because KaTeX reserves the vertical
+   space anyway. */
 .math-inline .katex {
-  font-size: 1em;
+  font-size: 1.15em;
+}
+
+/* Fractions written inline still render in "text" style, which stacks them
+   tightly. Forcing display style gives them full-height numerators and
+   denominators, matching how they appear in the printed paper. */
+.math-inline .katex .mfrac {
+  font-size: 1.06em;
 }
 
 .math-block {
   display: block;
   overflow-x: auto;
-  padding: 6px 0;
+  padding: 10px 0;
+}
+
+/* Display maths carries a whole expression on its own line, so it can afford
+   to be larger again. overflow-x on the wrapper keeps a long expression
+   scrolling inside its own box rather than widening the page on a phone. */
+.math-block .katex {
+  font-size: 1.32em;
 }
 
 .math-block .katex-display {
   margin: 0;
+}
+
+@media (max-width: 640px) {
+  /* Hold the increase on small screens but ease it slightly, so a long
+     expression needs less sideways scrolling. */
+  .math-inline .katex { font-size: 1.1em; }
+  .math-block .katex  { font-size: 1.2em; }
 }
 
 /* ── QuestionRenderer: analogy display ─────────────────────────────────── */
@@ -19793,6 +19820,61 @@ html {
   vertical-align: middle;
 }
 .mv-figure-wrap:has(.mv-figure-sm) { display: inline-block; margin: 0.1rem 0; vertical-align: middle; }
+
+/* Data tables inside a question (frequency distributions, letter matrices,
+   value grids). These arrive from the source as pipe-delimited lines; rendered
+   as text the columns do not line up and on a phone a row wraps mid-cell into
+   nonsense, so they are promoted to real <table> markup.
+
+   The wrapper is what makes them safe on mobile: the table may scroll
+   sideways inside its own box, but the page body never does. */
+.mv-table-wrap {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 0.9rem 0;
+  /* A faint edge tells the reader the box is scrollable when it is cut off. */
+  border: 1px solid var(--border, #e2e8f0);
+  border-radius: 8px;
+}
+.mv-table {
+  border-collapse: collapse;
+  width: auto;
+  min-width: 100%;
+  /* Digits in a column must line up or a frequency table is hard to read. */
+  font-variant-numeric: tabular-nums;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: inherit;
+}
+.mv-table th,
+.mv-table td {
+  border: 1px solid var(--border, #e2e8f0);
+  border-left: 0;
+  border-top: 0;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  white-space: nowrap;
+}
+.mv-table tr > *:first-child { border-left: 0; }
+.mv-table tr:last-child > * { border-bottom: 0; }
+.mv-table th {
+  font-weight: 600;
+  background: var(--surface-2, rgba(127, 127, 127, 0.08));
+}
+/* Zebra striping earns its keep on a 5x5 letter matrix, where the eye has to
+   track along a row to a numbered column. */
+.mv-table tbody tr:nth-child(even) { background: rgba(127, 127, 127, 0.04); }
+
+@media (max-width: 640px) {
+  /* Smaller, tighter cells so a five-column matrix fits a phone without
+     scrolling at all; anything wider still scrolls inside the wrapper.
+     Kept at 0.875rem — below that the digits stop being comfortably legible. */
+  .mv-table { font-size: 0.875rem; }
+  .mv-table th,
+  .mv-table td { padding: 0.4rem 0.5rem; }
+}
 /* Review could not load the answer sheet. Saying so is better than a palette of
    blank chips, which reads as "you skipped every question". */
 .pa-review-noanswers {

@@ -3,6 +3,7 @@
 
 import { postGuides } from './src/data/postGuides'
 import { figureSvg, figures } from './src/data/figures'
+import { splitTableBlocks, tableToText } from './src/lib/textTables'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 import { questionPath, questionRealSlug } from './src/lib/questionUrl'
 import { guidePathForExam } from './src/lib/examLinks'
@@ -78,6 +79,9 @@ type RelatedQuestionData = {
 type QuestionData = {
   slug: string
   urlCode?: string
+  /** Shared reading-comprehension text, kept out of `question` so the heading
+   *  and the URL keywords come from the question actually asked. */
+  passage?: string
   question: string
   examName: string
   examSlug: string
@@ -267,7 +271,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '15'
+const API_CACHE_VERSION = '22'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -354,7 +358,12 @@ function mathToText(s: string): string {
 const FLIP_RE = /\[\[(waterline|water|mirror|rotate):([^\]\n]+)\]\]/g
 
 function stripMarkdown(s: string): string {
-  return mathToText(s)
+  // A table's rows read as gibberish once the pipes are stripped ("5 2 3 10 40"),
+  // so in plain-text contexts each row becomes a comma-separated list instead.
+  const flattened = splitTableBlocks(String(s ?? ''))
+    .map((seg) => (seg.kind === 'table' ? tableToText(seg.rows) : seg.content))
+    .join('\n')
+  return mathToText(flattened)
     // A figure has no words of its own, so in plain-text contexts (title, meta
     // description, JSON-LD) it becomes its <title> — the only description of the
     // geometry that exists. Dropping it would leave those questions describing
@@ -416,10 +425,21 @@ function substantiveQuestionLine(question: string): string {
   // Figure-only lines are dropped BEFORE stripMarkdown, because stripping turns
   // "[[waterline:MARKET]]" into the bare word "MARKET", after which it is
   // indistinguishable from real question text and lands in the <h1>.
+  // Data-table rows are content, never a heading. A leading-"|" test is not
+  // enough: these papers write rows as "6 | 4 | 2 | 12 | ?" with no outer
+  // pipes, so the last row of a "find the missing value" table ends in "?" and
+  // would win the "line that is asked" rule. splitTableBlocks is the same
+  // detector the renderers use, so a line is skipped here exactly when it is
+  // drawn as a table row there. Must match questionHeading.ts.
+  const tableLines = new Set<string>()
+  for (const seg of splitTableBlocks(question)) {
+    if (seg.kind === 'table') for (const row of seg.rows) tableLines.add(row.join(' | ').trim())
+  }
   const lines = question
     .split('\n')
     .map((l) => l.trim())
-    .filter((l) => l && !l.startsWith('|') && !FIGURE_ONLY.test(l))
+    .filter((l) => l && !l.startsWith('|') && !FIGURE_ONLY.test(l)
+      && !tableLines.has(l.split('|').map((c) => c.trim()).join(' | ')))
     .map((l) => stripMarkdown(l).trim())
     .filter(Boolean)
   if (!lines.length) return stripMarkdown(question)
@@ -475,12 +495,31 @@ function optionHtml(s: string): string {
   return out + esc(src.slice(last))
 }
 
+function tableHtml(rows: string[][]): string {
+  const [head, ...body] = rows
+  const th = head.map((c) => `<th scope="col">${esc(c)}</th>`).join('')
+  const tr = body
+    .map((row) => `<tr>${row.map((c) => `<td>${esc(c)}</td>`).join('')}</tr>`)
+    .join('')
+  return `<div class="mv-table-wrap"><table class="mv-table">`
+    + `<thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`
+}
+
 function paragraph(s: string | undefined | null): string {
   // optionHtml, despite the name, is the shared "escape but keep flip tokens as
   // spans" renderer — the question stem needs it too, or the given figure in a
   // water-image question flattens to a bare word for crawlers.
-  const clean = optionHtml(String(s ?? ''))
-  return clean.trim() ? `<p>${clean}</p>` : ''
+  //
+  // Pipe-delimited tables are lifted out first and emitted as real <table>
+  // markup, matching MathText. A frequency table left as raw lines is
+  // unreadable to a reader and meaningless to a crawler.
+  return splitTableBlocks(String(s ?? ''))
+    .map((seg) => {
+      if (seg.kind === 'table') return tableHtml(seg.rows)
+      const clean = optionHtml(seg.content)
+      return clean.trim() ? `<p>${clean}</p>` : ''
+    })
+    .join('')
 }
 
 // inlineFmt escapes text then applies **bold**, matching how the React app
@@ -643,6 +682,57 @@ function isGenericStem(line: string, multiline: boolean): boolean {
   return multiline && t.length < 45
 }
 
+// A statement-list item ("Select the correct statements about X. I. … II. … III. …")
+// has no line ending in "?", so the heading rule falls back to the opening stem.
+// That stem is an instruction, and dozens of papers share its shape, so the <h1>
+// says almost nothing and reads as a near-duplicate of every other such page.
+// isGenericStem already diverts the <title> to a keyword-built one; the <h1> had
+// no equivalent guard.
+//
+// Fix: when the chosen heading is generic AND the question carries further
+// content lines, append the first of those lines. The result names the actual
+// subject matter ("… 2025. Indore secured first rank …") while staying a single
+// line. Nothing is invented — the appended text is the question's own next line.
+//
+// URLs are untouched: keywordify() reads the stored question text, not the
+// heading, so no canonical URL changes and nothing already indexed is orphaned.
+// questionHeading.ts keeps a mirror of this; the two must stay in step.
+const HEADING_JOIN_CAP = 150
+
+/**
+ * Rescue a heading that identifies nothing.
+ *
+ * Two distinct cases produce one, and both must be caught:
+ *  - the "line that is asked" wins but is shared boilerplate — 80 pages all
+ *    titled "Which of the statements given above is/are correct?";
+ *  - no rule fires and the opening instruction wins — "Select the correct
+ *    statements about …".
+ *
+ * Repair order: fall back to the opening line, and if that is generic too,
+ * append the question's first real content line. The appended text is the
+ * question's own next line, so nothing is invented.
+ */
+function expandGenericHeading(question: string, heading: string): string {
+  const lines = question
+    .split('\n')
+    .map((l) => stripMarkdown(l).trim())
+    .filter(Boolean)
+  if (lines.length <= 2) return heading
+  if (!isGenericStem(heading, true)) return heading
+
+  // The asked line was boilerplate; the opening line may carry the topic.
+  let base = lines[0]
+  if (!isGenericStem(base, true)) return base
+
+  const next = lines.find((l) => l !== base && l !== heading
+    && l.length >= 12 && !isGenericStem(l, true))
+  if (!next) return heading
+  const joined = `${base.replace(/[\s:;,]+$/, '')} ${next}`
+  return joined.length > HEADING_JOIN_CAP
+    ? joined.slice(0, HEADING_JOIN_CAP - 1).trimEnd() + '…'
+    : joined
+}
+
 // Google renders roughly 60 characters and appends the site name itself, so the
 // old " | Ministry of Papers" suffix spent 21 of those on something Search shows
 // anyway — it pushed the keywords that win the query out of the visible part.
@@ -760,11 +850,12 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
         .join('')}</ul></nav>`
     : ''
 
-  const heading = substantiveQuestionLine(q.question)
+  const heading = expandGenericHeading(q.question, substantiveQuestionLine(q.question))
   return renderPageShell(`${heading.length > 130 ? heading.slice(0, 129).trimEnd() + '…' : heading}`, `
     <p>${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` ${htmlText(q.year)}` : ''}</p>
     ${paperLink}
     ${images ? `<figure>${images}</figure>` : ''}
+    ${q.passage ? `<section><h2>Passage</h2>${paragraph(q.passage)}</section>` : ''}
     <section>
       <h2>Question</h2>
       ${paragraph(q.question)}
@@ -1170,7 +1261,11 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
               // line structure so multi-part questions stay readable.
               '@type': 'Question',
               name: flatQuestion.slice(0, 300),
-              text: stripMarkdownKeepLines(q.question),
+              // The passage is part of what is being asked; without it the
+              // Q&A entry is a question about a text that is nowhere present.
+              text: stripMarkdownKeepLines(q.passage ? `${q.passage}
+
+${q.question}` : q.question),
               answerCount: 1,
               author: QA_AUTHOR,
               datePublished: qaDate(q.year),
@@ -1333,7 +1428,7 @@ export default {
         // immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=5`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=9`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')

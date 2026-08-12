@@ -1,5 +1,6 @@
 import React from 'react'
 import { MathText } from './MathText'
+import { splitTableBlocks } from '../../lib/textTables'
 
 // Convenience wrapper — renders text with KaTeX math + bold support
 function renderInline(text: string): React.ReactNode {
@@ -285,7 +286,51 @@ function extractAnalogy(text: string): { pre: string; analogy: string } | null {
   return { pre, analogy: m[0] }
 }
 
+/**
+ * A pipe-delimited data table — a frequency distribution, a letter matrix, a
+ * grid of values.
+ *
+ * These arrive as "25 - 29 | 10": no outer pipes and no |---| separator, so
+ * parseMarkdownTable never sees them. Everything below this point works line by
+ * line, so each row was rendering as its own paragraph — unreadable, and on a
+ * phone it wrapped mid-row into nonsense. splitTableBlocks is the same detector
+ * worker.ts uses, so the app and the crawler draw the same table.
+ */
+function DataTable({ rows }: { rows: string[][] }) {
+  const [head, ...body] = rows
+  return (
+    <div className="mv-table-wrap">
+      <table className="mv-table">
+        <thead>
+          <tr>{head.map((c, i) => <th key={i} scope="col">{renderInline(c)}</th>)}</tr>
+        </thead>
+        <tbody>
+          {body.map((row, r) => (
+            <tr key={r}>{row.map((c, i) => <td key={i}>{renderInline(c)}</td>)}</tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
 function MultilineText({ text, className }: { text: string; className?: string }) {
+  // Lift out any pipe table FIRST — the line-by-line pass below is precisely
+  // why a table has to be recognised as a block before it starts.
+  const segments = splitTableBlocks(text)
+  if (segments.some(s => s.kind === 'table')) {
+    return (
+      <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
+        {segments.map((seg, i) =>
+          seg.kind === 'table'
+            ? <DataTable key={i} rows={seg.rows} />
+            // Terminates: a segment with no table takes the normal path below.
+            : seg.content.trim() ? <MultilineText key={i} text={seg.content} /> : null,
+        )}
+      </div>
+    )
+  }
+
   const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
 
   // Check for markdown table within the lines

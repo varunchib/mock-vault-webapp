@@ -17,7 +17,10 @@ export function getLocalizedQuestion(question: Question, language: QuestionLangu
     : question.options
 
   return {
-    passage: translation?.passage ?? '',
+    // A translated passage wins; otherwise the question's own passage. Without
+    // the second fallback the English passage never renders at all, since only
+    // translations ever carried one.
+    passage: translation?.passage ?? question.passage ?? '',
     question: translation?.question ?? question.question,
     options,
   }
