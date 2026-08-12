@@ -271,7 +271,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '21'
+const API_CACHE_VERSION = '22'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -682,6 +682,57 @@ function isGenericStem(line: string, multiline: boolean): boolean {
   return multiline && t.length < 45
 }
 
+// A statement-list item ("Select the correct statements about X. I. … II. … III. …")
+// has no line ending in "?", so the heading rule falls back to the opening stem.
+// That stem is an instruction, and dozens of papers share its shape, so the <h1>
+// says almost nothing and reads as a near-duplicate of every other such page.
+// isGenericStem already diverts the <title> to a keyword-built one; the <h1> had
+// no equivalent guard.
+//
+// Fix: when the chosen heading is generic AND the question carries further
+// content lines, append the first of those lines. The result names the actual
+// subject matter ("… 2025. Indore secured first rank …") while staying a single
+// line. Nothing is invented — the appended text is the question's own next line.
+//
+// URLs are untouched: keywordify() reads the stored question text, not the
+// heading, so no canonical URL changes and nothing already indexed is orphaned.
+// questionHeading.ts keeps a mirror of this; the two must stay in step.
+const HEADING_JOIN_CAP = 150
+
+/**
+ * Rescue a heading that identifies nothing.
+ *
+ * Two distinct cases produce one, and both must be caught:
+ *  - the "line that is asked" wins but is shared boilerplate — 80 pages all
+ *    titled "Which of the statements given above is/are correct?";
+ *  - no rule fires and the opening instruction wins — "Select the correct
+ *    statements about …".
+ *
+ * Repair order: fall back to the opening line, and if that is generic too,
+ * append the question's first real content line. The appended text is the
+ * question's own next line, so nothing is invented.
+ */
+function expandGenericHeading(question: string, heading: string): string {
+  const lines = question
+    .split('\n')
+    .map((l) => stripMarkdown(l).trim())
+    .filter(Boolean)
+  if (lines.length <= 2) return heading
+  if (!isGenericStem(heading, true)) return heading
+
+  // The asked line was boilerplate; the opening line may carry the topic.
+  let base = lines[0]
+  if (!isGenericStem(base, true)) return base
+
+  const next = lines.find((l) => l !== base && l !== heading
+    && l.length >= 12 && !isGenericStem(l, true))
+  if (!next) return heading
+  const joined = `${base.replace(/[\s:;,]+$/, '')} ${next}`
+  return joined.length > HEADING_JOIN_CAP
+    ? joined.slice(0, HEADING_JOIN_CAP - 1).trimEnd() + '…'
+    : joined
+}
+
 // Google renders roughly 60 characters and appends the site name itself, so the
 // old " | Ministry of Papers" suffix spent 21 of those on something Search shows
 // anyway — it pushed the keywords that win the query out of the visible part.
@@ -799,7 +850,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
         .join('')}</ul></nav>`
     : ''
 
-  const heading = substantiveQuestionLine(q.question)
+  const heading = expandGenericHeading(q.question, substantiveQuestionLine(q.question))
   return renderPageShell(`${heading.length > 130 ? heading.slice(0, 129).trimEnd() + '…' : heading}`, `
     <p>${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` ${htmlText(q.year)}` : ''}</p>
     ${paperLink}
@@ -1377,7 +1428,7 @@ export default {
         // immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=8`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=9`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
