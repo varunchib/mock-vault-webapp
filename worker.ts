@@ -32,8 +32,7 @@ type ExamData = {
   mocks?: number
   subjects?: string[]
   boardSlug?: string
-  // Number of sub-exams under this one. 1 = a thin board (near-duplicate of its
-  // lone child) → served noindex until a 2nd sub-exam makes it a real hub.
+  // Number of sub-exams under this one. Used when rendering the board hub.
   childExamCount?: number
 }
 
@@ -1072,11 +1071,6 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       const subExams = (allExams ?? []).filter(x => x.boardSlug === slug)
       // An exam with no papers and no mocks is a thin page → keep it out of the index.
       const examEmpty = (e.papers ?? 0) === 0 && (e.mocks ?? 0) === 0
-      // A thin board — one with exactly ONE sub-exam — just aggregates that lone
-      // child, so its page is a near-duplicate of the sub-exam's. Keep it out of
-      // the index (this matches the sitemap, which also skips it) until a 2nd
-      // sub-exam is added and childExamCount >= 2 turns it into a genuine hub.
-      const thinBoard = (e.childExamCount ?? 0) === 1
       const examCrumbs: Crumb[] = [
         { name: 'Home', item: BASE },
         { name: 'Exams', item: `${BASE}/exams` },
@@ -1085,7 +1079,10 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       return {
         title: titleFit(`${e.shortName} PYQ Papers & Free Mock Tests`),
         description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
-        robots: examEmpty || thinBoard ? 'noindex, follow' : undefined,
+        // A board hub is useful even with one child: it is the canonical entry
+        // point for that board and its paper collection. Only empty exams stay
+        // out of the index.
+        robots: examEmpty ? 'noindex, follow' : undefined,
         contentHtml: renderExamContent(e, papers ?? [], examMocks, subExams, examCrumbs),
         jsonLd: {
           '@context': 'https://schema.org',
