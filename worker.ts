@@ -1257,6 +1257,10 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       return {
         title: pageTitle,
         description: `${descLead}${descTail}`,
+        // Individual MCQ pages stay publicly accessible from their parent
+        // paper, but are deliberately excluded from search while the site
+        // concentrates its indexable inventory on complete papers and guides.
+        robots: 'noindex, follow',
         contentHtml: renderQuestionContent(q, crumbs, related ?? []),
         jsonLd: [
           {

@@ -86,50 +86,8 @@ async function generate() {
   // swallowed by a bare `.catch(() => [])` -- a whole paper would drop out of
   // the sitemap while the build still reported success. That is how a live,
   // fully solved paper silently stops being submitted for indexing.
-  const MIN_EXPLANATION = 100
-  const CONCURRENCY = 4
-  const failed = []
-
-  async function questionsFor(paper) {
-    const path = `/api/v1/papers/${encodeURIComponent(paper.slug)}/questions`
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      try {
-        return await fetchData(path)
-      } catch (err) {
-        if (attempt === 3) {
-          failed.push(`${paper.slug} (${err.message})`)
-          return []
-        }
-        await new Promise(r => setTimeout(r, 400 * attempt))
-      }
-    }
-    return []
-  }
-
-  const questionArrays = []
-  for (let i = 0; i < indexablePapers.length; i += CONCURRENCY) {
-    const batch = indexablePapers.slice(i, i + CONCURRENCY)
-    questionArrays.push(...await Promise.all(batch.map(questionsFor)))
-  }
-
-  // A paper that resolved to zero questions is either genuinely empty or a
-  // failure we did not catch; either way it must not pass unnoticed.
-  const emptyPapers = indexablePapers
-    .filter((paper, i) => questionArrays[i].length === 0)
-    .map(paper => paper.slug)
-
-  const questionUrls = questionArrays
-    .flat()
-    .filter(q => q && q.slug && (q.explanation ?? '').trim().length >= MIN_EXPLANATION)
-    .map(q => questionPath(q.urlCode || q.slug, q.question))
-
-  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers, ${questionUrls.length} solved questions`)
-  if (emptyPapers.length) console.warn(`  NOTE: no questions returned for: ${emptyPapers.join(', ')}`)
-  if (failed.length) {
-    // Writing a sitemap that is quietly missing a paper is worse than not
-    // writing one: the stale file stays in place and nobody finds out.
-    throw new Error(`question fetch failed for ${failed.length} paper(s): ${failed.join('; ')}`)
-  }
+  // Individual question pages are noindex and intentionally omitted.
+  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers`)
 
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),
@@ -142,8 +100,6 @@ async function generate() {
     ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
-    // /blog/:slug retired in full (301 → /guide/:slug) — no longer emitted.
-    ...questionUrls.map(p => url(`${BASE}${p}`, '0.6', 'monthly')),
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`
