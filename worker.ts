@@ -105,6 +105,18 @@ type QuestionData = {
 const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
+
+// A deliberately tiny indexing experiment. These are complete, reviewed UPSC
+// questions with substantial explanations from one official-paper collection.
+// Keep every other MCQ leaf noindex until this cohort has earned stable
+// indexing and useful impressions in Search Console.
+const INDEXABLE_QUESTION_CODES = new Set([
+  'bd0394bb56', // UPSC CSE 2025 GS I, Q1 — Alternative Investment Funds
+  'd14a7b378b', // UPSC CSE 2025 GS I, Q2 — RBI income
+  '5e628f3ca0', // UPSC CSE 2025 GS I, Q6 — critical minerals
+  '1a903c8462', // UPSC CSE 2025 GS I, Q9 — circular economy
+  '5847a27b82', // UPSC CSE 2025 GS I, Q13 — Araghatta
+])
 const API_TIMEOUT_MS = 4000
 
 // Recommended QAPage fields (Google "improve item appearance"): the platform
@@ -270,7 +282,18 @@ const STATIC_META: Record<string, PageMeta> = {
 // so without this the corrected pages would have stayed invisible to crawlers
 // for up to a day — exactly the window in which the Search Console fixes are
 // being validated. Bumped to '4' after normalising the tag vocabulary.
-const API_CACHE_VERSION = '22'
+// Bumped to '23' after adding 100 explanations and tag sets to the JKCCE
+// Prelims 2024 GS-I paper, which turns 100 edge-cached "no explanation"
+// responses stale in one go. Bumped again to '24' when 31 stems in that paper
+// were re-split to lift the closing rubric ("The correct answer/s is/are:")
+// off the last list item — that line is what isGenericStem() reads, so until
+// the edge refetches, those pages keep the broken <title> built from it.
+// '25' completes the same pass: that paper's tags were authored subject-first,
+// so questionTopic() returned the subject and the description printed it twice.
+// '26' picks up one last stem (Q57) whose rubric opens "Their correct sequence
+// …" — a possessive lead-in the peeler did not recognise until a DB-side audit
+// found it still shipping as that page's title.
+const API_CACHE_VERSION = '26'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -1260,7 +1283,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         // Individual MCQ pages stay publicly accessible from their parent
         // paper, but are deliberately excluded from search while the site
         // concentrates its indexable inventory on complete papers and guides.
-        robots: 'noindex, follow',
+        robots: INDEXABLE_QUESTION_CODES.has(q.urlCode ?? q.slug) ? undefined : 'noindex, follow',
         contentHtml: renderQuestionContent(q, crumbs, related ?? []),
         jsonLd: [
           {
