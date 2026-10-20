@@ -38,6 +38,16 @@ const GUIDE_SLUGS = [
   'jkssb-constable', 'jkssb-constable-telecom',
 ]
 
+// First, small indexing cohort only. Keep this list identical to the Worker
+// allow-list and review its Search Console performance before adding any URL.
+const INDEXABLE_QUESTION_PATHS = [
+  '/question/with-reference-to-investments-consider-the-following-i-bonds-ii-hedge-funds--bd0394bb56',
+  '/question/which-of-the-following-are-the-sources-of-income-for-the-reserve--d14a7b378b',
+  '/question/consider-the-following-statements-i-india-has-joined-the-minerals-security-partn--5e628f3ca0',
+  '/question/consider-the-following-statements-statement-i-circular-economy-reduces-the-emiss--1a903c8462',
+  '/question/the-irrigation-device-called-araghatta-was--5847a27b82',
+]
+
 const PAPER_SEO_SLUGS = {
   'jkssb-junior-assistant-pyq': 'jkssb-junior-assistant-question-paper-2026',
   'jkssb-lab-attendant-2026-may-10': 'jkssb-laboratory-attendant-question-paper-2026',
@@ -60,17 +70,15 @@ function url(loc, priority, freq = 'weekly') {
 async function generate() {
   console.log('Generating sitemap...')
 
-  const [exams, papers, mocks] = await Promise.all([
+  const [exams, papers] = await Promise.all([
     fetchData('/api/v1/exams'),
     fetchData('/api/v1/papers'),
-    fetchData('/api/v1/mocks'),
   ])
 
   const examSlugs = exams
     .filter(exam => exam.slug && ((exam.papers ?? 0) > 0 || (exam.mocks ?? 0) > 0 || EXAM_INFO_SLUGS.has(exam.slug)))
     .map(exam => exam.slug)
 
-  const mockExamSlugs = new Set(mocks.map(mock => mock.examSlug).filter(Boolean))
   // Skip near-empty papers (too thin to index → Soft 404).
   const indexablePapers = papers.filter(paper => (paper.questions ?? 0) >= 5)
   const paperSlugs = indexablePapers
@@ -87,7 +95,7 @@ async function generate() {
   // the sitemap while the build still reported success. That is how a live,
   // fully solved paper silently stops being submitted for indexing.
   // Individual question pages are noindex and intentionally omitted.
-  console.log(`  ${examSlugs.length} exam hubs, ${mockExamSlugs.size} mock hubs, ${paperSlugs.length} papers`)
+  console.log(`  ${examSlugs.length} exam hubs, ${paperSlugs.length} papers, ${INDEXABLE_QUESTION_PATHS.length} reviewed questions`)
 
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),
@@ -97,8 +105,8 @@ async function generate() {
     url(`${BASE}/terms`, '0.3', 'yearly'),
     ...examSlugs.map(slug => url(`${BASE}/exam/${slug}`, '0.9')),
     // /exam/:slug/overview retired (301 → /guide/:slug) — no longer emitted.
-    ...[...mockExamSlugs].map(slug => url(`${BASE}/mock-test/${slug}`, '0.8')),
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
+    ...INDEXABLE_QUESTION_PATHS.map(path => url(`${BASE}${path}`, '0.6', 'monthly')),
     ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
   ]
 
