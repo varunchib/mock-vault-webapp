@@ -1,7 +1,5 @@
-// Generates public/sitemap.xml at build time by fetching real slugs from the API.
-// Keep this conservative: submit strong canonical pages, not every individual
-// MCQ leaf. Google can discover question pages through paper pages once the
-// parent pages earn trust.
+// Generates the build-time fallback sitemap. Production normally serves the
+// backend sitemap, which includes all eligible solved-question URLs.
 import { writeFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -38,8 +36,8 @@ const GUIDE_SLUGS = [
   'jkssb-constable', 'jkssb-constable-telecom',
 ]
 
-// First, small indexing cohort only. Keep this list identical to the Worker
-// allow-list and review its Search Console performance before adding any URL.
+// Keep only the reviewed question URLs in the static fallback. The Worker does
+// not restrict indexing of other eligible question URLs from the backend sitemap.
 const INDEXABLE_QUESTION_PATHS = [
   '/question/with-reference-to-investments-consider-the-following-i-bonds-ii-hedge-funds--bd0394bb56',
   '/question/which-of-the-following-are-the-sources-of-income-for-the-reserve--d14a7b378b',
@@ -85,16 +83,8 @@ async function generate() {
     .map(paper => PAPER_SEO_SLUGS[paper.slug] ?? paper.slug)
     .filter(Boolean)
 
-  // Individual question pages — only the ones with a real explanation. This is
-  // the same >=300-char gate the IndexNow submit-all endpoint uses: a fully
-  // solved question deserves its own indexed URL, but a bare stub would be thin
-  // content and waste crawl budget. Fetch per paper (indexable papers only).
-  // Fetched a few at a time rather than all at once. Firing one request per
-  // paper in parallel trips the API's rate limiter, and the failures used to be
-  // swallowed by a bare `.catch(() => [])` -- a whole paper would drop out of
-  // the sitemap while the build still reported success. That is how a live,
-  // fully solved paper silently stops being submitted for indexing.
-  // Individual question pages are noindex and intentionally omitted.
+  // The backend sitemap includes all questions meeting its paper/explanation
+  // eligibility rules. This build-time fallback lists only reviewed questions.
   console.log(`  ${examSlugs.length} exam hubs, ${paperSlugs.length} papers, ${INDEXABLE_QUESTION_PATHS.length} reviewed questions`)
 
   const urls = [
