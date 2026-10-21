@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { CheckCircle2, ChevronRight, Search, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
@@ -18,17 +19,33 @@ import {
 
 const ALL = 'All'
 
-export function ExamCatalogPage() {
+function requestExamCatalog() {
+  return Promise.all([
+    fetchExamCatalog(),
+    fetchEnrolledSlugs().catch(() => ({ slugs: [] as string[] })),
+  ]).then(([catalog, enrolled]) => {
+    const all = catalog ?? []
+    return { all, boards: topLevelBoards(all), enrolled: new Set(enrolled.slugs) }
+  })
+}
+
+export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
   const [searchParams] = useSearchParams()
-  const [exams, setExams] = useState<Exam[]>([])
+  const searchKey = searchParams.toString()
+  const searchQuery = searchParams.get('q') ?? ''
+  const [exams, setExams] = useState<Exam[]>(() => initialExams ? topLevelBoards(initialExams) : [])
   // Full catalog including sub-exams. The grid browses boards only, but search
   // spans everything — otherwise sub-exams like JKSSB Patwari are unreachable.
-  const [allExams, setAllExams] = useState<Exam[]>([])
+  const [allExams, setAllExams] = useState<Exam[]>(initialExams ?? [])
   const [enrolledSlugs, setEnrolledSlugs] = useState<Set<string>>(new Set())
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading] = useState(initialExams === undefined)
   const [error, setError] = useState(false)
-  const [activeCategory, setActiveCategory] = useState(ALL)
-  const [query, setQuery] = useState(searchParams.get('q') ?? '')
+  const [categoryState, setCategoryState] = useState({ searchKey, value: ALL })
+  const [queryState, setQueryState] = useState({ searchKey, value: searchQuery })
+  const activeCategory = categoryState.searchKey === searchKey ? categoryState.value : ALL
+  const setActiveCategory = (value: string) => setCategoryState({ searchKey, value })
+  const query = queryState.searchKey === searchKey ? queryState.value : searchQuery
+  const setQuery = (value: string) => setQueryState({ searchKey, value })
 
   usePageMeta({
     title: 'Exam Catalog — Browse 240+ Competitive Exams | Ministry of Papers',
@@ -58,26 +75,34 @@ export function ExamCatalogPage() {
   const load = () => {
     setLoading(true)
     setError(false)
-    Promise.all([fetchExamCatalog(), fetchEnrolledSlugs().catch(() => ({ slugs: [] as string[] }))])
-      .then(([catalog, enrolled]) => {
-        const all = catalog ?? []
-        setExams(topLevelBoards(all))
+    void requestExamCatalog()
+      .then(({ all, boards, enrolled }) => {
+        setExams(boards)
         setAllExams(all)
-        setEnrolledSlugs(new Set(enrolled.slugs))
+        setEnrolledSlugs(enrolled)
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }
 
   useEffect(() => {
-    load()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  useEffect(() => {
-    setQuery(searchParams.get('q') ?? '')
-    setActiveCategory(ALL)
-  }, [searchParams])
+    if (initialExams !== undefined) return
+    let cancelled = false
+    void requestExamCatalog()
+      .then(({ all, boards, enrolled }) => {
+        if (cancelled) return
+        setExams(boards)
+        setAllExams(all)
+        setEnrolledSlugs(enrolled)
+      })
+      .catch(() => {
+        if (!cancelled) setError(true)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+      return () => { cancelled = true }
+  }, [initialExams])
 
   const categories = useMemo(() => {
     const raw = [...new Set(exams.map((e) => normalizeExamCategory(e.category)))]
@@ -91,24 +116,22 @@ export function ExamCatalogPage() {
     })]
   }, [exams])
 
-  const filtered = useMemo(() => {
-    const q = query.trim()
-    // Browse the boards; search the whole catalog. Restricting search to boards
-    // made sub-exams (JKSSB Patwari, Junior Assistant, ...) unfindable here even
-    // though they have their own pages.
-    //
-    // The category filter is applied AFTER searching, not before: searchExams
-    // reads the board/sub-exam relationship out of the list it is given, so
-    // handing it a category slice would hide the children that identify a board
-    // and boards would leak back into the results. Both are independent
-    // predicates, so the final set is identical either way.
-    const hits = q ? searchExams(allExams, q) : exams
-    return hits.filter(
-      (e) => activeCategory === ALL || normalizeExamCategory(e.category) === activeCategory,
-    )
-  }, [exams, allExams, activeCategory, query])
+  const q = query.trim()
+  // Browse the boards; search the whole catalog. Restricting search to boards
+  // made sub-exams (JKSSB Patwari, Junior Assistant, ...) unfindable here even
+  // though they have their own pages.
+  //
+  // The category filter is applied AFTER searching, not before: searchExams
+  // reads the board/sub-exam relationship out of the list it is given, so
+  // handing it a category slice would hide the children that identify a board
+  // and boards would leak back into the results. Both are independent
+  // predicates, so the final set is identical either way.
+  const hits = q ? searchExams(allExams, q) : exams
+  const filtered = hits.filter(
+    (e) => activeCategory === ALL || normalizeExamCategory(e.category) === activeCategory,
+  )
 
-  if (loading) return <HaloLoader label="Loading exams" />
+  if (loading) return React.createElement(HaloLoader, { label: 'Loading exams' })
 
   if (error) {
     return (

@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
 
@@ -8,7 +9,7 @@ export function PrivacyPolicyPage() {
     canonicalPath: '/privacy',
   })
 
-  return (
+  return React.createElement(React.Fragment, null,
     <section className="public-page">
       <div className="public-shell narrow">
         <div className="legal-page">
@@ -270,6 +271,6 @@ export function PrivacyPolicyPage() {
           </div>
         </div>
       </div>
-    </section>
+    </section>,
   )
 }

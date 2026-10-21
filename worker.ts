@@ -8,6 +8,14 @@ import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from '.
 import { questionPath, questionRealSlug } from './src/lib/questionUrl'
 import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
+import { createElement, type ReactNode } from 'react'
+import { renderToStaticMarkup } from 'react-dom/server'
+import { AboutPage } from './src/pages/AboutPage'
+import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
+import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
+import { TermsPage } from './src/pages/TermsPage'
+import { MemoryRouter } from 'react-router-dom'
+import type { Exam } from './src/lib/api'
 
 interface Env {
   ASSETS: { fetch(req: Request): Promise<Response> }
@@ -106,18 +114,15 @@ const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Goog
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 
-// A deliberately tiny indexing experiment. These are complete, reviewed UPSC
-// questions with substantial explanations from one official-paper collection.
-// Keep every other MCQ leaf noindex until this cohort has earned stable
-// indexing and useful impressions in Search Console.
-const INDEXABLE_QUESTION_CODES = new Set([
-  'bd0394bb56', // UPSC CSE 2025 GS I, Q1 — Alternative Investment Funds
-  'd14a7b378b', // UPSC CSE 2025 GS I, Q2 — RBI income
-  '5e628f3ca0', // UPSC CSE 2025 GS I, Q6 — critical minerals
-  '1a903c8462', // UPSC CSE 2025 GS I, Q9 — circular economy
-  '5847a27b82', // UPSC CSE 2025 GS I, Q13 — Araghatta
-])
 const API_TIMEOUT_MS = 4000
+
+function renderStaticPage(pathname: string, page: ReactNode): string {
+  return renderToStaticMarkup(createElement(
+    MemoryRouter,
+    { initialEntries: [pathname] },
+    page,
+  ))
+}
 
 // Recommended QAPage fields (Google "improve item appearance"): the platform
 // authors and verifies every solution, so it is the author of both the
@@ -249,6 +254,7 @@ const STATIC_META: Record<string, PageMeta> = {
   '/about': {
     title: 'About - Ministry of Papers',
     description: "Ministry of Papers is India's free platform for previous year exam questions - mission, content policy, and contact.",
+    contentHtml: renderStaticPage('/about', createElement(AboutPage)),
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
@@ -266,10 +272,12 @@ const STATIC_META: Record<string, PageMeta> = {
   '/privacy': {
     title: 'Privacy Policy | Ministry of Papers',
     description: 'Privacy Policy for Ministry of Papers: what data we collect when you use our free previous-year-question and mock-test platform, how it is used and protected, cookies, third-party analytics, and your rights.',
+    contentHtml: renderStaticPage('/privacy', createElement(PrivacyPolicyPage)),
   },
   '/terms': {
     title: 'Terms of Service | Ministry of Papers',
     description: 'Terms of Service for Ministry of Papers: the rules for using our free previous-year-question and mock-test platform, acceptable use, intellectual-property and content policy, disclaimers, and account terms for aspirants.',
+    contentHtml: renderStaticPage('/terms', createElement(TermsPage)),
   },
 }
 
@@ -1092,8 +1100,9 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       const examMocks = (mocks ?? []).filter(m => m.examSlug === slug)
       // Sub-exams for board hubs (rendered as internal links, see renderExamContent).
       const subExams = (allExams ?? []).filter(x => x.boardSlug === slug)
-      // An exam with no papers and no mocks is a thin page → keep it out of the index.
-      const examEmpty = (e.papers ?? 0) === 0 && (e.mocks ?? 0) === 0
+      // Boards can qualify through papers or mocks in their child exams.
+      const childHasContent = subExams.some(x => (x.papers ?? 0) > 0 || (x.mocks ?? 0) > 0)
+      const examEmpty = papers.length === 0 && examMocks.length === 0 && !childHasContent
       const examCrumbs: Crumb[] = [
         { name: 'Home', item: BASE },
         { name: 'Exams', item: `${BASE}/exams` },
@@ -1280,10 +1289,6 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       return {
         title: pageTitle,
         description: `${descLead}${descTail}`,
-        // Individual MCQ pages stay publicly accessible from their parent
-        // paper, but are deliberately excluded from search while the site
-        // concentrates its indexable inventory on complete papers and guides.
-        robots: INDEXABLE_QUESTION_CODES.has(q.urlCode ?? q.slug) ? undefined : 'noindex, follow',
         contentHtml: renderQuestionContent(q, crumbs, related ?? []),
         jsonLd: [
           {
@@ -1468,7 +1473,7 @@ export default {
         // immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=9`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=10`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
@@ -1516,15 +1521,37 @@ export default {
     const staticMeta = STATIC_META[path]
     if (staticMeta && BOT_UA.test(ua)) {
       try {
+        let meta = staticMeta
+        if (path === '/exams') {
+          const exams = await apiJson<Exam[]>(
+            `${API}/api/v1/exams`,
+            3600,
+            request.headers.get('CF-Connecting-IP') ?? undefined,
+          )
+          if (!exams) return serviceUnavailableResponse()
+          meta = {
+            ...staticMeta,
+            contentHtml: renderStaticPage('/exams', createElement(ExamCatalogPage, { initialExams: exams })),
+          }
+        }
         const baseRes = await env.ASSETS.fetch(indexRequest)
         if (!baseRes.ok) return env.ASSETS.fetch(indexRequest)
         const html = await baseRes.text()
-        const enhanced = injectMeta(html, staticMeta, path)
+        let enhanced = injectMeta(html, meta, path)
+        if (meta.contentHtml) {
+          enhanced = enhanced
+            .replace(/<script type="module"[^>]*><\/script>\s*/g, '')
+            .replace(/<link rel="modulepreload"[^>]*>\s*/g, '')
+        }
         const headers = withSecurityHeaders(new Headers(baseRes.headers))
         headers.set('content-type', 'text/html; charset=UTF-8')
         headers.delete('content-length')
         return new Response(enhanced, { status: 200, headers })
-      } catch {
+      } catch (err) {
+        if (staticMeta.contentHtml || path === '/exams') {
+          console.error(`Crawler page rendering failed for ${path}`, err)
+          return serviceUnavailableResponse()
+        }
         return env.ASSETS.fetch(indexRequest)
       }
     }

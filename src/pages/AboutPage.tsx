@@ -1,3 +1,4 @@
+import * as React from 'react'
 import { usePageMeta } from '../lib/usePageMeta'
 
 export function AboutPage() {
@@ -24,7 +25,7 @@ export function AboutPage() {
     },
   })
 
-  return (
+  return React.createElement(React.Fragment, null,
     <section className="public-page">
       <div className="public-shell narrow">
         <div className="legal-page">
@@ -95,6 +96,6 @@ export function AboutPage() {
           </div>
         </div>
       </div>
-    </section>
+    </section>,
   )
 }
