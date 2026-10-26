@@ -114,6 +114,14 @@ const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Goog
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 
+// Only this small, manually reviewed cohort of MCQ pages is eligible for
+// indexing. The remaining question leaves stay discoverable from their paper
+// pages but are noindex while their content is reviewed individually.
+const INDEXABLE_QUESTION_CODES = new Set([
+  'd14a7b378b', '13fe297a0a', '08d10bc35e', '9ddb216968', '9cc8bd65af',
+  '595914102a', '16aa514e39', '6b9238f4dd', '447bfd9d16', '22d112207e',
+])
+
 const API_TIMEOUT_MS = 4000
 
 function renderStaticPage(pathname: string, page: ReactNode): string {
@@ -1210,7 +1218,9 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
     const questionMatch = pathname.match(/^\/question\/([^/]+)$/)
     if (questionMatch) {
       // URL is /question/<keywords>--<id>; fetch by the stable id after "--".
-      const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${questionRealSlug(questionMatch[1])}?v=2`, 86400, clientIp)
+      // v=3 intentionally refreshes the Worker cache after the reviewed UPSC
+      // explanation cohort was updated.
+      const q = await apiJson<QuestionData>(`${API}/api/v1/questions/${questionRealSlug(questionMatch[1])}?v=3`, 86400, clientIp)
       if (!q) return null
       // Canonical keyword URL; 301 any bare/old/mismatched URL to it.
       const canonicalPath = questionPath(q.urlCode ?? q.slug, q.question)
@@ -1294,6 +1304,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       return {
         title: pageTitle,
         description: `${descLead}${descTail}`,
+        robots: INDEXABLE_QUESTION_CODES.has(q.urlCode ?? q.slug) ? undefined : 'noindex, follow',
         contentHtml: renderQuestionContent(q, crumbs, related ?? []),
         jsonLd: [
           {

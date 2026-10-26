@@ -36,14 +36,18 @@ const GUIDE_SLUGS = [
   'jkssb-constable', 'jkssb-constable-telecom',
 ]
 
-// Keep only the reviewed question URLs in the static fallback. The Worker does
-// not restrict indexing of other eligible question URLs from the backend sitemap.
+// Keep only this manually reviewed question cohort in the sitemap.
 const INDEXABLE_QUESTION_PATHS = [
   '/question/with-reference-to-investments-consider-the-following-i-bonds-ii-hedge-funds--bd0394bb56',
-  '/question/which-of-the-following-are-the-sources-of-income-for-the-reserve--d14a7b378b',
-  '/question/consider-the-following-statements-i-india-has-joined-the-minerals-security-partn--5e628f3ca0',
-  '/question/consider-the-following-statements-statement-i-circular-economy-reduces-the-emiss--1a903c8462',
-  '/question/the-irrigation-device-called-araghatta-was--5847a27b82',
+  '/question/who-among-the-following-rulers-in-ancient-india-had-assumed-the-titles--13fe297a0a',
+  '/question/which-one-of-the-following-launched-the-nature-solutions-finance-hub-for--08d10bc35e',
+  '/question/consider-the-following-pairs-plant-description-i-cassava-woody-shrub-ii-ginger--9ddb216968',
+  '/question/in-the-context-of-electric-vehicle-batteries-consider-the-following-elements-i--9cc8bd65af',
+  '/question/consider-the-following-i-cigarette-butts-ii-eyeglass-lenses-iii-car-tyres--595914102a',
+  '/question/with-reference-to-india-consider-the-following-i-the-inter-state-council--16aa514e39',
+  '/question/with-reference-to-india-consider-the-following-pairs-organization-union-ministry--6b9238f4dd',
+  '/question/india-is-one-of-the-founding-members-of-the-international-north-south--447bfd9d16',
+  '/question/subsequent-to-which-one-of-the-following-events-gandhiji-who-consistently-oppose--22d112207e',
 ]
 
 const PAPER_SEO_SLUGS = {
