@@ -1158,6 +1158,10 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         apiJson<QuestionData[]>(`${API}/api/v1/papers/${slug}/questions`, 3600, clientIp),
       ])
       if (!p) return null
+      // A paper without a meaningful question set is an announcement/stub, not
+      // a useful PYQ resource. Keep it reachable for visitors but don't ask
+      // Google to index an empty or near-empty page.
+      const paperThin = (questions ?? []).length < 5
       const override = paperSeoOverride(p.slug)
       const canonical = `${BASE}${paperPath(p.slug)}`
       const title = override?.title ?? titleFit(`${p.title} PYQ - Solved Questions & Answers`)
@@ -1172,6 +1176,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       return {
         title,
         description,
+        robots: paperThin ? 'noindex, follow' : undefined,
         contentHtml: renderPaperContent(p, questions ?? [], crumbs),
         jsonLd: [
           {
