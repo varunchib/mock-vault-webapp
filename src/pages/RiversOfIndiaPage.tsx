@@ -25,8 +25,8 @@ const RIVERS: River[] = [
     source: 'Near Mount Kailash, Tibet',
     mouth: 'Arabian Sea (via Pakistan)',
     states: ['Ladakh'],
-    tributaries: 'Zanskar, Shyok, Nubra, Suru and Dras rivers.',
-    info: 'Flows through Ladakh, the only stretch inside India. Its upper valley is among the highest river valleys in the world.',
+    tributaries: 'Major basin rivers include Zanskar, Suru, Shyok, Gilgit, Kabul and the Punjab rivers that converge through the Panjnad.',
+    info: 'Flows through Ladakh, the only stretch inside India. Its upper valley is among the highest river valleys in the world. Tributary lists for the full basin include rivers in Tibet, India, Pakistan and Afghanistan.',
     points: [[81.5, 31.2], [79.5, 33.2], [77.5, 34.1], [75.5, 35], [74.5, 35.5]],
     labelPoint: [79.6, 35],
   },
@@ -38,7 +38,7 @@ const RIVERS: River[] = [
     source: 'Rakshastal Lake, Tibet',
     mouth: 'Flows into the Indus system downstream in Pakistan',
     states: ['Himachal Pradesh', 'Punjab'],
-    tributaries: 'Spiti and Baspa are important tributaries in India; the river later joins the Indus system in Pakistan.',
+    tributaries: 'Spiti, Baspa and Beas; Beas meets the Sutlej at Harike, and the Sutlej later joins the Indus system through the Panjnad.',
     info: 'Enters India at Shipki La and feeds the Bhakra Nangal dam. It is the longest of the five rivers of Punjab.',
     points: [[80, 31.1], [78.7, 31.6], [77, 31.3], [76.2, 31], [75, 31.1]],
     labelPoint: [78.7, 32.7],
@@ -51,7 +51,7 @@ const RIVERS: River[] = [
     source: 'Yamunotri Glacier, Uttarakhand',
     mouth: 'Joins the Ganga at Prayagraj',
     states: ['Uttarakhand', 'Haryana', 'Delhi', 'Uttar Pradesh'],
-    tributaries: 'Tons in the upper course; Chambal, Sind, Betwa and Ken join from the south, while Hindon joins from the west.',
+    tributaries: 'Tons, Hindon, Chambal, Sind, Betwa, Ken and Rind; several join the Yamuna through the Chambal system.',
     info: 'Passes Delhi and Agra and is the Ganga’s longest tributary. The Taj Mahal stands on its bank.',
     points: [[78.5, 31], [77.3, 30], [77.2, 28.6], [78, 27.2], [79.5, 26.3], [81.8, 25.4]],
   },
@@ -63,7 +63,7 @@ const RIVERS: River[] = [
     source: 'Gangotri Glacier, Uttarakhand',
     mouth: 'Bay of Bengal (Sundarbans delta)',
     states: ['Uttarakhand', 'Uttar Pradesh', 'Bihar', 'Jharkhand', 'West Bengal'],
-    tributaries: 'Yamuna, Ramganga, Gomti, Ghaghara, Gandak, Kosi, Son and Damodar. Bhagirathi and Alaknanda meet at Devprayag to form the Ganga.',
+    tributaries: 'Major direct tributaries include Ramganga, Gomti, Ghaghara, Gandak, Kosi, Mahananda, Yamuna, Tamsa, Son and Punpun. Bhagirathi and Alaknanda meet at Devprayag to form the Ganga.',
     info: 'A lifeline of the northern plains. Haridwar, Prayagraj, Varanasi and Patna lie on its banks.',
     points: [[79, 30.9], [78.2, 29.9], [79.5, 27.5], [80.3, 26.4], [81.8, 25.4], [83, 25.3], [84.9, 25.6], [86.9, 25.3], [87.9, 24.9], [88.3, 24.2], [89, 23.8]],
   },
@@ -75,7 +75,7 @@ const RIVERS: River[] = [
     source: 'Angsi Glacier, Tibet (Tsangpo)',
     mouth: 'Joins the Ganga delta, Bay of Bengal',
     states: ['Arunachal Pradesh', 'Assam'],
-    tributaries: 'Dibang and Lohit join the Siang to form the Brahmaputra in Assam; Subansiri, Kameng, Manas, Sankosh, Dhansiri and Kopili also join the system.',
+    tributaries: 'Dibang and Lohit join the Siang upstream; major Assam tributaries include Subansiri, Kameng, Manas, Sankosh, Beki, Raidak, Dhansiri, Kopili and Teesta.',
     info: 'Enters Arunachal Pradesh as the Siang and flows through Assam as a wide braided river with Majuli, one of the world’s largest river islands.',
     points: [[93.5, 29.3], [95.3, 29.5], [95.2, 28.2], [95.5, 27.5], [94.5, 27.2], [93.5, 26.8], [92, 26.3], [91.7, 26.2], [90.5, 26.2], [89.8, 25.8], [89.7, 25]],
   },
@@ -87,7 +87,7 @@ const RIVERS: River[] = [
     source: 'Amarkantak, Madhya Pradesh',
     mouth: 'Arabian Sea (Gulf of Khambhat)',
     states: ['Madhya Pradesh', 'Maharashtra', 'Gujarat'],
-    tributaries: 'Tawa is the largest tributary; other important tributaries include Hiran, Banjar, Shakkar, Dudhi and Orsang.',
+    tributaries: 'Major tributaries include Tawa, Hiran, Banjar, Shakkar, Dudhi, Ganjal, Barna, Kolar and Orsang.',
     info: 'Flows west in a rift valley between the Vindhya and Satpura ranges. Famous for the Dhuandhar Falls and Sardar Sarovar Dam.',
     points: [[81.8, 22.7], [80, 22.4], [78.5, 22.4], [76.5, 22.3], [75, 22.1], [73.5, 21.9], [72.6, 21.7]],
   },
@@ -99,7 +99,7 @@ const RIVERS: River[] = [
     source: 'Multai, Madhya Pradesh',
     mouth: 'Arabian Sea (near Surat)',
     states: ['Madhya Pradesh', 'Maharashtra', 'Gujarat'],
-    tributaries: 'Purna, Girna, Panzara, Waghur and Aner.',
+    tributaries: 'Major tributaries include Purna, Girna, Panzara, Waghur, Aner, Gomai, Arunavati, Bori, Buray, Amravati, Nesu, Mona and Sipna.',
     info: 'The other major west-flowing river of the peninsula, running just south of the Narmada.',
     points: [[77.9, 21.9], [76, 21.2], [74.5, 21.2], [73, 21.2], [72.7, 21.1]],
   },
@@ -111,7 +111,7 @@ const RIVERS: River[] = [
     source: 'Sihawa, Chhattisgarh',
     mouth: 'Bay of Bengal near Paradeep',
     states: ['Chhattisgarh', 'Odisha'],
-    tributaries: 'Seonath (Shivnath), Hasdeo, Mand and Ib join upstream; Ong and Tel join in Odisha.',
+    tributaries: 'Seonath (Shivnath), Hasdeo, Mand and Ib join from the left bank; Ong, Tel and Jonk join from the right.',
     info: 'Its Hirakud Dam is one of the longest earthen dams in the world. Cuttack stands on its delta.',
     points: [[81.9, 20.3], [82.5, 21.2], [83.9, 21.5], [84.5, 20.8], [85.8, 20.5], [86.7, 20.3]],
   },
@@ -123,7 +123,7 @@ const RIVERS: River[] = [
     source: 'Trimbakeshwar, Nashik, Maharashtra',
     mouth: 'Bay of Bengal',
     states: ['Maharashtra', 'Telangana', 'Andhra Pradesh'],
-    tributaries: 'Pravara, Purna, Manjira, Pranhita, Indravati and Sabari. The Pranhita is formed by the Wardha and Wainganga system.',
+    tributaries: 'Major left-bank tributaries include Purna, Pranhita, Indravati and Sabari; major right-bank tributaries include Pravara, Manjira and Maner.',
     info: 'The longest peninsular river, often called Dakshin Ganga. It hosts the Kumbh Mela at Nashik.',
     points: [[73.5, 19.9], [75, 19.2], [77, 19], [79.5, 18.7], [80.5, 18.5], [81.8, 17.5], [82.3, 16.8]],
   },
@@ -135,7 +135,7 @@ const RIVERS: River[] = [
     source: 'Mahabaleshwar, Maharashtra',
     mouth: 'Bay of Bengal',
     states: ['Maharashtra', 'Karnataka', 'Telangana', 'Andhra Pradesh'],
-    tributaries: 'Koyna, Bhima, Ghataprabha, Malaprabha and Tungabhadra; the Tungabhadra is formed by the Tunga and Bhadra.',
+    tributaries: 'Major left-bank tributaries include Bhima, Dindi, Musi, Paleru and Munneru; major right-bank tributaries include Koyna, Panchganga, Ghataprabha, Malaprabha and Tungabhadra.',
     info: 'Flows across the Deccan plateau and irrigates a vast rain-shadow region.',
     points: [[73.6, 17.9], [74.5, 17.2], [76, 16.5], [77.3, 16.2], [78.5, 16], [80, 16.2], [80.8, 16.1], [81, 15.7]],
   },
@@ -147,7 +147,7 @@ const RIVERS: River[] = [
     source: 'Talakaveri, Karnataka',
     mouth: 'Bay of Bengal',
     states: ['Karnataka', 'Tamil Nadu', 'Puducherry (Karaikal delta)'],
-    tributaries: 'Hemavati, Kabini, Shimsha and Arkavathi in Karnataka; Bhavani, Noyyal and Amaravati in Tamil Nadu.',
+    tributaries: 'Major left-bank tributaries include Harangi, Hemavati, Shimsha and Arkavathi; major right-bank tributaries include Lakshmanatirtha, Kabini, Bhavani, Noyyal and Amaravati.',
     info: 'A rain-fed river that still flows well in the dry months thanks to both monsoons. It splits into islands at Srirangapatna and Srirangam.',
     points: [[75.5, 12.4], [76.6, 12.2], [77.8, 12.1], [78.2, 11], [79, 10.9], [79.8, 10.8]],
   },
@@ -158,25 +158,29 @@ type RiverStudyDetails = {
   leftBank: string[]
   rightBank: string[]
   districts: { state: string; names: string[] }[]
+  tributaryNote?: string
 }
 
 const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Indus: {
-    leftBank: ['Zanskar'],
-    rightBank: ['Shyok', 'Shigar', 'Gilgit'],
+    leftBank: ['Zanskar', 'Suru (including the Dras system)', 'Soan (Sohan)', 'Jhelum', 'Chenab', 'Ravi', 'Beas', 'Sutlej', 'Panjnad'],
+    rightBank: ['Shyok (Nubra joins the Shyok)', 'Shigar', 'Gilgit (receives the Hunza)', 'Swat', 'Kunar (Chitral)', 'Kurram', 'Gomal', 'Tochi (Gambila)', 'Kabul'],
     districts: [{ state: 'Ladakh', names: ['Leh'] }],
+    tributaryNote: 'This is the wider Indus basin, not a list of direct confluences only. Jhelum, Chenab, Ravi, Beas and Sutlej converge through the Panjnad before meeting the Indus. Nubra joins the Shyok, Hunza joins the Gilgit system, and Kishanganga (Neelum), Vishav, Rambiara and Doodhganga feed the Jhelum.',
   },
   Sutlej: {
-    leftBank: ['Baspa'],
-    rightBank: ['Spiti'],
+    leftBank: ['Baspa', 'Tirung', 'Gayathing', 'Duling', 'Soldang', 'Nogli Khad'],
+    rightBank: ['Spiti', 'Beas (joins at Harike)', 'Ropa', 'Taiti', 'Kashang', 'Mulgaon', 'Yula', 'Wanger', 'Throng', 'Rupi', 'Kerang', 'Soan (Swan)', 'White Bein (East Bein)'],
+    tributaryNote: 'These lists include named Sutlej tributaries shown for the Himachal Pradesh and Punjab reaches. Farther downstream in Pakistan, the Sutlej and Chenab meet to form the Panjnad; Chenab is part of the wider Indus basin system, not a bank tributary of the Sutlej.',
     districts: [
       { state: 'Himachal Pradesh', names: ['Kinnaur', 'Lahaul and Spiti'] },
       { state: 'Punjab', names: ['Rupnagar'] },
     ],
   },
   Yamuna: {
-    leftBank: ['Hindon', 'Rind', 'Sengar'],
-    rightBank: ['Tons', 'Chambal', 'Sind', 'Betwa', 'Ken'],
+    leftBank: ['Tons', 'Giri', 'Rishi Ganga', 'Hanuman Ganga', 'Hindon', 'Rind', 'Sengar', 'Sasur Khaderi'],
+    rightBank: ['Chambal', 'Sind (Sindh)', 'Betwa', 'Ken', 'Sabi (Sahibi)', 'Baghain'],
+    tributaryNote: 'The Chambal system also receives the Banas, Kali Sindh, Parbati and Shipra; Betwa receives the Dhasan. These are nested basin tributaries, not direct Yamuna confluences.',
     districts: [
       { state: 'Uttarakhand', names: ['Uttarkashi'] },
       { state: 'Haryana', names: ['Yamunanagar'] },
@@ -185,8 +189,9 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
     ],
   },
   Ganga: {
-    leftBank: ['Ramganga', 'Gomti', 'Ghaghara', 'Gandak', 'Kosi', 'Mahananda'],
-    rightBank: ['Yamuna', 'Son', 'Punpun'],
+    leftBank: ['Ramganga', 'Gomti', 'Ghaghara (Karnali/Sarayu)', 'Gandak (Narayani)', 'Burhi Gandak', 'Kosi (Saptakoshi)', 'Mahananda', 'Varuna'],
+    rightBank: ['Yamuna', 'Tamsa (Tamasa)', 'Karamnasa', 'Son (Sone)', 'Punpun', 'Falgu', 'Kiul', 'Chandan', 'Ajoy (Ajay)', 'Damodar (via Hooghly)', 'Rupnarayan (via Hooghly system)'],
+    tributaryNote: 'Bhagirathi and Alaknanda meet at Devprayag to form the Ganga; Alaknanda receives Dhauliganga, Nandakini, Pindar and Mandakini. The Ghaghara system includes Sharda and Rapti; the Yamuna system includes Tons, Giri, Hindon, Rind, Sengar, Chambal, Sind, Betwa and Ken. Damodar and Rupnarayan drain through the Hooghly distributary system.',
     districts: [
       { state: 'Uttarakhand', names: ['Haridwar'] },
       { state: 'Uttar Pradesh', names: ['Prayagraj', 'Varanasi'] },
@@ -195,24 +200,26 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
     ],
   },
   Brahmaputra: {
-    leftBank: ['Burhi Dihing', 'Dhansiri', 'Kopili'],
-    rightBank: ['Subansiri', 'Kameng', 'Manas', 'Sankosh'],
+    leftBank: ['Lhasa', 'Nyang', 'Parlung Zangbo', 'Dibang', 'Lohit', 'Burhi Dihing', 'Dhansiri', 'Kopili', 'Kolong', 'Kulsi'],
+    rightBank: ['Subansiri', 'Kameng (Jia Bharali)', 'Manas', 'Sankosh', 'Beki', 'Raidak', 'Jaldhaka', 'Torsa', 'Gadadhar', 'Teesta'],
+    tributaryNote: 'Dibang and Lohit join the Siang (Dihang) before the combined river is called the Brahmaputra in Assam. The upper basin in Tibet also includes the Lhasa, Nyang and Parlung Zangbo rivers. Teesta joins the Jamuna, the Brahmaputra’s continuation in Bangladesh.',
     districts: [
       { state: 'Arunachal Pradesh', names: ['Upper Siang'] },
       { state: 'Assam', names: ['Dhemaji', 'Dibrugarh', 'Majuli', 'Sonitpur', 'Kamrup Metropolitan'] },
     ],
   },
   Narmada: {
-    leftBank: ['Tawa', 'Shakkar', 'Dudhi', 'Ganjal'],
-    rightBank: ['Hiran', 'Barna', 'Kolar', 'Orsang'],
+    leftBank: ['Burhner', 'Banjar', 'Sher', 'Shakkar', 'Dudhi', 'Tawa', 'Chhota Tawa', 'Ganjal', 'Kundi', 'Goi', 'Karjan'],
+    rightBank: ['Hiran', 'Tendoni (Tindoni)', 'Barna', 'Kolar', 'Man', 'Uri', 'Hatni', 'Orsang'],
+    tributaryNote: 'Some published tributary tables place Karjan on both banks; it is listed once here, but its bank classification varies between references.',
     districts: [
       { state: 'Madhya Pradesh', names: ['Anuppur', 'Narmadapuram', 'Barwani'] },
       { state: 'Gujarat', names: ['Bharuch'] },
     ],
   },
   Tapti: {
-    leftBank: ['Girna', 'Panzara', 'Bori'],
-    rightBank: ['Purna', 'Waghur', 'Aner'],
+    leftBank: ['Purna', 'Girna', 'Panzara (Panjhara)', 'Bori', 'Waghur', 'Amravati', 'Buray', 'Nesu', 'Mona', 'Sipna'],
+    rightBank: ['Gomai', 'Aner', 'Arunavati', 'Vaki'],
     districts: [
       { state: 'Madhya Pradesh', names: ['Betul', 'Burhanpur'] },
       { state: 'Maharashtra', names: ['Jalgaon'] },
@@ -221,7 +228,7 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   },
   Mahanadi: {
     leftBank: ['Seonath', 'Hasdeo', 'Mand', 'Ib'],
-    rightBank: ['Ong', 'Tel', 'Jonk'],
+    rightBank: ['Pairi', 'Ong', 'Tel', 'Jonk'],
     districts: [
       { state: 'Chhattisgarh', names: ['Dhamtari'] },
       { state: 'Odisha', names: ['Sambalpur', 'Boudh', 'Cuttack'] },
@@ -230,6 +237,7 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Godavari: {
     leftBank: ['Purna', 'Pranhita', 'Indravati', 'Sabari'],
     rightBank: ['Pravara', 'Manjira', 'Maner'],
+    tributaryNote: 'Pranhita is formed by the Wardha, Wainganga and Painganga river system. Important basin tributaries also include the Kadam and Kinnerasani.',
     districts: [
       { state: 'Maharashtra', names: ['Nashik', 'Nanded'] },
       { state: 'Telangana', names: ['Nizamabad', 'Bhadradri Kothagudem'] },
@@ -237,8 +245,9 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
     ],
   },
   Krishna: {
-    leftBank: ['Bhima', 'Musi', 'Munneru'],
-    rightBank: ['Koyna', 'Ghataprabha', 'Malaprabha', 'Tungabhadra'],
+    leftBank: ['Yerla', 'Bhima', 'Dindi', 'Musi', 'Peddavagu', 'Halia', 'Paleru', 'Munneru'],
+    rightBank: ['Kudali (Nira)', 'Venna', 'Koyna', 'Panchganga', 'Dudhaganga', 'Ghataprabha', 'Malaprabha', 'Tungabhadra'],
+    tributaryNote: 'The Tunga and Bhadra unite to form the Tungabhadra, a major tributary of the Krishna.',
     districts: [
       { state: 'Maharashtra', names: ['Satara', 'Sangli'] },
       { state: 'Karnataka', names: ['Bagalkot', 'Raichur'] },
@@ -247,8 +256,8 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
     ],
   },
   Kaveri: {
-    leftBank: ['Hemavati', 'Shimsha', 'Arkavathi'],
-    rightBank: ['Kabini', 'Bhavani', 'Noyyal', 'Amaravati'],
+    leftBank: ['Harangi', 'Hemavati', 'Shimsha', 'Arkavathi'],
+    rightBank: ['Lakshmanatirtha', 'Kabini', 'Suvarnavathi', 'Bhavani', 'Noyyal', 'Amaravati'],
     districts: [
       { state: 'Karnataka', names: ['Kodagu', 'Mysuru', 'Mandya'] },
       { state: 'Tamil Nadu', names: ['Erode', 'Karur', 'Tiruchirappalli', 'Thanjavur'] },
@@ -705,14 +714,23 @@ export function RiversOfIndiaPage() {
                     <dt>Source</dt><dd>{selected.source}</dd>
                     <dt>Mouth</dt><dd>{selected.mouth}</dd>
                     <dt>States crossed</dt><dd>{selected.states.join(', ')}</dd>
-                    <dt>Key tributaries</dt><dd>{selected.tributaries}</dd>
+                    <dt>Major tributaries</dt><dd>{selected.tributaries}</dd>
                   </dl>
                   <p>{selected.info}</p>
                   {selectedStudy && (
                     <section className="rivers-selected-study" aria-label={`${selected.name} river details`}>
-                      <h3>Major tributaries by bank</h3>
-                      <p><strong>Left bank:</strong> {selectedStudy.leftBank.join(', ') || 'No major tributaries listed here.'}</p>
-                      <p><strong>Right bank:</strong> {selectedStudy.rightBank.join(', ') || 'No major tributaries listed here.'}</p>
+                      <h3>Major Tributaries</h3>
+                      <div className="rivers-bank-groups">
+                        <section>
+                          <h4>Right-Bank Tributaries</h4>
+                          <ul>{selectedStudy.rightBank.map((name) => <li key={name}>{name}</li>)}</ul>
+                        </section>
+                        <section>
+                          <h4>Left-Bank Tributaries</h4>
+                          <ul>{selectedStudy.leftBank.map((name) => <li key={name}>{name}</li>)}</ul>
+                        </section>
+                      </div>
+                      {selectedStudy.tributaryNote && <p>{selectedStudy.tributaryNote}</p>}
                       <h3>Notable districts by state</h3>
                       <ul className="rivers-district-list">
                         {selectedStudy.districts.map(({ state, names }) => (
@@ -720,7 +738,7 @@ export function RiversOfIndiaPage() {
                         ))}
                       </ul>
                       <p className="rivers-detail-type">Selected river-adjacent districts and places, not an exhaustive district boundary list.</p>
-                      <p className="rivers-detail-type">Bank is defined looking downstream. These are major examples, not exhaustive tributary inventories; basin references may differ in minor stream classification.</p>
+                      <p className="rivers-detail-type">Banks are named looking downstream. Lists include named tributaries surfaced in Google river-system results and source tables; nested basin streams are identified in the notes. Names and bank classifications can vary between references.</p>
                     </section>
                   )}
                   <p className="rivers-border-note">
@@ -761,7 +779,7 @@ export function RiversOfIndiaPage() {
             {RIVERS.map((river) => (
               <li key={river.name}>
                 <strong>{river.name}:</strong> {river.states.join(', ')}.
-                <span> Key tributaries: {river.tributaries}</span>
+                <span> Major tributaries: {river.tributaries}</span>
               </li>
             ))}
           </ul>

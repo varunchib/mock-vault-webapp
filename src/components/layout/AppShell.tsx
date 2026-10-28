@@ -34,11 +34,14 @@ const primaryNav: NavItem[] = [
 function isNavActive(href: string, pathname: string): boolean {
   if (href === '/dashboard') return pathname === '/dashboard'
   if (href === '/exams') return pathname === '/exams' || pathname.startsWith('/exam/')
+  if (href === '/study-material') return pathname === href || pathname === '/rivers-of-india'
   return pathname === href || pathname.startsWith(href + '/')
 }
 
 function getPageTitle(pathname: string): string {
   if (pathname === '/dashboard') return 'Home'
+  if (pathname === '/study-material') return 'Study Material'
+  if (pathname === '/rivers-of-india') return 'Rivers of India'
   if (pathname.startsWith('/admin')) return 'Admin'
   if (pathname.startsWith('/mock-attempt/')) return 'Mock Test'
   if (pathname.startsWith('/mock-test')) return 'Tests'
@@ -243,10 +246,9 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span>{item.label}</span>
               </button>
             ))}
-            <p className="vault-nav-label">Study Material</p>
-            <Link className={`vault-nav-item${isNavActive('/rivers-of-india', location.pathname) ? ' active' : ''}`} to="/rivers-of-india">
+            <Link className={`vault-nav-item${isNavActive('/study-material', location.pathname) ? ' active' : ''}`} to="/study-material">
               <span className="vault-nav-icon"><BookOpen size={16} /></span>
-              <span>Rivers of India</span>
+              <span>Study Material</span>
             </Link>
 
             {/* Suggestions inbox — opens a panel rather than routing */}

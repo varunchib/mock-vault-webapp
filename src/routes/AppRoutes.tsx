@@ -23,6 +23,7 @@ import { RiversOfIndiaPage } from '../pages/RiversOfIndiaPage'
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
 const AdminDashboardPage  = lazy(() => import('../pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
 const AnalyticsPage       = lazy(() => import('../pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
+const StudyMaterialPage   = lazy(() => import('../pages/StudyMaterialPage').then(m => ({ default: m.StudyMaterialPage })))
 const ExamAnalyticsPage   = lazy(() => import('../pages/ExamAnalyticsPage').then(m => ({ default: m.ExamAnalyticsPage })))
 const PaperAttemptPage    = lazy(() => import('../pages/PaperAttemptPage').then(m => ({ default: m.PaperAttemptPage })))
 const AdminUserAnalyticsOverview = lazy(() => import('../pages/AdminUserAnalyticsPage').then(m => ({ default: m.AdminUserAnalyticsOverview })))
@@ -107,6 +108,7 @@ export function AppRoutes() {
       {/* /exam/:slug/overview retired — the Worker 301s it to /guide/:slug */}
       <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
+      <Route path="/study-material"       element={<ProtectedPage><Lazy><StudyMaterialPage /></Lazy></ProtectedPage>} />
       <Route path="/question/:slug"     element={<QuestionPage />} />
       <Route path="/pyq/:slug"          element={<PyqPaperPage />} />
       {/* The test series moved into the exam page's Mock Tests tab; this
