@@ -214,7 +214,7 @@ img {
 
 .logo-words-sub {
   font-family: 'DM Sans', sans-serif;
-  font-size: 9.5px;
+  font-size: 13px;
   font-weight: 500;
   letter-spacing: 2px;
   text-transform: uppercase;
@@ -2183,7 +2183,7 @@ footer {
   min-width: 0;
   overflow: hidden;
   align-self: start;
-  aspect-ratio: 662 / 720;
+  aspect-ratio: 800 / 774.1;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: #dbeaf3;
@@ -2197,28 +2197,66 @@ footer {
   cursor: grabbing;
 }
 
-.rivers-state-object {
-  position: absolute;
-  border: 0;
-  pointer-events: none;
-}
-
 .rivers-map-svg {
   position: absolute;
   z-index: 1;
   display: block;
   --rivers-ink: #1c2430;
   --rivers-land: #e4ead8;
+  --rivers-land-border: #a3b094;
+  --rivers-country-fill: #ecece6;
+  --rivers-lake-fill: #b4d4e8;
+  --rivers-lake-border: #5b9bc4;
 }
 
-.rivers-map-content {
-  position: absolute;
-  inset: 0;
+.rivers-country-shape {
+  fill: var(--rivers-country-fill);
+  stroke: none;
+}
+
+.rivers-country-border {
+  fill: none;
+  stroke: var(--rivers-land-border);
+  stroke-width: .7;
   pointer-events: none;
 }
 
-.rivers-map-content .rivers-map-svg {
-  pointer-events: auto;
+.rivers-state-fill path {
+  fill: var(--rivers-land);
+  stroke: var(--rivers-land-border);
+  stroke-width: 1.6;
+  pointer-events: none;
+}
+
+.rivers-state-boundaries path {
+  fill: var(--rivers-land);
+  stroke: var(--rivers-land-border);
+  stroke-width: .4;
+  pointer-events: none;
+}
+
+.rivers-lake-shape {
+  fill: var(--rivers-lake-fill);
+  stroke: var(--rivers-lake-border);
+  stroke-width: .5;
+}
+
+.rivers-lake-shape[data-lake-index] {
+  cursor: pointer;
+}
+
+.rivers-lake-marker {
+  cursor: pointer;
+}
+
+.rivers-lake-marker circle {
+  fill: var(--rivers-lake-fill);
+  stroke: #3f86b5;
+  stroke-width: 1.4;
+}
+
+.rivers-lake-marker.is-selected circle {
+  stroke-width: 2.4;
 }
 
 .rivers-state-labels {
@@ -2227,6 +2265,26 @@ footer {
   stroke-width: 2.2px;
   paint-order: stroke;
   font-size: 7px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.rivers-country-labels {
+  fill: #64707d;
+  font-size: 8.5px;
+  letter-spacing: .12em;
+  text-anchor: middle;
+  text-transform: uppercase;
+  opacity: .8;
+  pointer-events: none;
+}
+
+.rivers-region-label {
+  fill: var(--rivers-ink);
+  stroke: var(--rivers-land);
+  stroke-width: 2.5px;
+  paint-order: stroke;
+  font-size: 9px;
   font-weight: 700;
   pointer-events: none;
 }
@@ -2242,9 +2300,9 @@ footer {
 .rivers-map-river-label {
   fill: var(--river-label-color);
   stroke: var(--rivers-land);
-  stroke-width: 3px;
+  stroke-width: 4.5px;
   paint-order: stroke;
-  font-size: 9px;
+  font-size: 9.5px;
   font-weight: 800;
   pointer-events: none;
 }
@@ -2266,6 +2324,42 @@ footer {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: rivers-draw 2.2s ease-in-out forwards;
+}
+
+.rivers-tributary-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-width: 1.4;
+  animation: rivers-draw 1.8s ease-in-out forwards;
+}
+
+.rivers-tributary-flow {
+  stroke-width: .6;
+}
+
+.rivers-tributary-hit {
+  stroke-width: 6;
+}
+
+.rivers-tributary-label {
+  font-size: 7.5px;
+  font-weight: 500;
+}
+
+.no-tributaries .rivers-tributary {
+  display: none;
+}
+
+.hide-lakes .rivers-lakes {
+  display: none;
+}
+
+.hide-states .rivers-state-fill,
+.hide-states .rivers-state-boundaries {
+  display: none;
 }
 
 .rivers-route-flow {
@@ -2424,6 +2518,12 @@ footer {
   gap: 8px;
 }
 
+.rivers-layer-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
 .rivers-map-controls button,
 .rivers-list-button {
   display: inline-flex;
@@ -2450,6 +2550,40 @@ footer {
   height: 10px;
   flex: 0 0 10px;
   border-radius: 50%;
+}
+
+.rivers-lake-list h3 {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink3);
+  font-size: 12px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.rivers-map-section > .rivers-lake-list {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  align-content: start;
+  padding: 14px;
+}
+
+.rivers-lake-list .rivers-list-button {
+  justify-content: flex-start;
+  min-width: 0;
+  padding: 6px 9px;
+  font-size: 12px;
+  text-align: left;
+}
+
+.rivers-lake-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border: 1px solid #3f86b5;
+  border-radius: 50%;
+  background: #b4d4e8;
 }
 
 .rivers-detail-card h2 {

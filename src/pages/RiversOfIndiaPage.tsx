@@ -2,6 +2,48 @@ import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
 
+type MapTributary = {
+  n: string
+  d: string
+  s: [number, number]
+}
+
+type MapRiver = {
+  n: string
+  t: 'H' | 'P'
+  c: string
+  len: string
+  src: string
+  mouth: string
+  info: string
+  d: string
+  m: string
+  s: [number, number]
+  e: [number, number]
+  tr: MapTributary[]
+}
+
+type IndiaRiversMapData = {
+  W: number
+  H: number
+  C: [string, string][]
+  B: string
+  st0: string
+  CL: [string, number, number][]
+  st: string
+  tf: string
+  lk: [string, number][]
+  li: [string, string, [number, number]][]
+  MK: [string, number, number, string][]
+  R: MapRiver[]
+}
+
+type Lake = {
+  name: string
+  description: string
+  point: [number, number]
+}
+
 type River = {
   name: string
   type: 'H' | 'P'
@@ -157,7 +199,47 @@ const RIVERS: River[] = [
     info: 'A rain-fed river that still flows well in the dry months thanks to both monsoons. It splits into islands at Srirangapatna and Srirangam.',
     points: [[75.5, 12.4], [76.6, 12.2], [77.8, 12.1], [78.2, 11], [79, 10.9], [79.8, 10.8]],
   },
+  {
+    name: 'Mahi',
+    type: 'P',
+    color: '#5e35b1',
+    length: '583 km',
+    source: 'Vindhya Range, Madhya Pradesh',
+    mouth: 'Gulf of Khambhat, Arabian Sea',
+    states: ['Madhya Pradesh', 'Rajasthan', 'Gujarat'],
+    tributaries: 'The Som, Anas and Panam are among its major tributaries.',
+    info: 'Flows northwest through Madhya Pradesh and Rajasthan before turning southwest through Gujarat to the Gulf of Khambhat.',
+    points: [],
+  },
+  {
+    name: 'Brahmani',
+    type: 'P',
+    color: '#00838f',
+    length: 'About 799 km',
+    source: 'Formed by the Sankh and South Koel rivers near Rourkela, Odisha',
+    mouth: 'Bay of Bengal, Odisha',
+    states: ['Jharkhand', 'Chhattisgarh', 'Odisha'],
+    tributaries: 'The Sankh and South Koel unite to form the Brahmani; the Karo is another important tributary.',
+    info: 'The Brahmani flows across Odisha and joins the Baitarani system near the coast before reaching the Bay of Bengal.',
+    points: [],
+  },
 ]
+
+const RIVER_LABEL_FRACTIONS: Record<string, number> = {
+  Indus: 0.5,
+  Sutlej: 0.4,
+  Yamuna: 0.45,
+  Ganga: 0.6,
+  Brahmaputra: 0.55,
+  Narmada: 0.5,
+  Tapti: 0.5,
+  Mahanadi: 0.55,
+  Godavari: 0.55,
+  Krishna: 0.45,
+  Kaveri: 0.5,
+  Mahi: 0.45,
+  Brahmani: 0.55,
+}
 
 type RiverFilter = 'A' | 'H' | 'P'
 type RiverStudyDetails = {
@@ -277,38 +359,15 @@ const FILTERS: { key: RiverFilter; label: string }[] = [
   { key: 'P', label: 'Peninsular' },
 ]
 
-const MAP_VIEWBOX = { x: -50, y: 0, width: 662, height: 720 }
+const MAP_VIEWBOX = { x: 0, y: 0, width: 800, height: 774.1 }
 
 function mercator(latitude: number) {
   return Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360))
 }
 
 function project([longitude, latitude]: [number, number]): [number, number] {
-  const scale = 695.7 / (mercator(37.09) - mercator(6.75))
-  return [(longitude - 68.16) * 20.93, (mercator(37.09) - mercator(latitude)) * scale]
-}
-
-function riverPath(points: [number, number][]) {
-  const projected = points.map(project)
-  let path = `M${projected[0][0].toFixed(1)},${projected[0][1].toFixed(1)}`
-
-  for (let index = 0; index < projected.length - 1; index += 1) {
-    const previous = projected[index - 1] ?? projected[index]
-    const start = projected[index]
-    const end = projected[index + 1]
-    const next = projected[index + 2] ?? end
-    const control1: [number, number] = [
-      start[0] + (end[0] - previous[0]) / 6,
-      start[1] + (end[1] - previous[1]) / 6,
-    ]
-    const control2: [number, number] = [
-      end[0] - (next[0] - start[0]) / 6,
-      end[1] - (next[1] - start[1]) / 6,
-    ]
-    path += `C${control1[0].toFixed(1)},${control1[1].toFixed(1)} ${control2[0].toFixed(1)},${control2[1].toFixed(1)} ${end[0].toFixed(1)},${end[1].toFixed(1)}`
-  }
-
-  return path
+  const scale = 20 * 180 / Math.PI
+  return [(longitude - 60) * 20, (mercator(40) - mercator(latitude)) * scale]
 }
 
 const riverGroups = [
@@ -320,7 +379,7 @@ const riverGroups = [
   {
     title: 'Peninsular rivers',
     description: 'Mostly rain-fed, with seasonal flow shaped strongly by the monsoons.',
-    rivers: 'Narmada, Tapti, Mahanadi, Godavari, Krishna and Kaveri.',
+    rivers: 'Narmada, Tapti, Mahanadi, Godavari, Krishna, Kaveri, Mahi and Brahmani.',
   },
 ]
 
@@ -358,31 +417,80 @@ const STATE_LABELS: { name: string; point: [number, number] }[] = [
 
 export function RiversOfIndiaPage() {
   const [selectedRiver, setSelectedRiver] = React.useState<number | null>(null)
+  const [selectedLake, setSelectedLake] = React.useState<number | null>(null)
+  const [indiaMap, setIndiaMap] = React.useState<IndiaRiversMapData | null>(null)
+  const [mapLoadError, setMapLoadError] = React.useState<string | null>(null)
   const [filter, setFilter] = React.useState<RiverFilter>('A')
   const [animationKey, setAnimationKey] = React.useState(0)
   const [zoom, setZoom] = React.useState(1)
   const [pan, setPan] = React.useState<[number, number]>([0, 0])
   const [isDragging, setIsDragging] = React.useState(false)
+  const [showTributaries, setShowTributaries] = React.useState(true)
+  const [showLakes, setShowLakes] = React.useState(true)
+  const [showStates, setShowStates] = React.useState(true)
+  const [riverLabelPositions, setRiverLabelPositions] = React.useState<Record<string, [number, number]>>({})
   const mapRef = React.useRef<HTMLDivElement>(null)
-  const stateMapRef = React.useRef<HTMLObjectElement>(null)
+  const mapSvgRef = React.useRef<SVGSVGElement>(null)
   const dragRef = React.useRef<{ pointerId: number; x: number; y: number; pan: [number, number] } | null>(null)
   const draggedRef = React.useRef(false)
+  const mapData = indiaMap
+  const mapRivers = new Map(mapData?.R.map((river) => [river.n, river] as const) ?? [])
+  const lakes: Lake[] = mapData ? [
+    ...mapData.li.map(([name, description, point]) => ({ name, description, point })),
+    ...mapData.MK.map(([name, x, y, description]) => ({ name, description, point: [x, y] as [number, number] })),
+  ] : []
   const visibleRivers = RIVERS.map((river, index) => ({ river, index }))
     .filter(({ river }) => filter === 'A' || river.type === filter)
 
+  React.useEffect(() => {
+    let active = true
+    void import('../data/india-rivers-map.json?url')
+      .then(({ default: mapUrl }) => fetch(mapUrl))
+      .then((response) => {
+        if (!response.ok) throw new Error(`Map data request failed with status ${response.status}`)
+        return response.json()
+      })
+      .then((data: IndiaRiversMapData) => {
+        if (active) setIndiaMap(data)
+      })
+      .catch((error: unknown) => {
+        console.error('Failed to load the rivers and lakes map data.', error)
+        if (active) setMapLoadError('The map data could not be loaded. Please refresh the page.')
+      })
+
+    return () => { active = false }
+  }, [])
+
+  React.useLayoutEffect(() => {
+    const svg = mapSvgRef.current
+    if (!svg || !mapData) return
+
+    const positions: Record<string, [number, number]> = {}
+    for (const [index, river] of RIVERS.entries()) {
+      if (filter !== 'A' && river.type !== filter) continue
+      const path = svg.querySelector<SVGPathElement>(`[data-river-path="${index}"]`)
+      const length = path?.getTotalLength()
+      if (!path || !length) continue
+      const point = path.getPointAtLength(length * (RIVER_LABEL_FRACTIONS[river.name] ?? 0.5))
+      positions[river.name] = [point.x, point.y]
+    }
+
+    setRiverLabelPositions(positions)
+  }, [animationKey, filter, mapData])
+
   usePageMeta({
-    title: 'Rivers of India Map: Major Rivers & Tributaries',
-    description: 'Explore India’s major rivers on an interactive map. Follow river courses, compare Himalayan and Peninsular systems, and discover tributaries, states and notable districts.',
+    title: 'Rivers and Lakes of India: Interactive Map',
+    description: 'Explore a full regional map of India’s major rivers, tributaries, lakes and state boundaries.',
     canonicalPath: '/rivers-of-india',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'LearningResource',
-      name: 'Rivers of India Map: Major Rivers and Tributaries',
-      description: 'Explore the courses, tributaries, states and notable districts of India’s major rivers with an interactive map.',
+      name: 'Rivers and Lakes of India: Interactive Map',
+      description: 'Explore the courses, tributaries, lakes, states and neighboring countries of India with an interactive map.',
       url: 'https://ministryofpapers.com/rivers-of-india',
       learningResourceType: 'Interactive map',
       educationalLevel: 'General education',
-      keywords: 'rivers of India map, Indian rivers and tributaries, Himalayan rivers, Peninsular rivers, river systems, Indian geography',
+      keywords: 'rivers and lakes of India map, Indian rivers and tributaries, Himalayan rivers, Peninsular rivers, river systems, Indian geography',
       inLanguage: 'en',
       isAccessibleForFree: true,
       provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
@@ -404,28 +512,27 @@ export function RiversOfIndiaPage() {
     }
 
     if (selectedRiver === index) {
+      setSelectedLake(null)
       setSelectedRiver(null)
+      setZoom(1)
+      setPan([0, 0])
       return
     }
 
+    setSelectedLake(null)
     setSelectedRiver(index)
     const bounds = mapRef.current?.getBoundingClientRect()
-    if (!bounds) return
-    const points = RIVERS[index].points.map(project)
-    const xValues = points.map(([x]) => x)
-    const yValues = points.map(([, y]) => y)
-    const minX = Math.min(...xValues)
-    const maxX = Math.max(...xValues)
-    const minY = Math.min(...yValues)
-    const maxY = Math.max(...yValues)
-    const routeWidth = Math.max(maxX - minX, 1)
-    const routeHeight = Math.max(maxY - minY, 1)
+    const route = mapSvgRef.current?.querySelector<SVGPathElement>(`[data-river-path="${index}"]`)
+    if (!bounds || !route) return
+    const routeBounds = route.getBBox()
+    const routeWidth = Math.max(routeBounds.width, 1)
+    const routeHeight = Math.max(routeBounds.height, 1)
     const nextZoom = Math.min(4, Math.max(1, Math.min(
       MAP_VIEWBOX.width * 0.88 / routeWidth,
       MAP_VIEWBOX.height * 0.88 / routeHeight,
     )))
-    const centerX = ((minX + maxX) / 2 - MAP_VIEWBOX.x) / MAP_VIEWBOX.width * bounds.width
-    const centerY = ((minY + maxY) / 2 - MAP_VIEWBOX.y) / MAP_VIEWBOX.height * bounds.height
+    const centerX = (routeBounds.x + routeBounds.width / 2 - MAP_VIEWBOX.x) / MAP_VIEWBOX.width * bounds.width
+    const centerY = (routeBounds.y + routeBounds.height / 2 - MAP_VIEWBOX.y) / MAP_VIEWBOX.height * bounds.height
     setZoom(nextZoom)
     setPan(clampPan([
       bounds.width / 2 - centerX * nextZoom,
@@ -433,20 +540,52 @@ export function RiversOfIndiaPage() {
     ], nextZoom))
   }
 
+  const selectLake = (index: number) => {
+    if (draggedRef.current) {
+      draggedRef.current = false
+      return
+    }
+
+    if (selectedLake === index) {
+      setSelectedLake(null)
+      setZoom(1)
+      setPan([0, 0])
+      return
+    }
+
+    setSelectedRiver(null)
+    setSelectedLake(index)
+    const bounds = mapRef.current?.getBoundingClientRect()
+    if (!bounds) return
+    const lake = lakes[index]
+    if (!lake) throw new Error(`Missing lake details for index ${index}`)
+    const [centerX, centerY] = lake.point
+    const nextZoom = Math.min(4, Math.max(1, Math.min(
+      MAP_VIEWBOX.width * 0.4 / 130,
+      MAP_VIEWBOX.height * 0.4 / 130,
+    )))
+    const viewportX = (centerX - MAP_VIEWBOX.x) / MAP_VIEWBOX.width * bounds.width
+    const viewportY = (centerY - MAP_VIEWBOX.y) / MAP_VIEWBOX.height * bounds.height
+    setZoom(nextZoom)
+    setPan(clampPan([
+      bounds.width / 2 - viewportX * nextZoom,
+      bounds.height / 2 - viewportY * nextZoom,
+    ], nextZoom))
+  }
+
   const selected = selectedRiver === null ? null : RIVERS[selectedRiver]
+  const selectedLakeData = selectedLake === null ? null : lakes[selectedLake] ?? null
   const selectedStudy = selected ? RIVER_STUDY_DETAILS[selected.name] : null
-  const selectedSource = selected ? project(selected.points[0]) : null
-  const selectedMouth = selected ? project(selected.points[selected.points.length - 1]) : null
+  const selectedMapRiver = selected ? mapRivers.get(selected.name) : null
+  const indusMapRiver = mapRivers.get('Indus')
+  if (mapData && !indusMapRiver) throw new Error('Missing Indus map route')
+  const selectedSource = selectedMapRiver?.s ?? null
+  const selectedMouth = selectedMapRiver?.e ?? null
   const mapContentStyle = {
     left: `${pan[0]}px`,
     top: `${pan[1]}px`,
     width: `${zoom * 100}%`,
     height: `${zoom * 100}%`,
-  }
-  const stateMapStyle = {
-    ...mapContentStyle,
-    left: `calc(${pan[0]}px + ${zoom * 50 / 662 * 100}%)`,
-    width: `${zoom * 612 / 662 * 100}%`,
   }
 
   const clampPan = React.useCallback((nextPan: [number, number], scale = zoom): [number, number] => {
@@ -497,31 +636,6 @@ export function RiversOfIndiaPage() {
     setIsDragging(false)
   }
 
-  const highlightSelectedStates = React.useCallback(() => {
-    const svgDocument = stateMapRef.current?.contentDocument
-    if (!svgDocument) return
-
-    const selectedStates = (selected?.states ?? []).map((state) => state.toLowerCase().replace(/\s+\(.+\)$/, ''))
-    const paths = [...svgDocument.querySelectorAll('path')]
-    for (const path of paths) {
-      const stateName = path.querySelector('title')?.textContent?.trim().toLowerCase()
-      path.classList.remove('river-state-flash')
-      path.style.removeProperty('--river-highlight')
-      path.style.removeProperty('animation-delay')
-      const stateIndex = stateName ? selectedStates.indexOf(stateName) : -1
-      if (stateIndex !== -1 && selected) {
-        path.style.setProperty('--river-highlight', selected.color)
-        path.style.animationDelay = `${stateIndex * 1.15}s`
-        void path.getBoundingClientRect()
-        path.classList.add('river-state-flash')
-      }
-    }
-  }, [selected])
-
-  React.useEffect(() => {
-    highlightSelectedStates()
-  }, [highlightSelectedStates])
-
   React.useEffect(() => {
     const map = mapRef.current
     if (!map) return
@@ -542,6 +656,28 @@ export function RiversOfIndiaPage() {
     return () => map.removeEventListener('wheel', handleWheel)
   }, [clampPan, zoom, pan])
 
+  if (mapLoadError) {
+    return (
+      <section className="public-page rivers-page">
+        <article className="public-shell">
+          <h1>Rivers and Lakes of India: Interactive Map</h1>
+          <p role="alert">{mapLoadError}</p>
+        </article>
+      </section>
+    )
+  }
+
+  if (!mapData) {
+    return (
+      <section className="public-page rivers-page">
+        <article className="public-shell">
+          <h1>Rivers and Lakes of India: Interactive Map</h1>
+          <p role="status">Loading the full map…</p>
+        </article>
+      </section>
+    )
+  }
+
   return (
     <section className="public-page rivers-page">
       <article className="public-shell">
@@ -551,72 +687,142 @@ export function RiversOfIndiaPage() {
 
         <header className="rivers-hero">
           <span className="public-kicker">Interactive geography</span>
-          <h1>Rivers of India Map: Major Rivers and Tributaries</h1>
+          <h1>Rivers and Lakes of India: Interactive Map</h1>
           <p>
-            Follow India’s major rivers from source to sea, explore their
-            tributaries and see the states and districts along their courses.
-            Select a river to learn about its route and surrounding geography.
+            Explore detailed river courses, tributaries, lakes, state borders
+            and neighboring countries. Select any river or lake to zoom in and
+            see its details.
           </p>
         </header>
 
-        <section className="rivers-map-section" aria-label="Interactive map of Indian rivers">
+        <section className="rivers-map-section" aria-label="Interactive map of Indian rivers and lakes">
           <div className="rivers-map-column">
-          <div
-            className={`rivers-map${isDragging ? ' is-dragging' : ''}`}
-            onPointerDown={handleMapPointerDown}
-            onPointerMove={handleMapPointerMove}
-            onPointerUp={handleMapPointerUp}
-            onPointerCancel={handleMapPointerUp}
-            ref={mapRef}
-          >
-            <div className="rivers-map-content">
-              <object
-                aria-label="Indian state boundary map"
-                className="rivers-state-object"
-                data="/india-state-boundaries.svg"
-                onLoad={highlightSelectedStates}
-                ref={stateMapRef}
-                style={stateMapStyle}
-                type="image/svg+xml"
-              />
+            <div
+              className={`rivers-map${isDragging ? ' is-dragging' : ''}`}
+              onPointerDown={handleMapPointerDown}
+              onPointerMove={handleMapPointerMove}
+              onPointerUp={handleMapPointerUp}
+              onPointerCancel={handleMapPointerUp}
+              ref={mapRef}
+            >
               <svg
                 key={animationKey}
-                className={`rivers-map-svg${selectedRiver === null ? '' : ' has-selection'}`}
+                className={`rivers-map-svg${selectedRiver === null ? '' : ' has-selection'}${showTributaries ? '' : ' no-tributaries'}${showLakes ? '' : ' hide-lakes'}${showStates ? '' : ' hide-states'}`}
+                ref={mapSvgRef}
                 viewBox={`${MAP_VIEWBOX.x} ${MAP_VIEWBOX.y} ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
                 style={mapContentStyle}
                 role="img"
                 aria-labelledby="rivers-map-title rivers-map-description"
               >
-              <title id="rivers-map-title">Map of India showing major rivers</title>
-              <desc id="rivers-map-description">
-                Select a river route on the map or use the river buttons to see its source,
-                mouth and the Indian states it flows through.
-              </desc>
-              <g className="rivers-state-labels" aria-label="State names">
-                {STATE_LABELS.map(({ name, point }) => {
-                  const [x, y] = project(point)
-                  return (
-                    <text key={name} x={x} y={y} textAnchor="middle">
+                <title id="rivers-map-title">Interactive map of India’s rivers and lakes</title>
+                <desc id="rivers-map-description">
+                  Detailed river and tributary routes, lakes, country borders and Indian state boundaries.
+                  Select a river or lake to zoom in and see information.
+                </desc>
+                <g className="rivers-country-shapes" aria-label="Neighboring country boundaries">
+                  {mapData.C.map(([name, path]) => (
+                    <path className="rivers-country-shape" d={path} key={name}>
                       <title>{name}</title>
-                      {name}
+                    </path>
+                  ))}
+                </g>
+                <path className="rivers-country-border" d={mapData.B} />
+                <g
+                  aria-label="Indian state fill"
+                  className="rivers-state-fill"
+                  transform={mapData.tf}
+                  dangerouslySetInnerHTML={{ __html: mapData.st0 }}
+                />
+                <g
+                  aria-label="Indian state boundaries"
+                  className="rivers-state-boundaries"
+                  transform={mapData.tf}
+                  dangerouslySetInnerHTML={{ __html: mapData.st }}
+                />
+                {showLakes && (
+                  <g className="rivers-lakes" aria-label="Lakes and reservoirs">
+                    {mapData.lk.map(([path, lakeIndex], shapeIndex) => (
+                      <path
+                        className="rivers-lake-shape"
+                        d={path}
+                        key={`lake-shape-${shapeIndex}`}
+                        data-lake-index={lakeIndex >= 0 ? lakeIndex : undefined}
+                        role={lakeIndex >= 0 ? 'button' : undefined}
+                        tabIndex={lakeIndex >= 0 ? 0 : undefined}
+                        aria-label={lakeIndex >= 0 ? lakes[lakeIndex].name : undefined}
+                        onClick={lakeIndex >= 0 ? () => selectLake(lakeIndex) : undefined}
+                        onKeyDown={lakeIndex >= 0 ? (event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            selectLake(lakeIndex)
+                          }
+                        } : undefined}
+                      >
+                        {lakeIndex >= 0 && <title>{lakes[lakeIndex].name}</title>}
+                      </path>
+                    ))}
+                    {mapData.MK.map(([name, x, y], markerIndex) => {
+                      const lakeIndex = mapData.li.length + markerIndex
+                      return (
+                        <g
+                          className={`rivers-lake-marker${selectedLake === lakeIndex ? ' is-selected' : ''}`}
+                          key={name}
+                          role="button"
+                          tabIndex={0}
+                          aria-label={name}
+                          onClick={() => selectLake(lakeIndex)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                              event.preventDefault()
+                              selectLake(lakeIndex)
+                            }
+                          }}
+                        >
+                          <circle cx={x} cy={y} r="3.2" />
+                          <title>{name}</title>
+                        </g>
+                      )
+                    })}
+                  </g>
+                )}
+                <g className="rivers-country-labels" aria-label="Country names">
+                  {mapData.CL.map(([label, x, y]) => (
+                    <text key={label} x={x} y={y} textAnchor="middle">
+                      {label}
                     </text>
-                  )
-                })}
-              </g>
-              <text className="rivers-sea-label" x={project([68.3, 15])[0]} y={project([68.3, 15])[1]}>Arabian Sea</text>
-              <text className="rivers-sea-label" x={project([86, 14.5])[0]} y={project([86, 14.5])[1]}>Bay of Bengal</text>
-              <text className="rivers-sea-label" x={project([75.5, 6.2])[0]} y={project([75.5, 6.2])[1]}>Indian Ocean</text>
-              {visibleRivers.map(({ river, index }) => {
-                const path = riverPath(river.points)
-                const source = project(river.points[0])
-                const labelPoint = project(river.labelPoint ?? river.points[Math.floor(river.points.length / 2)])
-                const isSelected = selectedRiver === index
+                  ))}
+                </g>
+                {indusMapRiver && selected?.sourceRegion !== 'Tibet' && (
+                  <text
+                    className="rivers-region-label"
+                    x={indusMapRiver.s[0]}
+                    y={indusMapRiver.s[1] - 16}
+                    textAnchor="middle"
+                  >
+                    Tibet
+                  </text>
+                )}
+                <text className="rivers-sea-label" x={project([64.5, 15])[0]} y={project([64.5, 15])[1]}>Arabian Sea</text>
+                <text className="rivers-sea-label" x={project([86, 13])[0]} y={project([86, 13])[1]}>Bay of Bengal</text>
+                <text className="rivers-sea-label" x={project([77, 6])[0]} y={project([77, 6])[1]}>Indian Ocean</text>
+                {showStates && (
+                  <g className="rivers-state-labels" aria-label="State names">
+                    {STATE_LABELS.map(({ name, point }) => {
+                      const [x, y] = project(point)
+                      return <text key={name} x={x} y={y} textAnchor="middle">{name}</text>
+                    })}
+                  </g>
+                )}
+                {visibleRivers.map(({ river, index }) => {
+                  const mapRiver = mapRivers.get(river.name)
+                  if (!mapRiver) throw new Error(`Missing map route for ${river.name}`)
+                  const isSelected = selectedRiver === index
 
-                return (
-                  <g key={river.name}>
+                  return (
                     <g
                       className={`rivers-map-route${isSelected ? ' is-selected' : ''}`}
-                      data-river={river.name}
+                      data-river-index={index}
+                      key={river.name}
                       role="button"
                       tabIndex={0}
                       aria-label={`${river.name} river: ${river.states.join(', ')}`}
@@ -631,57 +837,91 @@ export function RiversOfIndiaPage() {
                     >
                       <path
                         className="rivers-route-line"
-                        d={path}
+                        d={mapRiver.d}
+                        data-river-path={index}
+                        id={`rivers-route-${index}`}
                         pathLength="1"
                         stroke={river.color}
-                        strokeWidth={isSelected ? 5.5 : 3.2}
+                        strokeWidth={isSelected ? 4 : 2.4}
                         style={{ animationDelay: `${index * 0.18}s` }}
                       />
-                      <path className="rivers-route-flow" d={path} />
-                      <circle className="rivers-route-drop" r="3.6" fill="#fff" stroke={river.color} strokeWidth="2">
-                        <animateMotion dur={`${6 + index * 0.4}s`} repeatCount="indefinite" path={path} />
+                      <path className="rivers-route-flow" d={mapRiver.d} />
+                      <circle className="rivers-route-drop" r="3" fill="#fff" stroke={river.color} strokeWidth="1.6">
+                        <animateMotion dur={`${10 + index}s`} repeatCount="indefinite" path={mapRiver.m} />
                       </circle>
-                      <circle cx={source[0]} cy={source[1]} r="4" fill={river.color} stroke="#fff" strokeWidth="1.5" />
-                      <path className="rivers-route-hit" d={path} />
+                      <circle cx={mapRiver.s[0]} cy={mapRiver.s[1]} r="3" fill={river.color} stroke="#fff" strokeWidth="1" />
+                      <path className="rivers-route-hit" d={mapRiver.d} />
+                      {showTributaries && mapRiver.tr.map((tributary) => (
+                        <g className="rivers-tributary" key={tributary.n}>
+                          <path
+                            className="rivers-tributary-line"
+                            d={tributary.d}
+                            pathLength="1"
+                            stroke={river.color}
+                            style={{ animationDelay: `${index * 0.2 + 2.2}s` }}
+                          />
+                          <path className="rivers-route-flow rivers-tributary-flow" d={tributary.d} />
+                          <path className="rivers-route-hit rivers-tributary-hit" d={tributary.d}>
+                            <title>{`${tributary.n} (tributary of ${river.name})`}</title>
+                          </path>
+                        </g>
+                      ))}
+                      {showTributaries && selectedRiver === index && mapRiver.tr.map((tributary) => (
+                        <text
+                          className="rivers-map-label rivers-tributary-label"
+                          key={`${tributary.n}-label`}
+                          x={tributary.s[0] + 4}
+                          y={tributary.s[1] - 3}
+                        >
+                          {tributary.n}
+                        </text>
+                      ))}
+                      {riverLabelPositions[river.name] && (
+                        <text
+                          className="rivers-map-river-label"
+                          aria-hidden="true"
+                          fill={river.color}
+                          textAnchor="middle"
+                          x={riverLabelPositions[river.name][0]}
+                          y={riverLabelPositions[river.name][1] - 5}
+                        >
+                          {river.name}
+                        </text>
+                      )}
                     </g>
+                  )
+                })}
+                {selected && selectedMapRiver && selectedSource && selectedMouth && (
+                  <g className="rivers-map-markers" aria-hidden="true">
                     <text
-                      className="rivers-map-river-label"
-                      data-river-label={river.name}
-                      x={labelPoint[0]}
-                      y={labelPoint[1] - 8}
-                      textAnchor="middle"
-                      aria-hidden="true"
-                      style={{ fill: river.color }}
+                      className="rivers-map-label"
+                      x={selectedSource[0] + (selectedSource[0] <= selectedMouth[0] ? 6 : -6)}
+                      y={selectedSource[1] - 5}
+                      textAnchor={selectedSource[0] <= selectedMouth[0] ? 'start' : 'end'}
                     >
-                      {river.name}
+                      {selected.sourceRegion ?? 'Source'}
+                    </text>
+                    <text
+                      className="rivers-map-label"
+                      x={selectedMouth[0] + (selectedMouth[0] > selectedSource[0] ? -6 : 6)}
+                      y={selectedMouth[1] + 11}
+                      textAnchor={selectedMouth[0] > selectedSource[0] ? 'end' : 'start'}
+                    >
+                      {selected.endLabel ?? 'Mouth'}
+                    </text>
+                    <circle cx={selectedMouth[0]} cy={selectedMouth[1]} r="4.5" fill="none" stroke={selected.color} strokeWidth="1.6" />
+                  </g>
+                )}
+                {selectedLakeData && selectedLake !== null && (
+                  <g className="rivers-map-markers" aria-hidden="true">
+                    <circle cx={selectedLakeData.point[0]} cy={selectedLakeData.point[1]} r="7" fill="none" stroke="#3f86b5" strokeWidth="1.6" />
+                    <text className="rivers-map-label" x={selectedLakeData.point[0] + 9} y={selectedLakeData.point[1] + 3}>
+                      {selectedLakeData.name}
                     </text>
                   </g>
-                )
-              })}
-              {selected && selectedSource && selectedMouth && (
-                <g className="rivers-map-markers" aria-hidden="true">
-                  <text
-                    className="rivers-map-label"
-                    x={selectedSource[0] + (selectedSource[0] <= selectedMouth[0] ? 8 : -8)}
-                    y={selectedSource[1] - 6}
-                    textAnchor={selectedSource[0] <= selectedMouth[0] ? 'start' : 'end'}
-                  >
-                    {selected.sourceRegion ?? 'Source'}
-                  </text>
-                  <text
-                    className="rivers-map-label"
-                    x={selectedMouth[0] + (selectedMouth[0] > selectedSource[0] ? -8 : 8)}
-                    y={selectedMouth[1] + 14}
-                    textAnchor={selectedMouth[0] > selectedSource[0] ? 'end' : 'start'}
-                  >
-                    {selected.endLabel ?? 'Mouth'}
-                  </text>
-                  <circle cx={selectedMouth[0]} cy={selectedMouth[1]} r="5" fill="none" stroke={selected.color} strokeWidth="2" />
-                </g>
-              )}
+                )}
               </svg>
             </div>
-          </div>
             <div className="rivers-map-zoom-controls" role="group" aria-label="Map zoom controls">
               <button
                 aria-label="Zoom in on map"
@@ -700,7 +940,7 @@ export function RiversOfIndiaPage() {
                 disabled={zoom === 1}
                 onClick={() => { setZoom(1); setPan([0, 0]) }}
                 type="button"
-              >Reset</button>
+              >Reset              </button>
               <span className="rivers-map-zoom-hint">Scroll to zoom · drag to move</span>
             </div>
           </div>
@@ -713,16 +953,39 @@ export function RiversOfIndiaPage() {
                     aria-pressed={filter === key}
                     className={filter === key ? 'is-active' : ''}
                     key={key}
-                    onClick={() => { setFilter(key); setSelectedRiver(null) }}
+                    onClick={() => {
+                      setFilter(key)
+                      setSelectedRiver(null)
+                      setSelectedLake(null)
+                      setZoom(1)
+                      setPan([0, 0])
+                    }}
                     type="button"
                   >
                     {label}
                   </button>
                 ))}
               </div>
+              <div className="rivers-layer-controls" aria-label="Map layers">
+                <button aria-pressed={showTributaries} className={showTributaries ? 'is-active' : ''} onClick={() => setShowTributaries((value) => !value)} type="button">
+                  Tributaries
+                </button>
+                <button aria-pressed={showLakes} className={showLakes ? 'is-active' : ''} onClick={() => setShowLakes((value) => !value)} type="button">
+                  Lakes
+                </button>
+                <button aria-pressed={showStates} className={showStates ? 'is-active' : ''} onClick={() => setShowStates((value) => !value)} type="button">
+                  States
+                </button>
+              </div>
               <button
                 className="rivers-replay-button"
-                onClick={() => { setSelectedRiver(null); setZoom(1); setPan([0, 0]); setAnimationKey((current) => current + 1) }}
+                onClick={() => {
+                  setSelectedRiver(null)
+                  setSelectedLake(null)
+                  setZoom(1)
+                  setPan([0, 0])
+                  setAnimationKey((current) => current + 1)
+                }}
                 type="button"
               >
                 <span aria-hidden="true">▶</span> Replay
@@ -788,24 +1051,45 @@ export function RiversOfIndiaPage() {
                     boundaries. River lengths vary slightly by source.
                   </p>
                 </>
+              ) : selectedLakeData ? (
+                <>
+                  <h2>{selectedLakeData.name}</h2>
+                  <p className="rivers-detail-type">Lake or reservoir</p>
+                  <p>{selectedLakeData.description}</p>
+                </>
               ) : (
                 <>
-                  <h2>Select a river</h2>
-                  <p className="rivers-detail-type">Explore the course and states crossed by each river.</p>
+                  <h2>Select a river or lake</h2>
+                  <p className="rivers-detail-type">Explore full river courses, tributaries, lakes and reservoirs.</p>
                   <p>Himalayan rivers are often perennial, while Peninsular rivers are more dependent on monsoon rainfall.</p>
                 </>
               )}
             </article>
+          </div>
+          <div className="rivers-list-card rivers-lake-list" aria-label="Select a lake or reservoir">
+            <h3>Lakes and reservoirs</h3>
+            {lakes.map((lake, index) => (
+              <button
+                aria-pressed={selectedLake === index}
+                className={`rivers-list-button${selectedLake === index ? ' is-active' : ''}`}
+                key={lake.name}
+                onClick={() => selectLake(index)}
+                type="button"
+              >
+                <span className="rivers-lake-dot" />
+                {lake.name}
+              </button>
+            ))}
           </div>
         </section>
 
         <section className="rivers-study-notes" aria-labelledby="rivers-study-heading">
           <h2 id="rivers-study-heading">Understanding India’s river systems</h2>
           <p>
-            Explore where each river begins, how it flows, which tributaries
-            join it and where it meets the sea. The map labels are schematic;
-            where a river forms a state boundary, the state list follows the
-            main course and may differ between references.
+            Explore where rivers begin, which tributaries join them, and where
+            they meet the sea. River routes and state boundaries are mapped
+            across India and neighboring regions; state lists follow the main
+            course and may differ between references.
           </p>
           <div className="rivers-study-grid">
             {riverGroups.map((group) => (
@@ -826,7 +1110,8 @@ export function RiversOfIndiaPage() {
             ))}
           </ul>
           <p className="rivers-attribution">
-            Map boundaries adapted from MapSVG via @svg-maps/india; licensed under{' '}
+            Country outlines, rivers and lakes: Natural Earth (public domain).
+            State boundaries: MapSVG via @svg-maps/india, licensed under{' '}
             <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
               CC BY 4.0
             </a>.
