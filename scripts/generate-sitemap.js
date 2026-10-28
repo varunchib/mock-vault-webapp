@@ -94,6 +94,7 @@ async function generate() {
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),
     url(`${BASE}/exams`, '0.9', 'daily'),
+    url(`${BASE}/rivers-of-india`, '0.7', 'monthly'),
     url(`${BASE}/about`, '0.5', 'monthly'),
     url(`${BASE}/privacy`, '0.3', 'yearly'),
     url(`${BASE}/terms`, '0.3', 'yearly'),

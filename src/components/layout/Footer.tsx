@@ -85,8 +85,8 @@ export function Footer() {
         <p className="footer-affiliation">
           Ministry of Papers is an independent educational resource and is
           <strong> not affiliated with, endorsed by, or sponsored by </strong>
-          JKSSB, JKPSC, UPSC, SSC, IBPS, RRB, NTA or any government body,
-          recruitment board or examination authority. Exam names, logos and
+          any government body, recruitment board or examination authority.
+          Exam names, logos and
           trademarks belong to their respective owners and are used here only to
           identify the examination a question paper relates to. Question papers
           and answer keys are reproduced from publicly released official

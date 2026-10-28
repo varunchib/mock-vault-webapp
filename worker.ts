@@ -14,6 +14,7 @@ import { AboutPage } from './src/pages/AboutPage'
 import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
 import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
 import { TermsPage } from './src/pages/TermsPage'
+import { RiversOfIndiaPage } from './src/pages/RiversOfIndiaPage'
 import { MemoryRouter } from 'react-router-dom'
 import type { Exam } from './src/lib/api'
 
@@ -113,14 +114,6 @@ type QuestionData = {
 const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
-
-// Only this small, manually reviewed cohort of MCQ pages is eligible for
-// indexing. The remaining question leaves stay discoverable from their paper
-// pages but are noindex while their content is reviewed individually.
-const INDEXABLE_QUESTION_CODES = new Set([
-  'd14a7b378b', '13fe297a0a', '08d10bc35e', '9ddb216968', '9cc8bd65af',
-  '595914102a', '16aa514e39', '6b9238f4dd', '447bfd9d16', '22d112207e',
-])
 
 const API_TIMEOUT_MS = 4000
 
@@ -256,6 +249,32 @@ const STATIC_META: Record<string, PageMeta> = {
           { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
           { '@type': 'ListItem', position: 2, name: 'Exams', item: `${BASE}/exams` },
         ],
+      },
+      '/rivers-of-india': {
+        title: 'Rivers of India Map: Major Rivers & Tributaries',
+        description: 'Explore India’s major rivers on an interactive map. Follow river courses, compare Himalayan and Peninsular systems, and discover tributaries, states and notable districts.',
+        contentHtml: renderStaticPage('/rivers-of-india', createElement(RiversOfIndiaPage)),
+        jsonLd: {
+          '@context': 'https://schema.org',
+          '@type': 'LearningResource',
+          name: 'Rivers of India Map: Major Rivers and Tributaries',
+          description: 'Explore the courses, tributaries, states and notable districts of India’s major rivers with an interactive map.',
+          url: `${BASE}/rivers-of-india`,
+          learningResourceType: 'Interactive map',
+          educationalLevel: 'General education',
+          keywords: 'rivers of India map, Indian rivers and tributaries, Himalayan rivers, Peninsular rivers, river systems, Indian geography',
+          inLanguage: 'en',
+          isAccessibleForFree: true,
+          provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+          breadcrumb: {
+            '@type': 'BreadcrumbList',
+            itemListElement: [
+              { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+              { '@type': 'ListItem', position: 2, name: 'Geography', item: `${BASE}/rivers-of-india` },
+              { '@type': 'ListItem', position: 3, name: 'Rivers of India', item: `${BASE}/rivers-of-india` },
+            ],
+          },
+        },
       },
     },
   },
@@ -1304,7 +1323,6 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       return {
         title: pageTitle,
         description: `${descLead}${descTail}`,
-        robots: INDEXABLE_QUESTION_CODES.has(q.urlCode ?? q.slug) ? undefined : 'noindex, follow',
         contentHtml: renderQuestionContent(q, crumbs, related ?? []),
         jsonLd: [
           {

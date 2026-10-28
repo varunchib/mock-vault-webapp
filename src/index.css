@@ -1965,6 +1965,449 @@ footer {
   width: min(860px, 100%);
 }
 
+.rivers-page .public-shell {
+  width: min(1200px, 100%);
+}
+
+.rivers-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  color: var(--ink3);
+  font-size: 13px;
+}
+
+.rivers-breadcrumb a {
+  color: inherit;
+}
+
+.rivers-hero {
+  max-width: 760px;
+  margin: 0 auto 24px;
+}
+
+.rivers-hero h1 {
+  margin: 8px 0 10px;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 5vw, 48px);
+  line-height: 1.12;
+}
+
+.rivers-hero p,
+.rivers-study-notes > p {
+  color: var(--ink3);
+  line-height: 1.7;
+}
+
+.rivers-map-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 16px;
+  overflow: hidden;
+}
+
+.rivers-map {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  align-self: start;
+  aspect-ratio: 612 / 720;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #dbeaf3;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.rivers-map.is-dragging {
+  cursor: grabbing;
+}
+
+html[data-theme="dark"] .rivers-map {
+  background: #1d2b35;
+}
+
+.rivers-state-object {
+  position: absolute;
+  border: 0;
+  pointer-events: none;
+}
+
+html[data-theme="dark"] .rivers-state-object {
+  filter: brightness(.68) saturate(.72);
+}
+
+.rivers-map-svg {
+  position: absolute;
+  z-index: 1;
+  display: block;
+  --rivers-ink: #1c2430;
+  --rivers-land: #e4ead8;
+}
+
+.rivers-map-content {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.rivers-map-content .rivers-map-svg {
+  pointer-events: auto;
+}
+
+html[data-theme="dark"] .rivers-map-svg {
+  --rivers-ink: #f1f5f9;
+  --rivers-land: #28332d;
+}
+
+.rivers-state-labels {
+  fill: var(--rivers-ink);
+  stroke: var(--rivers-land);
+  stroke-width: 2.2px;
+  paint-order: stroke;
+  font-size: 7px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.rivers-sea-label {
+  fill: var(--ink3);
+  font-size: 11px;
+  font-style: italic;
+  opacity: .95;
+  pointer-events: none;
+}
+
+.rivers-map-river-label {
+  fill: var(--river-label-color);
+  stroke: var(--rivers-land);
+  stroke-width: 3px;
+  paint-order: stroke;
+  font-size: 9px;
+  font-weight: 800;
+  pointer-events: none;
+}
+
+.rivers-map-route {
+  cursor: pointer;
+  outline: none;
+}
+
+.rivers-route-line,
+.rivers-route-flow {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+
+.rivers-route-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: rivers-draw 2.2s ease-in-out forwards;
+}
+
+.rivers-route-flow {
+  stroke: #fff;
+  stroke-width: 1.2;
+  stroke-dasharray: 6 14;
+  opacity: .75;
+  animation: rivers-flow 1.4s linear infinite;
+}
+
+.rivers-route-hit {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 16;
+  pointer-events: stroke;
+}
+
+.rivers-route-drop {
+  pointer-events: none;
+}
+
+.has-selection .rivers-map-route {
+  opacity: .16;
+}
+
+.has-selection .rivers-map-route.is-selected,
+.has-selection .rivers-map-route:focus-visible {
+  opacity: 1;
+}
+
+.rivers-map-route:focus-visible .rivers-route-hit {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+
+.rivers-map-label {
+  fill: var(--rivers-ink);
+  stroke: var(--rivers-land);
+  stroke-width: 3px;
+  paint-order: stroke;
+  font-size: 11px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+@keyframes rivers-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes rivers-flow {
+  to { stroke-dashoffset: -20; }
+}
+
+.rivers-map-zoom-controls {
+  position: absolute;
+  z-index: 2;
+  top: 10px;
+  right: 10px;
+  display: grid;
+  gap: 5px;
+}
+
+.rivers-map-zoom-controls button {
+  min-width: 34px;
+  min-height: 34px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+.rivers-map-zoom-controls button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.rivers-map-zoom-hint {
+  max-width: 115px;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--surface);
+  color: var(--ink3);
+  font-size: 10px;
+  line-height: 1.3;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.rivers-selected-study {
+  margin: 14px 0 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.rivers-selected-study h3 {
+  margin: 10px 0 4px;
+  font-size: 14px;
+}
+
+.rivers-selected-study ul {
+  padding-left: 20px;
+  line-height: 1.55;
+}
+
+.rivers-selected-study .rivers-district-list {
+  margin: 4px 0 8px;
+}
+
+.rivers-selected-study .rivers-district-list li {
+  margin-top: 3px;
+}
+
+.rivers-map-sidebar {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rivers-map-controls,
+.rivers-list-card,
+.rivers-detail-card {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.rivers-map-controls,
+.rivers-filter-controls,
+.rivers-list-card {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.rivers-map-controls button,
+.rivers-list-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.rivers-map-controls button.is-active,
+.rivers-list-button.is-active {
+  background: var(--ink);
+  color: var(--surface);
+}
+
+.rivers-list-dot {
+  width: 10px;
+  height: 10px;
+  flex: 0 0 10px;
+  border-radius: 50%;
+}
+
+.rivers-detail-card h2 {
+  width: fit-content;
+  margin: 0 0 2px;
+  padding-bottom: 4px;
+  border-bottom: 3px solid transparent;
+  font-size: 18px;
+}
+
+.rivers-detail-card p {
+  line-height: 1.6;
+}
+
+.rivers-detail-type {
+  margin: 0 0 8px;
+  color: var(--ink3);
+  font-size: 12px;
+}
+
+.rivers-detail-card dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 5px 12px;
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.rivers-detail-card dt {
+  color: var(--ink3);
+}
+
+.rivers-detail-card dd {
+  margin: 0;
+}
+
+.rivers-border-note,
+.rivers-attribution {
+  color: var(--ink3);
+  font-size: 12px;
+}
+
+.rivers-state-revision-list {
+  columns: 2;
+  padding-left: 22px;
+  line-height: 1.8;
+}
+
+.rivers-state-revision-list li {
+  break-inside: avoid;
+  margin-bottom: 5px;
+}
+
+.rivers-state-revision-list span {
+  color: var(--ink3);
+}
+
+.rivers-map-state-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px 16px;
+  padding-left: 20px;
+  margin-top: 10px;
+  line-height: 1.65;
+}
+
+.rivers-study-notes {
+  max-width: 980px;
+  margin: 34px auto 0;
+}
+
+.rivers-study-notes h2 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(24px, 3vw, 32px);
+}
+
+.rivers-study-notes > h3 {
+  margin-top: 24px;
+}
+
+.rivers-study-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.rivers-study-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.rivers-study-card h3 {
+  margin: 0 0 8px;
+}
+
+.rivers-study-card p {
+  color: var(--ink3);
+  line-height: 1.65;
+}
+
+.rivers-attribution {
+  margin-top: 22px;
+  font-size: 12px;
+}
+
+@media (max-width: 700px) {
+  .rivers-map-section {
+    grid-template-columns: 1fr;
+  }
+
+  .rivers-study-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rivers-state-revision-list {
+    columns: 1;
+  }
+
+  .rivers-map-state-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rivers-state-labels {
+    font-size: 6.5px;
+    stroke-width: 2.6px;
+  }
+}
+
 /* Not-found state for missing content (no redirect-to-home) */
 .nf-block {
   text-align: center;
@@ -12545,6 +12988,11 @@ html {
   letter-spacing: -.01em;
   transition: background .14s, color .14s;
   cursor: pointer;
+}
+
+.vault-sidebar-simple a.vault-nav-item {
+  color: inherit;
+  text-decoration: none;
 }
 
 .vault-sidebar-simple .vault-nav-item:hover {

@@ -243,6 +243,11 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <span>{item.label}</span>
               </button>
             ))}
+            <p className="vault-nav-label">Study Material</p>
+            <Link className={`vault-nav-item${isNavActive('/rivers-of-india', location.pathname) ? ' active' : ''}`} to="/rivers-of-india">
+              <span className="vault-nav-icon"><BookOpen size={16} /></span>
+              <span>Rivers of India</span>
+            </Link>
 
             {/* Suggestions inbox — opens a panel rather than routing */}
             <button
