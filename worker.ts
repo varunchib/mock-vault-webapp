@@ -217,6 +217,7 @@ const STATIC_META: Record<string, PageMeta> = {
         <a href="/exam/ssc-cgl">SSC CGL</a>
         <a href="/exam/bpsc">BPSC</a>
         <a href="/exam/jkssb">JKSSB</a>
+        <a href="/rivers-of-india">Explore the Rivers of India map</a>
       </nav>
     </article>`,
     jsonLd: {
