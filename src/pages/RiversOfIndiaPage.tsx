@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
+import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
 
@@ -340,16 +340,16 @@ const STATE_LABELS: { name: string; point: [number, number] }[] = [
 ]
 
 export function RiversOfIndiaPage() {
-  const [selectedRiver, setSelectedRiver] = useState<number | null>(null)
-  const [filter, setFilter] = useState<RiverFilter>('A')
-  const [animationKey, setAnimationKey] = useState(0)
-  const [zoom, setZoom] = useState(1)
-  const [pan, setPan] = useState<[number, number]>([0, 0])
-  const [isDragging, setIsDragging] = useState(false)
-  const mapRef = useRef<HTMLDivElement>(null)
-  const stateMapRef = useRef<HTMLObjectElement>(null)
-  const dragRef = useRef<{ pointerId: number; x: number; y: number; pan: [number, number] } | null>(null)
-  const draggedRef = useRef(false)
+  const [selectedRiver, setSelectedRiver] = React.useState<number | null>(null)
+  const [filter, setFilter] = React.useState<RiverFilter>('A')
+  const [animationKey, setAnimationKey] = React.useState(0)
+  const [zoom, setZoom] = React.useState(1)
+  const [pan, setPan] = React.useState<[number, number]>([0, 0])
+  const [isDragging, setIsDragging] = React.useState(false)
+  const mapRef = React.useRef<HTMLDivElement>(null)
+  const stateMapRef = React.useRef<HTMLObjectElement>(null)
+  const dragRef = React.useRef<{ pointerId: number; x: number; y: number; pan: [number, number] } | null>(null)
+  const draggedRef = React.useRef(false)
   const visibleRivers = RIVERS.map((river, index) => ({ river, index }))
     .filter(({ river }) => filter === 'A' || river.type === filter)
 
@@ -414,7 +414,7 @@ export function RiversOfIndiaPage() {
     height: `${zoom * 100}%`,
   }
 
-  const clampPan = useCallback((nextPan: [number, number], scale = zoom): [number, number] => {
+  const clampPan = React.useCallback((nextPan: [number, number], scale = zoom): [number, number] => {
     const bounds = mapRef.current?.getBoundingClientRect()
     if (!bounds) return nextPan
     return [
@@ -435,13 +435,13 @@ export function RiversOfIndiaPage() {
     setPan(clampPan([x - contentX * scale, y - contentY * scale], scale))
   }
 
-  const handleMapPointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const handleMapPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0 || (event.target as Element).closest('button')) return
     dragRef.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, pan }
     draggedRef.current = false
   }
 
-  const handleMapPointerMove = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const handleMapPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = dragRef.current
     if (!drag || drag.pointerId !== event.pointerId) return
     const deltaX = event.clientX - drag.x
@@ -456,13 +456,13 @@ export function RiversOfIndiaPage() {
     setPan(clampPan([drag.pan[0] + deltaX, drag.pan[1] + deltaY]))
   }
 
-  const handleMapPointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const handleMapPointerUp = (event: React.PointerEvent<HTMLDivElement>) => {
     if (dragRef.current?.pointerId !== event.pointerId) return
     dragRef.current = null
     setIsDragging(false)
   }
 
-  const highlightSelectedStates = useCallback(() => {
+  const highlightSelectedStates = React.useCallback(() => {
     const svgDocument = stateMapRef.current?.contentDocument
     if (!svgDocument) return
 
@@ -483,11 +483,11 @@ export function RiversOfIndiaPage() {
     }
   }, [selected])
 
-  useEffect(() => {
+  React.useEffect(() => {
     highlightSelectedStates()
   }, [highlightSelectedStates])
 
-  useEffect(() => {
+  React.useEffect(() => {
     const map = mapRef.current
     if (!map) return
 
