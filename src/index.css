@@ -2171,12 +2171,19 @@ footer {
   overflow: hidden;
 }
 
+.rivers-map-column {
+  display: grid;
+  min-width: 0;
+  gap: 8px;
+  align-content: start;
+}
+
 .rivers-map {
   position: relative;
   min-width: 0;
   overflow: hidden;
   align-self: start;
-  aspect-ratio: 612 / 720;
+  aspect-ratio: 662 / 720;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: #dbeaf3;
@@ -2313,11 +2320,9 @@ footer {
 }
 
 .rivers-map-zoom-controls {
-  position: absolute;
-  z-index: 2;
-  top: 10px;
-  right: 10px;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
   gap: 5px;
 }
 

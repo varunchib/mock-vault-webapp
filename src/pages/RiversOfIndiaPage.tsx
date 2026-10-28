@@ -10,6 +10,7 @@ type River = {
   source: string
   sourceRegion?: string
   mouth: string
+  endLabel?: string
   states: string[]
   tributaries: string
   info: string
@@ -24,13 +25,13 @@ const RIVERS: River[] = [
     color: '#1e88e5',
     length: '3,180 km (about 709 km in India)',
     source: 'Near Mount Kailash, Tibet',
-    sourceRegion: 'Tibet, China',
+    sourceRegion: 'Tibet',
     mouth: 'Arabian Sea (via Pakistan)',
     states: ['Ladakh'],
     tributaries: 'Major basin rivers include Zanskar, Suru, Shyok, Gilgit, Kabul and the Punjab rivers that converge through the Panjnad.',
     info: 'Flows through Ladakh, the only stretch inside India. Its upper valley is among the highest river valleys in the world. Tributary lists for the full basin include rivers in Tibet, India, Pakistan and Afghanistan.',
-    points: [[81.5, 30.9], [80.8, 31.5], [80.1, 32.2], [79.2, 33], [78.7, 34], [77.6, 34.1], [76.5, 34.4], [75.5, 35], [74.5, 35.5]],
-    labelPoint: [79.6, 35],
+    points: [[81.5, 32.5], [80.8, 32.2], [79.8, 32.5], [78.8, 33], [77.6, 34.1], [76.7, 34.8], [75.6, 35.3], [74.7, 35.8], [73.9, 35.4], [73.2, 34.7], [72.8, 33.6], [72.7, 32.3], [72.3, 31], [71.4, 29.7], [70.2, 28.3], [69.2, 26.9], [68.4, 25.7], [67.7, 24.7], [67.4, 24]],
+    labelPoint: [77.6, 34.1],
   },
   {
     name: 'Sutlej',
@@ -38,13 +39,14 @@ const RIVERS: River[] = [
     color: '#00acc1',
     length: '1,450 km (about 1,050 km in India)',
     source: 'Rakshastal Lake, Tibet',
-    sourceRegion: 'Tibet, China',
-    mouth: 'Flows into the Indus system downstream in Pakistan',
+    sourceRegion: 'Tibet',
+    mouth: 'Joins the Chenab to form the Panjnad in Pakistan',
+    endLabel: 'Panjnad confluence',
     states: ['Himachal Pradesh', 'Punjab'],
     tributaries: 'Spiti, Baspa and Beas; Beas meets the Sutlej at Harike, and the Sutlej later joins the Indus system through the Panjnad.',
     info: 'Enters India at Shipki La and feeds the Bhakra Nangal dam. It is the longest of the five rivers of Punjab.',
-    points: [[81.2, 30.8], [80.2, 31], [79.3, 31.4], [78.75, 31.9], [78, 31.6], [77, 31.4], [76.4, 31.4], [75, 31.1]],
-    labelPoint: [78.7, 32.7],
+    points: [[81.2, 30.8], [80.6, 30.9], [79.7, 31.2], [78.8, 31.8], [78.1, 31.6], [77.4, 31.4], [76.7, 31.4], [76.1, 31.3], [75.5, 31.2], [74.7, 31], [73.7, 30.7], [72.8, 30.3], [71.8, 29.8], [71.1, 29.4]],
+    labelPoint: [77.4, 31.4],
   },
   {
     name: 'Yamuna',
@@ -68,7 +70,7 @@ const RIVERS: River[] = [
     states: ['Uttarakhand', 'Uttar Pradesh', 'Bihar', 'Jharkhand', 'West Bengal'],
     tributaries: 'Major direct tributaries include Ramganga, Gomti, Ghaghara, Gandak, Kosi, Mahananda, Yamuna, Tamsa, Son and Punpun. Bhagirathi and Alaknanda meet at Devprayag to form the Ganga.',
     info: 'A lifeline of the northern plains. Haridwar, Prayagraj, Varanasi and Patna lie on its banks.',
-    points: [[79, 30.9], [78.2, 29.9], [79.5, 27.5], [80.3, 26.4], [81.8, 25.4], [83, 25.3], [84.9, 25.6], [86.9, 25.3], [87.9, 24.9], [88.3, 24.2], [89, 23.8]],
+    points: [[79, 30.9], [78.6, 30.2], [78.2, 29.9], [79, 28.5], [79.5, 27.5], [80.3, 26.4], [81.8, 25.4], [83, 25.3], [84.9, 25.6], [86.9, 25.3], [87.9, 24.9], [88.7, 24.4], [89.6, 23.8], [90, 22.8], [89.4, 22]],
   },
   {
     name: 'Brahmaputra',
@@ -76,12 +78,12 @@ const RIVERS: River[] = [
     color: '#8e24aa',
     length: '2,900 km (about 916 km in India)',
     source: 'Angsi Glacier, Tibet (Tsangpo)',
-    sourceRegion: 'Tibet, China',
-    mouth: 'Joins the Ganga delta, Bay of Bengal',
+    sourceRegion: 'Tibet',
+    mouth: 'Meets the Ganga-Padma system in Bangladesh before reaching the Meghna estuary, Bay of Bengal',
     states: ['Arunachal Pradesh', 'Assam'],
     tributaries: 'Dibang and Lohit join the Siang upstream; major Assam tributaries include Subansiri, Kameng, Manas, Sankosh, Beki, Raidak, Dhansiri, Kopili and Teesta.',
     info: 'Enters Arunachal Pradesh as the Siang and flows through Assam as a wide braided river with Majuli, one of the world’s largest river islands.',
-    points: [[82, 30.4], [85, 29.7], [88.5, 29.4], [91.5, 29.2], [94.3, 29.3], [95.2, 29], [95.3, 28.1], [95, 27.5], [93.5, 26.8], [92, 26.3], [90.5, 26.2], [89.8, 25.9]],
+    points: [[82, 30.4], [85, 29.8], [88.5, 29.5], [91.5, 29.3], [94.3, 29.4], [95.2, 29], [95.3, 28.1], [95, 27.5], [93.5, 26.8], [92, 26.3], [90.5, 26.2], [89.8, 25.9], [89.7, 24.8], [89.7, 23.8], [90.4, 23.2], [90.6, 22.1]],
   },
   {
     name: 'Narmada',
@@ -275,6 +277,8 @@ const FILTERS: { key: RiverFilter; label: string }[] = [
   { key: 'P', label: 'Peninsular' },
 ]
 
+const MAP_VIEWBOX = { x: -50, y: 0, width: 662, height: 720 }
+
 function mercator(latitude: number) {
   return Math.log(Math.tan(Math.PI / 4 + latitude * Math.PI / 360))
 }
@@ -408,12 +412,25 @@ export function RiversOfIndiaPage() {
     const bounds = mapRef.current?.getBoundingClientRect()
     if (!bounds) return
     const points = RIVERS[index].points.map(project)
-    const middle = Math.floor(points.length / 2)
-    const nextZoom = Math.max(zoom, 1.4)
-    const pointX = points[middle][0] / 612 * bounds.width
-    const pointY = points[middle][1] / 720 * bounds.height
+    const xValues = points.map(([x]) => x)
+    const yValues = points.map(([, y]) => y)
+    const minX = Math.min(...xValues)
+    const maxX = Math.max(...xValues)
+    const minY = Math.min(...yValues)
+    const maxY = Math.max(...yValues)
+    const routeWidth = Math.max(maxX - minX, 1)
+    const routeHeight = Math.max(maxY - minY, 1)
+    const nextZoom = Math.min(4, Math.max(1, Math.min(
+      MAP_VIEWBOX.width * 0.88 / routeWidth,
+      MAP_VIEWBOX.height * 0.88 / routeHeight,
+    )))
+    const centerX = ((minX + maxX) / 2 - MAP_VIEWBOX.x) / MAP_VIEWBOX.width * bounds.width
+    const centerY = ((minY + maxY) / 2 - MAP_VIEWBOX.y) / MAP_VIEWBOX.height * bounds.height
     setZoom(nextZoom)
-    setPan(clampPan([bounds.width / 2 - pointX * nextZoom, bounds.height / 2 - pointY * nextZoom], nextZoom))
+    setPan(clampPan([
+      bounds.width / 2 - centerX * nextZoom,
+      bounds.height / 2 - centerY * nextZoom,
+    ], nextZoom))
   }
 
   const selected = selectedRiver === null ? null : RIVERS[selectedRiver]
@@ -425,6 +442,11 @@ export function RiversOfIndiaPage() {
     top: `${pan[1]}px`,
     width: `${zoom * 100}%`,
     height: `${zoom * 100}%`,
+  }
+  const stateMapStyle = {
+    ...mapContentStyle,
+    left: `calc(${pan[0]}px + ${zoom * 50 / 662 * 100}%)`,
+    width: `${zoom * 612 / 662 * 100}%`,
   }
 
   const clampPan = React.useCallback((nextPan: [number, number], scale = zoom): [number, number] => {
@@ -538,6 +560,7 @@ export function RiversOfIndiaPage() {
         </header>
 
         <section className="rivers-map-section" aria-label="Interactive map of Indian rivers">
+          <div className="rivers-map-column">
           <div
             className={`rivers-map${isDragging ? ' is-dragging' : ''}`}
             onPointerDown={handleMapPointerDown}
@@ -553,18 +576,18 @@ export function RiversOfIndiaPage() {
                 data="/india-state-boundaries.svg"
                 onLoad={highlightSelectedStates}
                 ref={stateMapRef}
-                style={mapContentStyle}
+                style={stateMapStyle}
                 type="image/svg+xml"
               />
               <svg
                 key={animationKey}
                 className={`rivers-map-svg${selectedRiver === null ? '' : ' has-selection'}`}
-                viewBox="0 0 612 720"
+                viewBox={`${MAP_VIEWBOX.x} ${MAP_VIEWBOX.y} ${MAP_VIEWBOX.width} ${MAP_VIEWBOX.height}`}
                 style={mapContentStyle}
                 role="img"
                 aria-labelledby="rivers-map-title rivers-map-description"
               >
-              <title id="rivers-map-title">Map of India showing eleven major rivers</title>
+              <title id="rivers-map-title">Map of India showing major rivers</title>
               <desc id="rivers-map-description">
                 Select a river route on the map or use the river buttons to see its source,
                 mouth and the Indian states it flows through.
@@ -637,15 +660,28 @@ export function RiversOfIndiaPage() {
               })}
               {selected && selectedSource && selectedMouth && (
                 <g className="rivers-map-markers" aria-hidden="true">
-                  <text className="rivers-map-label" x={selectedSource[0] + 8} y={selectedSource[1] - 6}>
-                    {selected.sourceRegion ? `Source · ${selected.sourceRegion}` : 'Source'}
+                  <text
+                    className="rivers-map-label"
+                    x={selectedSource[0] + (selectedSource[0] <= selectedMouth[0] ? 8 : -8)}
+                    y={selectedSource[1] - 6}
+                    textAnchor={selectedSource[0] <= selectedMouth[0] ? 'start' : 'end'}
+                  >
+                    {selected.sourceRegion ?? 'Source'}
                   </text>
-                  <text className="rivers-map-label" x={selectedMouth[0] + 8} y={selectedMouth[1] + 14}>Mouth</text>
+                  <text
+                    className="rivers-map-label"
+                    x={selectedMouth[0] + (selectedMouth[0] > selectedSource[0] ? -8 : 8)}
+                    y={selectedMouth[1] + 14}
+                    textAnchor={selectedMouth[0] > selectedSource[0] ? 'end' : 'start'}
+                  >
+                    {selected.endLabel ?? 'Mouth'}
+                  </text>
                   <circle cx={selectedMouth[0]} cy={selectedMouth[1]} r="5" fill="none" stroke={selected.color} strokeWidth="2" />
                 </g>
               )}
               </svg>
             </div>
+          </div>
             <div className="rivers-map-zoom-controls" role="group" aria-label="Map zoom controls">
               <button
                 aria-label="Zoom in on map"
