@@ -2502,15 +2502,6 @@ footer {
   color: var(--ink3);
 }
 
-.rivers-map-state-list {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 5px 16px;
-  padding-left: 20px;
-  margin-top: 10px;
-  line-height: 1.65;
-}
-
 .rivers-study-notes {
   max-width: 980px;
   margin: 34px auto 0;
@@ -2568,10 +2559,6 @@ footer {
 
   .rivers-state-revision-list {
     columns: 1;
-  }
-
-  .rivers-map-state-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .rivers-state-labels {

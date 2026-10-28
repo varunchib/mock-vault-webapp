@@ -8,6 +8,7 @@ type River = {
   color: string
   length: string
   source: string
+  sourceRegion?: string
   mouth: string
   states: string[]
   tributaries: string
@@ -23,11 +24,12 @@ const RIVERS: River[] = [
     color: '#1e88e5',
     length: '3,180 km (about 709 km in India)',
     source: 'Near Mount Kailash, Tibet',
+    sourceRegion: 'Tibet, China',
     mouth: 'Arabian Sea (via Pakistan)',
     states: ['Ladakh'],
     tributaries: 'Major basin rivers include Zanskar, Suru, Shyok, Gilgit, Kabul and the Punjab rivers that converge through the Panjnad.',
     info: 'Flows through Ladakh, the only stretch inside India. Its upper valley is among the highest river valleys in the world. Tributary lists for the full basin include rivers in Tibet, India, Pakistan and Afghanistan.',
-    points: [[81.5, 31.2], [79.5, 33.2], [77.5, 34.1], [75.5, 35], [74.5, 35.5]],
+    points: [[81.5, 30.9], [80.8, 31.5], [80.1, 32.2], [79.2, 33], [78.7, 34], [77.6, 34.1], [76.5, 34.4], [75.5, 35], [74.5, 35.5]],
     labelPoint: [79.6, 35],
   },
   {
@@ -36,11 +38,12 @@ const RIVERS: River[] = [
     color: '#00acc1',
     length: '1,450 km (about 1,050 km in India)',
     source: 'Rakshastal Lake, Tibet',
+    sourceRegion: 'Tibet, China',
     mouth: 'Flows into the Indus system downstream in Pakistan',
     states: ['Himachal Pradesh', 'Punjab'],
     tributaries: 'Spiti, Baspa and Beas; Beas meets the Sutlej at Harike, and the Sutlej later joins the Indus system through the Panjnad.',
     info: 'Enters India at Shipki La and feeds the Bhakra Nangal dam. It is the longest of the five rivers of Punjab.',
-    points: [[80, 31.1], [78.7, 31.6], [77, 31.3], [76.2, 31], [75, 31.1]],
+    points: [[81.2, 30.8], [80.2, 31], [79.3, 31.4], [78.75, 31.9], [78, 31.6], [77, 31.4], [76.4, 31.4], [75, 31.1]],
     labelPoint: [78.7, 32.7],
   },
   {
@@ -73,11 +76,12 @@ const RIVERS: River[] = [
     color: '#8e24aa',
     length: '2,900 km (about 916 km in India)',
     source: 'Angsi Glacier, Tibet (Tsangpo)',
+    sourceRegion: 'Tibet, China',
     mouth: 'Joins the Ganga delta, Bay of Bengal',
     states: ['Arunachal Pradesh', 'Assam'],
     tributaries: 'Dibang and Lohit join the Siang upstream; major Assam tributaries include Subansiri, Kameng, Manas, Sankosh, Beki, Raidak, Dhansiri, Kopili and Teesta.',
     info: 'Enters Arunachal Pradesh as the Siang and flows through Assam as a wide braided river with Majuli, one of the world’s largest river islands.',
-    points: [[93.5, 29.3], [95.3, 29.5], [95.2, 28.2], [95.5, 27.5], [94.5, 27.2], [93.5, 26.8], [92, 26.3], [91.7, 26.2], [90.5, 26.2], [89.8, 25.8], [89.7, 25]],
+    points: [[82, 30.4], [85, 29.7], [88.5, 29.4], [91.5, 29.2], [94.3, 29.3], [95.2, 29], [95.3, 28.1], [95, 27.5], [93.5, 26.8], [92, 26.3], [90.5, 26.2], [89.8, 25.9]],
   },
   {
     name: 'Narmada',
@@ -633,7 +637,9 @@ export function RiversOfIndiaPage() {
               })}
               {selected && selectedSource && selectedMouth && (
                 <g className="rivers-map-markers" aria-hidden="true">
-                  <text className="rivers-map-label" x={selectedSource[0] + 8} y={selectedSource[1] - 6}>Source</text>
+                  <text className="rivers-map-label" x={selectedSource[0] + 8} y={selectedSource[1] - 6}>
+                    {selected.sourceRegion ? `Source · ${selected.sourceRegion}` : 'Source'}
+                  </text>
                   <text className="rivers-map-label" x={selectedMouth[0] + 8} y={selectedMouth[1] + 14}>Mouth</text>
                   <circle cx={selectedMouth[0]} cy={selectedMouth[1]} r="5" fill="none" stroke={selected.color} strokeWidth="2" />
                 </g>
@@ -783,13 +789,11 @@ export function RiversOfIndiaPage() {
               </li>
             ))}
           </ul>
-          <h3>States and union territories labelled on the map</h3>
-          <ul className="rivers-map-state-list">
-            {STATE_LABELS.map(({ name }) => <li key={name}>{name}</li>)}
-          </ul>
           <p className="rivers-attribution">
-            Map boundary artwork: MapSVG via @svg-maps/india, licensed under
-            Creative Commons Attribution 4.0 (CC BY 4.0).
+            Map boundaries adapted from MapSVG via @svg-maps/india; licensed under{' '}
+            <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
+              CC BY 4.0
+            </a>.
           </p>
         </section>
       </article>
