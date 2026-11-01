@@ -2179,34 +2179,25 @@ footer {
 }
 
 .rivers-map-loading-panel {
-  position: relative;
-  display: grid;
+  display: flex;
   min-height: min(62vh, 500px);
-  overflow: hidden;
-  place-items: center;
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  background: #dbeaf3;
-  color: #43515a;
-  font-size: 14px;
-  font-weight: 600;
+  align-items: center;
+  justify-content: center;
 }
 
-.rivers-map-loading-water {
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse at 38% 45%, transparent 0 34%, rgba(163, 176, 148, .45) 34.2% 34.6%, transparent 34.8%),
-    radial-gradient(ellipse at 52% 56%, #e4ead8 0 35%, transparent 35.4%),
-    #dbeaf3;
+.rivers-map-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid rgba(28, 36, 48, .16);
+  border-top-color: #1c2430;
+  border-radius: 50%;
+  animation: rivers-map-loading-spin .8s linear infinite;
 }
 
-.rivers-map-loading-panel > span {
-  z-index: 1;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 255, 255, .7);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .88);
+@keyframes rivers-map-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .rivers-map {
@@ -2571,40 +2562,136 @@ footer {
   border-radius: 50%;
 }
 
-.rivers-lake-list h3 {
-  grid-column: 1 / -1;
-  margin: 0;
-  color: var(--ink3);
-  font-size: 12px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
+.rivers-directory {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
 }
 
-.rivers-lake-star-legend {
-  grid-column: 1 / -1;
+.rivers-directory-header h2 {
   margin: 0;
+  font-size: 16px;
+}
+
+.rivers-directory-header p {
+  margin: 2px 0 0;
   color: var(--ink3);
   font-size: 11px;
 }
 
-.rivers-lake-star-legend span {
-  color: #d58a00;
-  font-size: 15px;
-}
-
-.rivers-lake-list {
+.rivers-directory-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   align-content: start;
-  gap: 5px;
+  gap: 6px;
 }
 
-.rivers-lake-list .rivers-list-button {
-  justify-content: flex-start;
+.rivers-directory-item {
+  display: grid;
   min-width: 0;
-  padding: 6px 9px;
-  font-size: 12px;
+  gap: 3px;
+  padding: 7px 8px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: var(--surface);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
   text-align: left;
+}
+
+.rivers-directory-item:hover,
+.rivers-directory-item.is-active {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+}
+
+.rivers-directory-name {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rivers-directory-states {
+  overflow: hidden;
+  color: var(--ink3);
+  font-size: 10px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+}
+
+.rivers-directory-item.is-active .rivers-directory-states {
+  color: var(--ink2);
+}
+
+.rivers-lake-browser {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.rivers-lake-browser-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.rivers-lake-search {
+  display: grid;
+  gap: 4px;
+  width: min(100%, 260px);
+  color: var(--ink3);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rivers-lake-state-filter {
+  display: grid;
+  gap: 4px;
+  width: min(100%, 260px);
+  color: var(--ink3);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.rivers-lake-state-filter select {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.rivers-lake-search input {
+  min-width: 0;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 13px;
+}
+
+.rivers-lake-empty {
+  margin: 0;
+  color: var(--ink3);
+  font-size: 13px;
 }
 
 .rivers-lake-dot {
@@ -2622,7 +2709,7 @@ footer {
   line-height: 1;
 }
 
-.rivers-list-button.is-active .rivers-lake-star {
+.rivers-directory-item.is-active .rivers-lake-star {
   color: #ffd166;
 }
 
@@ -2666,65 +2753,49 @@ footer {
   font-size: 12px;
 }
 
-.rivers-state-revision-list {
-  columns: 2;
-  padding-left: 22px;
-  line-height: 1.8;
-}
-
-.rivers-state-revision-list li {
-  break-inside: avoid;
-  margin-bottom: 5px;
-}
-
-.rivers-state-revision-list span {
-  color: var(--ink3);
-}
-
-.rivers-lake-study-list {
-  line-height: 1.65;
-}
-
 .rivers-study-notes {
-  max-width: 980px;
-  margin: 34px auto 0;
-}
-
-.rivers-study-notes h2 {
-  font-family: 'Fraunces', serif;
-  font-size: clamp(24px, 3vw, 32px);
-}
-
-.rivers-study-notes > h3 {
-  margin-top: 24px;
-}
-
-.rivers-study-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.rivers-study-card {
-  padding: 20px;
+  margin: 20px 0 0;
+  padding: 16px;
   border: 1px solid var(--line);
   border-radius: 14px;
   background: var(--surface);
 }
 
-.rivers-study-card h3 {
-  margin: 0 0 8px;
+.rivers-study-notes h2 {
+  margin: 0;
+  font-size: 17px;
 }
 
-.rivers-study-card p {
+.rivers-quick-revision {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.rivers-revision-item {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+.rivers-revision-item h3 {
+  margin: 0 0 4px;
+  font-size: 12px;
+}
+
+.rivers-revision-item p {
+  margin: 0;
   color: var(--ink3);
-  line-height: 1.65;
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 .rivers-attribution {
-  margin-top: 22px;
-  font-size: 12px;
+  margin-top: 10px;
+  font-size: 10px;
 }
 
 @media (max-width: 700px) {
@@ -2732,16 +2803,16 @@ footer {
     grid-template-columns: 1fr;
   }
 
+  .rivers-directory-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .rivers-bank-groups {
     grid-template-columns: 1fr;
   }
 
-  .rivers-study-grid {
+  .rivers-quick-revision {
     grid-template-columns: 1fr;
-  }
-
-  .rivers-state-revision-list {
-    columns: 1;
   }
 
   .rivers-state-labels {

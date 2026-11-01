@@ -385,19 +385,6 @@ function project([longitude, latitude]: [number, number]): [number, number] {
   return [(longitude - 60) * 20, (mercator(40) - mercator(latitude)) * scale]
 }
 
-const riverGroups = [
-  {
-    title: 'Himalayan rivers',
-    description: 'Generally perennial, with water supplied by snowmelt and monsoon rainfall.',
-    rivers: 'Indus, Sutlej, Yamuna, Ganga and Brahmaputra.',
-  },
-  {
-    title: 'Peninsular rivers',
-    description: 'Mostly rain-fed, with seasonal flow shaped strongly by the monsoons.',
-    rivers: 'Narmada, Tapti, Mahanadi, Godavari, Krishna, Kaveri, Mahi and Brahmani.',
-  },
-]
-
 const STATE_LABELS: { name: string; point: [number, number] }[] = [
   { name: 'Ladakh', point: [77.8, 34.1] },
   { name: 'Himachal Pradesh', point: [77.3, 31.7] },
@@ -464,6 +451,28 @@ const EXAM_RELEVANT_LAKES = new Set([
   'Ashtamudi Lake',
   'Sasthamkotta Lake',
   'Renuka Lake',
+  'Anchar Lake',
+  'Manasbal Lake',
+  'Surinsar Lake',
+  'Mansar Lake',
+  'Naini Lake',
+  'Bhimtal',
+  'Sattal',
+  'Roopkund',
+  'Chandratal',
+  'Tso Kar',
+  'Gurudongmar Lake',
+  'Son Beel',
+  'Kanwar Taal',
+  'Bakhira Lake',
+  'Ansupa Lake',
+  'Tampara Lake',
+  'Sur Sarovar',
+  'Ana Sagar',
+  'Pushkar Lake',
+  'Thol Lake',
+  'Periyar Lake',
+  'Kodaikanal Lake',
 ])
 
 const ADDITIONAL_INDIAN_LAKES: { name: string; description: string; point: [number, number] }[] = [
@@ -486,6 +495,57 @@ const ADDITIONAL_INDIAN_LAKES: { name: string; description: string; point: [numb
   { name: 'Tehri Reservoir', description: 'Reservoir formed by the Tehri Dam on the Bhagirathi in Uttarakhand.', point: project([78.48, 30.38]) },
   { name: 'Sardar Sarovar Reservoir', description: 'Reservoir on the Narmada River in Gujarat.', point: project([73.75, 21.83]) },
   { name: 'Ukai Reservoir', description: 'Reservoir on the Tapti River in Gujarat.', point: project([73.58, 21.23]) },
+  { name: 'Anchar Lake', description: 'Shallow urban lake at Soura in Srinagar, Jammu and Kashmir.', point: project([74.783, 34.15]) },
+  { name: 'Manasbal Lake', description: 'Freshwater lake in Ganderbal district, north of Srinagar in Jammu and Kashmir.', point: project([74.667, 34.25]) },
+  { name: 'Nigeen Lake', description: 'Lake in Srinagar connected to the Dal Lake water system.', point: project([74.87, 34.10]) },
+  { name: 'Mansar Lake', description: 'Natural lake in Jammu region, paired geographically with nearby Surinsar Lake.', point: project([75.15, 32.69]) },
+  { name: 'Surinsar Lake', description: 'Natural lake in Jammu region and part of the Surinsar-Mansar wetland complex.', point: project([75.03, 32.76]) },
+  { name: 'Gangabal Lake', description: 'High-altitude glacial lake at the foot of Mount Harmukh in Kashmir.', point: project([74.92, 34.38]) },
+  { name: 'Naini Lake', description: 'Natural freshwater lake in Nainital, Uttarakhand.', point: project([79.46, 29.39]) },
+  { name: 'Bhimtal', description: 'Natural lake in the Kumaon region of Uttarakhand, near Nainital.', point: project([79.56, 29.34]) },
+  { name: 'Sattal', description: 'Interconnected group of freshwater lakes in the Kumaon region of Uttarakhand.', point: project([79.55, 29.35]) },
+  { name: 'Naukuchiatal', description: 'Natural lake in Uttarakhand whose name refers to its nine-cornered shape.', point: project([79.60, 29.32]) },
+  { name: 'Roopkund', description: 'High-altitude glacial lake in the Garhwal Himalaya of Uttarakhand.', point: project([79.73, 30.26]) },
+  { name: 'Hemkund Lake', description: 'High-altitude glacial lake in Chamoli district, Uttarakhand.', point: project([79.59, 30.70]) },
+  { name: 'Chandratal', description: 'Crescent-shaped high-altitude lake in the Spiti region of Himachal Pradesh.', point: project([77.62, 32.48]) },
+  { name: 'Suraj Tal', description: 'High-altitude lake below Baralacha La in Himachal Pradesh; the Bhaga River originates nearby.', point: project([77.42, 32.75]) },
+  { name: 'Rewalsar Lake', description: 'Lake near Mandi in Himachal Pradesh, sacred to Buddhist, Hindu and Sikh communities.', point: project([76.83, 31.63]) },
+  { name: 'Tso Kar', description: 'High-altitude salt lake and wetland complex on the Changthang plateau of Ladakh.', point: project([78.00, 33.29]) },
+  { name: 'Gurudongmar Lake', description: 'High-altitude lake in North Sikkim, near the Tibetan border.', point: project([88.71, 28.02]) },
+  { name: 'Sela Lake', description: 'High-altitude lake near Sela Pass in Arunachal Pradesh.', point: project([92.08, 27.50]) },
+  { name: 'Sangetsar Lake', description: 'High-altitude lake near Tawang in Arunachal Pradesh, also known as Madhuri Lake.', point: project([91.87, 27.58]) },
+  { name: 'Tam Dil', description: 'Natural lake in Mizoram near Saitual.', point: project([92.78, 23.73]) },
+  { name: 'Shilloi Lake', description: 'Natural lake in the Patkai range of Nagaland.', point: project([94.77, 26.01]) },
+  { name: 'Son Beel', description: 'Large seasonal wetland lake in southern Assam, in Karimganj district.', point: project([92.62, 24.68]) },
+  { name: 'Chandubi Lake', description: 'Natural lake in Assam at the foothills of the Garo hills.', point: project([91.46, 26.03]) },
+  { name: 'Kanwar Taal', description: 'Oxbow lake and wetland in Begusarai district, Bihar, also called Kabartal.', point: project([86.13, 25.62]) },
+  { name: 'Kanjli Wetland', description: 'Wetland in Punjab formed around the Kali Bein stream near Kapurthala.', point: project([75.20, 31.41]) },
+  { name: 'Ropar Wetland', description: 'Reservoir and wetland on the Sutlej River in Punjab, near Rupnagar.', point: project([76.52, 30.97]) },
+  { name: 'Bakhira Lake', description: 'Shallow freshwater wetland in Sant Kabir Nagar district, Uttar Pradesh.', point: project([83.97, 26.92]) },
+  { name: 'Ansupa Lake', description: 'Freshwater oxbow lake on the Mahanadi floodplain in Odisha.', point: project([85.63, 20.45]) },
+  { name: 'Tampara Lake', description: 'Freshwater lake near Chhatrapur in Ganjam district, Odisha.', point: project([84.98, 19.36]) },
+  { name: 'Sur Sarovar', description: 'Reservoir near Agra, Uttar Pradesh, also known as Keetham Lake.', point: project([77.87, 27.23]) },
+  { name: 'Fateh Sagar Lake', description: 'Artificial lake in Udaipur, Rajasthan, connected to the city’s lake system.', point: project([73.67, 24.60]) },
+  { name: 'Jaisamand Lake', description: 'Large artificial lake, also called Dhebar Lake, in Udaipur district, Rajasthan.', point: project([73.99, 24.24]) },
+  { name: 'Ana Sagar', description: 'Historic artificial lake in Ajmer, Rajasthan.', point: project([74.63, 26.48]) },
+  { name: 'Pushkar Lake', description: 'Sacred lake in Pushkar, Rajasthan, associated with the annual Pushkar fair.', point: project([74.55, 26.49]) },
+  { name: 'Rajsamand Lake', description: 'Historic artificial lake in Rajsamand district, Rajasthan.', point: project([73.88, 25.07]) },
+  { name: 'Thol Lake', description: 'Shallow freshwater wetland and bird habitat in Gujarat, northwest of Ahmedabad.', point: project([72.38, 23.15]) },
+  { name: 'Tawa Reservoir', description: 'Reservoir on the Tawa River in Madhya Pradesh, a tributary of the Narmada.', point: project([77.95, 22.58]) },
+  { name: 'Powai Lake', description: 'Artificial lake in Mumbai, Maharashtra.', point: project([72.90, 19.13]) },
+  { name: 'Vihar Lake', description: 'Reservoir in Mumbai, Maharashtra, within Sanjay Gandhi National Park.', point: project([72.91, 19.15]) },
+  { name: 'Jayakwadi Reservoir', description: 'Reservoir on the Godavari River near Paithan in Maharashtra.', point: project([75.38, 19.48]) },
+  { name: 'Himayat Sagar', description: 'Reservoir on the outskirts of Hyderabad, Telangana.', point: project([78.37, 17.33]) },
+  { name: 'Osman Sagar', description: 'Reservoir on the outskirts of Hyderabad, Telangana, also known as Gandipet Lake.', point: project([78.29, 17.38]) },
+  { name: 'Ousteri Lake', description: 'Freshwater lake and wetland on the Puducherry-Tamil Nadu border, also called Oussudu.', point: project([79.75, 11.94]) },
+  { name: 'Veeranam Lake', description: 'Large irrigation reservoir in Cuddalore district, Tamil Nadu.', point: project([79.55, 11.26]) },
+  { name: 'Puzhal Lake', description: 'Reservoir north of Chennai, Tamil Nadu, also called Red Hills Lake.', point: project([80.16, 13.18]) },
+  { name: 'Chembarambakkam Lake', description: 'Reservoir southwest of Chennai, Tamil Nadu.', point: project([80.06, 13.00]) },
+  { name: 'Kodaikanal Lake', description: 'Artificial star-shaped lake in Kodaikanal, Tamil Nadu.', point: project([77.49, 10.23]) },
+  { name: 'Ooty Lake', description: 'Artificial lake in Udhagamandalam in the Nilgiri Hills, Tamil Nadu.', point: project([76.69, 11.41]) },
+  { name: 'Periyar Lake', description: 'Reservoir in the Periyar Tiger Reserve, Kerala, formed by the Mullaperiyar project.', point: project([77.15, 9.54]) },
+  { name: 'Pookode Lake', description: 'Freshwater lake in Wayanad district, Kerala.', point: project([76.00, 11.52]) },
+  { name: 'Vellayani Lake', description: 'Freshwater lake in Thiruvananthapuram district, Kerala.', point: project([76.99, 8.43]) },
 ]
 
 const LAKE_EXAM_NOTES = [
@@ -523,52 +583,92 @@ const LAKE_EXAM_NOTES = [
   { name: 'Tehri Reservoir', region: 'Uttarakhand', category: 'Hydroelectric reservoir', examFact: 'Formed by the Tehri Dam on the Bhagirathi, a headstream of the Ganga.' },
   { name: 'Sardar Sarovar Reservoir', region: 'Gujarat', category: 'Multipurpose reservoir', examFact: 'Formed by the Sardar Sarovar Dam on the Narmada as part of the Narmada Valley Project.' },
   { name: 'Ukai Reservoir', region: 'Gujarat', category: 'Multipurpose reservoir', examFact: 'Created by the Ukai Dam on the Tapti River.' },
+  { name: 'Anchar Lake', region: 'Jammu and Kashmir', category: 'Urban freshwater lake', examFact: 'Located at Soura in Srinagar; it is part of the Kashmir Valley’s interconnected lake and wetland system.' },
+  { name: 'Manasbal Lake', region: 'Jammu and Kashmir', category: 'Freshwater lake', examFact: 'Located in Ganderbal district, north of Srinagar, and known for its depth and aquatic vegetation.' },
+  { name: 'Nigeen Lake', region: 'Jammu and Kashmir', category: 'Freshwater urban lake', examFact: 'A lake in Srinagar linked to the Dal Lake water system.' },
+  { name: 'Mansar Lake', region: 'Jammu and Kashmir', category: 'Natural freshwater lake', examFact: 'A well-known lake in Jammu region, paired with nearby Surinsar Lake.' },
+  { name: 'Surinsar Lake', region: 'Jammu and Kashmir', category: 'Natural freshwater lake', examFact: 'Together with Mansar Lake, it forms the Surinsar-Mansar wetland complex.' },
+  { name: 'Gangabal Lake', region: 'Jammu and Kashmir', category: 'High-altitude glacial lake', examFact: 'Situated at the foot of Mount Harmukh in the Kashmir Himalaya.' },
+  { name: 'Naini Lake', region: 'Uttarakhand', category: 'Natural freshwater lake', examFact: 'The crescent-shaped lake at Nainital gives the town its name.' },
+  { name: 'Bhimtal', region: 'Uttarakhand', category: 'Natural freshwater lake', examFact: 'A prominent Kumaon lake near Nainital, with an island in its center.' },
+  { name: 'Sattal', region: 'Uttarakhand', category: 'Interconnected lake group', examFact: 'A group of seven interconnected freshwater lakes in the Kumaon region.' },
+  { name: 'Naukuchiatal', region: 'Uttarakhand', category: 'Natural freshwater lake', examFact: 'Its name means “lake of nine corners”; it lies in the Kumaon region.' },
+  { name: 'Roopkund', region: 'Uttarakhand', category: 'High-altitude glacial lake', examFact: 'A glacial lake in the Garhwal Himalaya, popularly known as Skeleton Lake.' },
+  { name: 'Hemkund Lake', region: 'Uttarakhand', category: 'High-altitude glacial lake', examFact: 'A glacial lake in Chamoli district, beside the Sikh pilgrimage site Hemkund Sahib.' },
+  { name: 'Chandratal', region: 'Himachal Pradesh', category: 'High-altitude lake', examFact: 'A crescent-shaped lake in the Spiti region, near the source region of the Chandra River.' },
+  { name: 'Suraj Tal', region: 'Himachal Pradesh', category: 'High-altitude lake', examFact: 'Lies below Baralacha La; the Bhaga River originates from the lake.' },
+  { name: 'Rewalsar Lake', region: 'Himachal Pradesh', category: 'Natural lake', examFact: 'A sacred lake near Mandi revered by Buddhist, Hindu and Sikh communities.' },
+  { name: 'Tso Kar', region: 'Ladakh', category: 'High-altitude salt lake', examFact: 'A salt-lake and wetland complex on the Changthang plateau, known for wildlife and breeding birds.' },
+  { name: 'Gurudongmar Lake', region: 'Sikkim', category: 'High-altitude lake', examFact: 'A high-altitude lake in North Sikkim, near the Tibetan border.' },
+  { name: 'Sela Lake', region: 'Arunachal Pradesh', category: 'High-altitude lake', examFact: 'Located near Sela Pass on the route to Tawang.' },
+  { name: 'Sangetsar Lake', region: 'Arunachal Pradesh', category: 'High-altitude lake', examFact: 'A lake near Tawang, also widely known as Madhuri Lake.' },
+  { name: 'Tam Dil', region: 'Mizoram', category: 'Natural freshwater lake', examFact: 'A natural lake near Saitual and one of Mizoram’s best-known lakes.' },
+  { name: 'Shilloi Lake', region: 'Nagaland', category: 'Natural lake', examFact: 'A natural lake in the Patkai range of eastern Nagaland.' },
+  { name: 'Son Beel', region: 'Assam', category: 'Seasonal wetland lake', examFact: 'A large seasonal wetland lake in Karimganj district in southern Assam.' },
+  { name: 'Chandubi Lake', region: 'Assam', category: 'Natural lake', examFact: 'A lake at the foothills of the Garo hills, southwest of Guwahati.' },
+  { name: 'Kanwar Taal', region: 'Bihar', category: 'Oxbow lake and wetland', examFact: 'Also called Kabartal, this oxbow lake is in Begusarai district.' },
+  { name: 'Kanjli Wetland', region: 'Punjab', category: 'Riverine wetland', examFact: 'A Ramsar wetland formed around the Kali Bein stream near Kapurthala.' },
+  { name: 'Ropar Wetland', region: 'Punjab', category: 'Reservoir and riverine wetland', examFact: 'A Ramsar wetland on the Sutlej near Rupnagar, also called Ropar Lake.' },
+  { name: 'Bakhira Lake', region: 'Uttar Pradesh', category: 'Freshwater wetland', examFact: 'A shallow freshwater wetland in Sant Kabir Nagar district and a Ramsar site.' },
+  { name: 'Ansupa Lake', region: 'Odisha', category: 'Freshwater oxbow lake', examFact: 'An oxbow lake on the Mahanadi floodplain in Cuttack district.' },
+  { name: 'Tampara Lake', region: 'Odisha', category: 'Freshwater lake', examFact: 'A Ramsar wetland near Chhatrapur in Ganjam district.' },
+  { name: 'Sur Sarovar', region: 'Uttar Pradesh', category: 'Reservoir and wetland', examFact: 'Also called Keetham Lake, it is a bird sanctuary near Agra.' },
+  { name: 'Fateh Sagar Lake', region: 'Rajasthan', category: 'Artificial freshwater lake', examFact: 'One of the interconnected lakes of Udaipur, northwest of Lake Pichola.' },
+  { name: 'Jaisamand Lake', region: 'Rajasthan', category: 'Artificial freshwater lake', examFact: 'Also called Dhebar Lake, it is an extensive artificial lake in Udaipur district.' },
+  { name: 'Ana Sagar', region: 'Rajasthan', category: 'Historic artificial lake', examFact: 'A historic lake in Ajmer, built during the 12th century.' },
+  { name: 'Pushkar Lake', region: 'Rajasthan', category: 'Sacred lake', examFact: 'A sacred lake in Pushkar, associated with the town’s annual camel and livestock fair.' },
+  { name: 'Rajsamand Lake', region: 'Rajasthan', category: 'Historic artificial lake', examFact: 'A historic lake in Rajasthan, built near the town of Rajsamand.' },
+  { name: 'Thol Lake', region: 'Gujarat', category: 'Freshwater wetland', examFact: 'A Ramsar wetland and bird sanctuary northwest of Ahmedabad.' },
+  { name: 'Tawa Reservoir', region: 'Madhya Pradesh', category: 'River reservoir', examFact: 'Formed on the Tawa River, a tributary of the Narmada.' },
+  { name: 'Powai Lake', region: 'Maharashtra', category: 'Artificial urban lake', examFact: 'An artificial lake in Mumbai, on the edge of Sanjay Gandhi National Park.' },
+  { name: 'Vihar Lake', region: 'Maharashtra', category: 'Reservoir', examFact: 'A major source reservoir for Mumbai, located within Sanjay Gandhi National Park.' },
+  { name: 'Jayakwadi Reservoir', region: 'Maharashtra', category: 'River reservoir', examFact: 'A large reservoir on the Godavari near Paithan, created by the Jayakwadi Dam.' },
+  { name: 'Himayat Sagar', region: 'Telangana', category: 'Reservoir', examFact: 'A reservoir on the outskirts of Hyderabad, built across the Musi River system.' },
+  { name: 'Osman Sagar', region: 'Telangana', category: 'Reservoir', examFact: 'Also called Gandipet Lake, it is a reservoir on the outskirts of Hyderabad.' },
+  { name: 'Ousteri Lake', region: 'Puducherry and Tamil Nadu', category: 'Freshwater wetland', examFact: 'Also known as Oussudu Lake, it lies near the Puducherry-Tamil Nadu border.' },
+  { name: 'Veeranam Lake', region: 'Tamil Nadu', category: 'Irrigation reservoir', examFact: 'A major reservoir in Cuddalore district, supplied through the Cauvery delta canal system.' },
+  { name: 'Puzhal Lake', region: 'Tamil Nadu', category: 'Reservoir', examFact: 'Also called Red Hills Lake, it is an important water-supply reservoir for Chennai.' },
+  { name: 'Chembarambakkam Lake', region: 'Tamil Nadu', category: 'Reservoir', examFact: 'A reservoir southwest of Chennai and one of the city’s drinking-water sources.' },
+  { name: 'Kodaikanal Lake', region: 'Tamil Nadu', category: 'Artificial freshwater lake', examFact: 'A star-shaped artificial lake in the hill station of Kodaikanal.' },
+  { name: 'Ooty Lake', region: 'Tamil Nadu', category: 'Artificial freshwater lake', examFact: 'An artificial lake in Udhagamandalam, in the Nilgiri Hills.' },
+  { name: 'Periyar Lake', region: 'Kerala', category: 'Reservoir', examFact: 'A reservoir in Periyar Tiger Reserve, formed by the Mullaperiyar project.' },
+  { name: 'Pookode Lake', region: 'Kerala', category: 'Freshwater lake', examFact: 'A natural freshwater lake in Wayanad district.' },
+  { name: 'Vellayani Lake', region: 'Kerala', category: 'Freshwater lake', examFact: 'A freshwater lake in Thiruvananthapuram district, used for irrigation and local water needs.' },
 ] as const
 
 const LAKE_EXAM_NOTE_BY_NAME = new Map<string, (typeof LAKE_EXAM_NOTES)[number]>(
   LAKE_EXAM_NOTES.map((note) => [note.name, note]),
 )
 
+const MULTI_STATE_LAKE_REGIONS: Record<string, string[]> = {
+  'Andhra Pradesh and Tamil Nadu': ['Andhra Pradesh', 'Tamil Nadu'],
+  'Puducherry and Tamil Nadu': ['Puducherry', 'Tamil Nadu'],
+  'Telangana and Andhra Pradesh': ['Telangana', 'Andhra Pradesh'],
+}
+
+function lakeStates(region: string | undefined): string[] {
+  if (!region) return ['Other / location not listed']
+  return MULTI_STATE_LAKE_REGIONS[region] ?? [region]
+}
+
 function GeographyStudyGuide() {
   return (
     <section className="rivers-study-notes" aria-labelledby="rivers-study-heading">
-      <h2 id="rivers-study-heading">Rivers and lakes of India: exam study guide</h2>
-      <p>
-        Use this guide alongside the interactive map for Indian geography revision.
-        The river routes, tributaries, states and lake facts below are available
-        without selecting a map layer.
-      </p>
-      <div className="rivers-study-grid">
-        {riverGroups.map((group) => (
-          <article className="rivers-study-card" key={group.title}>
-            <h3>{group.title}</h3>
-            <p>{group.description}</p>
-            <p><strong>Major rivers:</strong> {group.rivers}</p>
-          </article>
-        ))}
+      <h2 id="rivers-study-heading">Quick geography revision</h2>
+      <div className="rivers-quick-revision">
+        <article className="rivers-revision-item">
+          <h3>River regimes</h3>
+          <p>Himalayan rivers are generally perennial, fed by snowmelt and rain; most Peninsular rivers depend more on monsoon rainfall.</p>
+        </article>
+        <article className="rivers-revision-item">
+          <h3>Direction and landforms</h3>
+          <p>Most major Peninsular rivers flow east to the Bay of Bengal. Narmada and Tapti flow west through rift valleys to the Arabian Sea.</p>
+        </article>
+        <article className="rivers-revision-item">
+          <h3>Lake quick clues</h3>
+          <p>Wular—Jhelum; Loktak—floating phumdis; Sambhar—inland saline lake; Lonar—impact crater; Chilika—coastal lagoon.</p>
+        </article>
       </div>
-      <h3>Major rivers and states along their course</h3>
-      <ul className="rivers-state-revision-list">
-        {RIVERS.map((river) => (
-          <li key={river.name}>
-            <strong>{river.name}:</strong> {river.states.join(', ')}.
-            <span> Major tributaries: {river.tributaries}</span>
-          </li>
-        ))}
-      </ul>
-      <h3>Important Indian lakes and reservoirs for competitive exams</h3>
-      <p>
-        Review each water body’s state or region, type, river connection and
-        distinguishing feature. A star in the map’s lake list marks especially
-        common competitive-exam topics.
-      </p>
-      <ul className="rivers-state-revision-list rivers-lake-study-list">
-        {LAKE_EXAM_NOTES.map((lake) => (
-          <li key={lake.name}>
-            <strong>{lake.name}</strong> — {lake.region}; {lake.category}. {lake.examFact}
-          </li>
-        ))}
-      </ul>
       <p className="rivers-attribution">
         Country outlines, rivers and lakes: Natural Earth (public domain).
         State boundaries: MapSVG via @svg-maps/india, licensed under{' '}
@@ -587,11 +687,14 @@ export function RiversOfIndiaPage() {
   const [indiaMap, setIndiaMap] = React.useState<IndiaRiversMapData | null>(null)
   const [mapLoadError, setMapLoadError] = React.useState<string | null>(null)
   const [filter, setFilter] = React.useState<RiverFilter>('A')
+  const [lakeSearch, setLakeSearch] = React.useState('')
+  const [lakeState, setLakeState] = React.useState('all')
   const [zoom, setZoom] = React.useState(1)
   const [pan, setPan] = React.useState<[number, number]>([0, 0])
   const [isDragging, setIsDragging] = React.useState(false)
   const [showTributaries, setShowTributaries] = React.useState(true)
   const [riverLabelPositions, setRiverLabelPositions] = React.useState<Record<string, [number, number]>>({})
+  const [riverAnimation, setRiverAnimation] = React.useState(0)
   const mapRef = React.useRef<HTMLDivElement>(null)
   const mapSvgRef = React.useRef<SVGSVGElement>(null)
   const dragRef = React.useRef<{ pointerId: number; x: number; y: number; pan: [number, number] } | null>(null)
@@ -619,6 +722,35 @@ export function RiversOfIndiaPage() {
   ] : []
   const lakeIndexBySource = new Map(lakes.flatMap((lake, index) => lake.sourceIndex === undefined ? [] : [[lake.sourceIndex, index] as const]))
   const mappedLakeCount = mapData ? mapData.li.filter(([name]) => !OUTSIDE_INDIA_LAKES.has(name)).length : 0
+  const normalizedLakeSearch = lakeSearch.trim().toLocaleLowerCase()
+  const lakeStateCounts = lakes.reduce((counts, lake) => {
+    const region = LAKE_EXAM_NOTE_BY_NAME.get(lake.name)?.region
+    for (const state of lakeStates(region)) counts.set(state, (counts.get(state) ?? 0) + 1)
+    return counts
+  }, new Map<string, number>())
+  const sortedLakeStates = [...lakeStateCounts.keys()].sort((a, b) => {
+    if (a.startsWith('Other /')) return 1
+    if (b.startsWith('Other /')) return -1
+    return a.localeCompare(b)
+  })
+  const lakeGroups = lakes.reduce<{ region: string; entries: { lake: Lake; index: number }[] }[]>((groups, lake, index) => {
+    if (normalizedLakeSearch && !lake.name.toLocaleLowerCase().includes(normalizedLakeSearch)) return groups
+    const region = LAKE_EXAM_NOTE_BY_NAME.get(lake.name)?.region ?? 'Other / location not listed'
+    if (lakeState !== 'all' && !lakeStates(LAKE_EXAM_NOTE_BY_NAME.get(lake.name)?.region).includes(lakeState)) return groups
+    let group = groups.find((candidate) => candidate.region === region)
+    if (!group) {
+      group = { region, entries: [] }
+      groups.push(group)
+    }
+    group.entries.push({ lake, index })
+    return groups
+  }, [])
+  const isLakeVisible = (index: number) => {
+    if (lakeState === 'all') return true
+    const region = LAKE_EXAM_NOTE_BY_NAME.get(lakes[index]?.name ?? '')?.region
+    return lakeStates(region).includes(lakeState)
+  }
+  const filteredLakeCount = lakeGroups.reduce((count, group) => count + group.entries.length, 0)
   const visibleRivers = RIVERS.map((river, index) => ({ river, index }))
     .filter(({ river }) => filter === 'A' || river.type === filter)
 
@@ -722,17 +854,11 @@ export function RiversOfIndiaPage() {
       return
     }
 
-    if (selectedRiver === index) {
-      setSelectedLake(null)
-      setMapMode('rivers')
-      setSelectedRiver(null)
-      setMapViewport(1, [0, 0])
-      return
-    }
-
     trackMapSelection('river', RIVERS[index].name)
     setSelectedLake(null)
+    setMapMode('rivers')
     setSelectedRiver(index)
+    setRiverAnimation((animation) => animation + 1)
     const bounds = mapRef.current?.getBoundingClientRect()
     const route = mapSvgRef.current?.querySelector<SVGPathElement>(`[data-river-path="${index}"]`)
     if (!bounds || !route) return
@@ -757,13 +883,8 @@ export function RiversOfIndiaPage() {
       return
     }
 
-    if (selectedLake === index) {
-      setSelectedLake(null)
-      setMapViewport(1, [0, 0])
-      return
-    }
-
     trackMapSelection('lake', lakes[index].name)
+    setLakeState(lakeStates(LAKE_EXAM_NOTE_BY_NAME.get(lakes[index].name)?.region)[0])
     setSelectedRiver(null)
     setMapMode('lakes')
     setSelectedLake(index)
@@ -814,7 +935,6 @@ export function RiversOfIndiaPage() {
 
   const handleMapPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0 || (event.target as Element).closest('button')) return
-    event.currentTarget.setPointerCapture(event.pointerId)
     pointersRef.current.set(event.pointerId, { x: event.clientX, y: event.clientY })
 
     if (pointersRef.current.size >= 2) {
@@ -952,9 +1072,8 @@ export function RiversOfIndiaPage() {
             <h1>Rivers and Lakes of India Map: Major Rivers &amp; Exam Facts</h1>
             <p>Explore India’s rivers, tributaries, lakes and reservoirs with an interactive map and competitive-exam facts.</p>
           </header>
-          <div className="rivers-map-loading-panel" role="status">
-            <div className="rivers-map-loading-water" aria-hidden="true" />
-            <span>Loading the interactive map…</span>
+          <div className="rivers-map-loading-panel" role="status" aria-label="Loading interactive map">
+            <span className="rivers-map-loading-spinner" aria-hidden="true" />
           </div>
           <GeographyStudyGuide />
         </article>
@@ -1027,7 +1146,7 @@ export function RiversOfIndiaPage() {
                     {mapData.lk.map(([path, sourceIndex], shapeIndex) => {
                       const lakeIndex = lakeIndexBySource.get(sourceIndex)
                       const lakeName = lakeIndex === undefined ? undefined : lakes[lakeIndex]?.name
-                      if (!lakeName || lakeIndex === undefined) return null
+                      if (!lakeName || lakeIndex === undefined || !isLakeVisible(lakeIndex)) return null
                       return (
                         <path
                           className="rivers-lake-shape"
@@ -1051,6 +1170,7 @@ export function RiversOfIndiaPage() {
                     })}
                     {mapData.MK.map(([name, x, y], markerIndex) => {
                       const lakeIndex = mappedLakeCount + markerIndex
+                      if (!isLakeVisible(lakeIndex)) return null
                       return (
                         <g
                           className={`rivers-lake-marker${selectedLake === lakeIndex ? ' is-selected' : ''}`}
@@ -1073,6 +1193,7 @@ export function RiversOfIndiaPage() {
                     })}
                     {ADDITIONAL_INDIAN_LAKES.map(({ name, point }) => {
                       const lakeIndex = lakes.findIndex((lake) => lake.name === name)
+                      if (lakeIndex < 0 || !isLakeVisible(lakeIndex)) return null
                       return (
                         <g
                           className={`rivers-lake-marker${selectedLake === lakeIndex ? ' is-selected' : ''}`}
@@ -1130,7 +1251,7 @@ export function RiversOfIndiaPage() {
                     <g
                       className={`rivers-map-route${isSelected ? ' is-selected' : ''}`}
                       data-river-index={index}
-                      key={river.name}
+                      key={`${river.name}-${isSelected ? riverAnimation : 'idle'}`}
                       role="button"
                       tabIndex={0}
                       aria-label={`${river.name} river: ${river.states.join(', ')}`}
@@ -1251,6 +1372,33 @@ export function RiversOfIndiaPage() {
               >Reset</button>
               <span className="rivers-map-zoom-hint">Scroll to zoom · drag to move</span>
             </div>
+            {mapMode === 'rivers' && (
+              <section className="rivers-directory" aria-labelledby="rivers-directory-heading">
+                <header className="rivers-directory-header">
+                  <div>
+                    <h2 id="rivers-directory-heading">Explore rivers</h2>
+                    <p>{visibleRivers.length} rivers · select one for its route and facts</p>
+                  </div>
+                </header>
+                <div className="rivers-directory-list">
+                  {visibleRivers.map(({ river, index }) => (
+                    <button
+                      aria-pressed={selectedRiver === index}
+                      className={`rivers-directory-item${selectedRiver === index ? ' is-active' : ''}`}
+                      key={river.name}
+                      onClick={() => selectRiver(index)}
+                      type="button"
+                    >
+                      <span className="rivers-directory-name">
+                        <span className="rivers-list-dot" style={{ backgroundColor: river.color }} />
+                        {river.name}
+                      </span>
+                      <span className="rivers-directory-states">{river.states.join(', ')}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            )}
           </div>
 
           <div className="rivers-map-sidebar">
@@ -1276,35 +1424,37 @@ export function RiversOfIndiaPage() {
                     setMapMode('lakes')
                     setSelectedRiver(null)
                     setSelectedLake(null)
+                    setLakeState('all')
                     setMapViewport(1, [0, 0])
                   }}
                   type="button"
                 >
                   Lakes
                 </button>
-                {FILTERS.map(({ key, label }) => (
-                  <button
-                    aria-pressed={filter === key}
-                    className={filter === key ? 'is-active' : ''}
-                    key={key}
-                    onClick={() => {
-                      setFilter(key)
-                      setMapMode('rivers')
-                      setSelectedRiver(null)
-                      setSelectedLake(null)
-                      setMapViewport(1, [0, 0])
-                    }}
-                    type="button"
-                  >
-                    {label}
+                {mapMode === 'rivers' && FILTERS.map(({ key, label }) => (
+                    <button
+                      aria-pressed={filter === key}
+                      className={filter === key ? 'is-active' : ''}
+                      key={key}
+                      onClick={() => {
+                        setFilter(key)
+                        setSelectedRiver(null)
+                        setSelectedLake(null)
+                        setMapViewport(1, [0, 0])
+                      }}
+                      type="button"
+                    >
+                      {label}
+                    </button>
+                  ))}
+              </div>
+              {mapMode === 'rivers' && (
+                <div className="rivers-layer-controls" aria-label="Map layers">
+                  <button aria-pressed={showTributaries} className={showTributaries ? 'is-active' : ''} onClick={() => setShowTributaries((value) => !value)} type="button">
+                    Tributaries
                   </button>
-                ))}
-              </div>
-              <div className="rivers-layer-controls" aria-label="Map layers">
-                <button aria-pressed={showTributaries} className={showTributaries ? 'is-active' : ''} onClick={() => setShowTributaries((value) => !value)} type="button">
-                  Tributaries
-                </button>
-              </div>
+                </div>
+              )}
               <button
                 className="rivers-replay-button"
                 onClick={() => {
@@ -1316,39 +1466,6 @@ export function RiversOfIndiaPage() {
               >
                 Reset map
               </button>
-            </div>
-
-            <div className="rivers-list-card" aria-label="Select a river">
-              {visibleRivers.map(({ river, index }) => (
-                <button
-                  aria-pressed={selectedRiver === index}
-                  className={`rivers-list-button${selectedRiver === index ? ' is-active' : ''}`}
-                  key={river.name}
-                  onClick={() => selectRiver(index)}
-                  type="button"
-                >
-                  <span className="rivers-list-dot" style={{ backgroundColor: river.color }} />
-                  {river.name}
-                </button>
-              ))}
-            </div>
-
-            <div className="rivers-list-card rivers-lake-list" aria-label="Select a lake or reservoir">
-              <h3>Indian lakes and reservoirs</h3>
-              <p className="rivers-lake-star-legend"><span aria-hidden="true">★</span> Frequently asked in competitive exams</p>
-              {lakes.map((lake, index) => (
-                <button
-                  aria-pressed={selectedLake === index}
-                  className={`rivers-list-button${selectedLake === index ? ' is-active' : ''}`}
-                  key={lake.name}
-                  onClick={() => selectLake(index)}
-                  type="button"
-                >
-                  <span className="rivers-lake-dot" />
-                  {lake.examRelevant && <span className="rivers-lake-star" aria-label="Frequently asked in competitive exams">★</span>}
-                  {lake.name}
-                </button>
-              ))}
             </div>
 
             <article aria-live="polite" className="rivers-detail-card">
@@ -1421,6 +1538,66 @@ export function RiversOfIndiaPage() {
             </article>
           </div>
         </section>
+
+        {mapMode === 'lakes' && <section className="rivers-directory rivers-lake-browser" aria-labelledby="rivers-lake-browser-heading">
+          <div className="rivers-lake-browser-header rivers-directory-header">
+            <div>
+              <h2 id="rivers-lake-browser-heading">Explore lakes and reservoirs</h2>
+              <p>{filteredLakeCount} of {lakes.length} listed · select one for its map location and exam fact</p>
+            </div>
+            <label className="rivers-lake-state-filter">
+              <span>Filter lakes by state or region</span>
+              <select
+                onChange={(event) => {
+                  setLakeState(event.target.value)
+                  setSelectedLake(null)
+                  setMapViewport(1, [0, 0])
+                }}
+                value={lakeState}
+              >
+                <option value="all">All states ({lakes.length})</option>
+                {sortedLakeStates.map((state) => (
+                  <option key={state} value={state}>
+                    {state} ({lakeStateCounts.get(state)})
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="rivers-lake-search">
+              <span>Search lakes</span>
+              <input
+                onChange={(event) => setLakeSearch(event.target.value)}
+                placeholder="e.g. Manasbal"
+                type="search"
+                value={lakeSearch}
+              />
+            </label>
+          </div>
+          {lakeGroups.length > 0 ? (
+            <div className="rivers-directory-list">
+              {lakeGroups.flatMap(({ entries }) => entries.map(({ lake, index }) => (
+                <button
+                  aria-pressed={selectedLake === index}
+                  className={`rivers-directory-item${selectedLake === index ? ' is-active' : ''}`}
+                  key={lake.name}
+                  onClick={() => selectLake(index)}
+                  type="button"
+                >
+                  <span className="rivers-directory-name">
+                    <span className="rivers-lake-dot" />
+                    {lake.examRelevant && <span className="rivers-lake-star" aria-label="Frequently asked in competitive exams">★</span>}
+                    {lake.name}
+                  </span>
+                  <span className="rivers-directory-states">
+                    {LAKE_EXAM_NOTE_BY_NAME.get(lake.name)?.region ?? 'India'}
+                  </span>
+                </button>
+              )))}
+            </div>
+          ) : (
+            <p className="rivers-lake-empty">No lakes match “{lakeSearch}”. Try another name.</p>
+          )}
+        </section>}
 
         <GeographyStudyGuide />
       </article>
