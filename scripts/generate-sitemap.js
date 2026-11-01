@@ -8,23 +8,6 @@ const __dirname = dirname(fileURLToPath(import.meta.url))
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 
-// Keyword-rich question URL: /question/<keywords>--<id> (mirrors src/lib/questionUrl.ts).
-function keywordify(text) {
-  return (text || '')
-    .replace(/\$[^$]*\$/g, ' ')
-    .replace(/[*_`#>~|]/g, ' ')
-    .toLowerCase()
-    .replace(/&/g, ' and ')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .split('-').filter(Boolean).slice(0, 12).join('-')
-    .slice(0, 80).replace(/-+$/g, '')
-}
-function questionPath(slug, questionText) {
-  const kw = keywordify(questionText)
-  return kw ? `/question/${kw}--${slug}` : `/question/${slug}`
-}
-
 // Exams that have a dedicated /exam/:slug/overview page. Keep in sync with examFaq.ts keys.
 const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bpsc', 'rssb', 'jkpsc', 'jkpsi'])
 
@@ -94,7 +77,7 @@ async function generate() {
   const urls = [
     url(`${BASE}/`, '1.0', 'daily'),
     url(`${BASE}/exams`, '0.9', 'daily'),
-    url(`${BASE}/rivers-of-india`, '0.7', 'monthly'),
+    url(`${BASE}/india-physical-geography-map`, '0.7', 'monthly'),
     url(`${BASE}/about`, '0.5', 'monthly'),
     url(`${BASE}/privacy`, '0.3', 'yearly'),
     url(`${BASE}/terms`, '0.3', 'yearly'),

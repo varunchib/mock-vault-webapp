@@ -17,16 +17,16 @@ export function StudyMaterialPage() {
 
       <section className="study-material-section" aria-labelledby="study-material-geography">
         <h2 id="study-material-geography">Geography</h2>
-        <Link className="study-material-card" to="/rivers-of-india">
+        <Link className="study-material-card" to="/india-physical-geography-map">
           <span className="study-material-card-icon" aria-hidden="true">
             <Map size={24} />
             <Waves size={16} />
           </span>
           <span className="study-material-card-copy">
             <span className="study-material-card-label">Interactive map</span>
-            <strong>Rivers of India</strong>
+            <strong>India Physical Geography Map</strong>
             <span>
-              Explore major rivers, tributaries, states, and river systems on an interactive map.
+              Explore India’s major rivers, tributaries, lakes, and reservoirs on an interactive map.
             </span>
           </span>
           <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />

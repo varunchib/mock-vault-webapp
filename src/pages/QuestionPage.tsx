@@ -8,12 +8,11 @@ import { MathText } from '../components/common/MathText'
 import { ExplanationText } from '../components/common/ExplanationText'
 import { fetchQuestionBySlug, fetchRelatedQuestions, type Question, type RelatedQuestion } from '../lib/api'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
-import { useAuth } from '../context/useAuth'
 import { usePageMeta } from '../lib/usePageMeta'
 import { questionSeoTitle, questionSeoDescription } from '../lib/pageTitles'
 import { env } from '../lib/env'
 import { paperPath } from '../lib/paperSeo'
-import { questionPath, questionRealSlug } from '../lib/questionUrl'
+import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from '../lib/questionUrl'
 import { questionHeadingLine } from '../lib/questionHeading'
 
 // Renders solution text with headings/bullets/nesting (identical to how the
@@ -32,7 +31,6 @@ export function QuestionPage() {
   const [related, setRelated] = useState<RelatedQuestion[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
-  const { isAuthenticated } = useAuth()
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const [copied, setCopied] = useState(false)
 
@@ -83,8 +81,8 @@ export function QuestionPage() {
       url: `https://ministryofpapers.com${questionPath(question.urlCode ?? question.slug, question.question)}`,
       mainEntity: {
         '@type': 'Question',
-        name: question.question.replace(/\*\*/g, '').replace(/\n/g, ' ').slice(0, 200),
-        text: question.question.replace(/\*\*/g, '').replace(/\n/g, ' '),
+        name: stripQuestionNumberPrefix(question.question).replace(/\*\*/g, '').replace(/\n/g, ' ').slice(0, 200),
+        text: stripQuestionNumberPrefix(question.question).replace(/\*\*/g, '').replace(/\n/g, ' '),
         answerCount: 1,
         educationalLevel: 'Competitive Exam Preparation',
         about: { '@type': 'Thing', name: question.subject || question.examName },
@@ -127,22 +125,16 @@ export function QuestionPage() {
 
   const isDeleted = question.answerKey === 'Deleted'
   const isPending = question.answerKey === 'Pending'
-  const homeHref = isAuthenticated ? '/dashboard' : '/'
   const localized = getLocalizedQuestion(question, language)
+  const displayQuestion = stripQuestionNumberPrefix(localized.question)
   const hasHindiVersion = hasHindi(question)
   const answerOption = question.options.find(o => o.key === question.answerKey)
 
-  // Topic(s) for the Testbook-style breadcrumb/heading: the tags that are not
-  // the exam name, subject, paper or a bare year. The first one is the heading.
-  const metaTags = new Set([question.examName, question.subject, question.paper, String(question.year)].filter(Boolean) as string[])
-  const topics = question.tags.filter(t => t && !metaTags.has(t) && !/^\d{4}$/.test(t))
   // H1 = the question itself (Testbook-style). For multi-line / passage /
   // match-table items use the actual question line (last line ending in "?")
   // so the heading isn't a passage line or a table row.
-  const heading = questionHeadingLine(localized.question) || localized.question
-  const questionIsMultiline = localized.question.includes('\n')
-  const subjectHref = `/exam/${question.examSlug}?tab=subjects&subject=${encodeURIComponent(question.subject ?? '')}`
-
+  const heading = questionHeadingLine(displayQuestion) || displayQuestion
+  const questionIsMultiline = displayQuestion.includes('\n')
   const copyLink = () => {
     void navigator.clipboard?.writeText(window.location.href)
     setCopied(true)
@@ -153,30 +145,33 @@ export function QuestionPage() {
     <section className="public-page">
       <div className="public-shell narrow">
 
-        {/* Breadcrumb — topic focused (Home › Subject › Topic) */}
+        {/* Keep the public breadcrumb on the exam and paper hierarchy. */}
         <nav className="ep-breadcrumb" aria-label="Breadcrumb">
-          <Link to={homeHref}>Home</Link>
-          {question.subject && (
+          <Link to="/">Home</Link>
+          <ChevronRight size={13} />
+          <Link to={`/exam/${question.examSlug}`}>{question.examName}</Link>
+          {question.paperSlug && (
             <>
               <ChevronRight size={13} />
-              <Link to={subjectHref} rel="nofollow">{question.subject}</Link>
+              <Link to={paperPath(question.paperSlug)}>{question.paper || `${question.year} question paper`}</Link>
             </>
           )}
-          {topics.slice(0, 2).map(t => (
-            <span key={t} className="ep-crumb-plain">
-              <ChevronRight size={13} />
-              {t}
-            </span>
-          ))}
+          <ChevronRight size={13} />
+          <span>Question {question.questionNo}</span>
         </nav>
 
-        {/* Page heading — topic, not exam name */}
+        {/* Separate exam context and question number from the question itself. */}
         <div className="qpage-head">
           <div className="qpage-head-left">
+            <div className="qpage-context">
+              <span>{question.examName}</span>
+              {question.year && <span>{question.year}</span>}
+              <span>Question {question.questionNo}</span>
+            </div>
             <h1 className="qpage-h1"><MathText text={heading} /></h1>
             {question.paperSlug && (
               <p className="qpage-source">
-                Previously asked in{' '}
+                From the solved paper{' '}
                 <Link to={paperPath(question.paperSlug)}>{question.paper}</Link>
               </p>
             )}
@@ -234,7 +229,7 @@ export function QuestionPage() {
           {/* The H1 above already shows the question. Render the full body only
               for multi-line items (passages, match-the-following tables, etc.)
               so a simple one-line question isn't shown twice. */}
-          {questionIsMultiline && <QuestionRenderer className="pyq-q-text" text={localized.question} />}
+          {questionIsMultiline && <QuestionRenderer className="pyq-q-text" text={displayQuestion} />}
 
           {/* Options — correct answer highlighted (except deleted / pending) */}
           <div className="pyq-options pyq-options--solved">

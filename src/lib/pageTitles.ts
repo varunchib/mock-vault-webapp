@@ -1,3 +1,5 @@
+import { stripQuestionNumberPrefix } from './questionUrl'
+
 /**
  * Canonical SEO title / description builders.
  *
@@ -181,12 +183,12 @@ export function questionSeoTitle(q: QuestionMeta): string {
   // is the strongest ranking signal for a Q&A page (matches Testbook et al.).
   // The exam/paper context lives in the H1, breadcrumb and on-page content.
   const brand = ` | ${BRAND}`
-  const snippet = truncate(strip(q.question), 70 - brand.length)
+  const snippet = truncate(strip(stripQuestionNumberPrefix(q.question)), 70 - brand.length)
   return `${snippet}${brand}`
 }
 
 export function questionSeoDescription(q: QuestionMeta): string {
-  const clean = strip(q.question)
+  const clean = strip(stripQuestionNumberPrefix(q.question))
   const base = truncate(clean, 120)
   const suffix = q.answer ? ` Answer with explanation on ${BRAND}.` : ` Explained on ${BRAND}.`
   return truncate(base + suffix, 160)

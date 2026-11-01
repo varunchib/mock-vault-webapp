@@ -3,7 +3,11 @@
 // The segment after the final "--" is the original question slug (a stable,
 // unique id), so every URL still resolves by that id and the old bare
 // /question/<id> links can be 301-redirected to the canonical keyword URL —
-// no backend or database change needed.
+// without changing question IDs in the database.
+
+export function stripQuestionNumberPrefix(text: string): string {
+  return text.replace(/^(\s*)(?:(?:question)\s*#?\s*|q\s*\.?\s*)\d+\s*(?:[.):-]|–|—)\s*/i, '$1')
+}
 
 /**
  * Turn question text into a short, hyphenated keyword slug for the URL.
@@ -16,13 +20,14 @@
  * TestKeywordify and scripts/check-keywordify.mjs.
  */
 export function keywordify(text: string): string {
-  const words = (text || '')
+  const words = stripQuestionNumberPrefix(text || '')
     .replace(/\$[^$]*\$/g, ' ')   // drop inline LaTeX math
     .replace(/[*_`#>~|]/g, ' ')   // drop markdown marks
     .toLowerCase()
     .replace(/&/g, ' and ')
     // Devanagari (U+0900–U+097F) is kept alongside a-z0-9 so Hindi questions get
     // real keywords instead of collapsing to the bare id.
+    // eslint-disable-next-line no-misleading-character-class -- Preserve the exact Devanagari range mirrored by the Go sitemap generator.
     .replace(/[^a-z0-9ऀ-ॿ]+/g, '-')
     .replace(/^-+|-+$/g, '')
     .split('-')

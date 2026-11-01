@@ -264,6 +264,35 @@ type RiverStudyDetails = {
   tributaryNote?: string
 }
 
+type TributaryOption = {
+  name: string
+  bank: 'Left bank' | 'Right bank' | 'Basin / headstream'
+  mapRoute: MapTributary | null
+  mainRiverIndex: number | null
+}
+
+const TRIBUTARY_EXPLANATIONS: Record<string, string> = {
+  Jhelum: 'Rises at Verinag in Kashmir, flows through Srinagar and Wular Lake, then continues into Pakistan and joins the Chenab.',
+  Chenab: 'Formed by the Chandra and Bhaga rivers at Tandi in Himachal Pradesh; it joins the Indus system through the Panjnad.',
+  Ravi: 'Rises in the Himalaya of Himachal Pradesh, flows through the Punjab region, and joins the Chenab in Pakistan.',
+  Beas: 'Rises near Beas Kund in Himachal Pradesh and joins the Sutlej at Harike in Punjab.',
+  Chambal: 'Rises in the Vindhya region of Madhya Pradesh and joins the Yamuna near Etawah in Uttar Pradesh.',
+  Betwa: 'Rises in Madhya Pradesh and joins the Yamuna near Hamirpur in Uttar Pradesh.',
+  Parbati: 'A tributary of the Chambal in the Yamuna basin; it reaches the Yamuna system through the Chambal rather than joining the Yamuna directly.',
+  Ghaghara: 'Known upstream as the Karnali in Nepal; it crosses the northern plains and joins the Ganga in Bihar.',
+  Gandak: 'Flows from the Nepal Himalaya into the northern plains and joins the Ganga near the Bihar–Uttar Pradesh border.',
+  'Kosi (Sapt Kosi)': 'Formed by Himalayan tributaries in Nepal; it joins the Ganga near Kursela in Bihar.',
+  Son: 'Rises near Amarkantak in Madhya Pradesh and flows northeast to meet the Ganga near the Patna region.',
+  Lohit: 'Rises in eastern Tibet and joins the Siang in Arunachal Pradesh, contributing to the Brahmaputra system.',
+  Teesta: 'Rises in the Sikkim Himalaya and flows through Sikkim and West Bengal before joining the Brahmaputra–Jamuna system in Bangladesh.',
+  Tel: 'An important Mahanadi tributary that flows through western Odisha and joins the Mahanadi near Sonepur.',
+  Wainganga: 'A major Godavari-basin river; it joins the Wardha to form the Pranhita, which then meets the Godavari.',
+  Indravati: 'Rises in the Eastern Ghats region and flows through central India before joining the Godavari.',
+  Bhima: 'Rises near Bhimashankar in Maharashtra and joins the Krishna near the Maharashtra–Karnataka region.',
+  Tungabhadra: 'Formed by the Tunga and Bhadra rivers in Karnataka; it joins the Krishna near Alampur.',
+  Sankh: 'A headstream of the Brahmani: it joins the South Koel near Rourkela to form the Brahmani.',
+}
+
 const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Indus: {
     leftBank: ['Zanskar', 'Suru (including the Dras system)', 'Soan (Sohan)', 'Jhelum', 'Chenab', 'Ravi', 'Beas', 'Sutlej', 'Panjnad'],
@@ -323,6 +352,7 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Tapti: {
     leftBank: ['Purna', 'Girna', 'Panzara (Panjhara)', 'Bori', 'Waghur', 'Amravati', 'Buray', 'Nesu', 'Mona', 'Sipna'],
     rightBank: ['Gomai', 'Aner', 'Arunavati', 'Vaki'],
+    tributaryNote: 'Purna and Girna are among the major tributaries of the Tapti, with Panzara, Waghur, Aner and Gomai also draining the basin. These rivers join the Tapti as it flows west from Madhya Pradesh through Maharashtra and Gujarat to the Arabian Sea. Lists and bank groupings vary across reference tables.',
     districts: [
       { state: 'Madhya Pradesh', names: ['Betul', 'Burhanpur'] },
       { state: 'Maharashtra', names: ['Jalgaon'] },
@@ -332,6 +362,7 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Mahanadi: {
     leftBank: ['Seonath', 'Hasdeo', 'Mand', 'Ib'],
     rightBank: ['Pairi', 'Ong', 'Tel', 'Jonk'],
+    tributaryNote: 'The Seonath (Shivnath), Hasdeo, Mand and Ib join from the left bank; Pairi, Ong, Tel and Jonk are major right-bank tributaries. Together, these rivers collect runoff from the Chhattisgarh basin and Odisha uplands before the Mahanadi enters its delta and the Bay of Bengal.',
     districts: [
       { state: 'Chhattisgarh', names: ['Dhamtari'] },
       { state: 'Odisha', names: ['Sambalpur', 'Boudh', 'Cuttack'] },
@@ -361,10 +392,23 @@ const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Kaveri: {
     leftBank: ['Harangi', 'Hemavati', 'Shimsha', 'Arkavathi'],
     rightBank: ['Lakshmanatirtha', 'Kabini', 'Suvarnavathi', 'Bhavani', 'Noyyal', 'Amaravati'],
+    tributaryNote: 'The Kaveri’s Karnataka tributaries include Harangi, Hemavati, Shimsha and Arkavathi, while Kabini, Bhavani, Noyyal and Amaravati join farther downstream. The river’s east-flowing basin crosses the Deccan plateau and enters Tamil Nadu before spreading through its delta. Tributary naming and bank grouping can differ among references.',
     districts: [
       { state: 'Karnataka', names: ['Kodagu', 'Mysuru', 'Mandya'] },
       { state: 'Tamil Nadu', names: ['Erode', 'Karur', 'Tiruchirappalli', 'Thanjavur'] },
     ],
+  },
+  Mahi: {
+    leftBank: [],
+    rightBank: [],
+    tributaryNote: 'The Som, Anas and Panam are among the principal tributaries of the Mahi. They drain parts of Madhya Pradesh, Rajasthan and Gujarat before joining the west-flowing main river. Bank classifications and lists of smaller tributaries vary between references, so this guide highlights the commonly cited basin rivers without assigning disputed banks.',
+    districts: [],
+  },
+  Brahmani: {
+    leftBank: [],
+    rightBank: [],
+    tributaryNote: 'The Brahmani begins where the Sankh and South Koel meet near Rourkela. These headstreams form the river rather than joining it farther downstream; the Karo is another important tributary. The Brahmani then crosses Odisha and flows through the coastal delta system toward the Bay of Bengal.',
+    districts: [],
   },
 }
 
@@ -640,6 +684,98 @@ const LAKE_EXAM_NOTE_BY_NAME = new Map<string, (typeof LAKE_EXAM_NOTES)[number]>
   LAKE_EXAM_NOTES.map((note) => [note.name, note]),
 )
 
+type LakeStudyFact = {
+  label: string
+  value: string
+  emphasis?: string[]
+}
+
+const LAKE_STUDY_DETAILS: Record<string, LakeStudyFact[]> = {
+  'Dal Lake': [
+    { label: 'Nicknames', value: 'Srinagar’s Jewel; Jewel in the Crown of Kashmir', emphasis: ['Srinagar’s Jewel', 'Jewel in the Crown of Kashmir'] },
+    { label: 'Setting', value: 'Srinagar, Jammu and Kashmir, below the Zabarwan Range.' },
+    { label: 'Basins', value: 'Often described as Gagribal, Lokut Dal, Bod Dal and Nagin/Nigeen; some references treat Nigeen as a separate lake.' },
+    { label: 'Water and features', value: 'The Telbal stream is a major water source. Known for floating gardens (rad), houseboats, shikaras, and the Rup Lank (Char Chinar) and Sona Lank islands.' },
+    { label: 'Exam note', value: 'Often described in regional references as Jammu and Kashmir’s second-largest lake; rankings vary with how the connected lake system is measured.' },
+  ],
+  'Wular Lake': [
+    { label: 'District and setting', value: 'Bandipora area, Kashmir Valley, Jammu and Kashmir.' },
+    { label: 'Origin', value: 'Tectonic freshwater lake.' },
+    { label: 'River connection', value: 'The Jhelum flows through the lake.' },
+    { label: 'Exam distinction', value: 'Commonly identified as Jammu and Kashmir’s largest freshwater lake.' },
+    { label: 'Conservation', value: 'Ramsar wetland since 23 March 1990; listed area is 18,900 hectares.' },
+  ],
+  'Manasbal Lake': [
+    { label: 'District and setting', value: 'Ganderbal district, north of Srinagar, Jammu and Kashmir.' },
+    { label: 'Origin', value: 'Often described in regional references as tectonic.' },
+    { label: 'Exam distinction', value: 'Often called the deepest lake in Kashmir; this is a regional comparison, not an India-wide ranking.' },
+    { label: 'Known for', value: 'Lotus blooms and Jaroka Bagh, a Mughal garden on its shore.' },
+  ],
+  'Anchar Lake': [
+    { label: 'Locality', value: 'Soura area of Srinagar, Jammu and Kashmir.' },
+    { label: 'Character', value: 'Shallow urban lake.' },
+    { label: 'Connections', value: 'Part of the Kashmir Valley’s connected lake and wetland system; associated with Sindh Nallah inflows and waterway links toward Kushalsar and Nigeen.' },
+  ],
+  'Nigeen Lake': [
+    { label: 'Setting', value: 'Srinagar, west of Dal Lake, Jammu and Kashmir.' },
+    { label: 'Connection', value: 'Linked to Dal Lake by a narrow channel; treated as part of the wider Dal system in some references and as a separate lake in others.' },
+  ],
+  'Mansar Lake': [
+    { label: 'Exam connection', value: 'Study together with nearby Surinsar Lake as the Surinsar–Mansar lake pair.' },
+  ],
+  'Surinsar Lake': [
+    { label: 'Exam connection', value: 'Paired with Mansar Lake in the Surinsar–Mansar wetland complex.' },
+  ],
+  'Gangabal Lake': [
+    { label: 'Setting', value: 'At the foot of Mount Harmukh in Ganderbal district, Jammu and Kashmir.' },
+    { label: 'Also known as', value: 'Harmukh Ganga.', emphasis: ['Harmukh Ganga'] },
+    { label: 'Outflow', value: 'Flows toward nearby Nundkol and then through the Wangat stream system.' },
+  ],
+}
+
+function renderLakeFactValue(value: string, emphasis: string[] = []): React.ReactNode {
+  if (emphasis.length === 0) return value
+  const escapedTerms = emphasis.map((term) => term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'))
+  const matcher = new RegExp(`(${escapedTerms.join('|')})`, 'g')
+  const emphasizedTerms = new Set(emphasis)
+  return value.split(matcher).map((part, index) => (
+    emphasizedTerms.has(part) ? <strong key={`${part}-${index}`}>{part}</strong> : part
+  ))
+}
+
+function LakeQuickReference() {
+  return (
+    <details className="rivers-lake-reference">
+      <summary>Lake and reservoir quick reference ({LAKE_EXAM_NOTES.length} entries)</summary>
+      <p className="rivers-lake-reference-intro">
+        Key locations, classifications and exam facts for the lakes and reservoirs shown on the map.
+        Exact dimensions are included only where the current reference data provides them.
+      </p>
+      <div className="rivers-lake-reference-grid">
+        {LAKE_EXAM_NOTES.map((note) => {
+          const studyFacts = LAKE_STUDY_DETAILS[note.name]
+          return (
+            <article className="rivers-lake-reference-card" key={note.name}>
+              <h4>{note.name}</h4>
+              <dl>
+                <dt>Location</dt><dd>{note.region}</dd>
+                <dt>Type</dt><dd>{note.category}</dd>
+                {studyFacts?.map((fact) => (
+                  <React.Fragment key={fact.label}>
+                    <dt>{fact.label}</dt>
+                    <dd>{renderLakeFactValue(fact.value, fact.emphasis)}</dd>
+                  </React.Fragment>
+                ))}
+                <dt>Exam fact</dt><dd>{note.examFact}</dd>
+              </dl>
+            </article>
+          )
+        })}
+      </div>
+    </details>
+  )
+}
+
 const MULTI_STATE_LAKE_REGIONS: Record<string, string[]> = {
   'Andhra Pradesh and Tamil Nadu': ['Andhra Pradesh', 'Tamil Nadu'],
   'Puducherry and Tamil Nadu': ['Puducherry', 'Tamil Nadu'],
@@ -669,6 +805,7 @@ function GeographyStudyGuide() {
           <p>Wular—Jhelum; Loktak—floating phumdis; Sambhar—inland saline lake; Lonar—impact crater; Chilika—coastal lagoon.</p>
         </article>
       </div>
+      <LakeQuickReference />
       <p className="rivers-attribution">
         Country outlines, rivers and lakes: Natural Earth (public domain).
         State boundaries: MapSVG via @svg-maps/india, licensed under{' '}
@@ -682,6 +819,8 @@ function GeographyStudyGuide() {
 
 export function RiversOfIndiaPage() {
   const [selectedRiver, setSelectedRiver] = React.useState<number | null>(null)
+  const [selectedTributary, setSelectedTributary] = React.useState<string | null>(null)
+  const [tributaryScrollRequest, setTributaryScrollRequest] = React.useState(0)
   const [selectedLake, setSelectedLake] = React.useState<number | null>(null)
   const [mapMode, setMapMode] = React.useState<MapMode>('rivers')
   const [indiaMap, setIndiaMap] = React.useState<IndiaRiversMapData | null>(null)
@@ -697,6 +836,7 @@ export function RiversOfIndiaPage() {
   const [riverAnimation, setRiverAnimation] = React.useState(0)
   const mapRef = React.useRef<HTMLDivElement>(null)
   const mapSvgRef = React.useRef<SVGSVGElement>(null)
+  const tributaryDetailRef = React.useRef<HTMLElement>(null)
   const dragRef = React.useRef<{ pointerId: number; x: number; y: number; pan: [number, number] } | null>(null)
   const pointersRef = React.useRef(new Map<number, MapPointer>())
   const pinchRef = React.useRef<PinchGesture | null>(null)
@@ -791,15 +931,15 @@ export function RiversOfIndiaPage() {
   }, [filter, mapData])
 
   usePageMeta({
-    title: 'Rivers and Lakes of India Map: Major Rivers & Exam Facts',
-    description: 'Explore India’s rivers, tributaries, lakes and reservoirs with an interactive map, state boundaries and competitive-exam facts.',
-    canonicalPath: '/rivers-of-india',
+    title: 'India Physical Geography Map: Rivers, Lakes & Exam Facts',
+    description: 'Explore an interactive physical geography map of India with major rivers, tributaries, lakes and reservoirs, plus concise competitive-exam facts.',
+    canonicalPath: '/india-physical-geography-map',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'LearningResource',
-      name: 'Rivers and Lakes of India Map: Major Rivers and Exam Facts',
+      name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
       description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
-      url: 'https://ministryofpapers.com/rivers-of-india',
+      url: 'https://ministryofpapers.com/india-physical-geography-map',
       learningResourceType: 'Interactive map',
       educationalLevel: 'General education',
       keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
@@ -810,8 +950,8 @@ export function RiversOfIndiaPage() {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
-          { '@type': 'ListItem', position: 2, name: 'Geography', item: 'https://ministryofpapers.com/rivers-of-india' },
-          { '@type': 'ListItem', position: 3, name: 'Rivers of India', item: 'https://ministryofpapers.com/rivers-of-india' },
+          { '@type': 'ListItem', position: 2, name: 'Geography', item: 'https://ministryofpapers.com/india-physical-geography-map' },
+          { '@type': 'ListItem', position: 3, name: 'India Geography Map', item: 'https://ministryofpapers.com/india-physical-geography-map' },
         ],
       },
     },
@@ -856,13 +996,15 @@ export function RiversOfIndiaPage() {
 
     trackMapSelection('river', RIVERS[index].name)
     setSelectedLake(null)
+    setSelectedTributary(null)
     setMapMode('rivers')
     setSelectedRiver(index)
     setRiverAnimation((animation) => animation + 1)
     const bounds = mapRef.current?.getBoundingClientRect()
     const route = mapSvgRef.current?.querySelector<SVGPathElement>(`[data-river-path="${index}"]`)
     if (!bounds || !route) return
-    const routeBounds = route.getBBox()
+    const riverGroup = mapSvgRef.current?.querySelector<SVGGElement>(`.rivers-map-route[data-river-index="${index}"]`)
+    const routeBounds = (riverGroup ?? route).getBBox()
     const routeWidth = Math.max(routeBounds.width, 1)
     const routeHeight = Math.max(routeBounds.height, 1)
     const nextZoom = Math.min(4, Math.max(1, Math.min(
@@ -886,6 +1028,7 @@ export function RiversOfIndiaPage() {
     trackMapSelection('lake', lakes[index].name)
     setLakeState(lakeStates(LAKE_EXAM_NOTE_BY_NAME.get(lakes[index].name)?.region)[0])
     setSelectedRiver(null)
+    setSelectedTributary(null)
     setMapMode('lakes')
     setSelectedLake(index)
     const bounds = mapRef.current?.getBoundingClientRect()
@@ -908,8 +1051,47 @@ export function RiversOfIndiaPage() {
   const selected = selectedRiver === null ? null : RIVERS[selectedRiver]
   const selectedLakeData = selectedLake === null ? null : lakes[selectedLake] ?? null
   const selectedLakeExamNote = selectedLakeData ? LAKE_EXAM_NOTE_BY_NAME.get(selectedLakeData.name) : undefined
+  const selectedLakeStudyDetails = selectedLakeData ? LAKE_STUDY_DETAILS[selectedLakeData.name] : undefined
   const selectedStudy = selected ? RIVER_STUDY_DETAILS[selected.name] : null
   const selectedMapRiver = selected ? mapRivers.get(selected.name) : null
+  const normalizeTributaryName = (name: string) => name.split('(')[0]?.trim().toLocaleLowerCase().replace(/[^a-z0-9]/g, '') ?? ''
+  const tributaryOptions: TributaryOption[] = selected
+    ? (() => {
+        const options: TributaryOption[] = []
+        const addOption = (name: string, bank: TributaryOption['bank']) => {
+          if (options.some((option) => normalizeTributaryName(option.name) === normalizeTributaryName(name))) return
+          const mapRoute = selectedMapRiver?.tr.find((tributary) =>
+            normalizeTributaryName(tributary.n) === normalizeTributaryName(name),
+          ) ?? null
+          const mainRiverIndex = RIVERS.findIndex((river) =>
+            normalizeTributaryName(river.name) === normalizeTributaryName(name)
+              && normalizeTributaryName(river.name) !== normalizeTributaryName(selected.name),
+          )
+          options.push({ name, bank, mapRoute, mainRiverIndex: mainRiverIndex < 0 ? null : mainRiverIndex })
+        }
+        selectedStudy?.rightBank.forEach((name) => addOption(name, 'Right bank'))
+        selectedStudy?.leftBank.forEach((name) => addOption(name, 'Left bank'))
+        if ((selected.name === 'Mahi' || selected.name === 'Brahmani') && options.length === 0) {
+          const names = selected.name === 'Mahi'
+            ? ['Som', 'Anas', 'Panam']
+            : ['Sankh', 'South Koel', 'Karo']
+          names.forEach((name) => addOption(name, 'Basin / headstream'))
+        }
+        selectedMapRiver?.tr.forEach((tributary) => addOption(tributary.n, 'Basin / headstream'))
+        return options
+      })()
+    : []
+  const selectedTributaryOption = tributaryOptions.find((option) =>
+    option.name === selectedTributary || option.mapRoute?.n === selectedTributary,
+  ) ?? null
+  React.useEffect(() => {
+    if (tributaryScrollRequest > 0) {
+      tributaryDetailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [tributaryScrollRequest])
+  const selectedMapTributary = selectedMapRiver?.tr.find((tributary) =>
+    normalizeTributaryName(tributary.n) === normalizeTributaryName(selectedTributary ?? ''),
+  ) ?? null
   const indusMapRiver = mapRivers.get('Indus')
   if (mapData && !indusMapRiver) throw new Error('Missing Indus map route')
   const selectedSource = selectedMapRiver?.s ?? null
@@ -931,6 +1113,41 @@ export function RiversOfIndiaPage() {
     const contentX = (x - current.pan[0]) / current.zoom
     const contentY = (y - current.pan[1]) / current.zoom
     setMapViewport(scale, [x - contentX * scale, y - contentY * scale])
+  }
+
+  const selectTributary = (name: string, riverSystemName = selected?.name) => {
+    setSelectedTributary(name)
+    setTributaryScrollRequest((request) => request + 1)
+    setShowTributaries(true)
+    const systemMapRiver = riverSystemName ? mapRivers.get(riverSystemName) : null
+    const tributary = systemMapRiver?.tr.find((candidate) =>
+      normalizeTributaryName(candidate.n) === normalizeTributaryName(name),
+    )
+    const bounds = mapRef.current?.getBoundingClientRect()
+    const route = tributary
+      ? mapSvgRef.current?.querySelector<SVGPathElement>(`[data-tributary-name="${tributary.n}"]`)
+      : (() => {
+          const riverIndex = RIVERS.findIndex((river) =>
+            normalizeTributaryName(river.name) === normalizeTributaryName(name),
+          )
+          return riverIndex < 0
+            ? null
+            : mapSvgRef.current?.querySelector<SVGGElement>(`.rivers-map-route[data-river-index="${riverIndex}"]`)
+        })()
+    if (!bounds || !route) return
+    const routeBounds = route.getBBox()
+    const routeWidth = Math.max(routeBounds.width, 1)
+    const routeHeight = Math.max(routeBounds.height, 1)
+    const nextZoom = Math.min(4, Math.max(1, Math.min(
+      MAP_VIEWBOX.width * (tributary ? 0.7 : 0.88) / routeWidth,
+      MAP_VIEWBOX.height * (tributary ? 0.7 : 0.88) / routeHeight,
+    )))
+    const centerX = (routeBounds.x + routeBounds.width / 2 - MAP_VIEWBOX.x) / MAP_VIEWBOX.width * bounds.width
+    const centerY = (routeBounds.y + routeBounds.height / 2 - MAP_VIEWBOX.y) / MAP_VIEWBOX.height * bounds.height
+    setMapViewport(nextZoom, [
+      bounds.width / 2 - centerX * nextZoom,
+      bounds.height / 2 - centerY * nextZoom,
+    ])
   }
 
   const handleMapPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -1052,7 +1269,7 @@ export function RiversOfIndiaPage() {
     return (
       <section className="public-page rivers-page">
         <article className="public-shell">
-          <h1>Rivers and Lakes of India Map: Major Rivers &amp; Exam Facts</h1>
+          <h1>India Physical Geography Map</h1>
           <p role="alert">{mapLoadError}</p>
           <GeographyStudyGuide />
         </article>
@@ -1065,11 +1282,11 @@ export function RiversOfIndiaPage() {
       <section className="public-page rivers-page">
         <article className="public-shell rivers-map-loading">
           <nav className="rivers-breadcrumb" aria-label="Breadcrumb">
-            <Link to="/">Home</Link><span aria-hidden="true">›</span><span>Geography</span><span aria-hidden="true">›</span><span>Rivers of India</span>
+            <Link to="/">Home</Link><span aria-hidden="true">›</span><span>Geography</span><span aria-hidden="true">›</span><span>India Geography Map</span>
           </nav>
           <header className="rivers-hero">
             <span className="public-kicker">Interactive geography</span>
-            <h1>Rivers and Lakes of India Map: Major Rivers &amp; Exam Facts</h1>
+            <h1>India Physical Geography Map</h1>
             <p>Explore India’s rivers, tributaries, lakes and reservoirs with an interactive map and competitive-exam facts.</p>
           </header>
           <div className="rivers-map-loading-panel" role="status" aria-label="Loading interactive map">
@@ -1085,12 +1302,12 @@ export function RiversOfIndiaPage() {
     <section className="public-page rivers-page">
       <article className="public-shell">
         <nav className="rivers-breadcrumb" aria-label="Breadcrumb">
-          <Link to="/">Home</Link><span aria-hidden="true">›</span><span>Geography</span><span aria-hidden="true">›</span><span>Rivers of India</span>
+          <Link to="/">Home</Link><span aria-hidden="true">›</span><span>Geography</span><span aria-hidden="true">›</span><span>India Geography Map</span>
         </nav>
 
         <header className="rivers-hero">
           <span className="public-kicker">Interactive geography</span>
-          <h1>Rivers and Lakes of India Map: Major Rivers &amp; Exam Facts</h1>
+          <h1>India Physical Geography Map</h1>
           <p>
             Explore India’s major rivers, tributaries, lakes and reservoirs.
             Switch map views for animated rivers or lake-only geography, and
@@ -1246,23 +1463,17 @@ export function RiversOfIndiaPage() {
                   const mapRiver = mapRivers.get(river.name)
                   if (!mapRiver) throw new Error(`Missing map route for ${river.name}`)
                   const isSelected = selectedRiver === index
+                  const isSelectedTributaryRiver =
+                    normalizeTributaryName(selectedTributary ?? '') === normalizeTributaryName(river.name)
+                  const isHighlighted = isSelected || isSelectedTributaryRiver
 
                   return (
                     <g
-                      className={`rivers-map-route${isSelected ? ' is-selected' : ''}`}
+                      className={`rivers-map-route${isHighlighted ? ' is-selected' : ''}${isSelected ? ' is-current-river' : ''}`}
                       data-river-index={index}
                       key={`${river.name}-${isSelected ? riverAnimation : 'idle'}`}
-                      role="button"
-                      tabIndex={0}
-                      aria-label={`${river.name} river: ${river.states.join(', ')}`}
-                      aria-pressed={isSelected}
-                      onClick={() => selectRiver(index)}
-                      onKeyDown={(event) => {
-                        if (event.key === 'Enter' || event.key === ' ') {
-                          event.preventDefault()
-                          selectRiver(index)
-                        }
-                      }}
+                      role="group"
+                      aria-label={`${river.name} river and tributaries`}
                     >
                       <path
                         className="rivers-route-line"
@@ -1271,7 +1482,7 @@ export function RiversOfIndiaPage() {
                         id={`rivers-route-${index}`}
                         pathLength="1"
                         stroke={river.color}
-                        strokeWidth={isSelected ? 4 : 2.4}
+                        strokeWidth={isHighlighted ? 4 : 2.4}
                         style={{ animationDelay: `${index * 0.18}s` }}
                       />
                       <path className="rivers-route-flow" d={mapRiver.d} />
@@ -1279,9 +1490,26 @@ export function RiversOfIndiaPage() {
                         <animateMotion dur={`${10 + index}s`} repeatCount="indefinite" path={mapRiver.m} />
                       </circle>
                       <circle cx={mapRiver.s[0]} cy={mapRiver.s[1]} r="3" fill={river.color} stroke="#fff" strokeWidth="1" />
-                      <path className="rivers-route-hit" d={mapRiver.d} />
+                      <path
+                        aria-label={`${river.name} river: ${river.states.join(', ')}`}
+                        aria-pressed={isSelected}
+                        className="rivers-route-hit"
+                        d={mapRiver.d}
+                        onClick={() => selectRiver(index)}
+                        onKeyDown={(event) => {
+                          if (event.key === 'Enter' || event.key === ' ') {
+                            event.preventDefault()
+                            selectRiver(index)
+                          }
+                        }}
+                        role="button"
+                        tabIndex={0}
+                      />
                       {showTributaries && mapRiver.tr.map((tributary) => (
-                        <g className="rivers-tributary" key={tributary.n}>
+                        <g
+                          className={`rivers-tributary${selectedRiver === index && normalizeTributaryName(selectedTributary ?? '') === normalizeTributaryName(tributary.n) ? ' is-selected' : ''}`}
+                          key={tributary.n}
+                        >
                           <path
                             className="rivers-tributary-line"
                             d={tributary.d}
@@ -1290,24 +1518,43 @@ export function RiversOfIndiaPage() {
                             style={{ animationDelay: `${index * 0.2 + 2.2}s` }}
                           />
                           <path className="rivers-route-flow rivers-tributary-flow" d={tributary.d} />
-                          <path className="rivers-route-hit rivers-tributary-hit" d={tributary.d}>
+                          <path
+                            aria-label={`${tributary.n}, tributary in the ${river.name} river system`}
+                            className="rivers-route-hit rivers-tributary-hit"
+                            d={tributary.d}
+                            data-tributary-name={tributary.n}
+                            onClick={(event) => {
+                              event.stopPropagation()
+                              if (selectedRiver !== index) selectRiver(index)
+                              selectTributary(tributary.n, river.name)
+                            }}
+                            onKeyDown={(event) => {
+                              if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault()
+                                event.stopPropagation()
+                                selectTributary(tributary.n, river.name)
+                              }
+                            }}
+                            role="button"
+                            tabIndex={0}
+                          >
                             <title>{`${tributary.n} (tributary of ${river.name})`}</title>
                           </path>
                         </g>
                       ))}
-                      {showTributaries && selectedRiver === index && mapRiver.tr.map((tributary) => (
+                      {showTributaries && selectedRiver === index && selectedMapTributary && (
                         <text
-                          className="rivers-map-label rivers-tributary-label"
-                          key={`${tributary.n}-label`}
-                          x={tributary.s[0] + 4}
-                          y={tributary.s[1] - 3}
+                          aria-hidden="true"
+                          className="rivers-map-label rivers-tributary-label is-selected"
+                          x={selectedMapTributary.s[0] + 4}
+                          y={selectedMapTributary.s[1] - 3}
                         >
-                          {tributary.n}
+                          {selectedMapTributary.n}
                         </text>
-                      ))}
+                      )}
                       {riverLabelPositions[river.name] && (
                         <text
-                          className="rivers-map-river-label"
+                          className={`rivers-map-river-label${isSelectedTributaryRiver ? ' rivers-tributary-label is-selected' : ''}`}
                           aria-hidden="true"
                           fill={river.color}
                           textAnchor="middle"
@@ -1410,6 +1657,7 @@ export function RiversOfIndiaPage() {
                   onClick={() => {
                     setMapMode('rivers')
                     setSelectedRiver(null)
+                    setSelectedTributary(null)
                     setSelectedLake(null)
                     setMapViewport(1, [0, 0])
                   }}
@@ -1423,6 +1671,7 @@ export function RiversOfIndiaPage() {
                   onClick={() => {
                     setMapMode('lakes')
                     setSelectedRiver(null)
+                    setSelectedTributary(null)
                     setSelectedLake(null)
                     setLakeState('all')
                     setMapViewport(1, [0, 0])
@@ -1439,6 +1688,7 @@ export function RiversOfIndiaPage() {
                       onClick={() => {
                         setFilter(key)
                         setSelectedRiver(null)
+                        setSelectedTributary(null)
                         setSelectedLake(null)
                         setMapViewport(1, [0, 0])
                       }}
@@ -1459,6 +1709,7 @@ export function RiversOfIndiaPage() {
                 className="rivers-replay-button"
                 onClick={() => {
                   setSelectedRiver(null)
+                  setSelectedTributary(null)
                   setSelectedLake(null)
                   setMapViewport(1, [0, 0])
                 }}
@@ -1480,31 +1731,71 @@ export function RiversOfIndiaPage() {
                     <dt>Source</dt><dd>{selected.source}</dd>
                     <dt>Mouth</dt><dd>{selected.mouth}</dd>
                     <dt>States crossed</dt><dd>{selected.states.join(', ')}</dd>
-                    <dt>Major tributaries</dt><dd>{selected.tributaries}</dd>
                   </dl>
                   <p>{selected.info}</p>
                   {selectedStudy && (
-                    <section className="rivers-selected-study" aria-label={`${selected.name} river details`}>
-                      <h3>Major Tributaries</h3>
+                    <section className="rivers-selected-study" aria-label={`${selected.name} river study details`}>
                       <div className="rivers-bank-groups">
-                        <section>
-                          <h4>Right-Bank Tributaries</h4>
-                          <ul>{selectedStudy.rightBank.map((name) => <li key={name}>{name}</li>)}</ul>
-                        </section>
-                        <section>
-                          <h4>Left-Bank Tributaries</h4>
-                          <ul>{selectedStudy.leftBank.map((name) => <li key={name}>{name}</li>)}</ul>
-                        </section>
+                        {(['Left bank', 'Right bank'] as const).map((bank) => {
+                          const tributaries = bank === 'Left bank' ? selectedStudy.leftBank : selectedStudy.rightBank
+                          return (
+                            <div key={bank}>
+                              <h4>{bank} tributaries</h4>
+                              <ul className="rivers-tributary-inline-list">
+                                {tributaries.map((name) => {
+                                  const option = tributaryOptions.find((candidate) =>
+                                    normalizeTributaryName(candidate.name) === normalizeTributaryName(name),
+                                  )
+                                  if (!option) throw new Error(`Missing tributary option for ${name} on the ${selected.name}`)
+                                  const isActive = normalizeTributaryName(selectedTributary ?? '') === normalizeTributaryName(name)
+                                  return (
+                                    <li key={name}>
+                                      <button
+                                        aria-pressed={isActive}
+                                        className={`rivers-tributary-inline-button${isActive ? ' is-active' : ''}`}
+                                        onClick={() => selectTributary(option.name)}
+                                        type="button"
+                                      >
+                                        {name}
+                                      </button>
+                                    </li>
+                                  )
+                                })}
+                              </ul>
+                            </div>
+                          )
+                        })}
                       </div>
+                      {selectedStudy.districts.length > 0 && (
+                        <div className="rivers-study-districts">
+                          <h4>Districts along the river</h4>
+                          <ul>
+                            {selectedStudy.districts.map(({ state, names }) => (
+                              <li key={state}><strong>{state}:</strong> {names.join(', ')}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
                       {selectedStudy.tributaryNote && <p>{selectedStudy.tributaryNote}</p>}
-                      <h3>Notable districts by state</h3>
-                      <ul className="rivers-district-list">
-                        {selectedStudy.districts.map(({ state, names }) => (
-                          <li key={state}><strong>{state}:</strong> {names.join(', ')}</li>
-                        ))}
-                      </ul>
-                      <p className="rivers-detail-type">Selected river-adjacent districts and places, not an exhaustive district boundary list.</p>
-                      <p className="rivers-detail-type">Banks are named looking downstream. Lists include named tributaries surfaced in Google river-system results and source tables; nested basin streams are identified in the notes. Names and bank classifications can vary between references.</p>
+                      {selectedTributaryOption && (
+                        <article aria-live="polite" className="rivers-selected-tributary-detail" ref={tributaryDetailRef}>
+                          <h3>{selectedTributaryOption.name}</h3>
+                          <dl>
+                            <dt>River system</dt><dd>{selected.name} basin</dd>
+                            <dt>Classification</dt><dd>{selectedTributaryOption.bank}</dd>
+                            <dt>Map</dt>
+                            <dd>
+                              {selectedTributaryOption.mapRoute || selectedTributaryOption.mainRiverIndex !== null
+                                ? 'Route shown and highlighted on the map.'
+                                : 'This tributary is listed for the basin; its route is not drawn on this map.'}
+                            </dd>
+                          </dl>
+                          <p>
+                            {TRIBUTARY_EXPLANATIONS[selectedTributaryOption.mapRoute?.n ?? selectedTributaryOption.name]
+                              ?? `${selectedTributaryOption.name} is listed among the ${selected.name} river-system tributaries. The current map does not include a separate route or additional source and confluence notes for this stream.`}
+                          </p>
+                        </article>
+                      )}
                     </section>
                   )}
                   <p className="rivers-border-note">
@@ -1520,11 +1811,20 @@ export function RiversOfIndiaPage() {
                       ? `${selectedLakeExamNote.region} · ${selectedLakeExamNote.category}`
                       : 'Lake or reservoir'}
                   </p>
-                  <p>{selectedLakeData.description}</p>
                   {selectedLakeExamNote && (
-                    <section className="rivers-selected-study" aria-label={`${selectedLakeData.name} exam facts`}>
-                      <h3>Exam facts</h3>
-                      <p>{selectedLakeExamNote.examFact}</p>
+                    <section className="rivers-selected-study" aria-label={`${selectedLakeData.name} geography facts`}>
+                      <dl>
+                        <dt>Location</dt><dd>{selectedLakeExamNote.region}</dd>
+                        <dt>Type</dt><dd>{selectedLakeExamNote.category}</dd>
+                        <dt>Overview</dt><dd>{selectedLakeData.description}</dd>
+                        {selectedLakeStudyDetails?.map((fact) => (
+                          <React.Fragment key={fact.label}>
+                            <dt>{fact.label}</dt>
+                            <dd>{renderLakeFactValue(fact.value, fact.emphasis)}</dd>
+                          </React.Fragment>
+                        ))}
+                        <dt>Exam fact</dt><dd>{selectedLakeExamNote.examFact}</dd>
+                      </dl>
                     </section>
                   )}
                 </>

@@ -122,7 +122,8 @@ export function AppRoutes() {
       <Route path="/privacy"      element={<PrivacyPolicyPage />} />
       <Route path="/terms"        element={<TermsPage />} />
       <Route path="/about"        element={<AboutPage />} />
-      <Route path="/rivers-of-india"    element={<RiversOfIndiaPage />} />
+      <Route path="/india-physical-geography-map" element={<RiversOfIndiaPage />} />
+      <Route path="/rivers-of-india" element={<Navigate to="/india-physical-geography-map" replace />} />
       {/* Legacy redirects */}
       <Route path="/exam"        element={<Navigate to="/exams" replace />} />
       <Route path="/mock-test"   element={<Navigate to="/exams" replace />} />

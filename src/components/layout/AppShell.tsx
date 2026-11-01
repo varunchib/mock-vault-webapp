@@ -34,14 +34,14 @@ const primaryNav: NavItem[] = [
 function isNavActive(href: string, pathname: string): boolean {
   if (href === '/dashboard') return pathname === '/dashboard'
   if (href === '/exams') return pathname === '/exams' || pathname.startsWith('/exam/')
-  if (href === '/study-material') return pathname === href || pathname === '/rivers-of-india'
+  if (href === '/study-material') return pathname === href || pathname === '/india-physical-geography-map'
   return pathname === href || pathname.startsWith(href + '/')
 }
 
 function getPageTitle(pathname: string): string {
   if (pathname === '/dashboard') return 'Home'
   if (pathname === '/study-material') return 'Study Material'
-  if (pathname === '/rivers-of-india') return 'Rivers of India'
+  if (pathname === '/india-physical-geography-map') return 'India Physical Geography Map'
   if (pathname.startsWith('/admin')) return 'Admin'
   if (pathname.startsWith('/mock-attempt/')) return 'Mock Test'
   if (pathname.startsWith('/mock-test')) return 'Tests'

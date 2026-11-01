@@ -1,4 +1,5 @@
 import { splitTableBlocks } from './textTables'
+import { stripQuestionNumberPrefix } from './questionUrl'
 
 /**
  * The one line that identifies a question — used for the page <h1> and for the
@@ -107,6 +108,9 @@ function headingLines(question: string): string[] {
     .split('\n')
     .map(l => l.trim())
     .filter(l => l && !l.startsWith('|') && !FIGURE_ONLY.test(l) && !inTable.has(rowKey(l)))
+    .map(stripQuestionNumberPrefix)
+    .map(l => l.trim())
+    .filter(Boolean)
 }
 
 function pickHeadingLine(question: string): string {
@@ -118,6 +122,9 @@ function pickHeadingLine(question: string): string {
     // must never become the <h1> — "…provided below. MARKET" reads as a stray
     // word and drags the styled figure into the heading.
     .filter(l => l && !l.startsWith('|') && !FIGURE_ONLY.test(l) && !inTable.has(rowKey(l)))
+    .map(stripQuestionNumberPrefix)
+    .map(l => l.trim())
+    .filter(Boolean)
   if (!lines.length) return question
   if (lines.length <= 2) return lines.join(' ')
 

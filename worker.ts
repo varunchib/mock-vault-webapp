@@ -5,7 +5,7 @@ import { postGuides } from './src/data/postGuides'
 import { figureSvg, figures } from './src/data/figures'
 import { splitTableBlocks, tableToText } from './src/lib/textTables'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
-import { questionPath, questionRealSlug } from './src/lib/questionUrl'
+import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from './src/lib/questionUrl'
 import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 import { createElement, type ReactNode } from 'react'
@@ -166,6 +166,7 @@ function withSecurityHeaders(headers: Headers): Headers {
 }
 
 const LEGACY_REDIRECTS: Record<string, string> = {
+  '/rivers-of-india': '/india-physical-geography-map',
   '/exam': '/exams',
   '/mock-test': '/exams',
   '/pyq-papers': '/exams',
@@ -217,7 +218,7 @@ const STATIC_META: Record<string, PageMeta> = {
         <a href="/exam/ssc-cgl">SSC CGL</a>
         <a href="/exam/bpsc">BPSC</a>
         <a href="/exam/jkssb">JKSSB</a>
-        <a href="/rivers-of-india">Explore the Rivers of India map</a>
+        <a href="/india-physical-geography-map">Explore India’s physical geography map</a>
       </nav>
     </article>`,
     jsonLd: {
@@ -253,16 +254,16 @@ const STATIC_META: Record<string, PageMeta> = {
       },
     },
   },
-  '/rivers-of-india': {
-    title: 'Rivers and Lakes of India Map: Major Rivers & Exam Facts',
-    description: 'Explore India’s rivers, tributaries, lakes and reservoirs with an interactive map, state boundaries and competitive-exam facts.',
-    contentHtml: renderStaticPage('/rivers-of-india', createElement(RiversOfIndiaPage)),
+  '/india-physical-geography-map': {
+    title: 'India Physical Geography Map: Rivers, Lakes & Exam Facts',
+    description: 'Explore an interactive physical geography map of India with major rivers, tributaries, lakes and reservoirs, plus concise competitive-exam facts.',
+    contentHtml: renderStaticPage('/india-physical-geography-map', createElement(RiversOfIndiaPage)),
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'LearningResource',
-      name: 'Rivers and Lakes of India Map: Major Rivers and Exam Facts',
+      name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
       description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
-      url: `${BASE}/rivers-of-india`,
+      url: `${BASE}/india-physical-geography-map`,
       learningResourceType: 'Interactive map',
       educationalLevel: 'General education',
       keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
@@ -273,8 +274,8 @@ const STATIC_META: Record<string, PageMeta> = {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-          { '@type': 'ListItem', position: 2, name: 'Geography', item: `${BASE}/rivers-of-india` },
-          { '@type': 'ListItem', position: 3, name: 'Rivers of India', item: `${BASE}/rivers-of-india` },
+          { '@type': 'ListItem', position: 2, name: 'Geography', item: `${BASE}/india-physical-geography-map` },
+          { '@type': 'ListItem', position: 3, name: 'India Geography Map', item: `${BASE}/india-physical-geography-map` },
         ],
       },
     },
@@ -498,7 +499,7 @@ function substantiveQuestionLine(question: string): string {
     .map((l) => l.trim())
     .filter((l) => l && !l.startsWith('|') && !FIGURE_ONLY.test(l)
       && !tableLines.has(l.split('|').map((c) => c.trim()).join(' | ')))
-    .map((l) => stripMarkdown(l).trim())
+    .map((l) => stripQuestionNumberPrefix(stripMarkdown(l)).trim())
     .filter(Boolean)
   if (!lines.length) return stripMarkdown(question)
   if (lines.length <= 2) return lines.join(' ')
@@ -932,7 +933,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
     ${q.passage ? `<section><h2>Passage</h2>${paragraph(q.passage)}</section>` : ''}
     <section>
       <h2>Question</h2>
-      ${paragraph(q.question)}
+      ${paragraph(stripQuestionNumberPrefix(q.question))}
       ${optionItems ? `<ol type="A">${optionItems}</ol>` : ''}
     </section>
     ${isDeleted
@@ -1294,7 +1295,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       // passage, so slicing its first chars gives every Q in the set the SAME
       // description (Bing flags duplicates). The actual question is the last
       // line ending in '?', so prefer that when the text is multi-line.
-      const qLines = q.question.split('\n').map((l) => stripMarkdown(l).trim()).filter(Boolean)
+      const qLines = q.question.split('\n').map((l) => stripQuestionNumberPrefix(stripMarkdown(l)).trim()).filter(Boolean)
       const multiline = qLines.length > 2
       const actualQuestion = substantiveQuestionLine(q.question)
       // Curated tag first (67% of rows have one), else derive from the text.
@@ -1345,7 +1346,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
               // Q&A entry is a question about a text that is nowhere present.
               text: stripMarkdownKeepLines(q.passage ? `${q.passage}
 
-${q.question}` : q.question),
+${stripQuestionNumberPrefix(q.question)}` : stripQuestionNumberPrefix(q.question)),
               answerCount: 1,
               author: QA_AUTHOR,
               datePublished: qaDate(q.year),
@@ -1503,17 +1504,21 @@ export default {
 
     if (path === '/sitemap.xml') {
       try {
-        // ?sv bumps the edge cache key so a stale sitemap (e.g. the old
-        // 57-URL version cached before /question pages were added) is dropped
-        // immediately on deploy. Short 10-min TTL keeps it close to the DB —
+        // ?sv bumps the edge cache key so a sitemap with stale question slugs
+        // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=12`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=14`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
           headers.set('cache-control', 'public, max-age=600')
-          return new Response(res.body, { status: 200, headers })
+          const sitemap = (await res.text()).replaceAll(
+            `${BASE}/rivers-of-india`,
+            `${BASE}/india-physical-geography-map`,
+          )
+          headers.delete('content-length')
+          return new Response(sitemap, { status: 200, headers })
         }
       } catch {
         // Fall through to the static sitemap bundled with the app.

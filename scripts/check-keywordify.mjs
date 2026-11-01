@@ -9,13 +9,16 @@
 //
 // Run: node --experimental-strip-types scripts/check-keywordify.mjs
 
-import { keywordify, questionPath } from '../src/lib/questionUrl.ts'
+import { keywordify, questionPath, stripQuestionNumberPrefix } from '../src/lib/questionUrl.ts'
 
 // input -> expected slug
 const CASES = [
   // English is untouched by the Devanagari change.
   ['He deals ______ stationery.', 'he-deals-stationery'],
   ['REGRET:', 'regret'],
+  ['Q57. Astronomical (A) temperatures (B) are usually estimated from spectroscopic (C) measurements (D).',
+    'astronomical-a-temperatures-b-are-usually-estimated-from-spectroscopic-c-measure'],
+  ['Question 12: Choose the correct answer.', 'choose-the-correct-answer'],
   ['Choose the correct synonym of ‘audacity’:', 'choose-the-correct-synonym-of-audacity'],
   // Hindi now yields real keywords instead of an empty slug.
   ['‘कठोर’ के लिए समानार्थक शब्द है:', 'कठोर-के-लिए-समानार्थक-शब्द-है'],
@@ -54,6 +57,15 @@ if (questionPath('abc123', '') !== '/question/abc123') {
   failed++
   console.error('FAIL  empty keywords must fall back to the bare id path')
 }
+if (questionPath('abc123', 'Q57. Astronomical temperatures are usually estimated.') !== '/question/astronomical-temperatures-are-usually-estimated--abc123') {
+  failed++
+  console.error('FAIL  numbered question URL should omit its Q-number prefix')
+}
+const numberedHeading = stripQuestionNumberPrefix('Q57. Astronomical temperatures are usually estimated from spectroscopic measurements.')
+if (numberedHeading !== 'Astronomical temperatures are usually estimated from spectroscopic measurements.') {
+  failed++
+  console.error(`FAIL  numbered question prefix remained in heading: ${numberedHeading}`)
+}
 
 // Regression: the Worker compares the request's URL.pathname against
 // questionPath(). URL.pathname is percent-encoded, so a Devanagari canonical is
@@ -73,4 +85,4 @@ if (failed) {
   console.error(`\n${failed} keywordify parity check(s) failed`)
   process.exit(1)
 }
-console.log(`keywordify parity: ${CASES.length} cases + 3 invariants OK`)
+console.log(`keywordify parity: ${CASES.length} cases + 4 invariants OK`)
