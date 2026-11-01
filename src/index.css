@@ -2178,6 +2178,37 @@ footer {
   align-content: start;
 }
 
+.rivers-map-loading-panel {
+  position: relative;
+  display: grid;
+  min-height: min(62vh, 500px);
+  overflow: hidden;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #dbeaf3;
+  color: #43515a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.rivers-map-loading-water {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 38% 45%, transparent 0 34%, rgba(163, 176, 148, .45) 34.2% 34.6%, transparent 34.8%),
+    radial-gradient(ellipse at 52% 56%, #e4ead8 0 35%, transparent 35.4%),
+    #dbeaf3;
+}
+
+.rivers-map-loading-panel > span {
+  z-index: 1;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .88);
+}
+
 .rivers-map {
   position: relative;
   min-width: 0;
@@ -2318,9 +2349,6 @@ footer {
   stroke-linecap: round;
   stroke-linejoin: round;
   pointer-events: none;
-}
-
-.rivers-route-line {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   animation: rivers-draw 2.2s ease-in-out forwards;
@@ -2353,32 +2381,11 @@ footer {
   display: none;
 }
 
-.hide-lakes .rivers-lakes {
-  display: none;
-}
-
-.hide-states .rivers-state-fill,
-.hide-states .rivers-state-boundaries {
-  display: none;
-}
-
-.rivers-route-flow {
-  stroke: #fff;
-  stroke-width: 1.2;
-  stroke-dasharray: 6 14;
-  opacity: .75;
-  animation: rivers-flow 1.4s linear infinite;
-}
-
 .rivers-route-hit {
   fill: none;
   stroke: transparent;
   stroke-width: 16;
   pointer-events: stroke;
-}
-
-.rivers-route-drop {
-  pointer-events: none;
 }
 
 .has-selection .rivers-map-route {
@@ -2411,6 +2418,18 @@ footer {
 
 @keyframes rivers-flow {
   to { stroke-dashoffset: -20; }
+}
+
+.rivers-route-flow {
+  stroke: #fff;
+  stroke-width: 1.2;
+  stroke-dasharray: 6 14;
+  opacity: .75;
+  animation: rivers-flow 1.4s linear infinite;
+}
+
+.rivers-route-drop {
+  pointer-events: none;
 }
 
 .rivers-map-zoom-controls {
@@ -2561,12 +2580,23 @@ footer {
   text-transform: uppercase;
 }
 
-.rivers-map-section > .rivers-lake-list {
-  display: grid;
+.rivers-lake-star-legend {
   grid-column: 1 / -1;
+  margin: 0;
+  color: var(--ink3);
+  font-size: 11px;
+}
+
+.rivers-lake-star-legend span {
+  color: #d58a00;
+  font-size: 15px;
+}
+
+.rivers-lake-list {
+  display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   align-content: start;
-  padding: 14px;
+  gap: 5px;
 }
 
 .rivers-lake-list .rivers-list-button {
@@ -2584,6 +2614,16 @@ footer {
   border: 1px solid #3f86b5;
   border-radius: 50%;
   background: #b4d4e8;
+}
+
+.rivers-lake-star {
+  color: #d58a00;
+  font-size: 15px;
+  line-height: 1;
+}
+
+.rivers-list-button.is-active .rivers-lake-star {
+  color: #ffd166;
 }
 
 .rivers-detail-card h2 {
@@ -2639,6 +2679,10 @@ footer {
 
 .rivers-state-revision-list span {
   color: var(--ink3);
+}
+
+.rivers-lake-study-list {
+  line-height: 1.65;
 }
 
 .rivers-study-notes {

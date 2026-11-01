@@ -7,7 +7,6 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
-const TODAY = new Date().toISOString().split('T')[0]
 
 // Keyword-rich question URL: /question/<keywords>--<id> (mirrors src/lib/questionUrl.ts).
 function keywordify(text) {
@@ -65,8 +64,9 @@ async function fetchData(path) {
   return res.json()
 }
 
+// This fallback has no per-URL edit timestamps, so do not invent lastmod values.
 function url(loc, priority, freq = 'weekly') {
-  return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${TODAY}</lastmod>\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+  return `  <url>\n    <loc>${loc}</loc>\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
 }
 
 async function generate() {
