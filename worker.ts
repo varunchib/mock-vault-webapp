@@ -1573,7 +1573,7 @@ export default {
         // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=15`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=16`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')

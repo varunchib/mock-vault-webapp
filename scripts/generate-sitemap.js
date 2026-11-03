@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
+const GUIDE_CONTENT_UPDATED = '2026-11-03'
 
 // Exams that have a dedicated /exam/:slug/overview page. Keep in sync with examFaq.ts keys.
 const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bpsc', 'rssb', 'jkpsc', 'jkpsi'])
@@ -47,9 +48,12 @@ async function fetchData(path) {
   return res.json()
 }
 
-// This fallback has no per-URL edit timestamps, so do not invent lastmod values.
-function url(loc, priority, freq = 'weekly') {
-  return `  <url>\n    <loc>${loc}</loc>\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
+// Database-backed pages use their stored update timestamps. The static guide
+// renderer changed on GUIDE_CONTENT_UPDATED; other fallback URLs have no
+// reliable per-page edit timestamps and must not receive invented dates.
+function url(loc, priority, freq = 'weekly', lastmod) {
+  const lastmodLine = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ''
+  return `  <url>\n    <loc>${loc}</loc>${lastmodLine}\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
 }
 
 async function generate() {
@@ -85,7 +89,7 @@ async function generate() {
     // /exam/:slug/overview retired (301 → /guide/:slug) — no longer emitted.
     ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
     ...INDEXABLE_QUESTION_PATHS.map(path => url(`${BASE}${path}`, '0.6', 'monthly')),
-    ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly')),
+    ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly', GUIDE_CONTENT_UPDATED)),
   ]
 
   const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`
