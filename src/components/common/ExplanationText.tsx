@@ -1,4 +1,5 @@
 import { MathText } from './MathText'
+import { removeRedundantAnswerLead } from '../../lib/explanationText'
 
 /**
  * Renders a solution/explanation with a light structure so it reads like a
@@ -92,7 +93,7 @@ function headingIcon(text: string): string | null {
 }
 
 export function ExplanationText({ text }: { text: string }) {
-  const blocks = parseExplanation(text)
+  const blocks = parseExplanation(removeRedundantAnswerLead(text))
   return (
     <>
       {blocks.map((b, i) => {

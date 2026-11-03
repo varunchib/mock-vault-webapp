@@ -8,6 +8,7 @@ import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from '.
 import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from './src/lib/questionUrl'
 import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
+import { removeRedundantAnswerLead } from './src/lib/explanationText'
 import { createElement, type ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { AboutPage } from './src/pages/AboutPage'
@@ -619,7 +620,7 @@ function inlineFmt(s: string): string {
 //   ## Heading   → <h4>   ·   - item → <li>   ·   (indent) - item → nested <li>
 function richText(s: string | undefined | null): string {
   if (!s) return ''
-  const lines = String(s).replace(/\r/g, '').split('\n')
+  const lines = removeRedundantAnswerLead(s).replace(/\r/g, '').split('\n')
   const out: string[] = []
   let items: { text: string; sub: string[] }[] | null = null
   const flush = () => {
@@ -962,7 +963,7 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
   const questionLi = (q: QuestionData) => `<li>
       <a href="${questionPath(q.urlCode ?? q.slug, q.question)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 200)}</a>
       <br /><small><strong>Answer:</strong> ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</small>
-      ${q.explanation ? `<br /><small>${htmlText(q.explanation).slice(0, 240)}</small>` : ''}
+      ${q.explanation ? `<br /><small>${htmlText(removeRedundantAnswerLead(q.explanation)).slice(0, 240)}</small>` : ''}
     </li>`
   const sections = [...bySubject.entries()]
     .map(([subject, qs]) => `<section><h2>${htmlText(subject)} — Solved Questions</h2><ol>${qs.map(questionLi).join('')}</ol></section>`)
@@ -1354,7 +1355,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         // ("[[water:MARKET]]") must reach structured data as readable prose
         // ("MARKET (water image)"), never as the markup itself.
         q.answer ? `Correct answer: ${stripMarkdown(q.answer)}.` : `Correct option: ${q.answerKey}.`,
-        stripMarkdown(q.explanation ?? ''),
+        stripMarkdown(removeRedundantAnswerLead(q.explanation)),
       ].filter(Boolean).join(' ').slice(0, 1000)
       // For reading-passage questions the stored text begins with the shared
       // passage, so slicing its first chars gives every Q in the set the SAME

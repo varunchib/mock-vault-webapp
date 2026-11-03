@@ -14,6 +14,7 @@ import { env } from '../lib/env'
 import { paperPath } from '../lib/paperSeo'
 import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from '../lib/questionUrl'
 import { questionHeadingLine } from '../lib/questionHeading'
+import { removeRedundantAnswerLead } from '../lib/explanationText'
 
 // Renders solution text with headings/bullets/nesting (identical to how the
 // SSR/Worker renders it), falling back to paragraphs for plain text.
@@ -90,7 +91,7 @@ export function QuestionPage() {
         datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01`,
         acceptedAnswer: {
           '@type': 'Answer',
-          text: [question.answer, question.explanation].filter(Boolean).join(' — ').replace(/\*\*/g, '').slice(0, 800) || `Correct answer: ${question.answerKey}.`,
+          text: [question.answer, removeRedundantAnswerLead(question.explanation)].filter(Boolean).join(' — ').replace(/\*\*/g, '').slice(0, 800) || `Correct answer: ${question.answerKey}.`,
           url: `https://ministryofpapers.com${questionPath(question.urlCode ?? question.slug, question.question)}`,
           author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
           datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01`,
