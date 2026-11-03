@@ -1,5 +1,5 @@
-// Generates the build-time fallback sitemap. Production normally serves the
-// backend sitemap, which includes all eligible solved-question URLs.
+// Generate the build-time fallback from the same backend sitemap used in
+// production, so it remains complete if the Worker cannot reach the API.
 import { writeFileSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -7,98 +7,36 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
-const GUIDE_CONTENT_UPDATED = '2026-11-03'
-
-// Exams that have a dedicated /exam/:slug/overview page. Keep in sync with examFaq.ts keys.
-const EXAM_INFO_SLUGS = new Set(['jkssb', 'ssc-cgl', 'upsc-cse', 'ibps-po', 'bpsc', 'rssb', 'jkpsc', 'jkpsi'])
-
-// Editorial /guide/:slug pages. Keep in sync with keys of src/data/postGuides.ts.
-const GUIDE_SLUGS = [
-  'jkpsi', 'jkpsi-telecom', 'upsc-cse', 'ssc-cgl', 'bpsc-cce', 'ibps-po', 'jkcce', 'rssb-patwari', 'neet-ug',
-  'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
-  'jkssb-constable', 'jkssb-constable-telecom',
-]
-
-// Keep only this manually reviewed question cohort in the sitemap.
-const INDEXABLE_QUESTION_PATHS = [
-  '/question/with-reference-to-investments-consider-the-following-i-bonds-ii-hedge-funds--bd0394bb56',
-  '/question/who-among-the-following-rulers-in-ancient-india-had-assumed-the-titles--13fe297a0a',
-  '/question/which-one-of-the-following-launched-the-nature-solutions-finance-hub-for--08d10bc35e',
-  '/question/consider-the-following-pairs-plant-description-i-cassava-woody-shrub-ii-ginger--9ddb216968',
-  '/question/in-the-context-of-electric-vehicle-batteries-consider-the-following-elements-i--9cc8bd65af',
-  '/question/consider-the-following-i-cigarette-butts-ii-eyeglass-lenses-iii-car-tyres--595914102a',
-  '/question/with-reference-to-india-consider-the-following-i-the-inter-state-council--16aa514e39',
-  '/question/with-reference-to-india-consider-the-following-pairs-organization-union-ministry--6b9238f4dd',
-  '/question/india-is-one-of-the-founding-members-of-the-international-north-south--447bfd9d16',
-  '/question/subsequent-to-which-one-of-the-following-events-gandhiji-who-consistently-oppose--22d112207e',
-]
-
-const PAPER_SEO_SLUGS = {
-  'jkssb-junior-assistant-pyq': 'jkssb-junior-assistant-question-paper-2026',
-  'jkssb-lab-attendant-2026-may-10': 'jkssb-laboratory-attendant-question-paper-2026',
-  'jkssb-wildlife-guard-2026-may-10': 'jkssb-wildlife-guard-question-paper-2026',
-  'jkssb-patwari-2024-sep1-set-a': 'jkssb-patwari-question-paper-2024',
-  'jkssb-veterinary-pharmacist-2025': 'jkssb-veterinary-pharmacist-question-paper-2025',
-  'jkssb-finance-accounts-2024-paper': 'jkssb-finance-accounts-assistant-question-paper-2024',
-}
-
-async function fetchData(path) {
-  const res = await fetch(`${API}${path}`, { signal: AbortSignal.timeout(10000) })
-  if (!res.ok) throw new Error(`${path} -> ${res.status}`)
-  return res.json()
-}
-
-// Database-backed pages use their stored update timestamps. The static guide
-// renderer changed on GUIDE_CONTENT_UPDATED; other fallback URLs have no
-// reliable per-page edit timestamps and must not receive invented dates.
-function url(loc, priority, freq = 'weekly', lastmod) {
-  const lastmodLine = lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ''
-  return `  <url>\n    <loc>${loc}</loc>${lastmodLine}\n    <changefreq>${freq}</changefreq>\n    <priority>${priority}</priority>\n  </url>`
-}
 
 async function generate() {
-  console.log('Generating sitemap...')
+  console.log('Generating sitemap fallback...')
 
-  const [exams, papers] = await Promise.all([
-    fetchData('/api/v1/exams'),
-    fetchData('/api/v1/papers'),
-  ])
+  const res = await fetch(`${API}/sitemap.xml`, { signal: AbortSignal.timeout(30000) })
+  if (!res.ok) throw new Error(`/sitemap.xml -> ${res.status}`)
 
-  const examSlugs = exams
-    .filter(exam => exam.slug && ((exam.papers ?? 0) > 0 || (exam.mocks ?? 0) > 0 || EXAM_INFO_SLUGS.has(exam.slug)))
-    .map(exam => exam.slug)
+  const xml = (await res.text()).replaceAll(
+    `${BASE}/rivers-of-india`,
+    `${BASE}/india-physical-geography-map`,
+  )
+  const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
+  const urlCount = [...xml.matchAll(/<url(?:\s|>)/g)].length
 
-  // Skip near-empty papers (too thin to index → Soft 404).
-  const indexablePapers = papers.filter(paper => (paper.questions ?? 0) >= 5)
-  const paperSlugs = indexablePapers
-    .map(paper => PAPER_SEO_SLUGS[paper.slug] ?? paper.slug)
-    .filter(Boolean)
+  if (!/<urlset\b[^>]*>[\s\S]*<\/urlset>/.test(xml) || locations.length === 0 || locations.length !== urlCount) {
+    throw new Error('Backend response is not a complete URL-set sitemap')
+  }
+  if (locations.some((loc) => loc !== BASE && !loc.startsWith(`${BASE}/`))) {
+    throw new Error('Backend sitemap contains a URL outside the canonical site host')
+  }
+  if (new Set(locations).size !== locations.length) {
+    throw new Error('Backend sitemap contains duplicate URLs')
+  }
 
-  // The backend sitemap includes all questions meeting its paper/explanation
-  // eligibility rules. This build-time fallback lists only reviewed questions.
-  console.log(`  ${examSlugs.length} exam hubs, ${paperSlugs.length} papers, ${INDEXABLE_QUESTION_PATHS.length} reviewed questions`)
-
-  const urls = [
-    url(`${BASE}/`, '1.0', 'daily'),
-    url(`${BASE}/exams`, '0.9', 'daily'),
-    url(`${BASE}/india-physical-geography-map`, '0.7', 'monthly'),
-    url(`${BASE}/about`, '0.5', 'monthly'),
-    url(`${BASE}/privacy`, '0.3', 'yearly'),
-    url(`${BASE}/terms`, '0.3', 'yearly'),
-    ...examSlugs.map(slug => url(`${BASE}/exam/${slug}`, '0.9')),
-    // /exam/:slug/overview retired (301 → /guide/:slug) — no longer emitted.
-    ...paperSlugs.map(slug => url(`${BASE}/pyq/${slug}`, '0.8', 'monthly')),
-    ...INDEXABLE_QUESTION_PATHS.map(path => url(`${BASE}${path}`, '0.6', 'monthly')),
-    ...GUIDE_SLUGS.map(slug => url(`${BASE}/guide/${slug}`, '0.7', 'monthly', GUIDE_CONTENT_UPDATED)),
-  ]
-
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join('\n')}\n</urlset>\n`
   const out = join(__dirname, '../public/sitemap.xml')
-  writeFileSync(out, xml, 'utf8')
-  console.log(`  Sitemap written: ${urls.length} URLs -> public/sitemap.xml`)
+  writeFileSync(out, `${xml.trimEnd()}\n`, 'utf8')
+  console.log(`  Sitemap written: ${urlCount} URLs -> public/sitemap.xml`)
 }
 
-generate().catch(err => {
+generate().catch((err) => {
   console.warn(`  Sitemap generation skipped (${err.message}) - keeping existing file`)
   process.exit(0)
 })
