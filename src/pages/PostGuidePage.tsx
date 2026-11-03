@@ -149,8 +149,8 @@ export function PostGuidePage() {
               <h2 id="analysis-heading">Exam Analysis: Section Weightage</h2>
               {guide.analysis?.intro && <p>{guide.analysis.intro}</p>}
               <p className="pg-note">
-                Ranked by share of total marks — the sections at the top carry the most marks,
-                so a mark scored there counts as much as anywhere and they decide your rank.
+                Shares are calculated from the numeric section marks listed in this guide. They
+                describe the published pattern, not a prediction of the next paper.
               </p>
               <div className="pg-weightage">
                 {weightage.map(w => (

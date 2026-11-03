@@ -1041,21 +1041,86 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${htmlText(p.year)} - ${p.questions} questions</small></li>`)
     .join('')
   const syllabus = guide.syllabus
-    .slice(0, 10)
-    .map(s => `<section><h2>${htmlText(s.subject)}</h2><ul>${s.topics.slice(0, 12).map(t => `<li>${htmlText(t)}</li>`).join('')}</ul></section>`)
+    .map(s => `<section><h3>${htmlText(s.subject)}</h3><ul>${s.topics.map(t => `<li>${htmlText(t)}</li>`).join('')}</ul></section>`)
     .join('')
+  const patternRows = guide.examPattern
+    .map(row => `<tr${row.isTotal ? ' class="pg-table-total"' : ''}>
+      <td>${htmlText(row.section)}</td>
+      <td>${htmlText(row.questions)}</td>
+      <td>${htmlText(row.marks)}</td>
+      <td>${htmlText(row.note ?? '—')}</td>
+    </tr>`)
+    .join('')
+  const weightedSections = guide.examPattern
+    .filter(row => !row.isTotal && typeof row.marks === 'number' && row.marks > 0)
+    .map(row => ({ section: row.section, marks: row.marks as number }))
+  const totalMarks = weightedSections.reduce((sum, row) => sum + row.marks, 0)
+  const weightage = totalMarks > 0
+    ? weightedSections
+        .map(row => ({ ...row, share: Math.round(row.marks / totalMarks * 100) }))
+        .sort((a, b) => b.marks - a.marks)
+        .map(row => `<li><strong>${htmlText(row.section)}:</strong> ${row.share}% (${row.marks} of ${totalMarks} listed marks)</li>`)
+        .join('')
+    : ''
+  const topTopics = guide.analysis?.topTopics?.length
+    ? `<h3>Where the questions come from</h3><ul>${guide.analysis.topTopics.map(topic =>
+        `<li><strong>${htmlText(topic.section)}:</strong> ${htmlText(topic.topics)}</li>`,
+      ).join('')}</ul>`
+    : ''
+  const selectionProcess = guide.selectionProcess.map(step => `<li>${htmlText(step)}</li>`).join('')
+  const salaries = guide.salary
+    .map(row => `<tr><td>${htmlText(row.post)}</td><td>${htmlText(row.level)}</td><td>${htmlText(row.payScale)}</td></tr>`)
+    .join('')
+  const tips = guide.preparationTips.map(tip => `<li>${htmlText(tip)}</li>`).join('')
+  const eligibility = [
+    ['Age limit', guide.eligibility.age],
+    ['Education', guide.eligibility.education],
+    ['Domicile', guide.eligibility.domicile],
+    ...(guide.eligibility.attempts ? [['Attempts', guide.eligibility.attempts]] : []),
+  ].map(([label, value]) => `<dt>${htmlText(label)}</dt><dd>${htmlText(value)}</dd>`).join('')
+  const sourceNote = guide.patternNotification
+    ? `<p>${htmlText(guide.patternNotification)}</p>`
+    : `<p>Confirm current dates, eligibility and amendments against the latest notice from the conducting body before applying.</p>`
 
   return renderPageShell(guide.title, `
     <p>${htmlText(guide.tagline)}</p>
-    <!-- Visible counterpart of Article.dateModified — the markup must reflect
-         something on the page, the same rule that made a FAQPage without a
-         visible FAQ a violation. -->
     <p><small>Last updated: <time datetime="${esc(guide.lastUpdated)}">${htmlText(guide.lastUpdated)}</time></small></p>
+    <p><strong>Conducting body:</strong> ${htmlText(guide.conductingBody)} · <strong>Level:</strong> ${htmlText(guide.examLevel)} · <strong>Mode:</strong> ${htmlText(guide.examMode)}</p>
     <p><a href="/exam/${encodeURIComponent(guide.examSlug)}">Browse ${htmlText(guide.shortName)} PYQ papers</a></p>
     ${facts ? `<section><h2>Quick facts</h2><ul>${facts}</ul></section>` : ''}
     ${about ? `<section><h2>About ${htmlText(guide.shortName)}</h2>${about}</section>` : ''}
     ${papers ? `<section><h2>Previous year papers</h2><ul>${papers}</ul></section>` : ''}
-    ${syllabus}
+    <section>
+      <h2>Exam pattern</h2>
+      ${guide.examPatternNote ? paragraph(guide.examPatternNote) : ''}
+      <div class="pg-table-wrap"><table class="pg-table">
+        <thead><tr><th>Section</th><th>Questions</th><th>Marks</th><th>Negative marking / note</th></tr></thead>
+        <tbody>${patternRows}</tbody>
+      </table></div>
+    </section>
+    ${weightage ? `<section><h2>Exam analysis: marks distribution</h2>
+      ${guide.analysis?.intro ? paragraph(guide.analysis.intro) : ''}
+      <p>Shares below are calculated from the numeric section marks listed in this guide. They describe the published pattern, not a prediction of the next paper.</p>
+      <ul>${weightage}</ul>
+      ${topTopics}
+      ${guide.analysis?.difficulty ? `<p>${htmlText(guide.analysis.difficulty)}</p>` : ''}
+    </section>` : ''}
+    <section><h2>Detailed syllabus</h2>${syllabus}</section>
+    <section><h2>Eligibility</h2><dl>${eligibility}</dl></section>
+    <section><h2>Selection process</h2><ol>${selectionProcess}</ol></section>
+    ${salaries ? `<section><h2>Salary and pay scale</h2>
+      <div class="pg-table-wrap"><table class="pg-table">
+        <thead><tr><th>Post</th><th>Pay level</th><th>Pay scale</th></tr></thead>
+        <tbody>${salaries}</tbody>
+      </table></div>
+    </section>` : ''}
+    ${tips ? `<section><h2>Preparation tips</h2><ol>${tips}</ol></section>` : ''}
+    <section><h2>Official source and updates</h2>
+      ${sourceNote}
+      <p>Check the conducting body’s official website for corrigenda or a newer notification before relying on dates or eligibility details:
+        <a href="${esc(guide.officialWebsite)}" rel="noopener noreferrer">${htmlText(guide.conductingBody)}</a>.
+      </p>
+    </section>
     <p><a href="/guide/${encodeURIComponent(slug)}">Canonical guide page</a></p>
   `, crumbs)
 }
