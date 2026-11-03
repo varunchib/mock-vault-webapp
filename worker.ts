@@ -6,6 +6,7 @@ import { figureSvg, figures } from './src/data/figures'
 import { splitTableBlocks, tableToText } from './src/lib/textTables'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
 import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from './src/lib/questionUrl'
+import { questionTopic } from './src/lib/questionTopic'
 import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
 import { removeRedundantAnswerLead } from './src/lib/explanationText'
@@ -331,7 +332,9 @@ const STATIC_META: Record<string, PageMeta> = {
 // '26' picks up one last stem (Q57) whose rubric opens "Their correct sequence
 // …" — a possessive lead-in the peeler did not recognise until a DB-side audit
 // found it still shipping as that page's title.
-const API_CACHE_VERSION = '26'
+// '27' ensures title generation sees the fresh question data after ignoring
+// tags that merely repeat the exam, year or subject.
+const API_CACHE_VERSION = '27'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -662,15 +665,6 @@ function richText(s: string | undefined | null): string {
   }
   flush()
   return out.join('')
-}
-
-// questionTopic returns the question's primary topic keyword for the title.
-// It uses the curated first tag rather than parsing the question text: exam
-// questions open with boilerplate stems ("Consider the following statements:")
-// and the real topic sits in the body, so text extraction yields broken
-// fragments. No tag => no topic, which is better than a garbled one.
-function questionTopic(q: QuestionData): string {
-  return (q.tags ?? []).map(t => String(t).trim()).filter(Boolean)[0] ?? ''
 }
 
 // Only 67% of questions carry a curated tag, so for the rest the topic has to
