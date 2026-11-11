@@ -152,46 +152,38 @@ function parsePipeMatch(text: string): MatchData | null {
   return { intro, listILabel: 'List I', listIILabel: 'List II', listI, listII }
 }
 
-function parseNewlineMatch(text: string): MatchData | null {
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean)
-  if (lines.length < 3) return null
+const PAIR_MARKER_RE = /^(\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+([\s\S]+)$/
+const PAIR_ROW_RE = /^(?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+(.+?)\s+—\s+(.+)$/
 
-  const dashLine = /^[ivx]+\.\s+(.*?)\s+—\s+[a-e]\.\s+(.*)$/i
-  const matchLines = lines.filter(l => dashLine.test(l))
-  if (matchLines.length < 2) return null
+function splitEmDash(line: string): string[] {
+  return line.split(/\s+—\s+/).map(c => c.trim())
+}
 
-  const intro = lines[0]
-  const listI: string[] = []
-  const listII: string[] = []
-  for (const line of matchLines) {
-    const m = line.match(dashLine)
-    if (m) { listI.push(m[1].trim()); listII.push(m[2].trim()) }
-  }
-  if (listI.length < 2) return null
+function isPairRow(line: string): boolean {
+  return line.includes(' — ') && PAIR_ROW_RE.test(line)
+}
 
-  const labelMatch = intro.match(/List[- ]?I\s*\(([^)]+)\).*?List[- ]?II\s*\(([^)]+)\)/i)
-  return {
-    intro,
-    listILabel: labelMatch ? `List I — ${labelMatch[1]}` : 'List I',
-    listIILabel: labelMatch ? `List II — ${labelMatch[2]}` : 'List II',
-    listI,
-    listII,
-  }
+function isPairHeader(line: string, expectedCols: number): boolean {
+  if (!line.includes(' — ') || PAIR_ROW_RE.test(line)) return false
+  const cols = splitEmDash(line)
+  return cols.length === expectedCols && cols.every(c => c.length >= 1 && c.length <= 45)
 }
 
 // ── Renderers ─────────────────────────────────────────────────────────────────
 
-function MatchTable({ data }: { data: MatchData }) {
+function MatchTable({ data, asH1 }: { data: MatchData; asH1?: boolean }) {
+  const IntroTag = asH1 ? 'h1' : 'p'
+  const introClass = asH1 ? 'qr-match-intro qpage-card-h1' : 'qr-match-intro'
   return (
     <div className="qr-match">
-      {data.intro && <p className="qr-match-intro">{data.intro}</p>}
+      {data.intro && <IntroTag className={introClass}>{renderInline(data.intro)}</IntroTag>}
       <div className="qr-match-grid">
         <div className="qr-match-col">
           <div className="qr-match-head">{data.listILabel}</div>
           {data.listI.map((item, i) => (
             <div key={i} className="qr-match-row">
               <span className="qr-match-idx">({ROMAN[i] ?? i + 1})</span>
-              <span>{item}</span>
+              <span>{renderInline(item)}</span>
             </div>
           ))}
         </div>
@@ -200,7 +192,7 @@ function MatchTable({ data }: { data: MatchData }) {
           {data.listII.map((item, i) => (
             <div key={i} className="qr-match-row">
               <span className="qr-match-idx">{i + 1}.</span>
-              <span>{item}</span>
+              <span>{renderInline(item)}</span>
             </div>
           ))}
         </div>
@@ -209,10 +201,49 @@ function MatchTable({ data }: { data: MatchData }) {
   )
 }
 
-const INSTRUCTION_RE = /^(find|select|identify|choose|read|mark|arrange|rearrange|spot|convert|change|fill|what|which|who|how|where|when|complete|rewrite|pick|determine|from|in the following|using)/i
+function PairTable({ headers, rows }: { headers: string[]; rows: string[][] }) {
+  return (
+    <div className="qr-pair-table-wrap">
+      <table className="qr-pair-table">
+        {headers.length > 0 && (
+          <thead>
+            <tr>
+              {headers.map((h, i) => (
+                <th key={i} scope="col">{renderInline(h)}</th>
+              ))}
+            </tr>
+          </thead>
+        )}
+        <tbody>
+          {rows.map((row, r) => (
+            <tr key={r}>
+              {row.map((cell, c) => {
+                const m = cell.match(PAIR_MARKER_RE)
+                return (
+                  <td key={c}>
+                    {m ? (
+                      <>
+                        <span className="qr-pair-marker">{m[1]}</span>
+                        <span>{renderInline(m[3])}</span>
+                      </>
+                    ) : (
+                      renderInline(cell)
+                    )}
+                  </td>
+                )
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+const INSTRUCTION_RE = /^(find|select|identify|choose|read|mark|arrange|rearrange|spot|convert|change|fill|what|which|who|how|where|when|complete|rewrite|pick|determine|from|in the following|using|consider|with reference|match)/i
 
 function isInstructionLine(line: string): boolean {
-  return (line.endsWith(':') || INSTRUCTION_RE.test(line.trim())) && !line.includes('/')
+  return (line.endsWith(':') || line.endsWith('?') || INSTRUCTION_RE.test(line.trim())) && !isErrorSentence(line)
 }
 
 // ── Structural line roles ────────────────────────────────────────────────────
@@ -230,17 +261,20 @@ const LABELLED_RE =
 // Roman numerals are matched case-sensitively as whole markers so ordinary
 // prose starting with a capital letter is not mistaken for a list item; the
 // "two consecutive items" rule below is the real safeguard.
-const ITEM_RE = /^(\d{1,2}|[A-H]|[IVX]{1,4}|[ivx]{1,4})[.)]\s+(.+)$/
+const ITEM_RE = /^(\(?(\d{1,2}|[A-H]|[IVX]{1,4}|[ivx]{1,4})[.)])\s+(.+)$/
 
 // A whole line that is nothing but bold — a column header such as
 // "**List-I (Coal Field)**" or "**(Pass) — (State/Union Territory)**"
 const HEADER_ONLY_RE = /^\*\*(.+?)\*\*$/
 
-// The closing rubric: "Select the correct answer from the code given below:"
-const DIRECTIVE_RE = /^(select|choose|mark|identify|use|answer|code)\b/i
+// The closing rubric or question line after statements/pairs:
+// "Select the correct answer from the code given below:" or
+// "Which of the statements given above is/are correct?"
+const DIRECTIVE_RE = /^(select|choose|mark|identify|use|answer|code|match|which|how many|in how many|through how many|the correct|their correct|give the correct)\b/i
 
 function isDirectiveLine(line: string): boolean {
-  return line.endsWith(':') && DIRECTIVE_RE.test(line.trim())
+  const t = line.trim()
+  return (t.endsWith(':') || t.endsWith('?')) && DIRECTIVE_RE.test(t)
 }
 
 // "Given below are two statements, one is labelled as Assertion (A) and the
@@ -314,19 +348,21 @@ function DataTable({ rows }: { rows: string[][] }) {
   )
 }
 
-function MultilineText({ text, className }: { text: string; className?: string }) {
+function MultilineText({ text, className, asH1 }: { text: string; className?: string; asH1?: boolean }) {
   // Lift out any pipe table FIRST — the line-by-line pass below is precisely
   // why a table has to be recognised as a block before it starts.
   const segments = splitTableBlocks(text)
   if (segments.some(s => s.kind === 'table')) {
+    let firstText = true
     return (
       <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
-        {segments.map((seg, i) =>
-          seg.kind === 'table'
-            ? <DataTable key={i} rows={seg.rows} />
-            // Terminates: a segment with no table takes the normal path below.
-            : seg.content.trim() ? <MultilineText key={i} text={seg.content} /> : null,
-        )}
+        {segments.map((seg, i) => {
+          if (seg.kind === 'table') return <DataTable key={i} rows={seg.rows} />
+          if (!seg.content.trim()) return null
+          const useH1 = Boolean(asH1 && firstText)
+          firstText = false
+          return <MultilineText key={i} text={seg.content} asH1={useH1} />
+        })}
       </div>
     )
   }
@@ -338,38 +374,83 @@ function MultilineText({ text, className }: { text: string; className?: string }
   if (tableResult) {
     return (
       <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
-        {tableResult.before.map((line, i) => (
-          <p key={`b${i}`} className={isInstructionLine(line) ? 'qr-instruction' : 'qr-text'}>
-            {renderInline(line)}
-          </p>
-        ))}
+        {tableResult.before.map((line, i) => {
+          if (i === 0 && asH1) {
+            return <h1 key={`b${i}`} className="qr-lead qpage-card-h1">{renderInline(line)}</h1>
+          }
+          return (
+            <p key={`b${i}`} className={isInstructionLine(line) ? 'qr-lead' : 'qr-text'}>
+              {renderInline(line)}
+            </p>
+          )
+        })}
         <MarkdownTable table={tableResult.table} />
         {tableResult.after.map((line, i) => (
-          <p key={`a${i}`} className="qr-text">{renderInline(line)}</p>
+          <p key={`a${i}`} className={isDirectiveLine(line) ? 'qr-directive' : 'qr-text'}>{renderInline(line)}</p>
         ))}
       </div>
     )
   }
 
-  const hasInstruction = rawLines.length > 1 && isInstructionLine(rawLines[0])
-
   // Parsed into blocks first (rather than emitted line by line) so that a
-  // header followed by its list can be recognised as one unit — which is what
-  // lets two such units sit side by side in a match-the-following question.
+  // header followed by its list or an em-dash pair table can be recognised as
+  // one unit.
   type Block =
     | { k: 'lead' | 'text' | 'directive' | 'error' | 'analogy' | 'preamble'; line: string }
     | { k: 'colhead'; label: string }
     | { k: 'items'; items: Array<{ marker: string; body: string }> }
     | { k: 'claim'; label: string; body: string }
+    | { k: 'pairtable'; headers: string[]; rows: string[][] }
 
   const blocks: Block[] = []
   for (let i = 0; i < rawLines.length; i++) {
     const line = rawLines[i]
 
     if (i === 0 && isClaimPreamble(line)) { blocks.push({ k: 'preamble', line }); continue }
-    if (i === 0 && hasInstruction) { blocks.push({ k: 'lead', line }); continue }
     if (isErrorSentence(line)) { blocks.push({ k: 'error', line }); continue }
     if (ANALOGY_RE.test(line)) { blocks.push({ k: 'analogy', line }); continue }
+
+    // Em-dash Match / Pair table with an explicit header line (e.g. "Goal — Name of Goal")
+    if (i + 2 < rawLines.length && isPairRow(rawLines[i + 1])) {
+      const expectedCols = splitEmDash(rawLines[i + 1]).length
+      if (
+        isPairHeader(line, expectedCols) &&
+        isPairRow(rawLines[i + 2]) &&
+        splitEmDash(rawLines[i + 2]).length === expectedCols
+      ) {
+        const headers = splitEmDash(line).map(h => h.replace(/^\*\*|\*\*$/g, '').trim())
+        const rows: string[][] = []
+        let j = i + 1
+        while (j < rawLines.length && isPairRow(rawLines[j]) && splitEmDash(rawLines[j]).length === expectedCols) {
+          rows.push(splitEmDash(rawLines[j]))
+          j++
+        }
+        blocks.push({ k: 'pairtable', headers, rows })
+        i = j - 1
+        continue
+      }
+    }
+
+    // Em-dash Match / Pair table without an explicit header line (e.g. "i. Primary Deficit — a. 0.3 percent")
+    if (isPairRow(line) && i + 1 < rawLines.length && isPairRow(rawLines[i + 1])) {
+      const expectedCols = splitEmDash(line).length
+      if (splitEmDash(rawLines[i + 1]).length === expectedCols) {
+        const rows: string[][] = []
+        let j = i
+        while (j < rawLines.length && isPairRow(rawLines[j]) && splitEmDash(rawLines[j]).length === expectedCols) {
+          rows.push(splitEmDash(rawLines[j]))
+          j++
+        }
+        let headers: string[] = []
+        if (expectedCols === 2 && rows.every(r => PAIR_MARKER_RE.test(r[1]))) {
+          const labelMatch = rawLines[0]?.match(/List[- ]?I\s*\(([^)]+)\).*?List[- ]?II\s*\(([^)]+)\)/i)
+          headers = labelMatch ? [`List I (${labelMatch[1]})`, `List II (${labelMatch[2]})`] : ['List I', 'List II']
+        }
+        blocks.push({ k: 'pairtable', headers, rows })
+        i = j - 1
+        continue
+      }
+    }
 
     const header = line.match(HEADER_ONLY_RE)
     if (header) { blocks.push({ k: 'colhead', label: header[1] }); continue }
@@ -385,16 +466,18 @@ function MultilineText({ text, className }: { text: string; className?: string }
       for (; j < rawLines.length; j++) {
         const m = rawLines[j].match(ITEM_RE)
         if (!m) break
-        items.push({ marker: m[1], body: m[2] })
+        items.push({ marker: m[1], body: m[3] })
       }
       if (items.length >= 2) { blocks.push({ k: 'items', items }); i = j - 1; continue }
     }
 
-    if (isDirectiveLine(line)) { blocks.push({ k: 'directive', line }); continue }
+    if (i === 0 && rawLines.length > 1) { blocks.push({ k: 'lead', line }); continue }
+    if (i > 0 && isDirectiveLine(line)) { blocks.push({ k: 'directive', line }); continue }
     blocks.push({ k: 'text', line })
   }
 
   const nodes: React.ReactNode[] = []
+  let h1Used = false
   for (let i = 0; i < blocks.length; i++) {
     const b = blocks[i]
 
@@ -422,15 +505,36 @@ function MultilineText({ text, className }: { text: string; className?: string }
     }
 
     switch (b.k) {
-      case 'lead': nodes.push(<p key={i} className="qr-lead">{renderInline(b.line)}</p>); break
-      case 'preamble': nodes.push(<p key={i} className="qr-preamble">{renderInline(b.line)}</p>); break
+      case 'lead':
+        if (asH1 && !h1Used) {
+          h1Used = true
+          nodes.push(<h1 key={i} className="qr-lead qpage-card-h1">{renderInline(b.line)}</h1>)
+        } else {
+          nodes.push(<p key={i} className="qr-lead">{renderInline(b.line)}</p>)
+        }
+        break
+      case 'preamble':
+        if (asH1 && !h1Used) {
+          h1Used = true
+          nodes.push(<h1 key={i} className="qr-preamble qpage-card-h1">{renderInline(b.line)}</h1>)
+        } else {
+          nodes.push(<p key={i} className="qr-preamble">{renderInline(b.line)}</p>)
+        }
+        break
       case 'error': nodes.push(<ErrorSentence key={i} text={b.line} />); break
       case 'analogy': nodes.push(<AnalogyDisplay key={i} analogy={b.line} />); break
       case 'colhead': nodes.push(<div key={i} className="qr-colhead">{renderInline(b.label)}</div>); break
       case 'claim': nodes.push(<LabelledStatement key={i} label={b.label} body={b.body} />); break
       case 'items': nodes.push(<ItemList key={i} items={b.items} />); break
+      case 'pairtable': nodes.push(<PairTable key={i} headers={b.headers} rows={b.rows} />); break
       case 'directive': nodes.push(<p key={i} className="qr-directive">{renderInline(b.line)}</p>); break
-      default: nodes.push(<p key={i} className="qr-text">{renderInline(b.line)}</p>)
+      default:
+        if (asH1 && !h1Used) {
+          h1Used = true
+          nodes.push(<h1 key={i} className="qr-lead qpage-card-h1">{renderInline(b.line)}</h1>)
+        } else {
+          nodes.push(<p key={i} className="qr-text">{renderInline(b.line)}</p>)
+        }
     }
   }
 
@@ -441,28 +545,38 @@ function MultilineText({ text, className }: { text: string; className?: string }
 
 // ── Public component ──────────────────────────────────────────────────────────
 
-export function QuestionRenderer({ text, className }: { text: string; className?: string }) {
-  // Match-the-following table formats
-  const match = parsePipeMatch(text) ?? parseNewlineMatch(text)
-  if (match) return <MatchTable data={match} />
+export function QuestionRenderer({ text, className, asH1 }: { text: string; className?: string; asH1?: boolean }) {
+  // Single-line pipe-delimited Match-the-following format
+  const match = parsePipeMatch(text)
+  if (match) return <MatchTable data={match} asH1={asH1} />
 
-  // Multi-line questions (handle table, analogy, error-sentence, bold)
+  // Multi-line questions (handle table, analogy, error-sentence, bold, pair-table)
   if (text.includes('\n') || text.includes('\r')) {
-    return <MultilineText text={text} className={className} />
+    return <MultilineText text={text} className={className} asH1={asH1} />
   }
 
   // Single-line: error sentence
-  if (isErrorSentence(text)) return <ErrorSentence text={text} />
+  if (isErrorSentence(text)) {
+    return asH1
+      ? <h1 className={['qpage-card-h1', className].filter(Boolean).join(' ')}><ErrorSentence text={text} /></h1>
+      : <ErrorSentence text={text} />
+  }
 
   // Single-line: analogy embedded in instruction text (e.g. Q14)
   const extracted = extractAnalogy(text)
   if (extracted) {
+    const PreTag = asH1 ? 'h1' : 'p'
+    const preClass = asH1 ? 'qr-instruction qpage-card-h1' : 'qr-instruction'
     return (
       <div className={['qr-multiline', className].filter(Boolean).join(' ')}>
-        {extracted.pre && <p className="qr-instruction">{renderInline(extracted.pre)}</p>}
+        {extracted.pre && <PreTag className={preClass}>{renderInline(extracted.pre)}</PreTag>}
         <AnalogyDisplay analogy={extracted.analogy} />
       </div>
     )
+  }
+
+  if (asH1) {
+    return <h1 className={['qpage-card-h1', className].filter(Boolean).join(' ')}>{renderInline(text)}</h1>
   }
 
   return <p className={className}>{renderInline(text)}</p>

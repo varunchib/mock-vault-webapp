@@ -147,11 +147,6 @@ export function QuestionPage() {
   const hasHindiVersion = hasHindi(question)
   const answerOption = question.options.find(o => o.key === question.answerKey)
 
-  // H1 = the question itself (Testbook-style). For multi-line / passage /
-  // match-table items use the actual question line (last line ending in "?")
-  // so the heading isn't a passage line or a table row.
-  const heading = questionHeadingLine(displayQuestion) || displayQuestion
-  const questionIsMultiline = displayQuestion.includes('\n')
   const copyLink = () => {
     void navigator.clipboard?.writeText(window.location.href)
     setCopied(true)
@@ -177,51 +172,44 @@ export function QuestionPage() {
           <span>Question {question.questionNo}</span>
         </nav>
 
-        {/* Separate exam context and question number from the question itself. */}
-        <div className="qpage-head">
-          <div className="qpage-head-left">
-            <div className="qpage-context">
-              <span>{question.examName}</span>
-              {question.year && <span>{question.year}</span>}
-              <span>Question {question.questionNo}</span>
-            </div>
-            <h1 className="qpage-h1"><MathText text={heading} /></h1>
-            {question.paperSlug && (
-              <p className="qpage-source">
-                From the solved paper{' '}
-                <Link to={paperPath(question.paperSlug)}>{question.paper}</Link>
-              </p>
-            )}
-          </div>
-          <div className="qpage-head-actions">
-            <button type="button" className="pyq-action-btn" onClick={copyLink}>
-              <Copy size={14} /> {copied ? 'Copied!' : 'Share'}
-            </button>
-          </div>
-        </div>
-
-        {/* Question + full solution card */}
+        {/* Unified Question + Solution Card (industry-standard single header) */}
         <article className="pyq-question-card">
 
-          <div className="pyq-q-header">
-            {question.subject && (
-              <Link
-                className="pyq-q-subject pyq-q-subject-link"
-                to={`/exam/${question.examSlug}?tab=subjects&subject=${encodeURIComponent(question.subject)}`}
-                rel="nofollow"
-                title={`All ${question.examName} ${question.subject} questions`}
-              >
-                {question.subject}
-              </Link>
-            )}
-          </div>
-
-          {hasHindiVersion && (
-            <div className="pyq-language-toggle" aria-label="Question language">
-              <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
-              <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
+          <div className="pyq-q-header qpage-card-header">
+            <div className="qpage-card-meta">
+              <span className="pyq-q-num">Q.{question.questionNo}</span>
+              {question.subject && (
+                <Link
+                  className="pyq-q-subject pyq-q-subject-link"
+                  to={`/exam/${question.examSlug}?tab=subjects&subject=${encodeURIComponent(question.subject)}`}
+                  rel="nofollow"
+                  title={`All ${question.examName} ${question.subject} questions`}
+                >
+                  {question.subject}
+                </Link>
+              )}
+              <span className="qpage-card-source">
+                {question.examName}{question.year ? ` (${question.year})` : ''}
+                {question.paperSlug && (
+                  <>
+                    {' · '}
+                    <Link to={paperPath(question.paperSlug)}>{question.paper}</Link>
+                  </>
+                )}
+              </span>
             </div>
-          )}
+            <div className="qpage-card-actions">
+              {hasHindiVersion && (
+                <div className="pyq-language-toggle" aria-label="Question language">
+                  <button type="button" className={language === 'en' ? 'active' : ''} onClick={() => setLanguage('en')}>English</button>
+                  <button type="button" className={language === 'hi' ? 'active' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button>
+                </div>
+              )}
+              <button type="button" className="pyq-action-btn" onClick={copyLink}>
+                <Copy size={14} /> {copied ? 'Copied!' : 'Share'}
+              </button>
+            </div>
+          </div>
 
           {localized.passage && (
             <div className="pyq-passage">
@@ -243,10 +231,7 @@ export function QuestionPage() {
             </div>
           )}
 
-          {/* The H1 above already shows the question. Render the full body only
-              for multi-line items (passages, match-the-following tables, etc.)
-              so a simple one-line question isn't shown twice. */}
-          {questionIsMultiline && <QuestionRenderer className="pyq-q-text" text={displayQuestion} />}
+          <QuestionRenderer className="pyq-q-text" text={displayQuestion} asH1 />
 
           {/* Options — correct answer highlighted (except deleted / pending) */}
           <div className="pyq-options pyq-options--solved">
@@ -318,7 +303,7 @@ export function QuestionPage() {
                 const label = questionHeadingLine(r.question) || r.question
                 return (
                   <li key={r.urlCode}>
-                    <Link className="rq-item" to={questionPath(r.urlCode, label)}>
+                    <Link className="rq-item" to={questionPath(r.urlCode, r.question)}>
                       <span className="rq-q"><MathText text={label} /></span>
                       <span className="rq-meta">
                         {r.subject}{r.subject && r.examName ? ' · ' : ''}{r.examName}{r.year ? ` ${r.year}` : ''}

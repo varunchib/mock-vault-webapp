@@ -17706,13 +17706,14 @@ html {
   white-space: pre-wrap;
 }
 
-/* Closing rubric ("Select the correct answer…") — present but recessive. */
+/* Closing rubric or question line ("Which of the statements given above is/are correct?") */
 .qr-directive {
-  margin-top: 2px;
-  font-size: 0.875rem;
-  font-style: italic;
-  color: var(--ink3);
-  line-height: 1.5;
+  margin-top: 4px;
+  font-size: 0.96875rem;
+  font-weight: 600;
+  font-style: normal;
+  color: var(--ink);
+  line-height: 1.55;
 }
 
 /* Match-the-following: the two headed lists side by side, so the reader can
@@ -17959,6 +17960,67 @@ html {
 .qr-table td:last-child,
 .qr-table th:last-child {
   text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── QuestionRenderer: em-dash pair / match-the-following table ─────────── */
+
+.qr-pair-table-wrap {
+  overflow-x: auto;
+  margin: 6px 0 4px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.qr-pair-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.qr-pair-table thead tr {
+  background: var(--line2);
+}
+
+.qr-pair-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-weight: 700;
+  color: var(--ink2);
+  font-size: 0.8125rem;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  border-bottom: 1.5px solid var(--line);
+}
+
+.qr-pair-table th + th,
+.qr-pair-table td + td {
+  border-left: 1px solid var(--line);
+}
+
+.qr-pair-table td {
+  padding: 8px 12px;
+  text-align: left;
+  color: var(--ink);
+  border-bottom: 1px solid var(--line2);
+  vertical-align: top;
+  white-space: normal;
+}
+
+.qr-pair-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.qr-pair-table tbody tr:nth-child(even) {
+  background: rgba(127, 127, 127, 0.03);
+}
+
+.qr-pair-marker {
+  font-weight: 700;
+  color: var(--ink2);
+  margin-right: 6px;
   font-variant-numeric: tabular-nums;
 }
 
@@ -19547,10 +19609,68 @@ html {
   flex-shrink: 0;
 }
 
+/* ── Single unified card header on QuestionPage ────────────────────────── */
+.qpage-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line2);
+}
+
+.qpage-card-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.qpage-card-source {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.qpage-card-source a {
+  color: var(--accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.qpage-card-source a:hover {
+  text-decoration: underline;
+}
+
+.qpage-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Semantic H1 inside the question card — overrides the global Fraunces H1 */
+.qpage-card-h1 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0;
+}
+
 @media (max-width: 560px) {
-  .qpage-head { flex-direction: column; gap: 10px; }
-  .qpage-head-actions { flex-direction: row; flex-wrap: wrap; }
-  .qpage-head-actions .pyq-action-btn { flex: 1 1 auto; min-width: 0; }
+  .qpage-card-header {
+    align-items: flex-start;
+  }
+  .qpage-card-h1 {
+    font-size: 16px;
+  }
 }
 
 /* Freshness signal on guide pages — visible counterpart of Article.dateModified */

@@ -72,6 +72,16 @@ function isGenericStem(line: string): boolean {
 
 const HEADING_JOIN_CAP = 150
 
+const BARE_LEAD_RE =
+  /^(?:consider|read|study|examine|match)\s+the\s+following(?:\s+(?:statements?|pairs?|items?|lists?|initiatives?|functionaries|locations?|monuments?|personalities|technologies|options?|events?))?\s*:?$/i
+
+function fitHeadingCap(s: string, cap = HEADING_JOIN_CAP): string {
+  if (s.length <= cap) return s
+  const cut = s.slice(0, cap - 1)
+  const sp = cut.lastIndexOf(' ')
+  return (sp > 60 ? cut.slice(0, sp) : cut).replace(/[,;:\-\s]+$/, '') + '…'
+}
+
 /**
  * Statement-list items have no line ending in "?", so the rule below falls back
  * to the opening instruction. Append the question's own next content line so the
@@ -83,14 +93,16 @@ function expandGenericHeading(lines: string[], heading: string): string {
   if (lines.length <= 2 || !isGenericStem(heading)) return heading
   // The asked line was boilerplate; the opening line may carry the topic.
   const base = lines[0]
-  if (!isGenericStem(base)) return base
+  if (!isGenericStem(base)) return fitHeadingCap(base)
   const next = lines.find(l => l !== base && l !== heading
     && l.length >= 12 && !isGenericStem(l))
   if (!next) return heading
-  const joined = `${base.replace(/[\s:;,]+$/, '')} ${next}`
-  return joined.length > HEADING_JOIN_CAP
-    ? joined.slice(0, HEADING_JOIN_CAP - 1).trimEnd() + '…'
-    : joined
+  const cleanNext = next.replace(/^(?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+/, '')
+  if (BARE_LEAD_RE.test(base.trim())) {
+    return fitHeadingCap(cleanNext)
+  }
+  const joined = `${base.replace(/[\s;,]+$/, '')} ${cleanNext}`
+  return fitHeadingCap(joined)
 }
 
 export function questionHeadingLine(question: string): string {

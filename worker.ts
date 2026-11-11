@@ -359,7 +359,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // tags that merely repeat the exam, year or subject.
 // '28' refreshes the edge cache for the human-rewritten JKCCE 2025 GS-I
 // explanations and curated topic tags.
-const API_CACHE_VERSION = '29'
+const API_CACHE_VERSION = '30'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -593,35 +593,123 @@ function tableHtml(rows: string[][]): string {
     + `<thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table></div>`
 }
 
-function paragraph(s: string | undefined | null): string {
+const SSR_PAIR_MARKER_RE = /^(\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+([\s\S]+)$/
+const SSR_PAIR_ROW_RE = /^(?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+(.+?)\s+—\s+(.+)$/
+const SSR_ITEM_RE = /^(\(?(\d{1,2}|[A-H]|[IVX]{1,4}|[ivx]{1,4})[.)])\s+(.+)$/
+
+function splitSsrEmDash(line: string): string[] {
+  return line.split(/\s+—\s+/).map((c) => c.trim())
+}
+
+function isSsrPairRow(line: string): boolean {
+  return line.includes(' — ') && SSR_PAIR_ROW_RE.test(line)
+}
+
+function isSsrPairHeader(line: string, expectedCols: number): boolean {
+  if (!line.includes(' — ') || SSR_PAIR_ROW_RE.test(line)) return false
+  const cols = splitSsrEmDash(line)
+  return cols.length === expectedCols && cols.every((c) => c.length >= 1 && c.length <= 45)
+}
+
+function pairTableHtml(headers: string[], rows: string[][]): string {
+  const thead = headers.length
+    ? `<thead><tr>${headers.map((h) => `<th scope="col">${optionHtml(h)}</th>`).join('')}</tr></thead>`
+    : ''
+  const tbody = rows
+    .map((row) => `<tr>${row.map((c) => `<td>${optionHtml(c)}</td>`).join('')}</tr>`)
+    .join('')
+  return `<div class="qr-pair-table-wrap"><table class="qr-pair-table">${thead}<tbody>${tbody}</tbody></table></div>`
+}
+
+function paragraph(s: string | undefined | null, asH1 = false): string {
   // optionHtml, despite the name, is the shared "escape but keep flip tokens as
   // spans" renderer — the question stem needs it too, or the given figure in a
   // water-image question flattens to a bare word for crawlers.
   //
-  // Pipe-delimited tables are lifted out first and emitted as real <table>
-  // markup, matching MathText. A frequency table left as raw lines is
-  // unreadable to a reader and meaningless to a crawler.
-  //
-  // Each LINE becomes its own <p>. Emitting the whole segment as a single <p>
-  // collapsed every newline, so a stem stored as
-  //
-  //     Arrange the following ... in chronological order:
-  //     i. Indonesia
-  //     ii. India
-  //
-  // reached crawlers as one run-on sentence, while readers saw it correctly --
-  // MultilineText in the React app has always rendered line by line. The two
-  // must agree, and the structured form is far easier to parse besides.
+  // Pipe-delimited tables and em-dash pair/match tables are emitted as real
+  // <table> markup, and consecutive numbered/Roman items are emitted as <ul>,
+  // matching QuestionRenderer on the client.
+  let h1Used = false
   return splitTableBlocks(String(s ?? ''))
     .map((seg) => {
       if (seg.kind === 'table') return tableHtml(seg.rows)
-      return seg.content
-        .split(/\r?\n/)
-        .map((line) => {
-          const clean = optionHtml(line)
-          return clean.trim() ? `<p>${clean}</p>` : ''
-        })
-        .join('')
+      const rawLines = seg.content.split(/\r?\n/).map((l) => l.trim()).filter(Boolean)
+      const out: string[] = []
+      for (let i = 0; i < rawLines.length; i++) {
+        const line = rawLines[i]
+
+        // Em-dash Match / Pair table with an explicit header line
+        if (i + 2 < rawLines.length && isSsrPairRow(rawLines[i + 1])) {
+          const expectedCols = splitSsrEmDash(rawLines[i + 1]).length
+          if (
+            isSsrPairHeader(line, expectedCols) &&
+            isSsrPairRow(rawLines[i + 2]) &&
+            splitSsrEmDash(rawLines[i + 2]).length === expectedCols
+          ) {
+            const headers = splitSsrEmDash(line).map((h) => h.replace(/^\*\*|\*\*$/g, '').trim())
+            const rows: string[][] = []
+            let j = i + 1
+            while (j < rawLines.length && isSsrPairRow(rawLines[j]) && splitSsrEmDash(rawLines[j]).length === expectedCols) {
+              rows.push(splitSsrEmDash(rawLines[j]))
+              j++
+            }
+            out.push(pairTableHtml(headers, rows))
+            i = j - 1
+            continue
+          }
+        }
+
+        // Em-dash Match / Pair table without an explicit header line
+        if (isSsrPairRow(line) && i + 1 < rawLines.length && isSsrPairRow(rawLines[i + 1])) {
+          const expectedCols = splitSsrEmDash(line).length
+          if (splitSsrEmDash(rawLines[i + 1]).length === expectedCols) {
+            const rows: string[][] = []
+            let j = i
+            while (j < rawLines.length && isSsrPairRow(rawLines[j]) && splitSsrEmDash(rawLines[j]).length === expectedCols) {
+              rows.push(splitSsrEmDash(rawLines[j]))
+              j++
+            }
+            let headers: string[] = []
+            if (expectedCols === 2 && rows.every((r) => SSR_PAIR_MARKER_RE.test(r[1]))) {
+              const labelMatch = rawLines[0]?.match(/List[- ]?I\s*\(([^)]+)\).*?List[- ]?II\s*\(([^)]+)\)/i)
+              headers = labelMatch ? [`List I (${labelMatch[1]})`, `List II (${labelMatch[2]})`] : ['List I', 'List II']
+            }
+            out.push(pairTableHtml(headers, rows))
+            i = j - 1
+            continue
+          }
+        }
+
+        // Consecutive numbered/Roman list items
+        if (SSR_ITEM_RE.test(line)) {
+          const items: Array<{ marker: string; body: string }> = []
+          let j = i
+          for (; j < rawLines.length; j++) {
+            const m = rawLines[j].match(SSR_ITEM_RE)
+            if (!m) break
+            items.push({ marker: m[1], body: m[3] })
+          }
+          if (items.length >= 2) {
+            out.push(
+              `<ul class="qr-items">${items
+                .map((it) => `<li class="qr-item"><span class="qr-item-marker">${esc(it.marker)}</span> <span class="qr-item-body">${optionHtml(it.body)}</span></li>`)
+                .join('')}</ul>`,
+            )
+            i = j - 1
+            continue
+          }
+        }
+
+        const clean = optionHtml(line)
+        if (!clean.trim()) continue
+        if (asH1 && !h1Used) {
+          h1Used = true
+          out.push(`<h1 class="qpage-card-h1">${clean}</h1>`)
+        } else {
+          out.push(`<p>${clean}</p>`)
+        }
+      }
+      return out.join('')
     })
     .join('')
 }
@@ -794,6 +882,16 @@ function isGenericStem(line: string, multiline: boolean): boolean {
 // questionHeading.ts keeps a mirror of this; the two must stay in step.
 const HEADING_JOIN_CAP = 150
 
+const BARE_LEAD_RE =
+  /^(?:consider|read|study|examine|match)\s+the\s+following(?:\s+(?:statements?|pairs?|items?|lists?|initiatives?|functionaries|locations?|monuments?|personalities|technologies|options?|events?))?\s*:?$/i
+
+function fitHeadingCap(s: string, cap = HEADING_JOIN_CAP): string {
+  if (s.length <= cap) return s
+  const cut = s.slice(0, cap - 1)
+  const sp = cut.lastIndexOf(' ')
+  return (sp > 60 ? cut.slice(0, sp) : cut).replace(/[,;:\-\s]+$/, '') + '…'
+}
+
 /**
  * Rescue a heading that identifies nothing.
  *
@@ -817,15 +915,17 @@ function expandGenericHeading(question: string, heading: string): string {
 
   // The asked line was boilerplate; the opening line may carry the topic.
   const base = lines[0]
-  if (!isGenericStem(base, true)) return base
+  if (!isGenericStem(base, true)) return fitHeadingCap(base)
 
   const next = lines.find((l) => l !== base && l !== heading
     && l.length >= 12 && !isGenericStem(l, true))
   if (!next) return heading
-  const joined = `${base.replace(/[\s:;,]+$/, '')} ${next}`
-  return joined.length > HEADING_JOIN_CAP
-    ? joined.slice(0, HEADING_JOIN_CAP - 1).trimEnd() + '…'
-    : joined
+  const cleanNext = next.replace(/^(?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+/, '')
+  if (BARE_LEAD_RE.test(base.trim())) {
+    return fitHeadingCap(cleanNext)
+  }
+  const joined = `${base.replace(/[\s;,]+$/, '')} ${cleanNext}`
+  return fitHeadingCap(joined)
 }
 
 // Google renders roughly 60 characters and appends the site name itself, so the
@@ -935,25 +1035,26 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
   const relatedSection = related.length
     ? `<nav aria-label="Related questions"><h2>Related questions</h2><ul>${related
         .map((r) => {
-          const label = substantiveQuestionLine(r.question) || r.question
+          const label = expandGenericHeading(r.question, substantiveQuestionLine(r.question)) || r.question
           const meta = [r.subject, r.examName && `${r.examName}${r.year ? ' ' + r.year : ''}`]
             .filter(Boolean).join(' · ')
-          return `<li><a href="${questionPath(r.urlCode, label)}">${htmlText(label).slice(0, 160)}</a>${
+          return `<li><a href="${questionPath(r.urlCode, r.question)}">${htmlText(label).slice(0, 160)}</a>${
             meta ? ` — ${htmlText(meta)}` : ''
           }</li>`
         })
         .join('')}</ul></nav>`
     : ''
 
-  const heading = expandGenericHeading(q.question, substantiveQuestionLine(q.question))
-  return renderPageShell(`${heading.length > 130 ? heading.slice(0, 129).trimEnd() + '…' : heading}`, `
-    <p>${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` ${htmlText(q.year)}` : ''}</p>
-    ${paperLink}
+  return `<article class="seo-rendered">
+    ${renderBreadcrumb(crumbs)}
+    <header class="qpage-card-header">
+      <p><strong>Q.${htmlText(q.questionNo)}</strong> · ${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` (${htmlText(q.year)})` : ''}</p>
+      ${paperLink}
+    </header>
     ${images ? `<figure>${images}</figure>` : ''}
     ${q.passage ? `<section><h2>Passage</h2>${paragraph(q.passage)}</section>` : ''}
     <section>
-      <h2>Question</h2>
-      ${paragraph(stripQuestionNumberPrefix(q.question))}
+      ${paragraph(stripQuestionNumberPrefix(q.question), true)}
       ${optionItems ? `<ol type="A">${optionItems}</ol>` : ''}
     </section>
     ${isDeleted
@@ -965,7 +1066,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
     ${hindiSection}
     ${tags ? `<p><strong>Topics covered:</strong> ${tags}</p>` : ''}
     ${relatedSection}
-  `, crumbs)
+  </article>`
 }
 
 function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Crumb[] = []): string {
