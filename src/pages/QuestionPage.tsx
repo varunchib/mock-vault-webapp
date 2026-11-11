@@ -34,22 +34,38 @@ export function QuestionPage() {
   const [error, setError] = useState(false)
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const [copied, setCopied] = useState(false)
+  const [activeSlug, setActiveSlug] = useState(slug)
+
+  // Navigating between questions (e.g. via Related questions) keeps this
+  // component mounted. Reset during render so the previous question is never
+  // shown under the new URL — otherwise the canonical-URL effect below would
+  // rewrite the address bar back to the OLD question.
+  if (activeSlug !== slug) {
+    setActiveSlug(slug)
+    setQuestion(null)
+    setLoading(true)
+    setError(false)
+  }
 
   useEffect(() => {
     if (!slug) return
-    setLoading(true)
-    setError(false)
+    const target = questionRealSlug(slug)
+    let cancelled = false
+
     // The URL is /question/<keywords>--<id>; fetch by the stable id after "--".
-    fetchQuestionBySlug(questionRealSlug(slug))
-      .then(setQuestion)
-      .catch(() => setError(true))
-      .finally(() => setLoading(false))
+    fetchQuestionBySlug(target)
+      .then((q) => { if (!cancelled) setQuestion(q) })
+      .catch(() => { if (!cancelled) setError(true) })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
     // Related questions are supplementary: a failure here leaves the block out
     // rather than failing the page, and it must not clear the previous list
     // until the new one arrives or the section would flicker on navigation.
-    fetchRelatedQuestions(questionRealSlug(slug))
-      .then(setRelated)
-      .catch(() => setRelated([]))
+    fetchRelatedQuestions(target)
+      .then((rel) => { if (!cancelled) setRelated(rel) })
+      .catch(() => { if (!cancelled) setRelated([]) })
+
+    return () => { cancelled = true }
   }, [slug])
 
   // Swap any bare/old URL for the canonical keyword URL without a reload, so the
@@ -280,6 +296,19 @@ export function QuestionPage() {
             </div>
           )}
         </article>
+
+        {question.paperSlug && (
+          <div className="pyq-paper-cta">
+            <div className="pyq-paper-cta-text">
+              <span className="pyq-paper-cta-badge">Complete Paper Practice</span>
+              <h3>Practise all questions from {question.paper}</h3>
+              <p>Attempt the full official question paper with countdown timer, negative marking, and instant detailed solutions for every question.</p>
+            </div>
+            <Link to={paperPath(question.paperSlug)} className="pyq-paper-cta-btn">
+              Start Full Paper Test →
+            </Link>
+          </div>
+        )}
 
         {related.length > 0 && (
           <aside className="rq" aria-labelledby="rq-h">

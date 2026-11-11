@@ -2164,6 +2164,1214 @@ footer {
   line-height: 1.7;
 }
 
+.rivers-article-link {
+  margin: 0 0 18px;
+  font-size: 14px;
+  font-weight: 650;
+}
+
+.rivers-article-link a {
+  color: var(--blue);
+  text-decoration: none;
+}
+
+.rivers-article-link a:hover {
+  text-decoration: underline;
+}
+
+.river-article-page .public-shell {
+  width: min(900px, 100%);
+}
+
+.river-guide-header {
+  margin-bottom: 24px;
+}
+
+.river-guide-header h1 {
+  margin: 0 0 10px;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(30px, 4vw, 42px);
+  letter-spacing: -.03em;
+  line-height: 1.15;
+}
+
+.river-guide-header p,
+.river-guide-reading-note,
+.river-guide-overview p,
+.river-guide-system-intro,
+.river-guide-facts p,
+.river-guide-map-card p {
+  color: var(--ink3);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.river-guide-header p {
+  max-width: 720px;
+  margin: 0 0 14px;
+}
+
+.river-guide-map-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.river-guide-map-link:hover {
+  text-decoration: underline;
+}
+
+.river-guide-map-link:focus-visible,
+.river-guide-index a:focus-visible,
+.river-guide-details summary:focus-visible,
+.blog-index-card a:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.river-guide-index {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 22px 0 14px;
+}
+
+.river-guide-index a {
+  padding: 6px 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink2);
+  font-size: 12px;
+  text-decoration: none;
+}
+
+.river-guide-index a:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.river-guide-reading-note {
+  margin: 0 0 28px;
+  font-size: 13px;
+}
+
+.river-guide-system {
+  margin: 0 0 32px;
+  scroll-margin-top: 20px;
+}
+
+.river-guide-system h2 {
+  margin: 0 0 8px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 25px;
+}
+
+.river-guide-entry {
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 20px;
+}
+
+.river-guide-overview {
+  margin: 0 0 34px;
+  padding: 20px 22px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+
+.river-guide-overview h2 {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 21px;
+}
+
+.river-guide-overview p {
+  margin: 0 0 10px;
+}
+
+.river-guide-overview p:last-child {
+  margin-bottom: 0;
+}
+
+.river-guide-system-intro {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.river-guide-entry h3 {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  padding: 17px 2px 6px;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.river-guide-entry > .river-guide-context {
+  margin: 0 0 8px;
+  font-size: 13px;
+}
+
+.river-guide-details {
+  padding: 0 0 12px;
+}
+
+.river-guide-details summary {
+  padding: 5px 2px;
+  color: var(--blue);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.river-guide-summary-meta {
+  color: var(--ink3);
+  font-size: 12px;
+  font-weight: 500;
+  text-align: right;
+}
+
+.river-guide-facts {
+  padding: 0 2px 18px 22px;
+}
+
+.river-guide-facts dl {
+  display: grid;
+  grid-template-columns: minmax(120px, 155px) minmax(0, 1fr);
+  gap: 8px 16px;
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.river-guide-facts dt {
+  color: var(--ink3);
+  font-weight: 650;
+}
+
+.river-guide-facts dd {
+  margin: 0;
+  color: var(--ink2);
+}
+
+.river-guide-tributaries h4 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.river-guide-facts p {
+  margin: 0 0 8px;
+  color: var(--ink2);
+  font-size: 13px;
+}
+
+.river-guide-facts .river-guide-note {
+  color: var(--ink3);
+}
+
+.river-guide-banks {
+  display: grid;
+  gap: 4px;
+}
+
+.river-guide-map-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 30px 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.river-guide-map-card h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-size: 17px;
+}
+
+.river-guide-map-card p {
+  margin: 0;
+  font-size: 13px;
+}
+
+.blog-index-header {
+  margin-bottom: 26px;
+}
+
+.blog-index-header h1 {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.15;
+}
+
+.blog-index-header p,
+.blog-index-card > p {
+  color: var(--ink3);
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.blog-index-card {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+
+.blog-index-card .blog-index-category {
+  margin: 0 0 6px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.blog-index-card h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+}
+
+.blog-index-card h2 a {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.blog-index-card h2 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.blog-index-card > p:not(.blog-index-category) {
+  margin: 0 0 14px;
+}
+
+@media (max-width: 560px) {
+  .river-guide-entry h3 {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .river-guide-summary-meta {
+    padding-left: 18px;
+    text-align: left;
+  }
+
+  .river-guide-facts {
+    padding-left: 18px;
+  }
+
+  .river-guide-facts dl {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+
+  .river-guide-facts dd {
+    margin-bottom: 8px;
+  }
+
+  .river-guide-map-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .river-guide-overview {
+    padding: 16px;
+  }
+
+}
+
+.river-article-page .public-shell {
+  width: min(1120px, 100%);
+}
+
+.river-guide-header {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(260px, .7fr);
+  align-items: center;
+  gap: clamp(28px, 6vw, 76px);
+  margin-bottom: 42px;
+}
+
+.river-guide-kicker {
+  margin: 0 0 10px;
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+
+.river-guide-header h1 {
+  max-width: 14ch;
+  margin: 0 0 16px;
+  font-size: clamp(38px, 5.2vw, 60px);
+  letter-spacing: -.045em;
+  line-height: 1.04;
+}
+
+.river-guide-header .river-guide-deck {
+  max-width: 680px;
+  margin: 0 0 20px;
+  color: var(--ink2);
+  font-size: clamp(16px, 1.7vw, 18px);
+  line-height: 1.75;
+}
+
+.river-guide-snapshot {
+  padding: 22px;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--blue);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.river-guide-snapshot-label {
+  margin: 0 0 10px;
+  color: var(--ink3);
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.river-guide-snapshot-stat {
+  display: grid;
+  grid-template-columns: 54px 1fr;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line2);
+}
+
+.river-guide-snapshot-stat strong {
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 34px;
+  font-weight: 550;
+  line-height: 1;
+}
+
+.river-guide-snapshot-stat span {
+  color: var(--ink2);
+  font-size: 13px;
+}
+
+.river-guide-snapshot-note {
+  margin: 14px 0 0;
+  color: var(--ink3);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.river-guide-index {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px 24px;
+  margin: 0 0 34px;
+  padding: 20px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.river-guide-index-heading h2 {
+  margin: 0 0 3px;
+  color: var(--ink);
+  font-size: 15px;
+}
+
+.river-guide-index-heading p {
+  color: var(--ink3);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.river-guide-index-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.river-guide-index a {
+  padding: 5px 10px;
+  border-radius: 6px;
+  background: var(--surface-2);
+  font-size: 12px;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.river-guide-index a:hover {
+  border-color: var(--blue);
+  background: var(--blue-bg);
+}
+
+.river-guide-index a.river-guide-index-system {
+  border-color: var(--blue-border);
+  background: var(--blue-bg);
+  color: var(--blue);
+  font-weight: 700;
+}
+
+.river-guide-overview {
+  margin: 0 0 42px;
+  padding: 26px;
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+}
+
+.river-guide-section-heading {
+  margin-bottom: 18px;
+}
+
+.river-guide-section-heading .river-guide-kicker {
+  margin-bottom: 5px;
+}
+
+.river-guide-section-heading h2,
+.river-guide-reading > h2 {
+  margin: 0;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: clamp(23px, 3vw, 30px);
+  letter-spacing: -.025em;
+  line-height: 1.2;
+}
+
+.river-guide-overview-grid,
+.river-guide-reading-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.river-guide-overview-grid article,
+.river-guide-reading-grid article {
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--paper);
+}
+
+.river-guide-overview-grid h3,
+.river-guide-reading-grid h3 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 14px;
+}
+
+.river-guide-overview-grid p,
+.river-guide-reading-grid p {
+  margin: 0;
+  color: var(--ink3);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.river-guide-system {
+  margin-bottom: 46px;
+  scroll-margin-top: 84px;
+}
+
+.river-guide-system h2 {
+  margin-bottom: 8px;
+  padding-bottom: 11px;
+  font-size: clamp(25px, 3vw, 32px);
+  letter-spacing: -.025em;
+}
+
+.river-guide-system-intro {
+  max-width: 780px;
+  margin-bottom: 18px;
+  font-size: 14px;
+}
+
+.river-guide-entry {
+  margin: 12px 0 0;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, .035);
+  scroll-margin-top: 84px;
+}
+
+.river-guide-entry h3 {
+  padding: 0 0 8px;
+  font-size: 19px;
+}
+
+.river-guide-entry-name {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.river-guide-system-tag {
+  padding: 3px 7px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: var(--ink3);
+  font-size: 10px;
+  font-weight: 650;
+  letter-spacing: .02em;
+}
+
+.river-guide-summary-meta {
+  max-width: 50%;
+  font-size: 12px;
+}
+
+.river-guide-entry > .river-guide-context {
+  max-width: 900px;
+  margin-bottom: 10px;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.river-guide-details {
+  padding: 0;
+}
+
+.river-guide-details summary {
+  width: fit-content;
+  padding: 5px 0;
+  font-size: 12px;
+}
+
+.river-guide-details[open] summary {
+  margin-bottom: 12px;
+}
+
+.river-guide-facts {
+  padding: 14px 16px;
+  border-radius: 8px;
+  background: var(--surface-2);
+}
+
+.river-guide-facts dl {
+  grid-template-columns: minmax(140px, 180px) minmax(0, 1fr);
+  gap: 7px 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.river-guide-facts dt {
+  color: var(--ink3);
+}
+
+.river-guide-facts dd {
+  color: var(--ink);
+}
+
+.river-guide-tributaries {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.river-guide-tributaries h4 {
+  margin-bottom: 7px;
+  font-size: 12px;
+}
+
+.river-guide-facts p {
+  margin-bottom: 5px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.river-guide-facts .river-guide-note {
+  margin-top: 7px;
+  font-size: 11px;
+}
+
+.river-guide-reading {
+  margin: 0 0 34px;
+  padding: 26px 0 28px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.river-guide-reading > .river-guide-kicker {
+  margin-bottom: 5px;
+}
+
+.river-guide-reading > h2 {
+  margin-bottom: 18px;
+}
+
+.river-guide-source {
+  margin-top: 16px;
+  color: var(--ink3);
+  font-size: 12px;
+}
+
+.river-guide-source a {
+  color: var(--blue);
+  font-weight: 650;
+  text-underline-offset: 3px;
+}
+
+.river-guide-map-card {
+  margin-top: 0;
+}
+
+@media (max-width: 760px) {
+  .river-guide-header {
+    grid-template-columns: 1fr;
+    gap: 22px;
+  }
+
+  .river-guide-snapshot {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 16px;
+  }
+
+  .river-guide-snapshot-label,
+  .river-guide-snapshot-note {
+    grid-column: 1 / -1;
+  }
+
+  .river-guide-snapshot-stat {
+    grid-template-columns: 42px 1fr;
+  }
+
+  .river-guide-snapshot-stat strong {
+    font-size: 29px;
+  }
+
+  .river-guide-overview-grid,
+  .river-guide-reading-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .river-guide-index {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+@media (max-width: 560px) {
+  .river-guide-header {
+    margin-bottom: 32px;
+  }
+
+  .river-guide-header h1 {
+    font-size: clamp(36px, 11vw, 48px);
+  }
+
+  .river-guide-snapshot {
+    padding: 16px;
+  }
+
+  .river-guide-overview {
+    padding: 18px;
+  }
+
+  .river-guide-entry {
+    padding: 16px;
+  }
+
+  .river-guide-entry h3 {
+    align-items: flex-start;
+  }
+
+  .river-guide-summary-meta {
+    max-width: none;
+    padding-left: 0;
+  }
+
+  .river-guide-facts {
+    padding: 12px;
+  }
+}
+
+.river-article-page .public-shell {
+  width: min(940px, 100%);
+}
+
+.river-guide-article {
+  width: min(100%, 740px);
+  margin: 0 auto;
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.82;
+}
+
+.river-article-page .river-guide-article,
+.river-article-page .river-guide-article * {
+  font-family: Georgia, 'Times New Roman', serif !important;
+}
+
+.river-article-page .river-guide-article h1,
+.river-article-page .river-guide-article h2,
+.river-article-page .river-guide-article h3 {
+  font-family: 'Fraunces', Georgia, serif !important;
+}
+
+.river-article-page .river-guide-article .river-guide-map-cta,
+.river-article-page .river-guide-article .river-guide-map-cta *,
+.river-article-page .river-guide-article .river-guide-byline,
+.river-article-page .river-guide-article .river-guide-byline *,
+.river-article-page .river-guide-article .river-guide-table,
+.river-article-page .river-guide-article .river-guide-table * {
+  font-family: 'DM Sans', Arial, sans-serif !important;
+}
+
+.river-guide-article p {
+  margin: 0 0 1.2em;
+  color: var(--ink2);
+  font-size: 16px;
+  line-height: 1.82;
+}
+
+.river-guide-header {
+  display: block;
+  margin: 28px 0 28px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--line);
+}
+
+.river-guide-map-cta {
+  margin: 0 0 22px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 650;
+  line-height: 1.5;
+}
+
+.river-guide-map-cta a {
+  color: var(--blue);
+  text-underline-offset: 3px;
+}
+
+.river-guide-header .river-guide-kicker {
+  margin: 0 0 8px;
+  color: var(--ink3);
+  font-size: 12px;
+  font-weight: 650;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+
+.river-guide-header h1 {
+  max-width: 18ch;
+  margin: 0 0 14px;
+  font-size: clamp(36px, 5vw, 48px);
+  letter-spacing: -.035em;
+  line-height: 1.12;
+}
+
+.river-guide-header .river-guide-deck {
+  max-width: 700px;
+  margin: 0 0 14px;
+  color: var(--ink2);
+  font-size: 18px;
+  line-height: 1.65;
+}
+
+.river-guide-article .river-guide-byline {
+  font-family: 'DM Sans', sans-serif;
+}
+
+.river-guide-header .river-guide-byline {
+  margin: 0;
+  color: var(--ink3);
+  font-size: 13px;
+}
+
+.river-guide-byline span {
+  padding: 0 5px;
+}
+
+.river-guide-index {
+  display: block;
+  margin: 0 0 30px;
+  padding: 18px 22px;
+  border: 0;
+  border-left: 3px solid var(--line);
+  border-radius: 0;
+  background: var(--surface-2);
+}
+
+.river-guide-index h2 {
+  margin: 0 0 7px;
+  color: var(--ink);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+}
+
+.river-guide-index ol {
+  margin: 0;
+  padding-left: 22px;
+}
+
+.river-guide-index > ol > li {
+  margin: 3px 0;
+}
+
+.river-guide-index ol ol {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 18px;
+  padding-left: 20px;
+  color: var(--ink3);
+}
+
+.river-guide-index a {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--blue);
+  font-size: 13px;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.river-guide-index a:hover,
+.river-guide-index a.river-guide-index-system {
+  border: 0;
+  background: none;
+  color: var(--blue);
+}
+
+.river-guide-article > p {
+  margin: 0 0 1.25em;
+}
+
+.river-guide-comparison {
+  margin: 28px 0 38px;
+}
+
+.river-guide-comparison h2 {
+  margin: 0 0 7px;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 24px;
+  line-height: 1.3;
+}
+
+.river-guide-comparison > p {
+  margin: 0 0 12px;
+  color: var(--ink3);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.river-guide-table-wrap {
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  scrollbar-color: var(--ink4) var(--surface-2);
+}
+
+.river-guide-table-wrap:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 3px;
+}
+
+.river-guide-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  color: var(--ink2);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  line-height: 1.55;
+  text-align: left;
+}
+
+.river-guide-table th,
+.river-guide-table td {
+  padding: 9px 11px;
+  border-bottom: 1px solid var(--line2);
+  vertical-align: top;
+}
+
+.river-guide-table thead th {
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.river-guide-table tbody th {
+  min-width: 90px;
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.river-guide-table tbody tr:last-child th,
+.river-guide-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.river-guide-table a {
+  color: var(--blue);
+  text-underline-offset: 2px;
+}
+
+.river-guide-overview {
+  margin: 28px 0 38px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.river-guide-overview h2,
+.river-guide-reading > h2,
+.river-guide-sources h2 {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 27px;
+  letter-spacing: -.02em;
+  line-height: 1.25;
+}
+
+.river-guide-overview p {
+  margin: 0 0 1em;
+  color: var(--ink2);
+  font-size: 16px;
+  line-height: 1.82;
+}
+
+.river-guide-overview p:last-child {
+  margin-bottom: 0;
+}
+
+.river-guide-system {
+  margin: 0 0 36px;
+  scroll-margin-top: 82px;
+}
+
+.river-guide-system > h2 {
+  margin: 0 0 10px;
+  padding: 0;
+  border: 0;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 30px;
+  letter-spacing: -.025em;
+}
+
+.river-guide-system-intro {
+  margin: 0 0 24px;
+  color: var(--ink3);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.river-guide-entry {
+  margin: 0 0 28px;
+  padding: 0 0 24px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  scroll-margin-top: 82px;
+}
+
+.river-guide-entry h3 {
+  display: block;
+  margin: 0 0 8px;
+  padding: 0;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 23px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.river-guide-entry > p {
+  margin: 0 0 1em;
+  color: var(--ink2);
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+.river-guide-entry .river-guide-facts {
+  margin-top: 16px;
+  padding: 14px 0 0;
+  border-top: 1px solid var(--line);
+  background: transparent;
+}
+
+.river-guide-facts dl {
+  grid-template-columns: minmax(110px, 145px) minmax(0, 1fr);
+  gap: 5px 14px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.river-guide-facts dt {
+  color: var(--ink3);
+  font-weight: 650;
+}
+
+.river-guide-facts dd {
+  color: var(--ink2);
+}
+
+.river-guide-tributaries {
+  padding-top: 11px;
+  border-top: 1px solid var(--line2);
+}
+
+.river-guide-tributaries h4 {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font-size: 13px;
+}
+
+.river-guide-facts p {
+  margin: 0 0 5px;
+  color: var(--ink2);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.river-guide-facts .river-guide-note {
+  margin-top: 8px;
+  color: var(--ink3);
+}
+
+.river-guide-reading {
+  margin: 34px 0;
+  padding: 24px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.river-guide-reading > h2 {
+  margin-bottom: 12px;
+}
+
+.river-guide-reading-grid {
+  display: block;
+}
+
+.river-guide-reading-grid article {
+  margin: 0 0 14px;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.river-guide-reading-grid h3 {
+  margin: 0 0 3px;
+  font-size: 15px;
+}
+
+.river-guide-reading-grid p {
+  margin: 0;
+  color: var(--ink2);
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.river-guide-sources {
+  margin: 34px 0;
+  scroll-margin-top: 82px;
+}
+
+.river-guide-sources > p {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.river-guide-sources ul {
+  margin: 0 0 14px;
+  padding-left: 22px;
+  color: var(--ink2);
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.river-guide-sources a {
+  color: var(--blue);
+  text-underline-offset: 2px;
+}
+
+.river-guide-sources .river-guide-source-note {
+  color: var(--ink3);
+  font-size: 13px;
+}
+
+.river-guide-map-card {
+  display: block;
+  margin: 34px 0;
+  padding: 18px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.river-guide-map-card h2 {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 21px;
+}
+
+.river-guide-map-card p {
+  margin: 0 0 8px;
+  color: var(--ink3);
+  font-size: 14px;
+}
+
+@media (max-width: 560px) {
+  .river-guide-header h1 {
+    font-size: clamp(34px, 10vw, 42px);
+  }
+
+  .river-guide-header .river-guide-deck {
+    font-size: 16px;
+  }
+
+  .river-guide-index {
+    padding: 14px 16px;
+  }
+
+  .river-guide-table {
+    min-width: 760px;
+  }
+
+  .river-guide-facts dl {
+    grid-template-columns: 1fr;
+    gap: 1px;
+  }
+
+  .river-guide-facts dd {
+    margin-bottom: 7px;
+  }
+}
+
 .rivers-map-section {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
@@ -5699,6 +6907,128 @@ footer {
   padding: 3px 8px;
   border-radius: 999px;
   white-space: nowrap;
+}
+
+.pyq-opt-badge--wrong {
+  color: #dc2626;
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+[data-theme="dark"] .pyq-opt-badge--wrong {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.pyq-attempt-feedback {
+  margin-top: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.pyq-attempt-feedback--correct {
+  background: var(--green-bg);
+  border: 1px solid var(--green-border);
+  color: var(--green);
+}
+.pyq-attempt-feedback--wrong {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+[data-theme="dark"] .pyq-attempt-feedback--wrong {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+
+.pyq-feedback-widget {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+  padding: 12px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.pyq-feedback-prompt {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink2);
+}
+.pyq-feedback-btns {
+  display: flex;
+  gap: 8px;
+}
+.pyq-feedback-btn {
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface2);
+  color: var(--ink);
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.pyq-feedback-btn:hover {
+  border-color: var(--ink3);
+}
+.pyq-feedback-btn.active {
+  border-color: var(--green);
+  background: var(--green-bg);
+  color: var(--green);
+}
+
+.pyq-paper-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 24px 0;
+  padding: 18px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(238, 242, 255, 0.8) 0%, rgba(224, 231, 255, 0.5) 100%);
+  border: 1px solid #c7d2fe;
+}
+[data-theme="dark"] .pyq-paper-cta {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: #334155;
+}
+.pyq-paper-cta-text h3 {
+  margin: 4px 0 6px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.pyq-paper-cta-text p {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--ink2);
+}
+.pyq-paper-cta-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: #4f46e5;
+}
+.pyq-paper-cta-btn {
+  padding: 10px 18px;
+  background: #4f46e5;
+  color: #fff !important;
+  font-size: 13.5px;
+  font-weight: 700;
+  border-radius: 8px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: opacity .15s ease;
+}
+.pyq-paper-cta-btn:hover {
+  opacity: 0.9;
 }
 
 .pyq-answer-banner {

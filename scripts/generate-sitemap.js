@@ -7,6 +7,8 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
+const BLOG_URL = `${BASE}/blog`
+const ARTICLE_URL = `${BASE}/blog/indian-rivers-and-tributaries`
 
 async function generate() {
   console.log('Generating sitemap fallback...')
@@ -14,10 +16,24 @@ async function generate() {
   const res = await fetch(`${API}/sitemap.xml`, { signal: AbortSignal.timeout(30000) })
   if (!res.ok) throw new Error(`/sitemap.xml -> ${res.status}`)
 
-  const xml = (await res.text()).replaceAll(
+  let xml = (await res.text()).replaceAll(
     `${BASE}/rivers-of-india`,
     `${BASE}/india-physical-geography-map`,
   )
+  if (!xml.includes(`<loc>${ARTICLE_URL}</loc>`)) {
+    if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+    xml = xml.replace(
+      '</urlset>',
+      `  <url>\n    <loc>${ARTICLE_URL}</loc>\n  </url>\n</urlset>`,
+    )
+  }
+  if (!xml.includes(`<loc>${BLOG_URL}</loc>`)) {
+    if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+    xml = xml.replace(
+      '</urlset>',
+      `  <url>\n    <loc>${BLOG_URL}</loc>\n  </url>\n</urlset>`,
+    )
+  }
   const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
   const urlCount = [...xml.matchAll(/<url(?:\s|>)/g)].length
 

@@ -45,7 +45,7 @@ const HEADING_ICON: Record<string, string> = {
   explanation: '📝',
 }
 
-export function parseExplanation(raw: string): Block[] {
+function parseExplanation(raw: string): Block[] {
   const lines = raw.replace(/\r/g, '').split('\n')
   const blocks: Block[] = []
   let list: ListItem[] | null = null

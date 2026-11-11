@@ -400,6 +400,11 @@ export function AdminDashboardPage() {
   const [statusMsg, setStatusMsg] = useState<StatusMsg | null>(null)
   const [saving, setSaving] = useState(false)
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('admin-dark') === '1')
+
+  const toast = useCallback((kind: StatusMsg['kind'], text: string) => {
+    setStatusMsg({ kind, text })
+    setTimeout(() => setStatusMsg(null), 5000)
+  }, [])
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   // ── Cutoff form state ──────────────────────────────────────
@@ -647,11 +652,6 @@ export function AdminDashboardPage() {
   const selectedMock = mocks.find((m) => m.slug === selectedMockSlug) ?? null
 
   usePageMeta({ title: 'Admin | Ministry of Papers', description: 'Admin panel.', canonicalPath: '/admin' })
-
-  const toast = (kind: StatusMsg['kind'], text: string) => {
-    setStatusMsg({ kind, text })
-    setTimeout(() => setStatusMsg(null), 5000)
-  }
 
   // ── Load data ───────────────────────────────────────────────
 

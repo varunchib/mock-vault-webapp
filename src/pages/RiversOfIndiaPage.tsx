@@ -59,7 +59,7 @@ type PinchGesture = {
   anchor: [number, number]
 }
 
-type River = {
+export type River = {
   name: string
   type: 'H' | 'P'
   color: string
@@ -75,7 +75,9 @@ type River = {
   labelPoint?: [number, number]
 }
 
-const RIVERS: River[] = [
+// Shared by the map renderer and the standalone river guide.
+// eslint-disable-next-line react-refresh/only-export-components
+export const RIVERS: River[] = [
   {
     name: 'Indus',
     type: 'H',
@@ -257,7 +259,7 @@ const RIVER_LABEL_FRACTIONS: Record<string, number> = {
 }
 
 type RiverFilter = 'A' | 'H' | 'P'
-type RiverStudyDetails = {
+export type RiverStudyDetails = {
   leftBank: string[]
   rightBank: string[]
   districts: { state: string; names: string[] }[]
@@ -293,7 +295,9 @@ const TRIBUTARY_EXPLANATIONS: Record<string, string> = {
   Sankh: 'A headstream of the Brahmani: it joins the South Koel near Rourkela to form the Brahmani.',
 }
 
-const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
+// Shared by the map renderer and the standalone river guide.
+// eslint-disable-next-line react-refresh/only-export-components
+export const RIVER_STUDY_DETAILS: Record<string, RiverStudyDetails> = {
   Indus: {
     leftBank: ['Zanskar', 'Suru (including the Dras system)', 'Soan (Sohan)', 'Jhelum', 'Chenab', 'Ravi', 'Beas', 'Sutlej', 'Panjnad'],
     rightBank: ['Shyok (Nubra joins the Shyok)', 'Shigar', 'Gilgit (receives the Hunza)', 'Swat', 'Kunar (Chitral)', 'Kurram', 'Gomal', 'Tochi (Gambila)', 'Kabul'],
@@ -1314,6 +1318,12 @@ export function RiversOfIndiaPage() {
             study exam facts for important Indian water bodies.
           </p>
         </header>
+
+        <p className="rivers-article-link">
+          <Link to="/blog/indian-rivers-and-tributaries">
+            Read the guide to India’s major river systems and tributaries <span aria-hidden="true">→</span>
+          </Link>
+        </p>
 
         <section className="rivers-map-section" aria-label="Interactive map of Indian rivers and lakes">
           <div className="rivers-map-column">

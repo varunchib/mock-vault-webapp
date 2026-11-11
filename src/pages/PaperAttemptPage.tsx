@@ -180,8 +180,7 @@ export function PaperAttemptPage() {
   const resultSavedRef      = useRef(false)
   const startTimeRef        = useRef(Date.now())
   const submittedRef        = useRef(false)
-  const resumeFetchedAtMs   = useRef(0)
-  const [, forceResumeTick] = useState(0)
+  const [resumeRemainingSeconds, setResumeRemainingSeconds] = useState<number | null>(null)
 
   useEffect(() => { submittedRef.current = submitted }, [submitted])
 
@@ -201,7 +200,9 @@ export function PaperAttemptPage() {
 
   useEffect(() => {
     if (!resumeDetected || examStarted) return
-    const id = window.setInterval(() => forceResumeTick((n) => n + 1), 1000)
+    const id = window.setInterval(() => {
+      setResumeRemainingSeconds((prev) => (prev !== null && prev > 0 ? prev - 1 : 0))
+    }, 1000)
     return () => window.clearInterval(id)
   }, [resumeDetected, examStarted])
 
@@ -276,7 +277,7 @@ export function PaperAttemptPage() {
         }
         const existing = liveAttempts.find((a) => a.paperSlug === slug)
         if (existing) {
-          resumeFetchedAtMs.current = Date.now()
+          setResumeRemainingSeconds(existing.remainingSeconds)
           setExistingAttempt(existing)
           setResumeDetected(true)
         }
@@ -616,8 +617,7 @@ export function PaperAttemptPage() {
     const hasNeg = (paper.negativeMarking ?? 0) > 0
 
     if (resumeDetected && existingAttempt) {
-      const elapsed = Math.floor((Date.now() - resumeFetchedAtMs.current) / 1000)
-      const liveRemaining = Math.max(0, existingAttempt.remainingSeconds - elapsed)
+      const liveRemaining = resumeRemainingSeconds ?? existingAttempt.remainingSeconds
       return (
         <div className="pa-intro-page">
           <div className="pa-intro-card pa-resume-card">

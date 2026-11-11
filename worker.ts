@@ -17,6 +17,9 @@ import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
 import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
 import { TermsPage } from './src/pages/TermsPage'
 import { RiversOfIndiaPage } from './src/pages/RiversOfIndiaPage'
+import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
+import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
+import { BlogIndexPage } from './src/pages/BlogIndexPage'
 import { MemoryRouter } from 'react-router-dom'
 import type { Exam } from './src/lib/api'
 
@@ -282,6 +285,26 @@ const STATIC_META: Record<string, PageMeta> = {
       },
     },
   },
+  '/blog': {
+    title: 'Blog | Ministry of Papers',
+    description: 'Read the Indian rivers guide, with major river systems, tributaries, sources and routes.',
+    contentHtml: renderStaticPage('/blog', createElement(BlogIndexPage)),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Articles and study guides',
+      description: 'A guide to India’s major rivers, tributaries, sources and drainage.',
+      url: `${BASE}/blog`,
+      inLanguage: 'en-IN',
+      isPartOf: { '@type': 'WebSite', name: 'Ministry of Papers', url: BASE },
+    },
+  },
+  '/blog/indian-rivers-and-tributaries': {
+    title: INDIAN_RIVERS_ARTICLE_META.title,
+    description: INDIAN_RIVERS_ARTICLE_META.description,
+    contentHtml: renderStaticPage('/blog/indian-rivers-and-tributaries', createElement(IndianRiversBlogPage)),
+    jsonLd: INDIAN_RIVERS_ARTICLE_META.jsonLd,
+  },
   '/about': {
     title: 'About - Ministry of Papers',
     description: "Ministry of Papers is India's free platform for previous year exam questions - mission, content policy, and contact.",
@@ -334,7 +357,9 @@ const STATIC_META: Record<string, PageMeta> = {
 // found it still shipping as that page's title.
 // '27' ensures title generation sees the fresh question data after ignoring
 // tags that merely repeat the exam, year or subject.
-const API_CACHE_VERSION = '27'
+// '28' refreshes the edge cache for the human-rewritten JKCCE 2025 GS-I
+// explanations and curated topic tags.
+const API_CACHE_VERSION = '29'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -791,7 +816,7 @@ function expandGenericHeading(question: string, heading: string): string {
   if (!isGenericStem(heading, true)) return heading
 
   // The asked line was boilerplate; the opening line may carry the topic.
-  let base = lines[0]
+  const base = lines[0]
   if (!isGenericStem(base, true)) return base
 
   const next = lines.find((l) => l !== base && l !== heading
@@ -1167,7 +1192,6 @@ function notFoundResponse(certainty: 'inferred' | 'decided' = 'inferred'): Respo
     status: 404,
     headers: {
       'content-type': 'text/html; charset=UTF-8',
-      'x-robots-tag': 'noindex',
       'cache-control': certainty === 'decided' ? 'public, max-age=300' : 'public, max-age=5',
     },
   })
@@ -1247,10 +1271,8 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         apiJson<QuestionData[]>(`${API}/api/v1/papers/${slug}/questions`, 3600, clientIp),
       ])
       if (!p) return null
-      // A paper without a meaningful question set is an announcement/stub, not
-      // a useful PYQ resource. Keep it reachable for visitors but don't ask
-      // Google to index an empty or near-empty page.
-      const paperThin = (questions ?? []).length < 5
+      // Only noindex a paper when it has zero content (0 questions).
+      const paperThin = (questions ?? []).length === 0
       const override = paperSeoOverride(p.slug)
       const canonical = `${BASE}${paperPath(p.slug)}`
       const title = override?.title ?? titleFit(`${p.title} PYQ - Solved Questions & Answers`)
@@ -1490,6 +1512,7 @@ function injectMeta(html: string, meta: PageMeta, pathname: string): string {
     result = result.replace('</head>', `  <meta name="robots" content="${esc(meta.robots)}" />\n</head>`)
   }
 
+
   const content = meta.contentHtml ?? `<h1>${esc(h1Text(meta.title))}</h1>`
   return result.replace('<div id="root"></div>', `<div id="root">${content}</div>`)
 }
@@ -1514,12 +1537,10 @@ export default {
       return Response.redirect(dest.toString(), 301)
     }
 
-    // The blog is retired. Known articles 301 above; anything else under /blog
-    // is gone for good and must say so with a real status. Falling through to
-    // the SPA returned 200 with an empty shell that client-redirects to "/",
-    // which Google classifies as a Soft 404 — the one blog-related error that
-    // would actually show up in Search Console.
-    if (path === '/blog' || path.startsWith('/blog/')) {
+    // Only the blog index and current river guide are active. Unknown blog paths
+    // must return a real 404 rather than an SPA shell that Google sees as a soft 404.
+    const canonicalBlogPath = path.endsWith('/') ? path.slice(0, -1) : path
+    if (canonicalBlogPath.startsWith('/blog/') && canonicalBlogPath !== '/blog/indian-rivers-and-tributaries') {
       return notFoundResponse('decided')
     }
 
@@ -1573,10 +1594,26 @@ export default {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
           headers.set('cache-control', 'public, max-age=600')
-          const sitemap = (await res.text()).replaceAll(
+          let sitemap = (await res.text()).replaceAll(
             `${BASE}/rivers-of-india`,
             `${BASE}/india-physical-geography-map`,
           )
+          const articleUrl = `${BASE}/blog/indian-rivers-and-tributaries`
+          const blogUrl = `${BASE}/blog`
+          if (!sitemap.includes(`<loc>${articleUrl}</loc>`)) {
+            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+            sitemap = sitemap.replace(
+              '</urlset>',
+              `  <url>\n    <loc>${articleUrl}</loc>\n  </url>\n</urlset>`,
+            )
+          }
+          if (!sitemap.includes(`<loc>${blogUrl}</loc>`)) {
+            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+            sitemap = sitemap.replace(
+              '</urlset>',
+              `  <url>\n    <loc>${blogUrl}</loc>\n  </url>\n</urlset>`,
+            )
+          }
           headers.delete('content-length')
           return new Response(sitemap, { status: 200, headers })
         }

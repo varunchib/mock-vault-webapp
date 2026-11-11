@@ -18,6 +18,8 @@ import { TermsPage }         from '../pages/TermsPage'
 import { AboutPage }         from '../pages/AboutPage'
 import { PostGuidePage }     from '../pages/PostGuidePage'
 import { RiversOfIndiaPage } from '../pages/RiversOfIndiaPage'
+import { IndianRiversBlogPage } from '../pages/IndianRiversBlogPage'
+import { BlogIndexPage } from '../pages/BlogIndexPage'
 
 // Lazy — auth-gated or heavy pages not needed on initial load
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
@@ -123,6 +125,8 @@ export function AppRoutes() {
       <Route path="/terms"        element={<TermsPage />} />
       <Route path="/about"        element={<AboutPage />} />
       <Route path="/india-physical-geography-map" element={<RiversOfIndiaPage />} />
+      <Route path="/blog" element={<BlogIndexPage />} />
+      <Route path="/blog/indian-rivers-and-tributaries" element={<IndianRiversBlogPage />} />
       <Route path="/rivers-of-india" element={<Navigate to="/india-physical-geography-map" replace />} />
       {/* Legacy redirects */}
       <Route path="/exam"        element={<Navigate to="/exams" replace />} />

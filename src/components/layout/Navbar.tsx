@@ -8,6 +8,7 @@ import { useAuth } from '../../context/useAuth'
 
 const NAV_LINKS = [
   { label: 'Exams', to: '/exams', hash: false },
+  { label: 'Blogs', to: '/blog', hash: false },
   { label: 'How it works', to: '/#how', hash: true },
   { label: 'Pricing', to: '/#pricing', hash: true },
 ]

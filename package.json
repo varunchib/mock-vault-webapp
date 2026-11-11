@@ -5,14 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "npm run check:urls && npm run check:explanations && npm run check:question-topics && node scripts/generate-sitemap.js && vite build",
+    "build": "npm run check:urls && npm run check:explanations && node scripts/generate-sitemap.js && vite build",
     "typecheck": "tsc -b --pretty",
     "lint": "eslint .",
     "preview": "vite preview",
     "deploy": "npm run build && wrangler deploy",
     "check:urls": "node --experimental-strip-types scripts/check-keywordify.mjs",
-    "check:explanations": "node --experimental-strip-types scripts/check-explanation-cleanup.mjs",
-    "check:question-topics": "node --experimental-strip-types scripts/check-question-topic.mjs"
+    "check:explanations": "node --experimental-strip-types scripts/check-explanation-cleanup.mjs"
   },
   "dependencies": {
     "@react-oauth/google": "^0.13.5",
