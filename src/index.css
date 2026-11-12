@@ -22480,3 +22480,34 @@ html {
   padding: 0.6rem 1.15rem; border-radius: 8px; border: 1px solid var(--line);
   background: var(--ink); color: var(--white); font-weight: 600; cursor: pointer;
 }
+
+/* ── Indian rivers article: quick answer, mistakes, PYQs, FAQ ─────────── */
+.river-guide-byline a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
+.river-guide-answer {
+  margin: 24px 0 28px;
+  padding: 18px 20px;
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: var(--line2);
+}
+.river-guide-answer > h2 { margin: 0 0 8px; font-size: 16px; }
+.river-guide-answer p { margin: 0 0 10px; color: var(--ink2); line-height: 1.7; }
+.river-guide-answer ul { margin: 0; padding-left: 20px; color: var(--ink2); line-height: 1.7; }
+.river-guide-mistakes, .river-guide-pyqs, .river-guide-faqs { margin: 34px 0; }
+.river-guide-mistakes ol, .river-guide-pyqs ul { padding-left: 22px; color: var(--ink2); line-height: 1.75; }
+.river-guide-mistakes li, .river-guide-pyqs li { margin-bottom: 8px; }
+.river-guide-pyqs a { color: var(--accent); font-weight: 600; }
+.river-guide-pyq-exam {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ink3);
+  white-space: nowrap;
+}
+.river-guide-faq { border-bottom: 1px solid var(--line); padding: 12px 0; }
+.river-guide-faq summary { cursor: pointer; font-weight: 600; color: var(--ink); }
+.river-guide-faq p { margin: 8px 0 0; color: var(--ink2); line-height: 1.75; }
