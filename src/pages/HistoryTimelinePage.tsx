@@ -25,24 +25,34 @@ import {
 
 export const HISTORY_TIMELINE_FAQS = [
   {
-    q: 'What is the exact chronological timeline of Modern Indian History for competitive exams?',
-    a: 'For UPSC, State PSCs, and SSC exams, Modern Indian History spans 1757 to 1947 and is studied across five distinct eras: (1) 1757–1857: British Expansion & Company Rule (Plassey, Buxar, Subsidiary Alliance, Doctrine of Lapse, 1857 Revolt); (2) 1858–1905: Direct Crown Rule & Moderate Phase (GOI Act 1858, Ripon’s Local Self-Government, 1885 INC founding, Drain of Wealth); (3) 1905–1919: Swadeshi Movement, Extremist Phase & Home Rule (1905 Bengal Partition, 1909 Morley-Minto, 1916 Lucknow Pact, 1917 Champaran); (4) 1919–1939: Gandhian Mass Movements (Non-Cooperation 1920, Civil Disobedience 1930, 1935 GOI Act); and (5) 1939–1947: Quit India Movement, Cabinet Mission, Partition & Independence.',
+    examTag: 'UPSC CSE Prelims 2021',
+    q: 'With reference to 8th August 1942 in Indian freedom struggle, which one of the following statements is correct?',
+    a: 'On 8 August 1942, the All India Congress Committee (AICC) met at Gowalia Tank (August Kranti Maidan) in Bombay and ratified the historic "Quit India Resolution", where Mahatma Gandhi gave the famous mantra "Do or Die" (Karo ya Maro). In the early hours of 9 August 1942, the British colonial administration launched "Operation Zero Hour", arresting all major Congress leaders (Gandhi, Nehru, Patel, Azad).',
+    takeaway: 'Operation Zero Hour occurred immediately following the 8 August 1942 Quit India resolution; Aruna Asaf Ali hoisted the tricolor at Gowalia Tank.',
   },
   {
-    q: 'Which events of Modern Indian History have the highest PYQ appearance in UPSC and State PSCs?',
-    a: 'The highest-yield events tested repeatedly include: Government of India Act 1935 (Provincial Autonomy & Federal Court), Quit India Movement 1942 (Operation Zero Hour & Parallel Governments), Dandi March & Civil Disobedience 1930, Swadeshi Movement & 1905 Bengal Partition, Non-Cooperation Movement 1920, Morley-Minto Reforms 1909 (Separate Electorates), Revolt of 1857, Doctrine of Lapse (Dalhousie’s chronological annexation order), Subsidiary Alliance (Wellesley’s treaties), and the Cabinet Mission Plan 1946.',
+    examTag: 'UPSC CSE Prelims 2020',
+    q: 'Indigo cultivation in India declined by the beginning of the 20th century primarily because of which reason?',
+    a: 'Indigo cultivation declined sharply by the start of the 20th century due to its unprofitability in the world market following the German invention and commercial synthesis of synthetic chemical dyes (aniline dyes). The synthetic dyes made natural blue indigo economically unviable, leading European planters in Champaran and Bengal to force ryots to pay heavy illegal cesses (Tinkathia system compensation) to release them from contracts.',
+    takeaway: 'Decline was triggered by German synthetic dyes, not peasant resistance or British government prohibition.',
   },
   {
-    q: 'What is the chronological sequence of states annexed under Dalhousie’s Doctrine of Lapse?',
-    a: 'The strict chronological order of states annexed under Lord Dalhousie’s Doctrine of Lapse is: Satara (1848) → Jaitpur and Sambalpur (1849) → Baghat (1850) → Udaipur (1852) → Jhansi (1853) → Nagpur (1854). Note: Awadh was annexed in 1856 on the grounds of "maladministration" (based on the Outram Report), NOT under the Doctrine of Lapse.',
+    examTag: 'UPSC CSE Prelims 2019 / JKPSC CCE',
+    q: 'With reference to the Swadeshi Movement (1905), which of the following statements is/are correct regarding national education and indigenous industry?',
+    a: 'Both statements frequently tested are correct: (1) The Swadeshi Movement gave a massive impetus to indigenous industries, reviving national textile mills, soap and match factories, national banks, and insurance companies; (2) In August 1906, the National Council of Education was formally established to organize an autonomous system of education (literary, scientific, and technical) on national lines, along with the Bengal National College headed by Sri Aurobindo.',
+    takeaway: 'National Council of Education (1906) & Bengal Chemicals (P.C. Ray) were direct institutional fruits of the Swadeshi Movement.',
   },
   {
-    q: 'What were the key differences between the Moderates and Extremists in the Indian National Congress?',
-    a: 'The Moderates (1885–1905), led by Dadabhai Naoroji, Gopal Krishna Gokhale, and Pherozeshah Mehta, believed in constitutional agitation through petitions, prayers, and memorandums (the "3 Ps") within the British framework. The Extremists (1905–1919), led by the Lal-Bal-Pal trio (Lala Lajpat Rai, Bal Gangadhar Tilak, Bipin Chandra Pal) and Aurobindo Ghosh, demanded "Swaraj" as a fundamental right through mass mobilization, passive resistance, boycott of British goods/institutions, and national education.',
+    examTag: 'UPSC CSE Prelims 2022',
+    q: 'In the Government of India Act 1919 (Montagu-Chelmsford Reforms), provincial subjects were divided into "Reserved" and "Transferred" subjects. Which were treated as Reserved subjects?',
+    a: 'Under the 1919 Act’s provincial "Dyarchy", subjects were bifurcated: (1) Reserved subjects (administered by the Governor and his Executive Council without responsibility to the provincial legislature) included Police, Land Revenue, Administration of Justice, Irrigation, and Finance; (2) Transferred subjects (administered by the Governor on the advice of Indian ministers responsible to the legislative council) included Local Self-Government, Education, Public Health, and Agriculture.',
+    takeaway: 'Key trap: Local Self-Government and Education were "Transferred", while Police, Justice, and Land Revenue were strictly "Reserved".',
   },
   {
-    q: 'How did the Government of India Act 1935 shape the modern Constitution of India?',
-    a: 'The Government of India Act 1935 provided the structural blueprint for over 250 provisions in the 1950 Indian Constitution. It established Provincial Autonomy (abolishing dyarchy in provinces), divided legislative powers into Three Lists (Federal, Provincial, Concurrent), created the Federal Court of India (forerunner to the Supreme Court), provided for the Reserve Bank of India, and established Public Service Commissions at central and provincial levels.',
+    examTag: 'UPSC CSE Prelims 2018 / BPSC CCE',
+    q: 'Which was the very first act enacted by the British Parliament to control and regulate the affairs of the East India Company in India?',
+    a: 'The Regulating Act of 1773 was the first landmark statute passed by the British Parliament to supervise and regulate the commercial and administrative affairs of the East India Company. It elevated the Governor of Bengal to "Governor-General of Bengal" (Lord Warren Hastings), established an Executive Council of four members, and provided for the establishment of the Supreme Court of Judicature at Calcutta (1774) with Sir Elijah Impey as the first Chief Justice.',
+    takeaway: '1773 Regulating Act = First parliamentary control + Governor-General of Bengal + 1774 Supreme Court at Calcutta.',
   },
 ]
 
@@ -56,8 +66,8 @@ export function HistoryTimelinePage() {
   const timelineTopRef = React.useRef<HTMLDivElement>(null)
 
   usePageMeta({
-    title: 'Modern Indian History Interactive Timeline (1757–1947): Events, Acts & PYQ Rankings | Ministry of Papers',
-    description: 'Master Modern Indian History (1757–1947) with an interactive UPSC-level timeline. Discover historical significance, exam frequency rankings, Governor-Generals, and landmark British Acts.',
+    title: 'Modern Indian History: Chronological Timeline (1757–1947) | Ministry of Papers',
+    description: 'Master Modern Indian History (1757–1947) in strict chronological sequence. Verified exam takeaways, Governor-Generals, and landmark British Acts for UPSC & State PSCs.',
     canonicalPath: '/modern-indian-history-timeline',
   })
 
@@ -226,10 +236,10 @@ export function HistoryTimelinePage() {
         '@type': 'FAQPage',
         mainEntity: HISTORY_TIMELINE_FAQS.map((faq) => ({
           '@type': 'Question',
-          name: faq.q,
+          name: `[${faq.examTag}] ${faq.q}`,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: faq.a,
+            text: `${faq.a} Key Takeaway: ${faq.takeaway}`,
           },
         })),
       },
@@ -242,6 +252,24 @@ export function HistoryTimelinePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* Sleek Custom Tab Scrollbar Styles */}
+      <style>{`
+        .custom-tab-scroller::-webkit-scrollbar {
+          height: 6px;
+        }
+        .custom-tab-scroller::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 6px;
+        }
+        .custom-tab-scroller::-webkit-scrollbar-thumb {
+          background: #99f6e4;
+          border-radius: 6px;
+        }
+        .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
+          background: #0f766e;
+        }
+      `}</style>
 
       <div className="public-shell">
         {/* Breadcrumb Navigation */}
@@ -258,7 +286,7 @@ export function HistoryTimelinePage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="public-kicker" style={{ margin: 0 }}>Interactive History Study Suite</span>
             <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
-              1757 – 1947 · 5 Eras · UPSC &amp; PSC PYQ Rankings
+              1757 – 1947 · 5 Eras · Complete Chronological Timeline
             </span>
           </div>
           <h1
@@ -271,10 +299,10 @@ export function HistoryTimelinePage() {
               lineHeight: '1.2',
             }}
           >
-            Modern Indian History Timeline (1757–1947): Events &amp; PYQ Rankings
+            Modern Indian History: Chronological Timeline (1757–1947)
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
-            Master the complete chronological arc of Modern Indian History from the Battle of Plassey (1757) to Independence (1947). Learn line-by-line with verified past examination appearance tags, student-friendly teaching notes, Governor-Generals, and landmark British Acts.
+            Master the complete chronological arc of Modern Indian History from the Battle of Plassey (1757) to Independence (1947). Learn line-by-line with verified past exam takeaways, student-friendly teaching notes, Governor-Generals, and landmark British Acts.
           </p>
 
           {/* Quick Metrics Ribbon */}
@@ -322,13 +350,17 @@ export function HistoryTimelinePage() {
 
         {/* Global Tab Switcher */}
         <div
+          role="tablist"
+          className="custom-tab-scroller"
           style={{
             display: 'flex',
             gap: '6px',
             borderBottom: '2px solid var(--line, #e2e8f0)',
             marginBottom: '20px',
             overflowX: 'auto',
-            paddingBottom: '2px',
+            paddingBottom: '6px',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#99f6e4 #f1f5f9',
           }}
         >
           <button
@@ -1305,7 +1337,7 @@ export function HistoryTimelinePage() {
                         border: 'none',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        alignItems: 'flex-start',
                         gap: '12px',
                         textAlign: 'left',
                         cursor: 'pointer',
@@ -1314,10 +1346,29 @@ export function HistoryTimelinePage() {
                         color: 'var(--ink, #0f172a)',
                       }}
                     >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <HelpCircle size={17} color="var(--brand, #0f766e)" />
-                        {faq.q}
-                      </span>
+                      <div>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            background: '#eff6ff',
+                            color: '#1d4ed8',
+                            border: '1px solid #bfdbfe',
+                            marginBottom: '6px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.4px',
+                          }}
+                        >
+                          {faq.examTag}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <HelpCircle size={17} color="var(--brand, #0f766e)" style={{ flexShrink: 0 }} />
+                          <span>{faq.q}</span>
+                        </div>
+                      </div>
                       <ChevronRight
                         size={18}
                         color="var(--ink2, #64748b)"
@@ -1325,6 +1376,7 @@ export function HistoryTimelinePage() {
                           transform: isOpen ? 'rotate(90deg)' : 'none',
                           transition: 'transform 0.2s',
                           flexShrink: 0,
+                          marginTop: '4px',
                         }}
                       />
                     </button>
@@ -1339,7 +1391,10 @@ export function HistoryTimelinePage() {
                           paddingTop: '14px',
                         }}
                       >
-                        {faq.a}
+                        <p style={{ margin: '0 0 10px' }}>{faq.a}</p>
+                        <div style={{ background: '#f8fafc', borderLeft: '3px solid var(--brand, #0f766e)', padding: '8px 12px', borderRadius: '0 6px 6px 0', fontSize: '12.5px', color: '#0f766e' }}>
+                          <strong>Exam Takeaway:</strong> {faq.takeaway}
+                        </div>
                       </div>
                     )}
                   </div>

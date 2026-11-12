@@ -165,24 +165,34 @@ export const SCHEDULES_DATABASE: ConstitutionalSchedule[] = [
 
 export const CONSTITUTION_EXPLORER_FAQS = [
   {
-    q: 'How many articles, parts, and schedules are in the Constitution of India?',
-    a: 'Originally, the Constitution of India had 395 articles divided into 22 parts and 8 schedules (adopted on 26 November 1949 and enacted on 26 January 1950). Following numerous constitutional amendments, it now encompasses over 448 articles across 25 parts and 12 schedules. The sequential numbering continues to end at Article 395, with newly created provisions inserted with alphabetical suffixes (e.g. Articles 21A, 39A, 51A, 243A–ZG, 300A, 338B, and 371A–J).',
+    examTag: 'UPSC CSE Prelims 2020 / JKPSC CCE',
+    q: 'The Preamble to the Constitution of India is: (a) a part of the Constitution; but has no legal effect (b) not a part of the Constitution and has no legal effect either (c) a part of the Constitution and has the same legal effect as any other part (d) a part of the Constitution, but has no legal effect independently of other parts',
+    a: 'Option (d) is correct. The Supreme Court in Kesavananda Bharati (1973) and LIC of India (1995) definitively established that the Preamble IS an integral part of the Constitution of India. However, the Preamble is non-justiciable and non-enforceable on its own in any court of law; it cannot create substantive enforceable rights or powers by itself independently of other operational articles of the Constitution.',
+    takeaway: 'Kesavananda Bharati established: Preamble is an integral part of the Constitution, but has no legal effect independently of other provisions.',
   },
   {
-    q: 'What is the Preamble of the Constitution of India and can it be amended?',
-    a: 'The Preamble is the preface or introduction to the Constitution, based on the "Objectives Resolution" moved by Jawaharlal Nehru on 13 December 1946. In the landmark Kesavananda Bharati case (1973), the Supreme Court ruled that the Preamble is an integral part of the Constitution and can be amended under Article 368, provided such amendment does not alter the "Basic Structure". It has been amended once by the 42nd Amendment Act (1976), which added the words "Socialist", "Secular", and "Integrity".',
+    examTag: 'UPSC CSE Prelims 2020',
+    q: 'A "Constitutional Government" by definition is: (a) government by popular representative (b) multi-party government (c) limited government (d) government by legislature',
+    a: 'Option (c) is correct. Constitutionalism by definition denotes a "Limited Government"—a political system where the powers of government are defined, circumscribed, and limited by constitutional law and fundamental rights to prevent tyranny, majoritarian excess, and arbitrary executive actions.',
+    takeaway: 'Core conceptual definition: Constitutional Government = Limited Government (safeguarded by fundamental rights and judicial review).',
   },
   {
-    q: 'Which articles of the Indian Constitution are the most frequently asked in competitive exams?',
-    a: 'The highest-yield articles tested repeatedly in UPSC, JKPSC, and State PSC exams include: Article 14 (Equality before Law), Article 19 (6 Fundamental Freedoms), Article 21 (Protection of Life & Personal Liberty), Article 21A (Right to Education), Article 32 (Constitutional Remedies & 5 Writs), Article 44 (Uniform Civil Code), Article 51A (Fundamental Duties), Article 72 (Presidential Pardons), Article 110 (Money Bills), Article 123 (Presidential Ordinances), Article 148 (CAG), Article 280 (Finance Commission), Article 324 (Election Commission of India), Article 352/356/360 (Emergency Provisions), and Article 368 (Constituent Amendment Power).',
+    examTag: 'UPSC CSE Prelims 2021',
+    q: 'Under the Indian Constitution, concentration of wealth violates which of the following provisions?',
+    a: 'Under Article 39(c) in Part IV (Directive Principles of State Policy), the State is mandated to direct its policy towards securing that the operation of the economic system does not result in the concentration of wealth and means of production to the common detriment. Hence, concentration of wealth directly violates the Directive Principles of State Policy (DPSP).',
+    takeaway: 'Article 39(c) mandates prevention of concentration of wealth; Article 39(b) mandates equitable distribution of material resources.',
   },
   {
-    q: 'Why can Fundamental Rights under Articles 20 and 21 never be suspended during a National Emergency?',
-    a: 'Following extensive executive abuses during the 1975–1977 Emergency, the 44th Constitutional Amendment Act, 1978 amended Article 359 to mandate that the right to protection in respect of conviction for offences (Article 20) and the right to life and personal liberty (Article 21) cannot be suspended by Presidential order under any circumstances, even during a National Emergency.',
+    examTag: 'UPSC CSE Prelims 2017 / JKCCE',
+    q: 'Which of the following are envisaged by the "Right against Exploitation" in the Constitution of India? (1) Prohibition of traffic in human beings and forced labour (2) Abolition of untouchability (3) Protection of the interests of minorities (4) Prohibition of employment of children in factories and mines',
+    a: 'Statements (1) and (4) only. The "Right against Exploitation" is guaranteed under Articles 23 and 24: Article 23 prohibits human trafficking and begar (forced labour), while Article 24 prohibits the employment of children below 14 years in factories, mines, and hazardous occupations. In contrast, Abolition of Untouchability is under Article 17 (Right to Equality), and Protection of Minority Interests is under Article 29 (Cultural and Educational Rights).',
+    takeaway: 'Right against Exploitation consists strictly of Articles 23 (human trafficking & begar) and 24 (child labour).',
   },
   {
-    q: 'Is the Preamble legally enforceable in an Indian court of law?',
-    a: 'No, the Preamble of the Constitution of India is non-justiciable. It is neither a direct source of power to the legislature nor a prohibition upon the powers of the legislature. Its provisions cannot be directly enforced in a court of law, but it serves as an interpretive guide for constitutional courts when statutes are ambiguous.',
+    examTag: 'UPSC CSE Prelims 2018 / BPSC CCE',
+    q: 'The Right to Privacy is protected as an intrinsic part of the Right to Life and Personal Liberty under which Article of the Constitution of India?',
+    a: 'The Right to Privacy is an intrinsic fundamental right protected under Article 21 and the freedoms guaranteed in Part III. In the landmark nine-judge Constitution Bench ruling in Justice K.S. Puttaswamy (Retd.) v. Union of India (2017), the Supreme Court unanimously declared Privacy to be a fundamental right inherent in dignity, autonomy, and personal liberty.',
+    takeaway: 'K.S. Puttaswamy (2017) unanimously elevated Right to Privacy into Article 21 (Right to Life & Personal Liberty).',
   },
 ]
 
@@ -378,10 +388,10 @@ export function ConstitutionExplorerPage() {
         '@type': 'FAQPage',
         mainEntity: CONSTITUTION_EXPLORER_FAQS.map((faq) => ({
           '@type': 'Question',
-          name: faq.q,
+          name: `[${faq.examTag}] ${faq.q}`,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: faq.a,
+            text: `${faq.a} Key Takeaway: ${faq.takeaway}`,
           },
         })),
       },
@@ -394,6 +404,24 @@ export function ConstitutionExplorerPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
+
+      {/* Sleek Custom Tab Scrollbar Styles */}
+      <style>{`
+        .custom-tab-scroller::-webkit-scrollbar {
+          height: 6px;
+        }
+        .custom-tab-scroller::-webkit-scrollbar-track {
+          background: #f1f5f9;
+          border-radius: 6px;
+        }
+        .custom-tab-scroller::-webkit-scrollbar-thumb {
+          background: #99f6e4;
+          border-radius: 6px;
+        }
+        .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
+          background: #0f766e;
+        }
+      `}</style>
 
       <div className="public-shell">
         {/* Breadcrumb Navigation */}
@@ -474,13 +502,17 @@ export function ConstitutionExplorerPage() {
 
         {/* Global Tab Switcher */}
         <div
+          role="tablist"
+          className="custom-tab-scroller"
           style={{
             display: 'flex',
             gap: '6px',
             borderBottom: '2px solid var(--line, #e2e8f0)',
             marginBottom: '20px',
             overflowX: 'auto',
-            paddingBottom: '2px',
+            paddingBottom: '6px',
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#99f6e4 #f1f5f9',
           }}
         >
           <button
@@ -1753,7 +1785,7 @@ export function ConstitutionExplorerPage() {
                         border: 'none',
                         display: 'flex',
                         justifyContent: 'space-between',
-                        alignItems: 'center',
+                        alignItems: 'flex-start',
                         gap: '12px',
                         textAlign: 'left',
                         cursor: 'pointer',
@@ -1762,10 +1794,29 @@ export function ConstitutionExplorerPage() {
                         color: 'var(--ink, #0f172a)',
                       }}
                     >
-                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <HelpCircle size={17} color="var(--brand, #0f766e)" />
-                        {faq.q}
-                      </span>
+                      <div>
+                        <span
+                          style={{
+                            display: 'inline-block',
+                            fontSize: '11px',
+                            fontWeight: 800,
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            background: '#eff6ff',
+                            color: '#1d4ed8',
+                            border: '1px solid #bfdbfe',
+                            marginBottom: '6px',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.4px',
+                          }}
+                        >
+                          {faq.examTag}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <HelpCircle size={17} color="var(--brand, #0f766e)" style={{ flexShrink: 0 }} />
+                          <span>{faq.q}</span>
+                        </div>
+                      </div>
                       <ChevronRight
                         size={18}
                         color="var(--ink2, #64748b)"
@@ -1773,6 +1824,7 @@ export function ConstitutionExplorerPage() {
                           transform: isOpen ? 'rotate(90deg)' : 'none',
                           transition: 'transform 0.2s',
                           flexShrink: 0,
+                          marginTop: '4px',
                         }}
                       />
                     </button>
@@ -1787,7 +1839,10 @@ export function ConstitutionExplorerPage() {
                           paddingTop: '14px',
                         }}
                       >
-                        {faq.a}
+                        <p style={{ margin: '0 0 10px' }}>{faq.a}</p>
+                        <div style={{ background: '#f8fafc', borderLeft: '3px solid var(--brand, #0f766e)', padding: '8px 12px', borderRadius: '0 6px 6px 0', fontSize: '12.5px', color: '#0f766e' }}>
+                          <strong>Exam Takeaway:</strong> {faq.takeaway}
+                        </div>
                       </div>
                     )}
                   </div>

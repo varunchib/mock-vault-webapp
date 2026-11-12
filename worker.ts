@@ -346,15 +346,15 @@ const STATIC_META: Record<string, PageMeta> = {
     ],
   },
   '/modern-indian-history-timeline': {
-    title: 'Modern Indian History Timeline (1757–1947): Events & PYQ Rankings | Ministry of Papers',
-    description: 'Master Modern Indian History (1757–1947) with an interactive UPSC-level timeline. Discover historical significance, exam frequency rankings, Governor-Generals, and landmark British Acts.',
+    title: 'Modern Indian History: Chronological Timeline (1757–1947) | Ministry of Papers',
+    description: 'Master Modern Indian History (1757–1947) in strict chronological sequence. Verified exam takeaways, Governor-Generals, and landmark British Acts for UPSC & State PSCs.',
     contentHtml: renderStaticPage('/modern-indian-history-timeline', createElement(HistoryTimelinePage)),
     jsonLd: [
       {
         '@context': 'https://schema.org',
         '@type': 'LearningResource',
-        name: 'Modern Indian History Interactive Timeline (1757–1947)',
-        description: 'Chronological timeline of Modern Indian History from the Battle of Plassey to Independence, with exam appearance frequency rankings for UPSC, JKPSC CCE, and State PSCs.',
+        name: 'Modern Indian History: Chronological Timeline (1757–1947)',
+        description: 'Chronological timeline of Modern Indian History from the Battle of Plassey to Independence, with verified exam takeaways for UPSC, JKPSC CCE, and State PSCs.',
         url: `${BASE}/modern-indian-history-timeline`,
         educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
         learningResourceType: 'Timeline, study guide, and historical reference',
@@ -375,25 +375,25 @@ const STATIC_META: Record<string, PageMeta> = {
         '@type': 'FAQPage',
         mainEntity: HISTORY_TIMELINE_FAQS.map((faq) => ({
           '@type': 'Question',
-          name: faq.q,
+          name: `[${faq.examTag}] ${faq.q}`,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: faq.a,
+            text: `${faq.a} Key Takeaway: ${faq.takeaway}`,
           },
         })),
       },
     ],
   },
   '/ramsar-wetlands-and-national-parks': {
-    title: 'Ramsar Wetlands of India (85 Sites): Chronological Timeline (1981–2024) | Ministry of Papers',
-    description: 'Complete vertical linewise explorer of all 85 Ramsar sites of India in chronological sequence (1981–2024). Details on river basins, endemic fauna, Montreux Record, and high-yield UPSC/PSC facts.',
+    title: 'Ramsar Wetlands of India (103 Sites): Complete Chronological Timeline (1981–2026) | Ministry of Papers',
+    description: 'Complete vertical linewise explorer of all 103 Ramsar sites of India in strict chronological sequence (1981–2026). River basins, endemic fauna, Montreux Record status, tentative candidates, and real UPSC/PSC exam questions.',
     contentHtml: renderStaticPage('/ramsar-wetlands-and-national-parks', createElement(RamsarWetlandsPage)),
     jsonLd: [
       {
         '@context': 'https://schema.org',
         '@type': 'LearningResource',
-        name: 'Ramsar Wetlands of India: Interactive Chronological Timeline (1981–2024)',
-        description: 'Complete pedagogical guide to India’s 85 Ramsar sites arranged chronologically by year of designation, with river basins, endemic fauna, and Montreux Record details for UPSC and State PSC exams.',
+        name: 'Ramsar Wetlands of India: Complete Chronological Timeline (1981–2026)',
+        description: 'Complete pedagogical guide to India’s 103 Ramsar sites arranged chronologically by year of designation (1981–2026), with river basins, endemic fauna, tentative candidate pipelines, and Montreux Record details for UPSC and State PSC exams.',
         url: `${BASE}/ramsar-wetlands-and-national-parks`,
         educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
         learningResourceType: 'Timeline, study guide, and environmental directory',
@@ -414,10 +414,10 @@ const STATIC_META: Record<string, PageMeta> = {
         '@type': 'FAQPage',
         mainEntity: RAMSAR_FAQS.map((faq) => ({
           '@type': 'Question',
-          name: faq.question,
+          name: `[${faq.examTag}] ${faq.question}`,
           acceptedAnswer: {
             '@type': 'Answer',
-            text: faq.answer,
+            text: `${faq.answer} Key Takeaway Rule: ${faq.examTakeaway}`,
           },
         })),
       },
