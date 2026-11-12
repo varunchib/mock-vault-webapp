@@ -286,14 +286,14 @@ const STATIC_META: Record<string, PageMeta> = {
     },
   },
   '/blog': {
-    title: 'Blog | Ministry of Papers',
-    description: 'Read the Indian rivers guide, with major river systems, tributaries, sources and routes.',
+    title: 'Study Guides & Geography Articles | Ministry of Papers',
+    description: 'Explore comprehensive study guides, interactive physical geography maps, and solved paper breakdowns for UPSC, SSC, and State PSC exams.',
     contentHtml: renderStaticPage('/blog', createElement(BlogIndexPage)),
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Articles and study guides',
-      description: 'A guide to India’s major rivers, tributaries, sources and drainage.',
+      description: 'Comprehensive study guides, physical geography resources, and exam syllabus breakdowns.',
       url: `${BASE}/blog`,
       inLanguage: 'en-IN',
       isPartOf: { '@type': 'WebSite', name: 'Ministry of Papers', url: BASE },
