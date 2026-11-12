@@ -16,6 +16,8 @@ import { PyqPaperPage }      from '../pages/PyqPaperPage'
 import { PrivacyPolicyPage } from '../pages/PrivacyPolicyPage'
 import { TermsPage }         from '../pages/TermsPage'
 import { AboutPage }         from '../pages/AboutPage'
+import { ContactPage }       from '../pages/ContactPage'
+import { DisclaimerPage }    from '../pages/DisclaimerPage'
 import { PostGuidePage }     from '../pages/PostGuidePage'
 import { RiversOfIndiaPage } from '../pages/RiversOfIndiaPage'
 import { IndianRiversBlogPage } from '../pages/IndianRiversBlogPage'
@@ -124,6 +126,8 @@ export function AppRoutes() {
       <Route path="/privacy"      element={<PrivacyPolicyPage />} />
       <Route path="/terms"        element={<TermsPage />} />
       <Route path="/about"        element={<AboutPage />} />
+      <Route path="/contact"      element={<ContactPage />} />
+      <Route path="/disclaimer"   element={<DisclaimerPage />} />
       <Route path="/india-physical-geography-map" element={<RiversOfIndiaPage />} />
       <Route path="/blog" element={<BlogIndexPage />} />
       <Route path="/blog/indian-rivers-and-tributaries" element={<IndianRiversBlogPage />} />

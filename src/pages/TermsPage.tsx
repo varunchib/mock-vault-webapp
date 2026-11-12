@@ -5,8 +5,20 @@ import { usePageMeta } from '../lib/usePageMeta'
 export function TermsPage() {
   usePageMeta({
     title: 'Terms of Service — Ministry of Papers',
-    description: 'Terms of Service for Ministry of Papers. Read our terms before using the platform.',
+    description: 'Terms of Service for Ministry of Papers. Acceptable use, intellectual property policy, and candidate terms.',
     canonicalPath: '/terms',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Terms of Service — Ministry of Papers',
+      url: 'https://ministryofpapers.com/terms',
+      publisher: {
+        '@type': 'Organization',
+        name: 'Ministry of Papers',
+        url: 'https://ministryofpapers.com',
+        logo: 'https://ministryofpapers.com/favicon.svg',
+      },
+    },
   })
 
   return React.createElement(React.Fragment, null,
@@ -16,7 +28,7 @@ export function TermsPage() {
           <div className="legal-hero">
             <span className="public-kicker">Legal</span>
             <h1>Terms of Service</h1>
-            <p>Effective date: 22 May 2026 &nbsp;·&nbsp; Ministry of Papers, ministryofpapers.com</p>
+            <p>Effective date: 12 November 2026 &nbsp;·&nbsp; Ministry of Papers, ministryofpapers.com</p>
           </div>
 
           <div className="legal-body">

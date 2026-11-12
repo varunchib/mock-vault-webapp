@@ -13,6 +13,8 @@ import { removeRedundantAnswerLead } from './src/lib/explanationText'
 import { createElement, type ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { AboutPage } from './src/pages/AboutPage'
+import { ContactPage } from './src/pages/ContactPage'
+import { DisclaimerPage } from './src/pages/DisclaimerPage'
 import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
 import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
 import { TermsPage } from './src/pages/TermsPage'
@@ -20,6 +22,7 @@ import { RiversOfIndiaPage } from './src/pages/RiversOfIndiaPage'
 import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
+import { buildGuideFaqs } from './src/lib/guideFaqs'
 import { MemoryRouter } from 'react-router-dom'
 import type { Exam } from './src/lib/api'
 
@@ -306,32 +309,76 @@ const STATIC_META: Record<string, PageMeta> = {
     jsonLd: INDIAN_RIVERS_ARTICLE_META.jsonLd,
   },
   '/about': {
-    title: 'About - Ministry of Papers',
-    description: "Ministry of Papers is India's free platform for previous year exam questions - mission, content policy, and contact.",
+    title: 'About Us — Ministry of Papers | Editorial Policy & Mission',
+    description: "Ministry of Papers is India's independent platform for verified previous year exam questions — mission, 4-step verification standards, and editorial governance.",
     contentHtml: renderStaticPage('/about', createElement(AboutPage)),
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'AboutPage',
       name: 'About Ministry of Papers',
       url: `${BASE}/about`,
+      description: 'Ministry of Papers provides 100% free, human-verified previous year competitive examination questions, official answer keys, and pedagogical explanations for Indian aspirants.',
       publisher: {
         '@type': 'Organization',
         name: 'Ministry of Papers',
         url: BASE,
         logo: `${BASE}/favicon.svg`,
-        contactPoint: { '@type': 'ContactPoint', email: 'hello@ministryofpapers.com', contactType: 'customer support' },
+        foundingDate: '2024',
+        contactPoint: [
+          { '@type': 'ContactPoint', email: 'hello@ministryofpapers.com', contactType: 'general inquiries' },
+          { '@type': 'ContactPoint', email: 'editorial@ministryofpapers.com', contactType: 'editorial and content corrections' },
+          { '@type': 'ContactPoint', email: 'grievance@ministryofpapers.com', contactType: 'grievance officer' },
+        ],
       },
     },
   },
+  '/contact': {
+    title: 'Contact Us — Ministry of Papers',
+    description: 'Get in touch with Ministry of Papers. Email contacts for general inquiries, content error reviews, paper submissions, and statutory grievance redressal.',
+    contentHtml: renderStaticPage('/contact', createElement(ContactPage)),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'ContactPage',
+      name: 'Contact Ministry of Papers',
+      url: `${BASE}/contact`,
+      publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+    },
+  },
+  '/disclaimer': {
+    title: 'Disclaimer & Non-Affiliation Statement — Ministry of Papers',
+    description: 'Disclaimer of government affiliation, nominative trademark fair use, and educational fair dealing policy for Ministry of Papers.',
+    contentHtml: renderStaticPage('/disclaimer', createElement(DisclaimerPage)),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Disclaimer — Ministry of Papers',
+      url: `${BASE}/disclaimer`,
+      publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+    },
+  },
   '/privacy': {
-    title: 'Privacy Policy | Ministry of Papers',
-    description: 'Privacy Policy for Ministry of Papers: what data we collect when you use our free previous-year-question and mock-test platform, how it is used and protected, cookies, third-party analytics, and your rights.',
+    title: 'Privacy Policy — Ministry of Papers',
+    description: 'Privacy Policy for Ministry of Papers: how personal information is collected, protected under DPDP Act 2023, Google OAuth Limited Use disclosure, and Grievance Officer details.',
     contentHtml: renderStaticPage('/privacy', createElement(PrivacyPolicyPage)),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Privacy Policy — Ministry of Papers',
+      url: `${BASE}/privacy`,
+      publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+    },
   },
   '/terms': {
-    title: 'Terms of Service | Ministry of Papers',
-    description: 'Terms of Service for Ministry of Papers: the rules for using our free previous-year-question and mock-test platform, acceptable use, intellectual-property and content policy, disclaimers, and account terms for aspirants.',
+    title: 'Terms of Service — Ministry of Papers',
+    description: 'Terms of Service for Ministry of Papers: candidate rules, acceptable use, public-domain content policy, and user account terms.',
     contentHtml: renderStaticPage('/terms', createElement(TermsPage)),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Terms of Service — Ministry of Papers',
+      url: `${BASE}/terms`,
+      publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+    },
   },
 }
 
@@ -360,7 +407,8 @@ const STATIC_META: Record<string, PageMeta> = {
 // '28' refreshes the edge cache for the human-rewritten JKCCE 2025 GS-I
 // explanations and curated topic tags.
 // '32' refreshes the edge cache after consolidating JKSSB subjects into clean canonical names.
-const API_CACHE_VERSION = '32'
+// '33' refreshes edge cache with upgraded About, Contact, Disclaimer, Privacy, and Guide FAQ schema.
+const API_CACHE_VERSION = '33'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -1173,7 +1221,7 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${htmlText(p.year)} - ${p.questions} questions</small></li>`)
     .join('')
   const syllabus = guide.syllabus
-    .map(s => `<section><h3>${htmlText(s.subject)}</h3><ul>${s.topics.map(t => `<li>${htmlText(t)}</li>`).join('')}</ul></section>`)
+    .map(s => `<section><h3>${htmlText(s.subject)}</h3><p><a href="/exam/${encodeURIComponent(guide.examSlug)}?tab=subjects&amp;subject=${encodeURIComponent(s.subject)}">Practise ${htmlText(s.subject)} solved questions →</a></p><ul>${s.topics.map(t => `<li>${htmlText(t)}</li>`).join('')}</ul></section>`)
     .join('')
   const patternRows = guide.examPattern
     .map(row => `<tr${row.isTotal ? ' class="pg-table-total"' : ''}>
@@ -1252,6 +1300,9 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
       <p>Check the conducting body’s official website for corrigenda or a newer notification before relying on dates or eligibility details:
         <a href="${esc(guide.officialWebsite)}" rel="noopener noreferrer">${htmlText(guide.conductingBody)}</a>.
       </p>
+    </section>
+    <section><h2>Frequently asked questions</h2>
+      <dl>${buildGuideFaqs(guide).map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl>
     </section>
     <p><a href="/guide/${encodeURIComponent(slug)}">Canonical guide page</a></p>
   `, crumbs)
@@ -1571,22 +1622,37 @@ ${stripQuestionNumberPrefix(q.question)}` : stripQuestionNumberPrefix(q.question
         { name: 'Exams', item: `${BASE}/exams` },
         { name: guide.shortName, item: `${BASE}/guide/${slug}` },
       ]
+      const faqs = buildGuideFaqs(guide)
       return {
         title: titleFit(`${guide.shortName} Syllabus & Exam Pattern`),
         description: stripMarkdown(guide.tagline).slice(0, 160),
         contentHtml: renderGuideContent(slug, guide, guideCrumbs),
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'Article',
-          headline: guide.title,
-          description: guide.tagline,
-          url: `${BASE}/guide/${slug}`,
-          // Mirrors the visible "Last updated" rendered by renderGuideContent.
-          datePublished: guide.lastUpdated,
-          dateModified: guide.lastUpdated,
-          author: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-        },
+        jsonLd: [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: guide.title,
+            description: guide.tagline,
+            url: `${BASE}/guide/${slug}`,
+            datePublished: guide.lastUpdated,
+            dateModified: guide.lastUpdated,
+            author: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
+            mainEntityOfPage: `${BASE}/guide/${slug}`,
+          },
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqs.map(f => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: f.a,
+              },
+            })),
+          },
+        ],
       }
     }
 
@@ -1702,7 +1768,7 @@ export default {
         // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=16`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=17`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
@@ -1713,6 +1779,8 @@ export default {
           )
           const articleUrl = `${BASE}/blog/indian-rivers-and-tributaries`
           const blogUrl = `${BASE}/blog`
+          const contactUrl = `${BASE}/contact`
+          const disclaimerUrl = `${BASE}/disclaimer`
           if (!sitemap.includes(`<loc>${articleUrl}</loc>`)) {
             if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
             sitemap = sitemap.replace(
@@ -1725,6 +1793,20 @@ export default {
             sitemap = sitemap.replace(
               '</urlset>',
               `  <url>\n    <loc>${blogUrl}</loc>\n  </url>\n</urlset>`,
+            )
+          }
+          if (!sitemap.includes(`<loc>${contactUrl}</loc>`)) {
+            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+            sitemap = sitemap.replace(
+              '</urlset>',
+              `  <url>\n    <loc>${contactUrl}</loc>\n  </url>\n</urlset>`,
+            )
+          }
+          if (!sitemap.includes(`<loc>${disclaimerUrl}</loc>`)) {
+            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+            sitemap = sitemap.replace(
+              '</urlset>',
+              `  <url>\n    <loc>${disclaimerUrl}</loc>\n  </url>\n</urlset>`,
             )
           }
           headers.delete('content-length')

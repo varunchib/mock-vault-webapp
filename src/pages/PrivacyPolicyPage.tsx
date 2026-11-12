@@ -5,8 +5,21 @@ import { usePageMeta } from '../lib/usePageMeta'
 export function PrivacyPolicyPage() {
   usePageMeta({
     title: 'Privacy Policy — Ministry of Papers',
-    description: 'Privacy Policy for Ministry of Papers. Explains how we collect, use, and protect your personal information, including data received via Google Sign-In.',
+    description: 'Privacy Policy for Ministry of Papers. Explains how we collect, use, and protect your personal information in compliance with DPDP Act 2023, including data received via Google Sign-In.',
     canonicalPath: '/privacy',
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      name: 'Privacy Policy — Ministry of Papers',
+      url: 'https://ministryofpapers.com/privacy',
+      description: 'Privacy Policy and data protection terms for Ministry of Papers, including Google OAuth Limited Use disclosure and Grievance Officer details.',
+      publisher: {
+        '@type': 'Organization',
+        name: 'Ministry of Papers',
+        url: 'https://ministryofpapers.com',
+        logo: 'https://ministryofpapers.com/favicon.svg',
+      },
+    },
   })
 
   return React.createElement(React.Fragment, null,
@@ -16,7 +29,7 @@ export function PrivacyPolicyPage() {
           <div className="legal-hero">
             <span className="public-kicker">Legal</span>
             <h1>Privacy Policy</h1>
-            <p>Effective date: 22 May 2026 &nbsp;·&nbsp; Ministry of Papers, ministryofpapers.com</p>
+            <p>Effective date: 12 November 2026 &nbsp;·&nbsp; Ministry of Papers, ministryofpapers.com</p>
           </div>
 
           <div className="legal-body">
@@ -255,16 +268,22 @@ export function PrivacyPolicyPage() {
             </section>
 
             <section>
-              <h2>12. Contact Us</h2>
+              <h2>12. Statutory Compliance & Grievance Redressal Officer</h2>
               <p>
-                For privacy-related questions, data requests, or account deletion:
+                In compliance with the <strong>Digital Personal Data Protection (DPDP) Act, 2023</strong> and the{' '}
+                <strong>Information Technology (Intermediary Guidelines and Digital Media Ethics Code) Rules, 2021</strong>,
+                Ministry of Papers has appointed a designated Grievance Redressal Officer for user data and privacy concerns.
               </p>
               <ul>
-                <li>Email: <a href="mailto:privacy@ministryofpapers.com">privacy@ministryofpapers.com</a></li>
-                <li>Website: <Link to="/">ministryofpapers.com</Link></li>
+                <li><strong>Designation:</strong> Grievance Redressal Officer</li>
+                <li><strong>Entity:</strong> Ministry of Papers</li>
+                <li><strong>Jurisdiction:</strong> Jammu & Kashmir, India</li>
+                <li><strong>Direct Email:</strong> <a href="mailto:grievance@ministryofpapers.com">grievance@ministryofpapers.com</a></li>
+                <li><strong>General Privacy Desk:</strong> <a href="mailto:privacy@ministryofpapers.com">privacy@ministryofpapers.com</a></li>
+                <li><strong>Response SLA:</strong> Acknowledgement within 24 hours; resolution within 15 calendar days.</li>
               </ul>
               <p>
-                We respond to all privacy requests within 30 days.
+                For further contact options, you may also visit our dedicated <Link to="/contact">Contact Page</Link>.
               </p>
             </section>
 

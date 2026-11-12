@@ -1006,7 +1006,7 @@ export function RiversOfIndiaPage() {
     }
   }
 
-  const selectRiver = (index: number) => {
+  function selectRiver(index: number) {
     if (draggedRef.current) {
       draggedRef.current = false
       return

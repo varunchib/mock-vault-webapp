@@ -4,6 +4,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { useAuth } from '../context/useAuth'
 import { postGuides } from '../data/postGuides'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
+import { buildGuideFaqs } from '../lib/guideFaqs'
 
 function formatUpdated(iso: string): string {
   const d = new Date(iso)
@@ -14,6 +15,7 @@ function formatUpdated(iso: string): string {
 export function PostGuidePage() {
   const { postSlug } = useParams<{ postSlug: string }>()
   const guide = postSlug ? postGuides[postSlug] : null
+  const faqs = guide ? buildGuideFaqs(guide) : []
 
   usePageMeta({
     title: guide ? guide.title : 'Exam Guide | Ministry of Papers',
@@ -21,26 +23,46 @@ export function PostGuidePage() {
     canonicalPath: guide ? `/guide/${postSlug}` : undefined,
     ogType: 'article',
     jsonLd: guide
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'Article',
-          headline: guide.title,
-          description: guide.tagline,
-          datePublished: guide.lastUpdated,
-          dateModified: guide.lastUpdated,
-          url: `https://ministryofpapers.com/guide/${postSlug}`,
-          keywords: `${guide.shortName}, ${guide.shortName} syllabus, ${guide.shortName} exam pattern, ${guide.conductingBody}, ${guide.shortName} previous year papers`,
-          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
-          breadcrumb: {
-            '@type': 'BreadcrumbList',
-            itemListElement: [
-              { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
-              { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
-              { '@type': 'ListItem', position: 3, name: guide.conductingBody, item: `https://ministryofpapers.com/exam/${guide.examSlug}` },
-              { '@type': 'ListItem', position: 4, name: guide.shortName, item: `https://ministryofpapers.com/guide/${postSlug}` },
-            ],
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: guide.title,
+            description: guide.tagline,
+            datePublished: guide.lastUpdated,
+            dateModified: guide.lastUpdated,
+            url: `https://ministryofpapers.com/guide/${postSlug}`,
+            keywords: `${guide.shortName}, ${guide.shortName} syllabus, ${guide.shortName} exam pattern, ${guide.conductingBody}, ${guide.shortName} previous year papers`,
+            author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+            publisher: {
+              '@type': 'Organization',
+              name: 'Ministry of Papers',
+              url: 'https://ministryofpapers.com',
+              logo: 'https://ministryofpapers.com/favicon.svg',
+            },
+            breadcrumb: {
+              '@type': 'BreadcrumbList',
+              itemListElement: [
+                { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+                { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
+                { '@type': 'ListItem', position: 3, name: guide.conductingBody, item: `https://ministryofpapers.com/exam/${guide.examSlug}` },
+                { '@type': 'ListItem', position: 4, name: guide.shortName, item: `https://ministryofpapers.com/guide/${postSlug}` },
+              ],
+            },
           },
-        }
+          {
+            '@context': 'https://schema.org',
+            '@type': 'FAQPage',
+            mainEntity: faqs.map(f => ({
+              '@type': 'Question',
+              name: f.q,
+              acceptedAnswer: {
+                '@type': 'Answer',
+                text: f.a,
+              },
+            })),
+          },
+        ]
       : undefined,
   })
 
@@ -187,7 +209,28 @@ export function PostGuidePage() {
             <div className="pg-syllabus">
               {guide.syllabus.map((block, i) => (
                 <div className="pg-syllabus-block" key={i}>
-                  <h3>{block.subject}</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+                    <h3 style={{ margin: 0 }}>{block.subject}</h3>
+                    <Link
+                      to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(block.subject)}`}
+                      className="pg-subject-practice-btn"
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        fontSize: '12px',
+                        fontWeight: 600,
+                        color: 'var(--brand, #0f766e)',
+                        background: 'var(--brand-bg, #f0fdf4)',
+                        padding: '3px 10px',
+                        borderRadius: '6px',
+                        border: '1px solid var(--brand-border, #bbf7d0)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Practise {block.subject} PYQs →
+                    </Link>
+                  </div>
                   <ul>
                     {block.topics.map((topic, j) => (
                       <li key={j}>{topic}</li>
@@ -272,6 +315,35 @@ export function PostGuidePage() {
                   <li key={i}>{tip}</li>
                 ))}
               </ol>
+            </section>
+          )}
+
+          {/* Frequently Asked Questions */}
+          {faqs.length > 0 && (
+            <section className="pg-section" aria-labelledby="faqs-heading">
+              <h2 id="faqs-heading">Frequently Asked Questions</h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '16px' }}>
+                {faqs.map((faq, i) => (
+                  <details
+                    key={i}
+                    open={i === 0}
+                    style={{
+                      background: 'var(--card-bg, #ffffff)',
+                      border: '1px solid var(--line, #e2e8f0)',
+                      borderRadius: '8px',
+                      padding: '14px 16px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <summary style={{ fontWeight: 600, fontSize: '15px', color: 'var(--ink, #0f172a)' }}>
+                      {faq.q}
+                    </summary>
+                    <p style={{ margin: '10px 0 0', fontSize: '14px', lineHeight: '1.6', color: 'var(--ink2, #475569)' }}>
+                      {faq.a}
+                    </p>
+                  </details>
+                ))}
+              </div>
             </section>
           )}
         </main>
