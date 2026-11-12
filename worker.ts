@@ -20,6 +20,9 @@ import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
 import { TermsPage } from './src/pages/TermsPage'
 import { RiversOfIndiaPage, GEOGRAPHY_MAP_FAQS } from './src/pages/RiversOfIndiaPage'
 import { ConstitutionExplorerPage, CONSTITUTION_EXPLORER_FAQS } from './src/pages/ConstitutionExplorerPage'
+import { HistoryTimelinePage, HISTORY_TIMELINE_FAQS } from './src/pages/HistoryTimelinePage'
+import { RamsarWetlandsPage } from './src/pages/RamsarWetlandsPage'
+import { RAMSAR_FAQS } from './src/data/ramsarSitesIndia'
 import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
@@ -337,6 +340,84 @@ const STATIC_META: Record<string, PageMeta> = {
           acceptedAnswer: {
             '@type': 'Answer',
             text: faq.a,
+          },
+        })),
+      },
+    ],
+  },
+  '/modern-indian-history-timeline': {
+    title: 'Modern Indian History Timeline (1757–1947): Events & PYQ Rankings | Ministry of Papers',
+    description: 'Master Modern Indian History (1757–1947) with an interactive UPSC-level timeline. Discover historical significance, exam frequency rankings, Governor-Generals, and landmark British Acts.',
+    contentHtml: renderStaticPage('/modern-indian-history-timeline', createElement(HistoryTimelinePage)),
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: 'Modern Indian History Interactive Timeline (1757–1947)',
+        description: 'Chronological timeline of Modern Indian History from the Battle of Plassey to Independence, with exam appearance frequency rankings for UPSC, JKPSC CCE, and State PSCs.',
+        url: `${BASE}/modern-indian-history-timeline`,
+        educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
+        learningResourceType: 'Timeline, study guide, and historical reference',
+        isAccessibleForFree: true,
+        inLanguage: 'en-IN',
+        provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+            { '@type': 'ListItem', position: 2, name: 'Study Tools', item: `${BASE}/exams` },
+            { '@type': 'ListItem', position: 3, name: 'Modern Indian History Timeline', item: `${BASE}/modern-indian-history-timeline` },
+          ],
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: HISTORY_TIMELINE_FAQS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      },
+    ],
+  },
+  '/ramsar-wetlands-and-national-parks': {
+    title: 'Ramsar Wetlands of India (85 Sites): Chronological Timeline (1981–2024) | Ministry of Papers',
+    description: 'Complete vertical linewise explorer of all 85 Ramsar sites of India in chronological sequence (1981–2024). Details on river basins, endemic fauna, Montreux Record, and high-yield UPSC/PSC facts.',
+    contentHtml: renderStaticPage('/ramsar-wetlands-and-national-parks', createElement(RamsarWetlandsPage)),
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: 'Ramsar Wetlands of India: Interactive Chronological Timeline (1981–2024)',
+        description: 'Complete pedagogical guide to India’s 85 Ramsar sites arranged chronologically by year of designation, with river basins, endemic fauna, and Montreux Record details for UPSC and State PSC exams.',
+        url: `${BASE}/ramsar-wetlands-and-national-parks`,
+        educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
+        learningResourceType: 'Timeline, study guide, and environmental directory',
+        isAccessibleForFree: true,
+        inLanguage: 'en-IN',
+        provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+            { '@type': 'ListItem', position: 2, name: 'Study Tools', item: `${BASE}/exams` },
+            { '@type': 'ListItem', position: 3, name: 'Ramsar Wetlands Timeline', item: `${BASE}/ramsar-wetlands-and-national-parks` },
+          ],
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: RAMSAR_FAQS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.answer,
           },
         })),
       },

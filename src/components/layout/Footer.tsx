@@ -28,10 +28,11 @@ const footerColumns = [
     title: 'Resources',
     links: [
       { label: 'Constitution of India Explorer', href: '/constitution-of-india' },
+      { label: 'Modern History Timeline (1757–1947)', href: '/modern-indian-history-timeline' },
+      { label: 'Ramsar Wetlands Timeline', href: '/ramsar-wetlands-and-national-parks' },
       { label: 'Interactive Geography Map', href: '/india-physical-geography-map' },
       { label: 'Indian Rivers & Tributaries', href: '/blog/indian-rivers-and-tributaries' },
       { label: 'All Exam Question Papers', href: '/exams' },
-      { label: 'All Post Guides', href: '/exams' },
     ],
   },
   {

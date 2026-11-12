@@ -188,7 +188,7 @@ export const CONSTITUTION_EXPLORER_FAQS = [
 
 export function ConstitutionExplorerPage() {
   const [search, setSearch] = React.useState('')
-  const [activeTab, setActiveTab] = React.useState<'articles' | 'preamble' | 'most-asked' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
+  const [activeTab, setActiveTab] = React.useState<'articles' | 'most-asked' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
   // On coming to this page, Part I is automatically selected as requested
   const [partFilter, setPartFilter] = React.useState<string>('Part I')
   const [frequencyFilter, setFrequencyFilter] = React.useState<'all' | ExamFrequency>('all')
@@ -441,8 +441,8 @@ export function ConstitutionExplorerPage() {
             <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
               <BookOpen size={18} color="var(--brand, #0f766e)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>{frequencyCounts.total}</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Articles (1–395+)</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>395</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Articles (406 with 21A, 51A...)</div>
               </div>
             </div>
 
@@ -499,28 +499,6 @@ export function ConstitutionExplorerPage() {
             }}
           >
             All Articles (395+)
-          </button>
-
-          <button
-            onClick={() => setActiveTab('preamble')}
-            style={{
-              padding: '10px 14px',
-              fontSize: '14px',
-              fontWeight: 700,
-              cursor: 'pointer',
-              background: 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'preamble' ? '3px solid #b45309' : '3px solid transparent',
-              color: activeTab === 'preamble' ? '#b45309' : 'var(--ink2, #64748b)',
-              marginBottom: '-2px',
-              whiteSpace: 'nowrap',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <ScrollText size={15} color={activeTab === 'preamble' ? '#b45309' : 'var(--ink2, #64748b)'} />
-            Preamble of India
           </button>
 
           <button
@@ -674,6 +652,7 @@ export function ConstitutionExplorerPage() {
                     }}
                   >
                     <option value="all">All 25 Parts (Show All 395+ Articles)</option>
+                    <option value="Preamble">📜 Preamble of the Constitution of India</option>
                     {CONSTITUTION_PARTS.map((p) => (
                       <option key={p.part} value={p.part}>
                         {p.part}: {p.name} ({p.articlesRange})
@@ -815,6 +794,242 @@ export function ConstitutionExplorerPage() {
               </div>
             </div>
 
+            {/* Preamble Content when selected in Part Dropdown */}
+            {partFilter === 'Preamble' ? (
+              <div style={{ maxWidth: '860px', margin: '0 auto 30px' }}>
+                {/* Authentic Ornate Preamble Plaque */}
+                <div
+                  style={{
+                    background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                    border: '2px solid #d97706',
+                    borderRadius: '16px',
+                    padding: '36px 32px',
+                    boxShadow: '0 4px 20px rgba(180, 83, 9, 0.12)',
+                    marginBottom: '28px',
+                    textAlign: 'center',
+                  }}
+                >
+                  <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', color: '#b45309', display: 'block', marginBottom: '8px' }}>
+                    The Constitution of India
+                  </span>
+                  <h2
+                    style={{
+                      fontFamily: 'var(--font-heading, "Fraunces", serif)',
+                      fontSize: 'clamp(26px, 4vw, 36px)',
+                      color: '#78350f',
+                      margin: '0 0 20px',
+                      letterSpacing: '1px',
+                    }}
+                  >
+                    PREAMBLE
+                  </h2>
+
+                  <div
+                    style={{
+                      fontSize: '16px',
+                      lineHeight: '2.1',
+                      color: '#451a03',
+                      textAlign: 'justify',
+                      maxWidth: '720px',
+                      margin: '0 auto',
+                      fontFamily: 'Georgia, "Times New Roman", serif',
+                    }}
+                  >
+                    <p style={{ margin: '0 0 16px' }}>
+                      <strong>WE, THE PEOPLE OF INDIA</strong>, having solemnly resolved to constitute India into a{' '}
+                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOVEREIGN</strong>{' '}
+                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOCIALIST</strong>{' '}
+                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SECULAR</strong>{' '}
+                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>DEMOCRATIC</strong>{' '}
+                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>REPUBLIC</strong> and to secure to all its citizens:
+                    </p>
+
+                    <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
+                      <strong>JUSTICE</strong>, social, economic and political;
+                    </p>
+
+                    <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
+                      <strong>LIBERTY</strong> of thought, expression, belief, faith and worship;
+                    </p>
+
+                    <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
+                      <strong>EQUALITY</strong> of status and of opportunity; and to promote among them all;
+                    </p>
+
+                    <p style={{ margin: '0 0 20px', paddingLeft: '20px' }}>
+                      <strong>FRATERNITY</strong> assuring the dignity of the individual and the{' '}
+                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>unity and integrity of the Nation</strong>;
+                    </p>
+
+                    <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 600 }}>
+                      <strong>IN OUR CONSTITUENT ASSEMBLY</strong> this twenty-sixth day of November, 1949, do{' '}
+                      <strong>HEREBY ADOPT, ENACT AND GIVE TO OURSELVES THIS CONSTITUTION</strong>.
+                    </p>
+                  </div>
+
+                  <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #fde68a', fontSize: '12px', color: '#92400e', fontWeight: 600 }}>
+                    Adopted by the Constituent Assembly on 26 November 1949 · Enacted on 26 January 1950 · Amended once via 42nd Amendment Act 1976
+                  </div>
+                </div>
+
+                {/* 4 Core Ingredients Breakdown */}
+                <div style={{ marginBottom: '28px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
+                    4 Core Ingredients of the Preamble
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>1. Source of Authority</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                        Derives its authority directly from the people of India (<em>&ldquo;We, the People&rdquo;</em>). Sovereignty resides with the citizens, not with any external power or hereditary ruler.
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>2. Nature of the Indian State</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                        Declares India to be a Sovereign, Socialist, Secular, Democratic, and Republican polity.
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>3. Statement of Objectives</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                        Specifies Justice (social, economic, political), Liberty, Equality, and Fraternity as the grand constitutional objectives to be secured for all citizens.
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>4. Date of Adoption</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                        Adopted on November 26, 1949 (celebrated nationwide as <em>Constitution Day / Samvidhan Diwas</em>). Came into full force on January 26, 1950 (Republic Day).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Keyword Semantic Analysis */}
+                <div style={{ marginBottom: '28px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
+                    Key Constitutional Terms Explained
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Sovereign</h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                        India is completely independent, supreme internally, and free from any external control. India can acquire foreign territory or cede a part of its territory in accordance with constitutional procedures (Article 1 to 4).
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
+                        Socialist <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
+                      </h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                        India adheres to <strong>Democratic Socialism</strong> (a mixed economy where public and private sectors co-exist), not Communist state socialism. Its goal is the elimination of poverty, disease, and inequality of opportunity through welfare policies.
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
+                        Secular <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
+                      </h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                        Follows the <strong>positive concept of secularism</strong> (<em>Sarva Dharma Sambhava</em>): all religions in India enjoy equal status, protection, and respect from the State, operationalized via Articles 25 to 28.
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Democratic &amp; Republic</h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                        <strong>Democratic:</strong> Established on representative parliamentary democracy, regular periodic elections, universal adult suffrage (Article 326), and judicial review.
+                        <br />
+                        <strong>Republic:</strong> The head of the State (President of India) is elected indirectly by the people for a fixed term of 5 years (not hereditary like the British Crown). All public offices are open to all citizens without discrimination.
+                      </p>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Justice, Liberty, Equality &amp; Fraternity</h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                        <strong>Justice:</strong> Social, Economic, and Political (borrowed from the 1917 Russian Revolution).
+                        <br />
+                        <strong>Liberty, Equality &amp; Fraternity:</strong> Ideals borrowed from the 1789 French Revolution. The word <strong>&ldquo;Integrity&rdquo;</strong> was inserted into Fraternity by the 42nd Constitutional Amendment Act, 1976.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Landmark Judicial Doctrine on Preamble */}
+                <div style={{ marginBottom: '28px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Scale size={20} color="var(--brand, #0f766e)" />
+                    Landmark Supreme Court Jurisprudence on the Preamble
+                  </h3>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <strong style={{ fontSize: '15px', color: '#991b1b' }}>In re Berubari Union Case (1960)</strong>
+                        <span style={{ fontSize: '11.5px', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>8-Judge Bench</span>
+                      </div>
+                      <p style={{ fontSize: '13.5px', color: '#7f1d1d', margin: 0, lineHeight: '1.5' }}>
+                        The Supreme Court opined that the Preamble is a key to open the mind of the constitution makers, but held that <strong>the Preamble is NOT a part of the Constitution</strong>.
+                      </p>
+                    </div>
+
+                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <strong style={{ fontSize: '15px', color: '#166534' }}>Kesavananda Bharati v. State of Kerala (1973)</strong>
+                        <span style={{ fontSize: '11.5px', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>Historic 13-Judge Bench</span>
+                      </div>
+                      <p style={{ fontSize: '13.5px', color: '#14532d', margin: '0 0 6px', lineHeight: '1.5' }}>
+                        Overruled the Berubari opinion and established three core constitutional doctrines:
+                      </p>
+                      <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: '#14532d', lineHeight: '1.5' }}>
+                        <li>The Preamble <strong>IS an integral part of the Constitution</strong>.</li>
+                        <li>The Preamble <strong>can be amended</strong> under Article 368.</li>
+                        <li>Amendments to the Preamble cannot damage or destroy the <strong>Basic Structure</strong>.</li>
+                      </ul>
+                    </div>
+
+                    <div style={{ background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '10px', padding: '16px 20px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <strong style={{ fontSize: '15px', color: 'var(--ink, #0f172a)' }}>LIC of India Case (1995)</strong>
+                        <span style={{ fontSize: '11.5px', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>Reaffirmation</span>
+                      </div>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                        Supreme Court once again reaffirmed that the Preamble is an integral part of the Constitution. However, it confirmed that the Preamble is <strong>non-justiciable</strong> (its provisions are not enforceable in courts of law).
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Continue to Part 1 Button */}
+                <div style={{ textAlign: 'center', margin: '24px 0' }}>
+                  <button
+                    onClick={() => loadNextPart('Part I')}
+                    style={{
+                      padding: '12px 28px',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      borderRadius: '8px',
+                      background: 'var(--brand, #0f766e)',
+                      color: '#ffffff',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 2px 8px rgba(15, 118, 110, 0.25)',
+                    }}
+                  >
+                    Continue to Part I: The Union and its Territory (Articles 1–4)
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              </div>
+            ) : null}
+
             {/* Preamble Callout Card when on Part I */}
             {partFilter === 'Part I' && (
               <div
@@ -844,7 +1059,7 @@ export function ConstitutionExplorerPage() {
                 </div>
 
                 <button
-                  onClick={() => setActiveTab('preamble')}
+                  onClick={() => setPartFilter('Preamble')}
                   style={{
                     padding: '6px 14px',
                     borderRadius: '6px',
@@ -1144,244 +1359,7 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 2: 📜 PREAMBLE OF INDIA (FULL ANALYSIS, KEYWORDS, LANDMARK CASES) */}
-        {activeTab === 'preamble' && (
-          <div style={{ maxWidth: '860px', margin: '0 auto' }}>
-            {/* Authentic Ornate Preamble Plaque */}
-            <div
-              style={{
-                background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                border: '2px solid #d97706',
-                borderRadius: '16px',
-                padding: '36px 32px',
-                boxShadow: '0 4px 20px rgba(180, 83, 9, 0.12)',
-                marginBottom: '28px',
-                textAlign: 'center',
-              }}
-            >
-              <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', color: '#b45309', display: 'block', marginBottom: '8px' }}>
-                The Constitution of India
-              </span>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-heading, "Fraunces", serif)',
-                  fontSize: 'clamp(26px, 4vw, 36px)',
-                  color: '#78350f',
-                  margin: '0 0 20px',
-                  letterSpacing: '1px',
-                }}
-              >
-                PREAMBLE
-              </h2>
-
-              <div
-                style={{
-                  fontSize: '16px',
-                  lineHeight: '2.1',
-                  color: '#451a03',
-                  textAlign: 'justify',
-                  maxWidth: '720px',
-                  margin: '0 auto',
-                  fontFamily: 'Georgia, "Times New Roman", serif',
-                }}
-              >
-                <p style={{ margin: '0 0 16px' }}>
-                  <strong>WE, THE PEOPLE OF INDIA</strong>, having solemnly resolved to constitute India into a{' '}
-                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOVEREIGN</strong>{' '}
-                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOCIALIST</strong>{' '}
-                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SECULAR</strong>{' '}
-                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>DEMOCRATIC</strong>{' '}
-                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>REPUBLIC</strong> and to secure to all its citizens:
-                </p>
-
-                <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
-                  <strong>JUSTICE</strong>, social, economic and political;
-                </p>
-
-                <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
-                  <strong>LIBERTY</strong> of thought, expression, belief, faith and worship;
-                </p>
-
-                <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
-                  <strong>EQUALITY</strong> of status and of opportunity; and to promote among them all;
-                </p>
-
-                <p style={{ margin: '0 0 20px', paddingLeft: '20px' }}>
-                  <strong>FRATERNITY</strong> assuring the dignity of the individual and the{' '}
-                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>unity and integrity of the Nation</strong>;
-                </p>
-
-                <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 600 }}>
-                  <strong>IN OUR CONSTITUENT ASSEMBLY</strong> this twenty-sixth day of November, 1949, do{' '}
-                  <strong>HEREBY ADOPT, ENACT AND GIVE TO OURSELVES THIS CONSTITUTION</strong>.
-                </p>
-              </div>
-
-              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #fde68a', fontSize: '12px', color: '#92400e', fontWeight: 600 }}>
-                Adopted by the Constituent Assembly on 26 November 1949 · Enacted on 26 January 1950 · Amended once via 42nd Amendment Act 1976
-              </div>
-            </div>
-
-            {/* 4 Core Ingredients Breakdown */}
-            <div style={{ marginBottom: '28px' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
-                4 Core Ingredients of the Preamble
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>1. Source of Authority</strong>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
-                    Derives its authority directly from the people of India (<em>&ldquo;We, the People&rdquo;</em>). Sovereignty resides with the citizens, not with any external power or hereditary ruler.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>2. Nature of the Indian State</strong>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
-                    Declares India to be a Sovereign, Socialist, Secular, Democratic, and Republican polity.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>3. Statement of Objectives</strong>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
-                    Specifies Justice (social, economic, political), Liberty, Equality, and Fraternity as the grand constitutional objectives to be secured for all citizens.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>4. Date of Adoption</strong>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
-                    Adopted on November 26, 1949 (celebrated nationwide as <em>Constitution Day / Samvidhan Diwas</em>). Came into full force on January 26, 1950 (Republic Day).
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Keyword Semantic Analysis */}
-            <div style={{ marginBottom: '28px' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
-                Key Constitutional Terms Explained
-              </h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Sovereign</h4>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
-                    India is completely independent, supreme internally, and free from any external control. India can acquire foreign territory or cede a part of its territory in accordance with constitutional procedures (Article 1 to 4).
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
-                    Socialist <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
-                  </h4>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
-                    India adheres to <strong>Democratic Socialism</strong> (a mixed economy where public and private sectors co-exist), not Communist state socialism. Its goal is the elimination of poverty, disease, and inequality of opportunity through welfare policies.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
-                    Secular <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
-                  </h4>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
-                    Follows the <strong>positive concept of secularism</strong> (<em>Sarva Dharma Sambhava</em>): all religions in India enjoy equal status, protection, and respect from the State, operationalized via Articles 25 to 28.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Democratic &amp; Republic</h4>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
-                    <strong>Democratic:</strong> Established on representative parliamentary democracy, regular periodic elections, universal adult suffrage (Article 326), and judicial review.
-                    <br />
-                    <strong>Republic:</strong> The head of the State (President of India) is elected indirectly by the people for a fixed term of 5 years (not hereditary like the British Crown). All public offices are open to all citizens without discrimination.
-                  </p>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Justice, Liberty, Equality &amp; Fraternity</h4>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
-                    <strong>Justice:</strong> Social, Economic, and Political (borrowed from the 1917 Russian Revolution).
-                    <br />
-                    <strong>Liberty, Equality &amp; Fraternity:</strong> Ideals borrowed from the 1789 French Revolution. The word <strong>&ldquo;Integrity&rdquo;</strong> was inserted into Fraternity by the 42nd Constitutional Amendment Act, 1976.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Landmark Judicial Doctrine on Preamble */}
-            <div style={{ marginBottom: '28px' }}>
-              <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Scale size={20} color="var(--brand, #0f766e)" />
-                Landmark Supreme Court Jurisprudence on the Preamble
-              </h3>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '15px', color: '#991b1b' }}>In re Berubari Union Case (1960)</strong>
-                    <span style={{ fontSize: '11.5px', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>8-Judge Bench</span>
-                  </div>
-                  <p style={{ fontSize: '13.5px', color: '#7f1d1d', margin: 0, lineHeight: '1.5' }}>
-                    The Supreme Court opined that the Preamble is a key to open the mind of the constitution makers, but held that <strong>the Preamble is NOT a part of the Constitution</strong>.
-                  </p>
-                </div>
-
-                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '15px', color: '#166534' }}>Kesavananda Bharati v. State of Kerala (1973)</strong>
-                    <span style={{ fontSize: '11.5px', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>Historic 13-Judge Bench</span>
-                  </div>
-                  <p style={{ fontSize: '13.5px', color: '#14532d', margin: '0 0 6px', lineHeight: '1.5' }}>
-                    Overruled the Berubari opinion and established three core constitutional doctrines:
-                  </p>
-                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: '#14532d', lineHeight: '1.5' }}>
-                    <li>The Preamble <strong>IS an integral part of the Constitution</strong>.</li>
-                    <li>The Preamble <strong>can be amended</strong> under Article 368.</li>
-                    <li>Amendments to the Preamble cannot damage or destroy the <strong>Basic Structure</strong>.</li>
-                  </ul>
-                </div>
-
-                <div style={{ background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '10px', padding: '16px 20px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                    <strong style={{ fontSize: '15px', color: 'var(--ink, #0f172a)' }}>LIC of India Case (1995)</strong>
-                    <span style={{ fontSize: '11.5px', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>Reaffirmation</span>
-                  </div>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
-                    Supreme Court once again reaffirmed that the Preamble is an integral part of the Constitution. However, it confirmed that the Preamble is <strong>non-justiciable</strong> (its provisions are not enforceable in courts of law).
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Practice Banner on Preamble */}
-            <div style={{ textAlign: 'center', padding: '20px', background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '12px' }}>
-              <h4 style={{ fontSize: '16px', margin: '0 0 6px', color: 'var(--ink, #0f172a)' }}>
-                Test Your Knowledge on the Preamble
-              </h4>
-              <p style={{ fontSize: '13px', color: 'var(--ink2, #475569)', margin: '0 0 12px' }}>
-                Practice UPSC &amp; State PSC previous year questions on the Objectives Resolution, 42nd Amendment, and Supreme Court rulings.
-              </p>
-              <Link
-                to="/exam/upsc-cse?tab=subjects&subject=Indian%20Polity"
-                style={{
-                  display: 'inline-block',
-                  fontWeight: 700,
-                  fontSize: '13px',
-                  color: '#ffffff',
-                  background: 'var(--brand, #0f766e)',
-                  padding: '8px 18px',
-                  borderRadius: '6px',
-                  textDecoration: 'none',
-                }}
-              >
-                Solve Preamble PYQs Free →
-              </Link>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 3: 🔥 MOST ASKED ARTICLES IN EXAMS (ORDERED BY MOST ASKED ON TOP) */}
+        {/* Tab 2: 🔥 MOST ASKED ARTICLES IN EXAMS (ORDERED BY MOST ASKED ON TOP) */}
         {activeTab === 'most-asked' && (
           <div>
             {/* Banner */}
