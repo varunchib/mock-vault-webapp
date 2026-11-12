@@ -24,6 +24,9 @@ import { IndianRiversBlogPage } from '../pages/IndianRiversBlogPage'
 import { BlogIndexPage } from '../pages/BlogIndexPage'
 
 // Lazy — auth-gated or heavy pages not needed on initial load
+const ConstitutionExplorerPage = lazy(() => import('../pages/ConstitutionExplorerPage').then(m => ({ default: m.ConstitutionExplorerPage })))
+const HistoryTimelinePage      = lazy(() => import('../pages/HistoryTimelinePage').then(m => ({ default: m.HistoryTimelinePage })))
+const RamsarWetlandsPage       = lazy(() => import('../pages/RamsarWetlandsPage').then(m => ({ default: m.RamsarWetlandsPage })))
 const DashboardPage       = lazy(() => import('../pages/DashboardPage').then(m => ({ default: m.DashboardPage })))
 const AdminDashboardPage  = lazy(() => import('../pages/AdminDashboardPage').then(m => ({ default: m.AdminDashboardPage })))
 const AnalyticsPage       = lazy(() => import('../pages/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })))
@@ -129,6 +132,9 @@ export function AppRoutes() {
       <Route path="/contact"      element={<ContactPage />} />
       <Route path="/disclaimer"   element={<DisclaimerPage />} />
       <Route path="/india-physical-geography-map" element={<RiversOfIndiaPage />} />
+      <Route path="/constitution-of-india" element={<Lazy><ConstitutionExplorerPage /></Lazy>} />
+      <Route path="/modern-indian-history-timeline" element={<Lazy><HistoryTimelinePage /></Lazy>} />
+      <Route path="/ramsar-wetlands-and-national-parks" element={<Lazy><RamsarWetlandsPage /></Lazy>} />
       <Route path="/blog" element={<BlogIndexPage />} />
       <Route path="/blog/indian-rivers-and-tributaries" element={<IndianRiversBlogPage />} />
       <Route path="/rivers-of-india" element={<Navigate to="/india-physical-geography-map" replace />} />

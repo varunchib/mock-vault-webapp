@@ -18,7 +18,7 @@ import { DisclaimerPage } from './src/pages/DisclaimerPage'
 import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
 import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
 import { TermsPage } from './src/pages/TermsPage'
-import { RiversOfIndiaPage } from './src/pages/RiversOfIndiaPage'
+import { RiversOfIndiaPage, GEOGRAPHY_MAP_FAQS } from './src/pages/RiversOfIndiaPage'
 import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
@@ -266,27 +266,41 @@ const STATIC_META: Record<string, PageMeta> = {
     title: 'India Physical Geography Map: Rivers, Lakes & Exam Facts',
     description: 'Explore an interactive physical geography map of India with major rivers, tributaries, lakes and reservoirs, plus concise competitive-exam facts.',
     contentHtml: renderStaticPage('/india-physical-geography-map', createElement(RiversOfIndiaPage)),
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'LearningResource',
-      name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
-      description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
-      url: `${BASE}/india-physical-geography-map`,
-      learningResourceType: 'Interactive map',
-      educationalLevel: 'General education',
-      keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
-      inLanguage: 'en',
-      isAccessibleForFree: true,
-      provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-      breadcrumb: {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
-          { '@type': 'ListItem', position: 2, name: 'Geography', item: `${BASE}/india-physical-geography-map` },
-          { '@type': 'ListItem', position: 3, name: 'India Geography Map', item: `${BASE}/india-physical-geography-map` },
-        ],
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
+        description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
+        url: `${BASE}/india-physical-geography-map`,
+        learningResourceType: 'Interactive map',
+        educationalLevel: 'General education',
+        keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
+        inLanguage: 'en',
+        isAccessibleForFree: true,
+        provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+            { '@type': 'ListItem', position: 2, name: 'Geography', item: `${BASE}/india-physical-geography-map` },
+            { '@type': 'ListItem', position: 3, name: 'India Geography Map', item: `${BASE}/india-physical-geography-map` },
+          ],
+        },
       },
-    },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: GEOGRAPHY_MAP_FAQS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      },
+    ],
   },
   '/blog': {
     title: 'Blog: Study Guides and Articles | Ministry of Papers',

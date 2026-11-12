@@ -791,10 +791,162 @@ function lakeStates(region: string | undefined): string[] {
   return MULTI_STATE_LAKE_REGIONS[region] ?? [region]
 }
 
+export const GEOGRAPHY_MAP_FAQS = [
+  {
+    q: 'Which is the longest river flowing entirely within India?',
+    a: 'The Godavari (1,465 km) is the longest river originating and flowing within peninsular India, often called "Dakshin Ganga" or "Vridha Ganga". The Ganga is the longest river inside India overall (2,525 km), while the Indus and Brahmaputra have greater total lengths but the majority of their courses flow in Tibet, Pakistan, and Bangladesh.',
+  },
+  {
+    q: 'Which major Indian rivers flow west into the Arabian Sea?',
+    a: 'The primary west-flowing rivers in India are the Narmada (1,312 km) and Tapti (724 km), both flowing through tectonic rift valleys between the Vindhya and Satpura ranges. Other prominent west-flowing rivers include the Mahi, Sabarmati, Luni, and Periyar in Kerala.',
+  },
+  {
+    q: 'Which is the largest freshwater lake and largest saltwater lake in India?',
+    a: 'Wular Lake in Jammu & Kashmir (fed by the Jhelum river) is India’s largest freshwater lake. Chilika Lake in Odisha is the largest brackish water coastal lagoon in Asia, and Sambhar Lake in Rajasthan is India’s largest inland saline lake.',
+  },
+  {
+    q: 'What are the main differences between Himalayan and Peninsular river systems?',
+    a: 'Himalayan rivers (Ganga, Indus, Brahmaputra) are perennial (fed by glaciers and monsoons), antecedent, flow through deep V-shaped gorges, and form vast depositional deltas. Peninsular rivers (Godavari, Krishna, Kaveri, Mahanadi) are seasonal and rain-fed, flow in mature shallow valleys, and have fixed courses with negligible meandering.',
+  },
+  {
+    q: 'Where can I practice previous year Indian Geography questions from UPSC, JKPSC, and State PSCs?',
+    a: 'Ministry of Papers hosts hundreds of authentic, fully solved Indian Physical Geography questions from UPSC CSE Prelims, JKPSC, JKSSB, BPSC, and SSC CGL with official answer keys and pedagogical explanations, accessible 100% free with no login required.',
+  },
+]
+
+function RiverQuickReference() {
+  return (
+    <div className="rivers-reference-wrap" style={{ marginTop: '28px' }}>
+      <h3 style={{ fontSize: '20px', fontFamily: 'var(--font-heading, "Fraunces", serif)', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
+        Major River Basins of India (Reference Table)
+      </h3>
+      <p style={{ fontSize: '14px', color: 'var(--ink2, #475569)', margin: '0 0 16px' }}>
+        Key facts for competitive exams: source, length, flowing states, tributaries, and confluences. Select any river to inspect on the interactive map above.
+      </p>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '14px' }}>
+        {RIVERS.map((river) => (
+          <article
+            key={river.name}
+            style={{
+              padding: '16px',
+              background: 'var(--card-bg, #ffffff)',
+              border: '1px solid var(--line, #e2e8f0)',
+              borderRadius: '10px',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
+                <h4 style={{ margin: 0, fontSize: '17px', color: 'var(--ink, #0f172a)' }}>{river.name}</h4>
+                <span
+                  style={{
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    padding: '2px 8px',
+                    borderRadius: '12px',
+                    background: river.type === 'H' ? '#eff6ff' : '#f0fdf4',
+                    color: river.type === 'H' ? '#1d4ed8' : '#15803d',
+                    border: `1px solid ${river.type === 'H' ? '#bfdbfe' : '#bbf7d0'}`,
+                  }}
+                >
+                  {river.type === 'H' ? 'Himalayan' : 'Peninsular'}
+                </span>
+              </div>
+
+              <div style={{ fontSize: '13px', lineHeight: '1.6', color: 'var(--ink2, #475569)', marginBottom: '10px' }}>
+                <div><strong>Length:</strong> {river.length}</div>
+                <div><strong>Source:</strong> {river.source}</div>
+                <div><strong>Mouth:</strong> {river.mouth}</div>
+                <div><strong>States:</strong> {river.states.join(', ')}</div>
+                <div style={{ marginTop: '4px' }}><strong>Tributaries:</strong> {river.tributaries}</div>
+                <div style={{ marginTop: '4px', fontStyle: 'italic', color: 'var(--ink, #1e293b)' }}>{river.info}</div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+              <a
+                href={`/india-physical-geography-map?river=${encodeURIComponent(river.name.toLowerCase())}`}
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 600,
+                  color: 'var(--brand, #0f766e)',
+                  background: 'var(--brand-bg, #f0fdf4)',
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  border: '1px solid var(--brand-border, #bbf7d0)',
+                  textDecoration: 'none',
+                }}
+              >
+                Highlight on Map →
+              </a>
+              <Link
+                to={`/blog/indian-rivers-and-tributaries#${encodeURIComponent(river.name.toLowerCase())}`}
+                style={{
+                  fontSize: '12px',
+                  fontWeight: 500,
+                  color: 'var(--ink2, #475569)',
+                  padding: '4px 8px',
+                  textDecoration: 'none',
+                }}
+              >
+                Read PYQ Notes ↗
+              </Link>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function GeographyStudyGuide() {
   return (
     <section className="rivers-study-notes" aria-labelledby="rivers-study-heading">
       <h2 id="rivers-study-heading">Quick geography revision</h2>
+
+      {/* Prominent Blog Bridge Banner */}
+      <div
+        style={{
+          background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%)',
+          border: '1.5px solid #a7f3d0',
+          borderRadius: '12px',
+          padding: '16px 20px',
+          margin: '20px 0',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '12px',
+        }}
+      >
+        <div>
+          <strong style={{ fontSize: '15px', color: '#065f46', display: 'block', marginBottom: '2px' }}>
+            📖 In-Depth Study Guide with Solved PYQs
+          </strong>
+          <span style={{ fontSize: '13.5px', color: '#047857' }}>
+            Master left &amp; right bank tributaries, origins, and previous year UPSC &amp; State PSC questions.
+          </span>
+        </div>
+        <Link
+          to="/blog/indian-rivers-and-tributaries"
+          style={{
+            fontWeight: 700,
+            fontSize: '13px',
+            color: '#ffffff',
+            background: '#059669',
+            padding: '8px 14px',
+            borderRadius: '8px',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Read Rivers &amp; Tributaries Blog →
+        </Link>
+      </div>
+
       <div className="rivers-quick-revision">
         <article className="rivers-revision-item">
           <h3>River regimes</h3>
@@ -809,8 +961,66 @@ function GeographyStudyGuide() {
           <p>Wular—Jhelum; Loktak—floating phumdis; Sambhar—inland saline lake; Lonar—impact crater; Chilika—coastal lagoon.</p>
         </article>
       </div>
+
+      {/* Major River Basins Reference Table */}
+      <RiverQuickReference />
+
+      {/* Lakes Quick Reference */}
       <LakeQuickReference />
-      <p className="rivers-attribution">
+
+      {/* FAQs Section */}
+      <div style={{ marginTop: '36px' }}>
+        <h3 style={{ fontSize: '20px', fontFamily: 'var(--font-heading, "Fraunces", serif)', margin: '0 0 12px', color: 'var(--ink, #0f172a)' }}>
+          Frequently Asked Questions on Indian Physical Geography
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {GEOGRAPHY_MAP_FAQS.map((faq, i) => (
+            <details
+              key={i}
+              open={i === 0}
+              style={{
+                background: 'var(--card-bg, #ffffff)',
+                border: '1px solid var(--line, #e2e8f0)',
+                borderRadius: '8px',
+                padding: '12px 16px',
+                cursor: 'pointer',
+              }}
+            >
+              <summary style={{ fontWeight: 600, fontSize: '14.5px', color: 'var(--ink, #0f172a)' }}>
+                {faq.q}
+              </summary>
+              <p style={{ margin: '8px 0 0', fontSize: '13.5px', lineHeight: '1.6', color: 'var(--ink2, #475569)' }}>
+                {faq.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </div>
+
+      {/* Question Practice CTA */}
+      <div style={{ marginTop: '28px', textAlign: 'center', padding: '22px', background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '12px' }}>
+        <h4 style={{ margin: '0 0 6px', fontSize: '16px', color: 'var(--ink, #0f172a)' }}>Ready to Test Your Geography Knowledge?</h4>
+        <p style={{ margin: '0 0 14px', fontSize: '13.5px', color: 'var(--ink2, #475569)' }}>
+          Practice 150+ authentic Indian Physical Geography previous year questions with verified answer keys and explanations.
+        </p>
+        <Link
+          to="/exams"
+          style={{
+            display: 'inline-block',
+            fontWeight: 700,
+            fontSize: '13.5px',
+            color: '#ffffff',
+            background: 'var(--brand, #0f766e)',
+            padding: '8px 18px',
+            borderRadius: '8px',
+            textDecoration: 'none',
+          }}
+        >
+          Practice Indian Geography PYQs →
+        </Link>
+      </div>
+
+      <p className="rivers-attribution" style={{ marginTop: '24px' }}>
         Country outlines, rivers and lakes: Natural Earth (public domain).
         State boundaries: MapSVG via @svg-maps/india, licensed under{' '}
         <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">
@@ -952,27 +1162,41 @@ export function RiversOfIndiaPage() {
     title: 'India Physical Geography Map: Rivers, Lakes & Exam Facts',
     description: 'Explore an interactive physical geography map of India with major rivers, tributaries, lakes and reservoirs, plus concise competitive-exam facts.',
     canonicalPath: '/india-physical-geography-map',
-    jsonLd: {
-      '@context': 'https://schema.org',
-      '@type': 'LearningResource',
-      name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
-      description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
-      url: 'https://ministryofpapers.com/india-physical-geography-map',
-      learningResourceType: 'Interactive map',
-      educationalLevel: 'General education',
-      keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
-      inLanguage: 'en',
-      isAccessibleForFree: true,
-      provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
-      breadcrumb: {
-        '@type': 'BreadcrumbList',
-        itemListElement: [
-          { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
-          { '@type': 'ListItem', position: 2, name: 'Geography', item: 'https://ministryofpapers.com/india-physical-geography-map' },
-          { '@type': 'ListItem', position: 3, name: 'India Geography Map', item: 'https://ministryofpapers.com/india-physical-geography-map' },
-        ],
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
+        description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
+        url: 'https://ministryofpapers.com/india-physical-geography-map',
+        learningResourceType: 'Interactive map',
+        educationalLevel: 'General education',
+        keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
+        inLanguage: 'en',
+        isAccessibleForFree: true,
+        provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+            { '@type': 'ListItem', position: 2, name: 'Geography', item: 'https://ministryofpapers.com/india-physical-geography-map' },
+            { '@type': 'ListItem', position: 3, name: 'India Geography Map', item: 'https://ministryofpapers.com/india-physical-geography-map' },
+          ],
+        },
       },
-    },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: GEOGRAPHY_MAP_FAQS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      },
+    ],
   })
 
   const clampPan = React.useCallback((nextPan: [number, number], scale = viewportRef.current.zoom): [number, number] => {
