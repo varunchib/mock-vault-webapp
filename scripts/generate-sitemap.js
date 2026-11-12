@@ -12,6 +12,7 @@ const ARTICLE_URL = `${BASE}/blog/indian-rivers-and-tributaries`
 const CONSTITUTION_URL = `${BASE}/constitution-of-india`
 const HISTORY_URL = `${BASE}/modern-indian-history-timeline`
 const RAMSAR_URL = `${BASE}/ramsar-wetlands-and-national-parks`
+const STUDY_MATERIAL_URL = `${BASE}/study-material`
 
 async function generate() {
   console.log('Generating sitemap fallback...')
@@ -23,7 +24,7 @@ async function generate() {
     `${BASE}/rivers-of-india`,
     `${BASE}/india-physical-geography-map`,
   )
-  for (const extraUrl of [ARTICLE_URL, BLOG_URL, CONSTITUTION_URL, HISTORY_URL, RAMSAR_URL]) {
+  for (const extraUrl of [ARTICLE_URL, BLOG_URL, CONSTITUTION_URL, HISTORY_URL, RAMSAR_URL, STUDY_MATERIAL_URL]) {
     if (!xml.includes(`<loc>${extraUrl}</loc>`)) {
       if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
       xml = xml.replace(

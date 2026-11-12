@@ -115,7 +115,7 @@ export function AppRoutes() {
       {/* /exam/:slug/overview retired — the Worker 301s it to /guide/:slug */}
       <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
-      <Route path="/study-material"       element={<ProtectedPage><Lazy><StudyMaterialPage /></Lazy></ProtectedPage>} />
+      <Route path="/study-material"       element={<Lazy><StudyMaterialPage /></Lazy>} />
       <Route path="/question/:slug"     element={<QuestionPage />} />
       <Route path="/pyq/:slug"          element={<PyqPaperPage />} />
       {/* The test series moved into the exam page's Mock Tests tab; this

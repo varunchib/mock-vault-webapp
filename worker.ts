@@ -1919,7 +1919,8 @@ export default {
           const constitutionUrl = `${BASE}/constitution-of-india`
           const historyUrl = `${BASE}/modern-indian-history-timeline`
           const ramsarUrl = `${BASE}/ramsar-wetlands-and-national-parks`
-          for (const extraUrl of [articleUrl, blogUrl, contactUrl, disclaimerUrl, constitutionUrl, historyUrl, ramsarUrl]) {
+          const studyMaterialUrl = `${BASE}/study-material`
+          for (const extraUrl of [articleUrl, blogUrl, contactUrl, disclaimerUrl, constitutionUrl, historyUrl, ramsarUrl, studyMaterialUrl]) {
             if (!sitemap.includes(`<loc>${extraUrl}</loc>`)) {
               if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
               sitemap = sitemap.replace(

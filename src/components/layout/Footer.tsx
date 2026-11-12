@@ -27,6 +27,7 @@ const footerColumns = [
   {
     title: 'Resources',
     links: [
+      { label: 'Study Material Hub', href: '/study-material' },
       { label: 'Constitution of India Explorer', href: '/constitution-of-india' },
       { label: 'Modern History Timeline (1757–1947)', href: '/modern-indian-history-timeline' },
       { label: 'Ramsar Wetlands Timeline', href: '/ramsar-wetlands-and-national-parks' },

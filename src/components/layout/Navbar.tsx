@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Menu, X } from 'lucide-react'
+import { ThemeToggle } from '../ui/ThemeToggle'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LoginModal } from '../auth/LoginModal'
 import { Logo } from '../ui/Logo'
@@ -8,6 +9,7 @@ import { useAuth } from '../../context/useAuth'
 
 const NAV_LINKS = [
   { label: 'Exams', to: '/exams', hash: false },
+  { label: 'Study Material', to: '/study-material', hash: false },
   { label: 'Blogs', to: '/blog', hash: false },
   { label: 'How it works', to: '/#how', hash: true },
   { label: 'Pricing', to: '/#pricing', hash: true },
@@ -65,6 +67,7 @@ export function Navbar() {
         </ul>
 
         <div className="nav-end">
+          <ThemeToggle className="nav-theme-toggle" size={17} />
           {isAuthenticated && user ? (
             <div className="nav-user">
               {user.avatarUrl ? <img src={user.avatarUrl} alt="" /> : <span>{user.name.slice(0, 1)}</span>}

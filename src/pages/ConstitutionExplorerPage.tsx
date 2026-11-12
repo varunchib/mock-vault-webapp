@@ -419,7 +419,7 @@ export function ConstitutionExplorerPage() {
         <header style={{ marginBottom: '22px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="public-kicker" style={{ margin: 0 }}>Interactive Polity Study Suite</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: 'var(--brand-soft)', color: 'var(--brand)', border: '1px solid var(--brand-line)' }}>
               Preamble + Articles 1–395 · 25 Parts · All 12 Schedules
             </span>
           </div>
@@ -428,14 +428,14 @@ export function ConstitutionExplorerPage() {
               fontFamily: 'var(--font-heading, "Fraunces", serif)',
               fontSize: 'clamp(28px, 4vw, 40px)',
               margin: '0 0 10px',
-              color: 'var(--ink, #0f172a)',
+              color: 'var(--ink)',
               letterSpacing: '-0.02em',
               lineHeight: '1.2',
             }}
           >
             Constitution of India: Preamble, Articles 1–395 &amp; Schedules
           </h1>
-          <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
+          <p style={{ fontSize: '15px', color: 'var(--ink2)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
             Read and master every article of the Indian Constitution line by line. Explore the foundational Preamble, seamlessly navigate all 25 Parts, discover the most frequently asked articles in competitive exams, and understand core legal principles with student-friendly explanations.
           </p>
 
@@ -448,35 +448,35 @@ export function ConstitutionExplorerPage() {
               marginTop: '18px',
             }}
           >
-            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <BookOpen size={18} color="var(--brand, #0f766e)" />
+            <div style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <BookOpen size={18} color="var(--brand)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>395</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Articles (406 with 21A, 51A...)</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink)' }}>395</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink3)', fontWeight: 600 }}>Articles (406 with 21A, 51A...)</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--red-bg, #fef2f2)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--red-border, #fecaca)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Flame size={18} color="var(--red, #dc2626)" />
+            <div style={{ background: 'var(--red-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--red-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Flame size={18} color="var(--red)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--red, #991b1b)' }}>{frequencyCounts.top}</div>
-                <div style={{ fontSize: '11px', color: 'var(--red, #b91c1c)', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--red)' }}>{frequencyCounts.top}</div>
+                <div style={{ fontSize: '11px', color: 'var(--red)', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--hl-bg, #fffbeb)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--hl-border, #fde68a)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Zap size={18} color="var(--hl-dark, #d97706)" />
+            <div style={{ background: 'var(--hl-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--hl-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Zap size={18} color="var(--hl-dark)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--hl-dark, #92400e)' }}>{CONSTITUTION_PARTS.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--hl-dark, #b45309)', fontWeight: 600 }}>Constitutional Parts</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--hl-dark)' }}>{CONSTITUTION_PARTS.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--hl-dark)', fontWeight: 600 }}>Constitutional Parts</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--blue-bg, #eff6ff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border, #bfdbfe)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={18} color="var(--blue, #2563eb)" />
+            <div style={{ background: 'var(--blue-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={18} color="var(--blue)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue, #1e40af)' }}>{KEY_AMENDMENTS.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--blue, #1d4ed8)', fontWeight: 600 }}>Landmark Amendments</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue)' }}>{KEY_AMENDMENTS.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--blue)', fontWeight: 600 }}>Landmark Amendments</div>
               </div>
             </div>
           </div>
@@ -489,7 +489,7 @@ export function ConstitutionExplorerPage() {
           style={{
             display: 'flex',
             gap: '6px',
-            borderBottom: '2px solid var(--line, #e2e8f0)',
+            borderBottom: '2px solid var(--line)',
             marginBottom: '20px',
             overflowX: 'auto',
             paddingBottom: '6px',
@@ -504,8 +504,8 @@ export function ConstitutionExplorerPage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'articles' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'articles' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'articles' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'articles' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -522,8 +522,8 @@ export function ConstitutionExplorerPage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'most-asked' ? '3px solid #dc2626' : '3px solid transparent',
-              color: activeTab === 'most-asked' ? '#dc2626' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'most-asked' ? '3px solid var(--red)' : '3px solid transparent',
+              color: activeTab === 'most-asked' ? 'var(--red)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
               display: 'inline-flex',
@@ -531,7 +531,7 @@ export function ConstitutionExplorerPage() {
               gap: '5px',
             }}
           >
-            <Flame size={15} color={activeTab === 'most-asked' ? '#dc2626' : 'var(--ink2, #64748b)'} />
+            <Flame size={15} color={activeTab === 'most-asked' ? 'var(--red)' : 'var(--ink2)'} />
             Most Asked Articles in Exams
           </button>
 
@@ -544,8 +544,8 @@ export function ConstitutionExplorerPage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'parts' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'parts' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'parts' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'parts' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -562,8 +562,8 @@ export function ConstitutionExplorerPage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'amendments' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'amendments' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'amendments' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'amendments' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -580,8 +580,8 @@ export function ConstitutionExplorerPage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'schedules' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'schedules' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'schedules' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'schedules' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -598,8 +598,8 @@ export function ConstitutionExplorerPage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'faq' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'faq' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'faq' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'faq' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -617,48 +617,40 @@ export function ConstitutionExplorerPage() {
             {/* Filter Bar with Part Selector & Search */}
             <div
               style={{
-                background: 'var(--card-bg, #ffffff)',
+                background: 'var(--card-bg)',
                 padding: '16px 20px',
                 borderRadius: '12px',
-                border: '1px solid var(--line, #e2e8f0)',
+                border: '1px solid var(--line)',
                 marginBottom: '16px',
               }}
             >
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '14px' }}>
                 <div style={{ flex: '1 1 280px', position: 'relative' }}>
-                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink3)' }} />
                   <input
                     type="text"
+                    className="study-control-input"
                     placeholder="Search by article number (e.g. 1, 21), keyword, or doctrine..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     style={{
                       width: '100%',
                       padding: '9px 12px 9px 36px',
-                      borderRadius: '8px',
-                      border: '1px solid var(--line, #cbd5e1)',
                       fontSize: '14px',
-                      outline: 'none',
-                      background: 'var(--bg, #f8fafc)',
-                      color: 'var(--ink, #0f172a)',
                     }}
                   />
                 </div>
 
                 {/* Part Switcher Dropdown (Part I selected by default) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Filter size={15} color="var(--ink2, #64748b)" />
+                  <Filter size={15} color="var(--ink3)" />
                   <select
                     value={partFilter}
+                    className="study-control-select"
                     onChange={(e) => setPartFilter(e.target.value)}
                     style={{
                       padding: '9px 12px',
-                      borderRadius: '8px',
-                      border: '1px solid var(--line, #cbd5e1)',
                       fontSize: '13.5px',
-                      background: 'var(--bg, #f8fafc)',
-                      color: 'var(--ink, #0f172a)',
-                      outline: 'none',
                       cursor: 'pointer',
                       fontWeight: 600,
                     }}
@@ -676,7 +668,7 @@ export function ConstitutionExplorerPage() {
 
               {/* Frequency Filter Pills */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink2, #64748b)' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink2)' }}>
                   Filter by PYQ Frequency:
                 </span>
 
@@ -689,9 +681,9 @@ export function ConstitutionExplorerPage() {
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
-                    background: frequencyFilter === 'all' ? 'var(--brand, #0f766e)' : 'transparent',
-                    color: frequencyFilter === 'all' ? '#ffffff' : 'var(--ink2, #475569)',
-                    borderColor: frequencyFilter === 'all' ? 'var(--brand, #0f766e)' : 'var(--line, #cbd5e1)',
+                    background: frequencyFilter === 'all' ? 'var(--brand)' : 'transparent',
+                    color: frequencyFilter === 'all' ? '#ffffff' : 'var(--ink2)',
+                    borderColor: frequencyFilter === 'all' ? 'var(--brand)' : 'var(--line)',
                   }}
                 >
                   All
@@ -709,9 +701,9 @@ export function ConstitutionExplorerPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    background: frequencyFilter === 'Top Tested' ? 'var(--red, #dc2626)' : 'var(--red-bg, #fef2f2)',
-                    color: frequencyFilter === 'Top Tested' ? '#ffffff' : 'var(--red, #991b1b)',
-                    borderColor: frequencyFilter === 'Top Tested' ? 'var(--red, #dc2626)' : 'var(--red-border, #fecaca)',
+                    background: frequencyFilter === 'Top Tested' ? 'var(--red)' : 'var(--red-bg)',
+                    color: frequencyFilter === 'Top Tested' ? '#ffffff' : 'var(--red)',
+                    borderColor: frequencyFilter === 'Top Tested' ? 'var(--red)' : 'var(--red-border)',
                   }}
                 >
                   <Flame size={12} />
@@ -730,9 +722,9 @@ export function ConstitutionExplorerPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    background: frequencyFilter === 'Frequently Tested' ? 'var(--hl-dark, #d97706)' : 'var(--hl-bg, #fffbeb)',
-                    color: frequencyFilter === 'Frequently Tested' ? '#ffffff' : 'var(--hl-dark, #92400e)',
-                    borderColor: frequencyFilter === 'Frequently Tested' ? 'var(--hl-dark, #d97706)' : 'var(--hl-border, #fde68a)',
+                    background: frequencyFilter === 'Frequently Tested' ? 'var(--hl-dark)' : 'var(--hl-bg)',
+                    color: frequencyFilter === 'Frequently Tested' ? '#ffffff' : 'var(--hl-dark)',
+                    borderColor: frequencyFilter === 'Frequently Tested' ? 'var(--hl-dark)' : 'var(--hl-border)',
                   }}
                 >
                   <Zap size={12} />
@@ -751,9 +743,9 @@ export function ConstitutionExplorerPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    background: frequencyFilter === 'Moderately Tested' ? 'var(--blue, #2563eb)' : 'var(--blue-bg, #eff6ff)',
-                    color: frequencyFilter === 'Moderately Tested' ? '#ffffff' : 'var(--blue, #1e40af)',
-                    borderColor: frequencyFilter === 'Moderately Tested' ? 'var(--blue, #2563eb)' : 'var(--blue-border, #bfdbfe)',
+                    background: frequencyFilter === 'Moderately Tested' ? 'var(--blue)' : 'var(--blue-bg)',
+                    color: frequencyFilter === 'Moderately Tested' ? '#ffffff' : 'var(--blue)',
+                    borderColor: frequencyFilter === 'Moderately Tested' ? 'var(--blue)' : 'var(--blue-border)',
                   }}
                 >
                   <Bookmark size={12} />
@@ -769,9 +761,9 @@ export function ConstitutionExplorerPage() {
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
-                    background: frequencyFilter === 'Foundational' ? 'var(--brand, #0f766e)' : 'var(--card-bg-subtle, #f8fafc)',
-                    color: frequencyFilter === 'Foundational' ? '#ffffff' : 'var(--ink2, #64748b)',
-                    borderColor: frequencyFilter === 'Foundational' ? 'var(--brand, #0f766e)' : 'var(--line, #e2e8f0)',
+                    background: frequencyFilter === 'Foundational' ? 'var(--brand)' : 'var(--card-bg-subtle)',
+                    color: frequencyFilter === 'Foundational' ? '#ffffff' : 'var(--ink2)',
+                    borderColor: frequencyFilter === 'Foundational' ? 'var(--brand)' : 'var(--line)',
                   }}
                 >
                   Foundational ({frequencyCounts.found})
@@ -792,7 +784,7 @@ export function ConstitutionExplorerPage() {
                       cursor: 'pointer',
                       border: 'none',
                       background: 'transparent',
-                      color: 'var(--brand, #0f766e)',
+                      color: 'var(--brand)',
                       display: 'inline-flex',
                       alignItems: 'center',
                       gap: '4px',
@@ -810,29 +802,11 @@ export function ConstitutionExplorerPage() {
             {partFilter === 'Preamble' ? (
               <div style={{ maxWidth: '860px', margin: '0 auto 30px' }}>
                 {/* Authentic Ornate Preamble Plaque */}
-                <div
-                  style={{
-                    background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
-                    border: '2px solid #d97706',
-                    borderRadius: '16px',
-                    padding: '36px 32px',
-                    boxShadow: '0 4px 20px rgba(180, 83, 9, 0.12)',
-                    marginBottom: '28px',
-                    textAlign: 'center',
-                  }}
-                >
-                  <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', color: '#b45309', display: 'block', marginBottom: '8px' }}>
+                <div className="study-preamble-plaque">
+                  <span className="preamble-kicker">
                     The Constitution of India
                   </span>
-                  <h2
-                    style={{
-                      fontFamily: 'var(--font-heading, "Fraunces", serif)',
-                      fontSize: 'clamp(26px, 4vw, 36px)',
-                      color: '#78350f',
-                      margin: '0 0 20px',
-                      letterSpacing: '1px',
-                    }}
-                  >
+                  <h2 className="preamble-heading">
                     PREAMBLE
                   </h2>
 
@@ -840,7 +814,6 @@ export function ConstitutionExplorerPage() {
                     style={{
                       fontSize: '16px',
                       lineHeight: '2.1',
-                      color: '#451a03',
                       textAlign: 'justify',
                       maxWidth: '720px',
                       margin: '0 auto',
@@ -849,11 +822,11 @@ export function ConstitutionExplorerPage() {
                   >
                     <p style={{ margin: '0 0 16px' }}>
                       <strong>WE, THE PEOPLE OF INDIA</strong>, having solemnly resolved to constitute India into a{' '}
-                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOVEREIGN</strong>{' '}
-                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOCIALIST</strong>{' '}
-                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SECULAR</strong>{' '}
-                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>DEMOCRATIC</strong>{' '}
-                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>REPUBLIC</strong> and to secure to all its citizens:
+                      <strong style={{ color: 'var(--hl-dark)', textDecoration: 'underline' }}>SOVEREIGN</strong>{' '}
+                      <strong style={{ color: 'var(--hl-dark)', textDecoration: 'underline' }}>SOCIALIST</strong>{' '}
+                      <strong style={{ color: 'var(--hl-dark)', textDecoration: 'underline' }}>SECULAR</strong>{' '}
+                      <strong style={{ color: 'var(--hl-dark)', textDecoration: 'underline' }}>DEMOCRATIC</strong>{' '}
+                      <strong style={{ color: 'var(--hl-dark)', textDecoration: 'underline' }}>REPUBLIC</strong> and to secure to all its citizens:
                     </p>
 
                     <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
@@ -870,7 +843,7 @@ export function ConstitutionExplorerPage() {
 
                     <p style={{ margin: '0 0 20px', paddingLeft: '20px' }}>
                       <strong>FRATERNITY</strong> assuring the dignity of the individual and the{' '}
-                      <strong style={{ color: '#92400e', textDecoration: 'underline' }}>unity and integrity of the Nation</strong>;
+                      <strong style={{ color: 'var(--hl-dark)', textDecoration: 'underline' }}>unity and integrity of the Nation</strong>;
                     </p>
 
                     <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 600 }}>
@@ -879,41 +852,41 @@ export function ConstitutionExplorerPage() {
                     </p>
                   </div>
 
-                  <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #fde68a', fontSize: '12px', color: '#92400e', fontWeight: 600 }}>
+                  <div className="preamble-footer">
                     Adopted by the Constituent Assembly on 26 November 1949 · Enacted on 26 January 1950 · Amended once via 42nd Amendment Act 1976
                   </div>
                 </div>
 
                 {/* 4 Core Ingredients Breakdown */}
                 <div style={{ marginBottom: '28px' }}>
-                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink)', margin: '0 0 14px' }}>
                     4 Core Ingredients of the Preamble
                   </h3>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>1. Source of Authority</strong>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <strong style={{ color: 'var(--brand)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>1. Source of Authority</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                         Derives its authority directly from the people of India (<em>&ldquo;We, the People&rdquo;</em>). Sovereignty resides with the citizens, not with any external power or hereditary ruler.
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>2. Nature of the Indian State</strong>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <strong style={{ color: 'var(--brand)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>2. Nature of the Indian State</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                         Declares India to be a Sovereign, Socialist, Secular, Democratic, and Republican polity.
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>3. Statement of Objectives</strong>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <strong style={{ color: 'var(--brand)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>3. Statement of Objectives</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                         Specifies Justice (social, economic, political), Liberty, Equality, and Fraternity as the grand constitutional objectives to be secured for all citizens.
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>4. Date of Adoption</strong>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <strong style={{ color: 'var(--brand)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>4. Date of Adoption</strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                         Adopted on November 26, 1949 (celebrated nationwide as <em>Constitution Day / Samvidhan Diwas</em>). Came into full force on January 26, 1950 (Republic Day).
                       </p>
                     </div>
@@ -922,47 +895,47 @@ export function ConstitutionExplorerPage() {
 
                 {/* Keyword Semantic Analysis */}
                 <div style={{ marginBottom: '28px' }}>
-                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
+                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink)', margin: '0 0 14px' }}>
                     Key Constitutional Terms Explained
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Sovereign</h4>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand)', margin: '0 0 6px' }}>Sovereign</h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.6' }}>
                         India is completely independent, supreme internally, and free from any external control. India can acquire foreign territory or cede a part of its territory in accordance with constitutional procedures (Article 1 to 4).
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
-                        Socialist <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand)', margin: '0 0 6px' }}>
+                        Socialist <span style={{ fontSize: '11px', background: 'var(--hl-bg)', color: 'var(--hl-dark)', border: '1px solid var(--hl-border)', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
                       </h4>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.6' }}>
                         India adheres to <strong>Democratic Socialism</strong> (a mixed economy where public and private sectors co-exist), not Communist state socialism. Its goal is the elimination of poverty, disease, and inequality of opportunity through welfare policies.
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
-                        Secular <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand)', margin: '0 0 6px' }}>
+                        Secular <span style={{ fontSize: '11px', background: 'var(--hl-bg)', color: 'var(--hl-dark)', border: '1px solid var(--hl-border)', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
                       </h4>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.6' }}>
                         Follows the <strong>positive concept of secularism</strong> (<em>Sarva Dharma Sambhava</em>): all religions in India enjoy equal status, protection, and respect from the State, operationalized via Articles 25 to 28.
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Democratic &amp; Republic</h4>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand)', margin: '0 0 6px' }}>Democratic &amp; Republic</h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.6' }}>
                         <strong>Democratic:</strong> Established on representative parliamentary democracy, regular periodic elections, universal adult suffrage (Article 326), and judicial review.
                         <br />
                         <strong>Republic:</strong> The head of the State (President of India) is elected indirectly by the people for a fixed term of 5 years (not hereditary like the British Crown). All public offices are open to all citizens without discrimination.
                       </p>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
-                      <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Justice, Liberty, Equality &amp; Fraternity</h4>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    <div style={{ background: 'var(--card-bg)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                      <h4 style={{ fontSize: '16px', color: 'var(--brand)', margin: '0 0 6px' }}>Justice, Liberty, Equality &amp; Fraternity</h4>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.6' }}>
                         <strong>Justice:</strong> Social, Economic, and Political (borrowed from the 1917 Russian Revolution).
                         <br />
                         <strong>Liberty, Equality &amp; Fraternity:</strong> Ideals borrowed from the 1789 French Revolution. The word <strong>&ldquo;Integrity&rdquo;</strong> was inserted into Fraternity by the 42nd Constitutional Amendment Act, 1976.
@@ -973,43 +946,43 @@ export function ConstitutionExplorerPage() {
 
                 {/* Landmark Judicial Doctrine on Preamble */}
                 <div style={{ marginBottom: '28px' }}>
-                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Scale size={20} color="var(--brand, #0f766e)" />
+                  <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Scale size={20} color="var(--brand)" />
                     Landmark Supreme Court Jurisprudence on the Preamble
                   </h3>
 
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '16px 20px' }}>
+                    <div style={{ background: 'var(--red-bg)', border: '1px solid var(--red-border)', borderRadius: '10px', padding: '16px 20px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <strong style={{ fontSize: '15px', color: '#991b1b' }}>In re Berubari Union Case (1960)</strong>
-                        <span style={{ fontSize: '11.5px', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>8-Judge Bench</span>
+                        <strong style={{ fontSize: '15px', color: 'var(--red)' }}>In re Berubari Union Case (1960)</strong>
+                        <span style={{ fontSize: '11.5px', background: 'var(--card-bg)', color: 'var(--red)', border: '1px solid var(--red-border)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>8-Judge Bench</span>
                       </div>
-                      <p style={{ fontSize: '13.5px', color: '#7f1d1d', margin: 0, lineHeight: '1.5' }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                         The Supreme Court opined that the Preamble is a key to open the mind of the constitution makers, but held that <strong>the Preamble is NOT a part of the Constitution</strong>.
                       </p>
                     </div>
 
-                    <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '16px 20px' }}>
+                    <div style={{ background: 'var(--green-bg)', border: '1px solid var(--green-border)', borderRadius: '10px', padding: '16px 20px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <strong style={{ fontSize: '15px', color: '#166534' }}>Kesavananda Bharati v. State of Kerala (1973)</strong>
-                        <span style={{ fontSize: '11.5px', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>Historic 13-Judge Bench</span>
+                        <strong style={{ fontSize: '15px', color: 'var(--green)' }}>Kesavananda Bharati v. State of Kerala (1973)</strong>
+                        <span style={{ fontSize: '11.5px', background: 'var(--card-bg)', color: 'var(--green)', border: '1px solid var(--green-border)', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>Historic 13-Judge Bench</span>
                       </div>
-                      <p style={{ fontSize: '13.5px', color: '#14532d', margin: '0 0 6px', lineHeight: '1.5' }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: '0 0 6px', lineHeight: '1.5' }}>
                         Overruled the Berubari opinion and established three core constitutional doctrines:
                       </p>
-                      <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: '#14532d', lineHeight: '1.5' }}>
+                      <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink2)', lineHeight: '1.5' }}>
                         <li>The Preamble <strong>IS an integral part of the Constitution</strong>.</li>
                         <li>The Preamble <strong>can be amended</strong> under Article 368.</li>
                         <li>Amendments to the Preamble cannot damage or destroy the <strong>Basic Structure</strong>.</li>
                       </ul>
                     </div>
 
-                    <div style={{ background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '10px', padding: '16px 20px' }}>
+                    <div style={{ background: 'var(--card-bg)', border: '1px solid var(--line)', borderRadius: '10px', padding: '16px 20px' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <strong style={{ fontSize: '15px', color: 'var(--ink, #0f172a)' }}>LIC of India Case (1995)</strong>
-                        <span style={{ fontSize: '11.5px', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>Reaffirmation</span>
+                        <strong style={{ fontSize: '15px', color: 'var(--ink)' }}>LIC of India Case (1995)</strong>
+                        <span style={{ fontSize: '11.5px', background: 'var(--surface-2)', color: 'var(--ink2)', border: '1px solid var(--line)', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>Reaffirmation</span>
                       </div>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                         Supreme Court once again reaffirmed that the Preamble is an integral part of the Constitution. However, it confirmed that the Preamble is <strong>non-justiciable</strong> (its provisions are not enforceable in courts of law).
                       </p>
                     </div>
@@ -1025,7 +998,7 @@ export function ConstitutionExplorerPage() {
                       fontSize: '14px',
                       fontWeight: 700,
                       borderRadius: '8px',
-                      background: 'var(--brand, #0f766e)',
+                      background: 'var(--brand)',
                       color: '#ffffff',
                       border: 'none',
                       cursor: 'pointer',
@@ -1044,27 +1017,14 @@ export function ConstitutionExplorerPage() {
 
             {/* Preamble Callout Card when on Part I */}
             {partFilter === 'Part I' && (
-              <div
-                style={{
-                  background: 'linear-gradient(135deg, #fefce8, #fffbeb)',
-                  border: '1px solid #fde68a',
-                  borderRadius: '10px',
-                  padding: '14px 18px',
-                  marginBottom: '16px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '10px',
-                }}
-              >
+              <div className="study-banner-amber">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <ScrollText size={22} color="#b45309" />
+                  <ScrollText size={22} color="var(--hl-dark)" />
                   <div>
-                    <strong style={{ fontSize: '13.5px', color: '#92400e', display: 'block' }}>
+                    <strong style={{ fontSize: '13.5px', color: 'var(--hl-dark)', display: 'block' }}>
                       Preceding Part I: The Preamble of the Constitution of India
                     </strong>
-                    <span style={{ fontSize: '12.5px', color: '#78350f' }}>
+                    <span style={{ fontSize: '12.5px', color: 'var(--ink2)' }}>
                       &ldquo;We, the People of India, having solemnly resolved to constitute India into a Sovereign Socialist Secular Democratic Republic...&rdquo;
                     </span>
                   </div>
@@ -1077,7 +1037,7 @@ export function ConstitutionExplorerPage() {
                     borderRadius: '6px',
                     fontSize: '12.5px',
                     fontWeight: 700,
-                    background: '#b45309',
+                    background: 'var(--hl-dark)',
                     color: '#ffffff',
                     border: 'none',
                     cursor: 'pointer',
@@ -1091,32 +1051,19 @@ export function ConstitutionExplorerPage() {
 
             {/* Current Part Banner */}
             {currentPartInfo && partFilter !== 'all' && (
-              <div
-                style={{
-                  background: 'linear-gradient(to right, #f0fdf4, #f8fafc)',
-                  border: '1px solid #bbf7d0',
-                  borderRadius: '10px',
-                  padding: '14px 18px',
-                  marginBottom: '16px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  flexWrap: 'wrap',
-                  gap: '10px',
-                }}
-              >
+              <div className="study-banner-part">
                 <div>
-                  <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#15803d' }}>
+                  <span className="part-kicker">
                     Currently Reading: {currentPartInfo.part}
                   </span>
-                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '2px 0 4px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink)', margin: '2px 0 4px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                     {currentPartInfo.name} ({currentPartInfo.articlesRange})
                   </h2>
-                  <p style={{ fontSize: '13px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                  <p style={{ fontSize: '13px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5' }}>
                     {currentPartInfo.description}
                   </p>
                 </div>
-                <div style={{ fontSize: '12px', fontWeight: 700, color: '#15803d', background: '#ffffff', padding: '6px 12px', borderRadius: '8px', border: '1px solid #86efac' }}>
+                <div className="part-count-badge">
                   {filteredArticles.length} Articles in this Part
                 </div>
               </div>
@@ -1129,9 +1076,9 @@ export function ConstitutionExplorerPage() {
                 const isFreqTested = art.frequency === 'Frequently Tested'
                 const isModTested = art.frequency === 'Moderately Tested'
 
-                const badgeBg = isTopTested ? 'var(--red-bg, #fef2f2)' : isFreqTested ? 'var(--hl-bg, #fffbeb)' : isModTested ? 'var(--blue-bg, #eff6ff)' : 'var(--card-bg-subtle, #f8fafc)'
-                const badgeColor = isTopTested ? 'var(--red, #991b1b)' : isFreqTested ? 'var(--hl-dark, #92400e)' : isModTested ? 'var(--blue, #1e40af)' : 'var(--ink2, #475569)'
-                const badgeBorder = isTopTested ? 'var(--red-border, #fecaca)' : isFreqTested ? 'var(--hl-border, #fde68a)' : isModTested ? 'var(--blue-border, #bfdbfe)' : 'var(--line, #e2e8f0)'
+                const badgeBg = isTopTested ? 'var(--red-bg)' : isFreqTested ? 'var(--hl-bg)' : isModTested ? 'var(--blue-bg)' : 'var(--card-bg-subtle)'
+                const badgeColor = isTopTested ? 'var(--red)' : isFreqTested ? 'var(--hl-dark)' : isModTested ? 'var(--blue)' : 'var(--ink2)'
+                const badgeBorder = isTopTested ? 'var(--red-border)' : isFreqTested ? 'var(--hl-border)' : isModTested ? 'var(--blue-border)' : 'var(--line)'
 
                 return (
                   <article
@@ -1139,8 +1086,8 @@ export function ConstitutionExplorerPage() {
                     id={art.id}
                     style={{
                       padding: '20px 24px',
-                      background: 'var(--card-bg, #ffffff)',
-                      border: '1px solid var(--line, #e2e8f0)',
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--line)',
                       borderRadius: '12px',
                       boxShadow: isTopTested ? '0 1px 4px rgba(220, 38, 38, 0.05)' : '0 1px 2px rgba(0,0,0,0.02)',
                     }}
@@ -1152,7 +1099,7 @@ export function ConstitutionExplorerPage() {
                           style={{
                             fontSize: '20px',
                             fontWeight: 800,
-                            color: 'var(--brand, #0f766e)',
+                            color: 'var(--brand)',
                             fontFamily: 'var(--font-heading, "Fraunces", serif)',
                           }}
                         >
@@ -1162,7 +1109,7 @@ export function ConstitutionExplorerPage() {
                           style={{
                             fontSize: '17px',
                             fontWeight: 700,
-                            color: 'var(--ink, #0f172a)',
+                            color: 'var(--ink)',
                             margin: 0,
                             lineHeight: '1.3',
                           }}
@@ -1194,25 +1141,17 @@ export function ConstitutionExplorerPage() {
                     </div>
 
                     {/* Official Constitutional Text / Summary */}
-                    <p style={{ fontSize: '14px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 12px' }}>
+                    <p style={{ fontSize: '14px', color: 'var(--ink)', lineHeight: '1.6', margin: '0 0 12px' }}>
                       {art.summary}
                     </p>
 
-                    {/* Teaching Breakdown: In Simple Words (Examiner trap removed as requested) */}
-                    <div
-                      style={{
-                        background: 'var(--bg, #f8fafc)',
-                        padding: '12px 16px',
-                        borderRadius: '8px',
-                        borderLeft: '3px solid var(--brand, #0f766e)',
-                        marginBottom: '12px',
-                      }}
-                    >
+                    {/* Teaching Breakdown: In Simple Words */}
+                    <div className="study-card-note">
                       <strong
                         style={{
                           fontSize: '11.5px',
                           textTransform: 'uppercase',
-                          color: 'var(--brand, #0f766e)',
+                          color: 'var(--brand)',
                           letterSpacing: '0.4px',
                           display: 'flex',
                           alignItems: 'center',
@@ -1223,24 +1162,15 @@ export function ConstitutionExplorerPage() {
                         <BookOpen size={13} />
                         In Simple Words (Student Teaching Note)
                       </strong>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #334155)', lineHeight: '1.55', margin: 0 }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', lineHeight: '1.55', margin: 0 }}>
                         {art.simpleExplanation}
                       </p>
                     </div>
 
                     {/* Landmark Judicial Precedent if available */}
                     {art.landmarkCase && (
-                      <div
-                        style={{
-                          fontSize: '13px',
-                          color: 'var(--ink2, #475569)',
-                          background: '#f1f5f9',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          marginBottom: '12px',
-                        }}
-                      >
-                        <strong style={{ color: 'var(--ink, #1e293b)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
+                      <div className="study-badge-precedent">
+                        <strong style={{ color: 'var(--ink)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
                       </div>
                     )}
 
@@ -1251,7 +1181,7 @@ export function ConstitutionExplorerPage() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         paddingTop: '10px',
-                        borderTop: '1px solid var(--line, #f1f5f9)',
+                        borderTop: '1px solid var(--line)',
                         flexWrap: 'wrap',
                         gap: '8px',
                       }}
@@ -1261,7 +1191,7 @@ export function ConstitutionExplorerPage() {
                         style={{
                           fontSize: '12.5px',
                           fontWeight: 700,
-                          color: 'var(--brand, #0f766e)',
+                          color: 'var(--brand)',
                           textDecoration: 'none',
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -1272,7 +1202,7 @@ export function ConstitutionExplorerPage() {
                         <ChevronRight size={13} />
                       </Link>
 
-                      <span style={{ fontSize: '12px', color: 'var(--ink2, #94a3b8)', fontWeight: 600 }}>
+                      <span style={{ fontSize: '12px', color: 'var(--ink3)', fontWeight: 600 }}>
                         {art.part} · {art.partName}
                       </span>
                     </div>
@@ -1286,16 +1216,7 @@ export function ConstitutionExplorerPage() {
               <div style={{ textAlign: 'center', marginTop: '24px' }}>
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 35)}
-                  style={{
-                    padding: '10px 24px',
-                    fontSize: '13.5px',
-                    fontWeight: 700,
-                    borderRadius: '8px',
-                    background: '#f1f5f9',
-                    color: 'var(--ink, #0f172a)',
-                    border: '1px solid var(--line, #cbd5e1)',
-                    cursor: 'pointer',
-                  }}
+                  className="study-btn-secondary"
                 >
                   Load More Articles in this Part ({filteredArticles.length - displayedArticles.length} remaining)
                 </button>
@@ -1308,16 +1229,16 @@ export function ConstitutionExplorerPage() {
                 style={{
                   marginTop: '36px',
                   padding: '24px 20px',
-                  background: 'var(--card-bg, #ffffff)',
-                  border: '1.5px dashed var(--brand, #0f766e)',
+                  background: 'var(--card-bg)',
+                  border: '1.5px dashed var(--brand)',
                   borderRadius: '12px',
                   textAlign: 'center',
                 }}
               >
-                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink2, #64748b)', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink3)', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '6px' }}>
                   Finished reading {currentPartInfo?.part} ({currentPartInfo?.name})
                 </span>
-                <h3 style={{ fontSize: '19px', fontFamily: 'var(--font-heading, "Fraunces", serif)', margin: '0 0 12px', color: 'var(--ink, #0f172a)' }}>
+                <h3 style={{ fontSize: '19px', fontFamily: 'var(--font-heading, "Fraunces", serif)', margin: '0 0 12px', color: 'var(--ink)' }}>
                   Continue Reading {nextPartInfo.part}: {nextPartInfo.name}
                 </h3>
                 <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', maxWidth: '560px', margin: '0 auto 16px', lineHeight: '1.5' }}>
@@ -1377,8 +1298,8 @@ export function ConstitutionExplorerPage() {
             {/* Banner */}
             <div
               style={{
-                background: 'linear-gradient(to right, #fef2f2, #fffbeb)',
-                border: '1px solid #fecaca',
+                background: 'var(--red-bg)',
+                border: '1px solid var(--red-border)',
                 borderRadius: '12px',
                 padding: '18px 22px',
                 marginBottom: '20px',
@@ -1390,41 +1311,37 @@ export function ConstitutionExplorerPage() {
               }}
             >
               <div>
-                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--red)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Award size={14} />
                   Historical Examination PYQ Ranking
                 </span>
-                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#991b1b', margin: '4px 0 6px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink)', margin: '4px 0 6px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                   Most Asked Articles in Indian Competitive Exams
                 </h2>
-                <p style={{ fontSize: '13.5px', color: '#7f1d1d', margin: 0, lineHeight: '1.5', maxWidth: '640px' }}>
+                <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5', maxWidth: '640px' }}>
                   Articles ranked in strict descending order of how frequently they appear in UPSC CSE Prelims, JKPSC CCE, SSC CGL, and State PSCs.
                 </p>
               </div>
 
-              <div style={{ background: '#ffffff', border: '1px solid #fca5a5', padding: '8px 16px', borderRadius: '10px', textAlign: 'center' }}>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#dc2626' }}>{mostAskedArticles.length}</div>
-                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#991b1b' }}>Ranked Articles</div>
+              <div style={{ background: 'var(--card-bg)', border: '1px solid var(--red-border)', padding: '8px 16px', borderRadius: '10px', textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--red)' }}>{mostAskedArticles.length}</div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--red)' }}>Ranked Articles</div>
               </div>
             </div>
 
             {/* Search Box in Most Asked */}
             <div style={{ position: 'relative', marginBottom: '18px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink3)' }} />
               <input
                 type="text"
+                className="study-control-input"
                 placeholder="Search ranked articles by number, title, or topic..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 style={{
                   width: '100%',
                   padding: '9px 12px 9px 36px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--line, #cbd5e1)',
                   fontSize: '14px',
-                  outline: 'none',
-                  background: 'var(--card-bg, #ffffff)',
-                  color: 'var(--ink, #0f172a)',
                 }}
               />
             </div>
@@ -1442,8 +1359,8 @@ export function ConstitutionExplorerPage() {
                     id={art.id}
                     style={{
                       padding: '20px 24px',
-                      background: 'var(--card-bg, #ffffff)',
-                      border: isTop5 ? '1.5px solid #f87171' : '1px solid var(--line, #e2e8f0)',
+                      background: 'var(--card-bg)',
+                      border: isTop5 ? '1.5px solid var(--red)' : '1px solid var(--line)',
                       borderRadius: '12px',
                       boxShadow: isTop5 ? '0 2px 8px rgba(220, 38, 38, 0.08)' : '0 1px 2px rgba(0,0,0,0.02)',
                     }}
@@ -1457,7 +1374,7 @@ export function ConstitutionExplorerPage() {
                             fontWeight: 800,
                             padding: '3px 8px',
                             borderRadius: '6px',
-                            background: isTop5 ? '#dc2626' : isTop15 ? '#d97706' : '#2563eb',
+                            background: isTop5 ? 'var(--red)' : isTop15 ? 'var(--hl-dark)' : 'var(--blue)',
                             color: '#ffffff',
                           }}
                         >
@@ -1468,7 +1385,7 @@ export function ConstitutionExplorerPage() {
                           style={{
                             fontSize: '20px',
                             fontWeight: 800,
-                            color: 'var(--brand, #0f766e)',
+                            color: 'var(--brand)',
                             fontFamily: 'var(--font-heading, "Fraunces", serif)',
                           }}
                         >
@@ -1479,7 +1396,7 @@ export function ConstitutionExplorerPage() {
                           style={{
                             fontSize: '17px',
                             fontWeight: 700,
-                            color: 'var(--ink, #0f172a)',
+                            color: 'var(--ink)',
                             margin: 0,
                             lineHeight: '1.3',
                           }}
@@ -1495,37 +1412,29 @@ export function ConstitutionExplorerPage() {
                           fontWeight: 700,
                           padding: '3px 10px',
                           borderRadius: '12px',
-                          background: '#fef2f2',
-                          color: '#991b1b',
-                          border: '1px solid #fecaca',
+                          background: 'var(--red-bg)',
+                          color: 'var(--red)',
+                          border: '1px solid var(--red-border)',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '4px',
                         }}
                       >
-                        <Flame size={13} color="#dc2626" />
+                        <Flame size={13} color="var(--red)" />
                         {art.pyqCount} Historical PYQs
                       </span>
                     </div>
 
-                    <p style={{ fontSize: '14px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 12px' }}>
+                    <p style={{ fontSize: '14px', color: 'var(--ink)', lineHeight: '1.6', margin: '0 0 12px' }}>
                       {art.summary}
                     </p>
 
-                    <div
-                      style={{
-                        background: 'var(--bg, #f8fafc)',
-                        padding: '12px 16px',
-                        borderRadius: '8px',
-                        borderLeft: '3px solid var(--brand, #0f766e)',
-                        marginBottom: '12px',
-                      }}
-                    >
+                    <div className="study-card-note">
                       <strong
                         style={{
                           fontSize: '11.5px',
                           textTransform: 'uppercase',
-                          color: 'var(--brand, #0f766e)',
+                          color: 'var(--brand)',
                           letterSpacing: '0.4px',
                           display: 'flex',
                           alignItems: 'center',
@@ -1536,23 +1445,14 @@ export function ConstitutionExplorerPage() {
                         <BookOpen size={13} />
                         In Simple Words (Student Teaching Note)
                       </strong>
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #334155)', lineHeight: '1.55', margin: 0 }}>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2)', lineHeight: '1.55', margin: 0 }}>
                         {art.simpleExplanation}
                       </p>
                     </div>
 
                     {art.landmarkCase && (
-                      <div
-                        style={{
-                          fontSize: '13px',
-                          color: 'var(--ink2, #475569)',
-                          background: '#f1f5f9',
-                          padding: '8px 12px',
-                          borderRadius: '6px',
-                          marginBottom: '12px',
-                        }}
-                      >
-                        <strong style={{ color: 'var(--ink, #1e293b)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
+                      <div className="study-badge-precedent">
+                        <strong style={{ color: 'var(--ink)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
                       </div>
                     )}
 
@@ -1562,7 +1462,7 @@ export function ConstitutionExplorerPage() {
                         justifyContent: 'space-between',
                         alignItems: 'center',
                         paddingTop: '10px',
-                        borderTop: '1px solid var(--line, #f1f5f9)',
+                        borderTop: '1px solid var(--line)',
                         flexWrap: 'wrap',
                         gap: '8px',
                       }}
@@ -1572,7 +1472,7 @@ export function ConstitutionExplorerPage() {
                         style={{
                           fontSize: '12.5px',
                           fontWeight: 700,
-                          color: 'var(--brand, #0f766e)',
+                          color: 'var(--brand)',
                           textDecoration: 'none',
                           display: 'inline-flex',
                           alignItems: 'center',
@@ -1583,7 +1483,7 @@ export function ConstitutionExplorerPage() {
                         <ChevronRight size={13} />
                       </Link>
 
-                      <span style={{ fontSize: '12px', color: 'var(--ink2, #94a3b8)', fontWeight: 600 }}>
+                      <span style={{ fontSize: '12px', color: 'var(--ink3)', fontWeight: 600 }}>
                         {art.part} · {art.partName}
                       </span>
                     </div>
@@ -1596,16 +1496,7 @@ export function ConstitutionExplorerPage() {
               <div style={{ textAlign: 'center', marginTop: '28px' }}>
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 35)}
-                  style={{
-                    padding: '11px 26px',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    borderRadius: '8px',
-                    background: 'var(--brand, #0f766e)',
-                    color: '#ffffff',
-                    border: 'none',
-                    cursor: 'pointer',
-                  }}
+                  className="study-btn-secondary"
                 >
                   Load Next Ranked Articles ({mostAskedArticles.length - displayedMostAsked.length} remaining)
                 </button>
@@ -1621,10 +1512,10 @@ export function ConstitutionExplorerPage() {
               <div
                 key={p.part}
                 style={{
-                  background: 'var(--card-bg, #ffffff)',
+                  background: 'var(--card-bg)',
                   padding: '20px',
                   borderRadius: '12px',
-                  border: '1px solid var(--line, #e2e8f0)',
+                  border: '1px solid var(--line)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
@@ -1632,19 +1523,19 @@ export function ConstitutionExplorerPage() {
               >
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>{p.part}</span>
-                    <span style={{ fontSize: '11.5px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: 'var(--bg, #f1f5f9)', color: 'var(--ink2, #475569)' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand)' }}>{p.part}</span>
+                    <span style={{ fontSize: '11.5px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: 'var(--surface-2)', color: 'var(--ink2)', border: '1px solid var(--line)' }}>
                       {p.articlesRange}
                     </span>
                   </div>
-                  <h3 style={{ fontSize: '17px', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
+                  <h3 style={{ fontSize: '17px', margin: '0 0 8px', color: 'var(--ink)' }}>
                     {p.name}
                   </h3>
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', lineHeight: '1.6', margin: 0 }}>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2)', lineHeight: '1.6', margin: 0 }}>
                     {p.description}
                   </p>
                 </div>
-                <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--line, #e2e8f0)' }}>
+                <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--line)' }}>
                   <button
                     onClick={() => {
                       setPartFilter(p.part)
@@ -1654,7 +1545,7 @@ export function ConstitutionExplorerPage() {
                       background: 'none',
                       border: 'none',
                       padding: 0,
-                      color: 'var(--brand, #0f766e)',
+                      color: 'var(--brand)',
                       fontSize: '13px',
                       fontWeight: 700,
                       cursor: 'pointer',
@@ -1679,31 +1570,31 @@ export function ConstitutionExplorerPage() {
                 key={am.amendment}
                 style={{
                   padding: '20px 24px',
-                  background: 'var(--card-bg, #ffffff)',
-                  border: '1px solid var(--line, #e2e8f0)',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--line)',
                   borderRadius: '12px',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand)' }}>
                       {am.amendment}
                     </span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink2, #64748b)' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink3)' }}>
                       ({am.year})
                     </span>
                   </div>
-                  <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: '#eff6ff', color: '#1d4ed8' }}>
+                  <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: 'var(--blue-bg)', color: 'var(--blue)', border: '1px solid var(--blue-border)' }}>
                     Constitutional Amendment
                   </span>
                 </div>
-                <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 8px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink)', margin: '0 0 8px' }}>
                   {am.title}
                 </h3>
-                <p style={{ fontSize: '13.5px', lineHeight: '1.6', color: 'var(--ink, #334155)', margin: '0 0 10px' }}>
+                <p style={{ fontSize: '13.5px', lineHeight: '1.6', color: 'var(--ink2)', margin: '0 0 10px' }}>
                   {am.significance}
                 </p>
-                <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', color: '#854d0e' }}>
+                <div style={{ background: 'var(--hl-bg)', border: '1px solid var(--hl-border)', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', color: 'var(--hl-dark)' }}>
                   <strong>💡 Exam Takeaway:</strong> {am.examNote}
                 </div>
               </article>
@@ -1719,17 +1610,17 @@ export function ConstitutionExplorerPage() {
                 key={sch.schedule}
                 style={{
                   padding: '20px 24px',
-                  background: 'var(--card-bg, #ffffff)',
-                  border: '1px solid var(--line, #e2e8f0)',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--line)',
                   borderRadius: '12px',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
-                  <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--brand, #0f766e)', fontWeight: 800 }}>{sch.schedule}</h3>
-                  <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>{sch.articles}</span>
+                  <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--brand)', fontWeight: 800 }}>{sch.schedule}</h3>
+                  <span style={{ fontSize: '12px', color: 'var(--ink3)', fontWeight: 600 }}>{sch.articles}</span>
                 </div>
-                <h4 style={{ fontSize: '15px', color: 'var(--ink, #0f172a)', margin: '0 0 8px' }}>{sch.subject}</h4>
-                <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', lineHeight: '1.6', margin: 0 }}>
+                <h4 style={{ fontSize: '15px', color: 'var(--ink)', margin: '0 0 8px' }}>{sch.subject}</h4>
+                <p style={{ fontSize: '13.5px', color: 'var(--ink2)', lineHeight: '1.6', margin: 0 }}>
                   {sch.details}
                 </p>
               </article>
@@ -1740,7 +1631,7 @@ export function ConstitutionExplorerPage() {
         {/* Tab 7: EXAM FAQS (5) */}
         {activeTab === 'faq' && (
           <div style={{ maxWidth: '840px', margin: '0 auto' }}>
-            <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink, #0f172a)' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink)' }}>
               Frequently Asked Questions on the Constitution of India
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1750,8 +1641,8 @@ export function ConstitutionExplorerPage() {
                   <div
                     key={idx}
                     style={{
-                      background: 'var(--card-bg, #ffffff)',
-                      border: '1px solid var(--line, #e2e8f0)',
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--line)',
                       borderRadius: '10px',
                       overflow: 'hidden',
                     }}
@@ -1771,7 +1662,7 @@ export function ConstitutionExplorerPage() {
                         cursor: 'pointer',
                         fontSize: '15px',
                         fontWeight: 700,
-                        color: 'var(--ink, #0f172a)',
+                        color: 'var(--ink)',
                       }}
                     >
                       <div>
@@ -1782,9 +1673,9 @@ export function ConstitutionExplorerPage() {
                             fontWeight: 800,
                             padding: '2px 8px',
                             borderRadius: '6px',
-                            background: '#eff6ff',
-                            color: '#1d4ed8',
-                            border: '1px solid #bfdbfe',
+                            background: 'var(--blue-bg)',
+                            color: 'var(--blue)',
+                            border: '1px solid var(--blue-border)',
                             marginBottom: '6px',
                             textTransform: 'uppercase',
                             letterSpacing: '0.4px',
@@ -1793,13 +1684,13 @@ export function ConstitutionExplorerPage() {
                           {faq.examTag}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <HelpCircle size={17} color="var(--brand, #0f766e)" style={{ flexShrink: 0 }} />
+                          <HelpCircle size={17} color="var(--brand)" style={{ flexShrink: 0 }} />
                           <span>{faq.q}</span>
                         </div>
                       </div>
                       <ChevronRight
                         size={18}
-                        color="var(--ink2, #64748b)"
+                        color="var(--ink2)"
                         style={{
                           transform: isOpen ? 'rotate(90deg)' : 'none',
                           transition: 'transform 0.2s',
@@ -1813,14 +1704,14 @@ export function ConstitutionExplorerPage() {
                         style={{
                           padding: '0 20px 16px',
                           fontSize: '14px',
-                          color: 'var(--ink2, #475569)',
+                          color: 'var(--ink2)',
                           lineHeight: '1.65',
-                          borderTop: '1px solid var(--line, #f1f5f9)',
+                          borderTop: '1px solid var(--line)',
                           paddingTop: '14px',
                         }}
                       >
                         <p style={{ margin: '0 0 10px' }}>{faq.a}</p>
-                        <div style={{ background: '#f8fafc', borderLeft: '3px solid var(--brand, #0f766e)', padding: '8px 12px', borderRadius: '0 6px 6px 0', fontSize: '12.5px', color: '#0f766e' }}>
+                        <div style={{ background: 'var(--surface-2)', borderLeft: '3px solid var(--brand)', padding: '8px 12px', borderRadius: '0 6px 6px 0', fontSize: '12.5px', color: 'var(--brand)' }}>
                           <strong>Exam Takeaway:</strong> {faq.takeaway}
                         </div>
                       </div>
@@ -1838,19 +1729,19 @@ export function ConstitutionExplorerPage() {
             marginTop: '44px',
             textAlign: 'center',
             padding: '28px 24px',
-            background: 'var(--card-bg, #ffffff)',
-            border: '1px solid var(--line, #e2e8f0)',
+            background: 'var(--card-bg)',
+            border: '1px solid var(--line)',
             borderRadius: '14px',
             boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
           }}
         >
-          <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--brand, #0f766e)', display: 'block', marginBottom: '6px' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--brand)', display: 'block', marginBottom: '6px' }}>
             Zero Paywall Question Bank
           </span>
-          <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
+          <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', margin: '0 0 8px', color: 'var(--ink)' }}>
             Practice Solved Indian Polity Previous Year Questions
           </h2>
-          <p style={{ fontSize: '14px', color: 'var(--ink2, #475569)', maxWidth: '640px', margin: '0 auto 18px', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '14px', color: 'var(--ink2)', maxWidth: '640px', margin: '0 auto 18px', lineHeight: '1.6' }}>
             Test your understanding of the Preamble, Fundamental Rights, DPSP, Parliament, Executive, and Constitutional Amendments against real exam questions from UPSC Prelims, JKPSC CCE, SSC CGL, and CDS.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1863,7 +1754,7 @@ export function ConstitutionExplorerPage() {
                 fontWeight: 700,
                 fontSize: '13.5px',
                 color: '#ffffff',
-                background: 'var(--brand, #0f766e)',
+                background: 'var(--brand)',
                 padding: '10px 22px',
                 borderRadius: '8px',
                 textDecoration: 'none',
@@ -1879,9 +1770,9 @@ export function ConstitutionExplorerPage() {
                 gap: '6px',
                 fontWeight: 700,
                 fontSize: '13.5px',
-                color: 'var(--ink, #0f172a)',
-                background: 'var(--bg, #f1f5f9)',
-                border: '1px solid var(--line, #cbd5e1)',
+                color: 'var(--ink)',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
                 padding: '10px 22px',
                 borderRadius: '8px',
                 textDecoration: 'none',
@@ -1891,6 +1782,122 @@ export function ConstitutionExplorerPage() {
             </Link>
           </div>
         </div>
+
+        {/* Cross-Link Ecosystem: Related Study Suites */}
+        <section
+          style={{
+            marginTop: '36px',
+            padding: '24px',
+            background: 'var(--card-bg)',
+            borderRadius: '14px',
+            border: '1px solid var(--line)',
+          }}
+          aria-labelledby="polity-related-suites-heading"
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brand)' }}>
+                Visual Learning Ecosystem
+              </span>
+              <h3 id="polity-related-suites-heading" style={{ margin: '3px 0 0', fontSize: '19px', fontWeight: 800, color: 'var(--ink)' }}>
+                Explore Related Study Suites
+              </h3>
+            </div>
+            <Link
+              to="/study-material"
+              style={{
+                fontSize: '12.5px',
+                fontWeight: 700,
+                color: 'var(--brand)',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                background: 'var(--brand-soft)',
+                border: '1px solid var(--brand-line)',
+              }}
+            >
+              <span>All Study Materials</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px' }}>
+            <Link
+              to="/modern-indian-history-timeline"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '16px',
+                borderRadius: '10px',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>⏳</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--hl-dark)' }}>History</span>
+              </div>
+              <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>Modern History Timeline (1757–1947)</strong>
+              <span style={{ fontSize: '12.5px', color: 'var(--ink2)', lineHeight: '1.45' }}>
+                Complete chronological Spectrum coverage, 35 Governor-Generals &amp; Viceroys, and British Acts.
+              </span>
+            </Link>
+
+            <Link
+              to="/ramsar-wetlands-and-national-parks"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '16px',
+                borderRadius: '10px',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🌿</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--green)' }}>Environment</span>
+              </div>
+              <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>Ramsar Wetlands Timeline (1981–2026)</strong>
+              <span style={{ fontSize: '12.5px', color: 'var(--ink2)', lineHeight: '1.45' }}>
+                All 103 Ramsar sites in chronological order, Montreux Record registry, and river basin links.
+              </span>
+            </Link>
+
+            <Link
+              to="/india-physical-geography-map"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '16px',
+                borderRadius: '10px',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🗺️</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--blue)' }}>Geography</span>
+              </div>
+              <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>India Physical Geography Map</strong>
+              <span style={{ fontSize: '12.5px', color: 'var(--ink2)', lineHeight: '1.45' }}>
+                Interactive map of 13 major river basins, tributaries by bank, lakes, and reservoirs.
+              </span>
+            </Link>
+          </div>
+        </section>
       </div>
     </section>
   )

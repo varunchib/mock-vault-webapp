@@ -50,7 +50,11 @@ function AppChrome() {
   // — never on the public landing / marketing / SEO pages. `authedForLayout`
   // already gates the app shell; the landing route is excluded explicitly.
   const authedForLayout = isAuthenticated || (isLoading && hasSessionHint())
-  const darkEligible = authedForLayout && location.pathname !== '/'
+  const isStudyToolOrBlog =
+    ['/constitution-of-india', '/modern-indian-history-timeline', '/ramsar-wetlands-and-national-parks', '/study-material', '/india-physical-geography-map'].some(
+      (path) => location.pathname === path || location.pathname.startsWith(path + '/')
+    ) || location.pathname.startsWith('/blog')
+  const darkEligible = (authedForLayout || isStudyToolOrBlog) && location.pathname !== '/'
   useEffect(() => {
     const resolved = darkEligible ? resolveTheme(themePref) : 'light'
     document.documentElement.setAttribute('data-theme', resolved)

@@ -217,7 +217,7 @@ export function HistoryTimelinePage() {
         <header style={{ marginBottom: '24px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="public-kicker" style={{ margin: 0 }}>Interactive History Study Suite</span>
-            <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: 'var(--brand-soft, #ecfdf5)', color: '#047857', border: '1px solid var(--brand-line, #a7f3d0)' }}>
+            <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: 'var(--brand-soft)', color: 'var(--brand)', border: '1px solid var(--brand-line)' }}>
               1757 – 1947 · 5 Eras · Complete Chronological Timeline
             </span>
           </div>
@@ -226,14 +226,14 @@ export function HistoryTimelinePage() {
               fontFamily: 'var(--font-heading, "Fraunces", serif)',
               fontSize: 'clamp(24px, 3.5vw, 36px)',
               margin: '0 0 10px',
-              color: 'var(--ink, #0f172a)',
+              color: 'var(--ink)',
               letterSpacing: '-0.02em',
               lineHeight: '1.2',
             }}
           >
             Modern Indian History: Chronological Timeline (1757–1947)
           </h1>
-          <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '840px', lineHeight: '1.6', margin: 0 }}>
+          <p style={{ fontSize: '15px', color: 'var(--ink2)', maxWidth: '840px', lineHeight: '1.6', margin: 0 }}>
             Master the complete chronological arc of Modern Indian History from the Battle of Plassey (1757) to Independence (1947). Learn line-by-line with concise Magbook-style bullet points, Governor-Generals &amp; Viceroys chronology, and landmark British Acts.
           </p>
 
@@ -246,35 +246,35 @@ export function HistoryTimelinePage() {
               marginTop: '18px',
             }}
           >
-            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Calendar size={18} color="var(--brand, #0f766e)" />
+            <div style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Calendar size={18} color="var(--brand)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>1757 – 1947</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>190 Years Covered</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink)' }}>1757 – 1947</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink3)', fontWeight: 600 }}>190 Years Covered</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <UserCheck size={18} color="var(--brand, #0f766e)" />
+            <div style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <UserCheck size={18} color="var(--brand)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>{GOVERNOR_GENERALS_TIMELINE.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Gov-Generals &amp; Viceroys</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink)' }}>{GOVERNOR_GENERALS_TIMELINE.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink3)', fontWeight: 600 }}>Gov-Generals &amp; Viceroys</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--red-bg, #fef2f2)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--red-border, #fecaca)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Award size={18} color="var(--red, #dc2626)" />
+            <div style={{ background: 'var(--red-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--red-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Award size={18} color="var(--red)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--red, #dc2626)' }}>{ALL_MODERN_HISTORY_EVENTS.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--red, #b91c1c)', fontWeight: 600 }}>Total Milestone Events</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--red)' }}>{ALL_MODERN_HISTORY_EVENTS.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--red)', fontWeight: 600 }}>Total Milestone Events</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--blue-bg, #eff6ff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border, #bfdbfe)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={18} color="var(--blue, #2563eb)" />
+            <div style={{ background: 'var(--blue-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={18} color="var(--blue)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue, #2563eb)' }}>{legislativeActs.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--blue, #1d4ed8)', fontWeight: 600 }}>Landmark Acts &amp; Reforms</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue)' }}>{legislativeActs.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--blue)', fontWeight: 600 }}>Landmark Acts &amp; Reforms</div>
               </div>
             </div>
           </div>
@@ -287,7 +287,7 @@ export function HistoryTimelinePage() {
           style={{
             display: 'flex',
             gap: '6px',
-            borderBottom: '2px solid var(--line, #e2e8f0)',
+            borderBottom: '2px solid var(--line)',
             marginBottom: '20px',
             overflowX: 'auto',
             paddingBottom: '6px',
@@ -302,8 +302,8 @@ export function HistoryTimelinePage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'timeline' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'timeline' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'timeline' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'timeline' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -320,8 +320,8 @@ export function HistoryTimelinePage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'viceroys' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'viceroys' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'viceroys' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'viceroys' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
               display: 'inline-flex',
@@ -342,8 +342,8 @@ export function HistoryTimelinePage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'most-asked' ? '3px solid #dc2626' : '3px solid transparent',
-              color: activeTab === 'most-asked' ? '#dc2626' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'most-asked' ? '3px solid var(--red)' : '3px solid transparent',
+              color: activeTab === 'most-asked' ? 'var(--red)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
               display: 'inline-flex',
@@ -351,7 +351,7 @@ export function HistoryTimelinePage() {
               gap: '5px',
             }}
           >
-            <Flame size={15} color={activeTab === 'most-asked' ? '#dc2626' : 'var(--ink2, #64748b)'} />
+            <Flame size={15} color={activeTab === 'most-asked' ? 'var(--red)' : 'var(--ink2)'} />
             Most Asked Events in Exams
           </button>
 
@@ -364,8 +364,8 @@ export function HistoryTimelinePage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'eras' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'eras' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'eras' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'eras' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -382,8 +382,8 @@ export function HistoryTimelinePage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'acts' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'acts' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'acts' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'acts' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -400,8 +400,8 @@ export function HistoryTimelinePage() {
               cursor: 'pointer',
               background: 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'faq' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
-              color: activeTab === 'faq' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              borderBottom: activeTab === 'faq' ? '3px solid var(--brand)' : '3px solid transparent',
+              color: activeTab === 'faq' ? 'var(--brand)' : 'var(--ink2)',
               marginBottom: '-2px',
               whiteSpace: 'nowrap',
             }}
@@ -416,8 +416,8 @@ export function HistoryTimelinePage() {
             {/* Filter Controls Bar */}
             <div
               style={{
-                background: 'var(--card-bg, #ffffff)',
-                border: '1px solid var(--line, #e2e8f0)',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--line)',
                 borderRadius: '12px',
                 padding: '16px 20px',
                 marginBottom: '20px',
@@ -428,39 +428,31 @@ export function HistoryTimelinePage() {
             >
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
                 <div style={{ flex: '1 1 280px', position: 'relative' }}>
-                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink3)' }} />
                   <input
                     type="text"
+                    className="study-control-input"
                     placeholder="Search events, treaties, acts, leaders (e.g., 'Plassey', 'Permanent Settlement', 'Dandi', 'Quit India')..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     style={{
                       width: '100%',
                       padding: '9px 12px 9px 36px',
-                      borderRadius: '8px',
-                      border: '1px solid var(--line, #cbd5e1)',
                       fontSize: '14px',
-                      outline: 'none',
-                      background: 'var(--bg, #f8fafc)',
-                      color: 'var(--ink, #0f172a)',
                     }}
                   />
                 </div>
 
                 <select
                   value={eraFilter}
+                  className="study-control-select"
                   onChange={(e) => {
                     setEraFilter(e.target.value)
                     setVisibleCount(35)
                   }}
                   style={{
                     padding: '9px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--line, #cbd5e1)',
                     fontSize: '13.5px',
-                    background: 'var(--bg, #f8fafc)',
-                    color: 'var(--ink, #0f172a)',
-                    outline: 'none',
                     cursor: 'pointer',
                     maxWidth: '280px',
                   }}
@@ -475,6 +467,7 @@ export function HistoryTimelinePage() {
 
                 <select
                   value={frequencyFilter}
+                  className="study-control-select"
                   onChange={(e) => setFrequencyFilter(e.target.value as any)}
                   style={{
                     padding: '9px 12px',
@@ -533,8 +526,8 @@ export function HistoryTimelinePage() {
                   id={ev.id}
                   style={{
                     padding: '18px 20px',
-                    background: 'var(--card-bg, #ffffff)',
-                    border: '1px solid var(--line, #e2e8f0)',
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--line)',
                     borderRadius: '10px',
                     boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
                   }}
@@ -546,21 +539,21 @@ export function HistoryTimelinePage() {
                         style={{
                           fontSize: '22px',
                           fontWeight: 800,
-                          color: 'var(--brand, #0f766e)',
+                          color: 'var(--brand)',
                           fontFamily: 'var(--font-heading, "Fraunces", serif)',
                           minWidth: '55px',
                         }}
                       >
                         {ev.year}
                       </span>
-                      <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, lineHeight: '1.3' }}>
+                      <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)', margin: 0, lineHeight: '1.3' }}>
                         {ev.title}
                       </h2>
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
                       {ev.dateOrMonth && (
-                        <span style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', padding: '2px 8px', borderRadius: '6px', background: 'var(--bg, #f1f5f9)' }}>
+                        <span style={{ fontSize: '11px', color: 'var(--ink2)', padding: '2px 8px', borderRadius: '6px', background: 'var(--surface-2)', border: '1px solid var(--line)' }}>
                           {ev.dateOrMonth}
                         </span>
                       )}
@@ -570,9 +563,9 @@ export function HistoryTimelinePage() {
                           fontWeight: 700,
                           padding: '2px 8px',
                           borderRadius: '6px',
-                          background: ev.frequency === 'Top Tested' ? 'var(--hl-bg, #fffbeb)' : 'var(--card-bg-subtle, #f8fafc)',
-                          color: ev.frequency === 'Top Tested' ? 'var(--hl-dark, #b45309)' : 'var(--ink2, #64748b)',
-                          border: `1px solid ${ev.frequency === 'Top Tested' ? 'var(--hl-border, #fde68a)' : 'var(--line, #e2e8f0)'}`,
+                          background: ev.frequency === 'Top Tested' ? 'var(--hl-bg)' : 'var(--card-bg-subtle)',
+                          color: ev.frequency === 'Top Tested' ? 'var(--hl-dark)' : 'var(--ink2)',
+                          border: `1px solid ${ev.frequency === 'Top Tested' ? 'var(--hl-border)' : 'var(--line)'}`,
                         }}
                       >
                         {ev.frequency === 'Top Tested' ? '🔥 ' : ''}{ev.frequency} ({ev.pyqCount} PYQs)
@@ -581,24 +574,24 @@ export function HistoryTimelinePage() {
                   </div>
 
                   {/* Viceroy & Category metadata line */}
-                  <div style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', marginBottom: '10px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ fontSize: '12.5px', color: 'var(--ink2)', marginBottom: '10px', display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                     <span><strong>Governor / Viceroy:</strong> {ev.viceroyOrGovGen}</span>
                     <span>•</span>
                     <span><strong>Category:</strong> {ev.category}</span>
                   </div>
 
                   {/* Summary */}
-                  <p style={{ fontSize: '14px', color: 'var(--ink, #334155)', lineHeight: '1.55', margin: '0 0 10px' }}>
+                  <p style={{ fontSize: '14px', color: 'var(--ink)', lineHeight: '1.55', margin: '0 0 10px' }}>
                     {ev.summary}
                   </p>
 
                   {/* Concise Magbook Points */}
                   {ev.points && ev.points.length > 0 && (
-                    <div style={{ background: 'var(--bg, #f8fafc)', padding: '12px 16px', borderRadius: '8px', borderLeft: '3px solid var(--brand, #0f766e)' }}>
-                      <strong style={{ fontSize: '11.5px', textTransform: 'uppercase', color: 'var(--brand, #0f766e)', letterSpacing: '0.4px', display: 'block', marginBottom: '6px' }}>
+                    <div className="study-card-note">
+                      <strong style={{ fontSize: '11.5px', textTransform: 'uppercase', color: 'var(--brand)', letterSpacing: '0.4px', display: 'block', marginBottom: '6px' }}>
                         Key Points &amp; Exam Facts:
                       </strong>
-                      <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.6' }}>
+                      <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink2)', lineHeight: '1.6' }}>
                         {ev.points.map((pt, idx) => (
                           <li key={idx} style={{ marginBottom: '4px' }}>{pt}</li>
                         ))}
@@ -609,16 +602,16 @@ export function HistoryTimelinePage() {
                   {/* Personalities footer */}
                   {ev.keyPersonalities && ev.keyPersonalities.length > 0 && (
                     <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', fontSize: '11.5px' }}>
-                      <span style={{ color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Key Figures:</span>
+                      <span style={{ color: 'var(--ink2)', fontWeight: 600 }}>Key Figures:</span>
                       {ev.keyPersonalities.map((person) => (
                         <span
                           key={person}
                           style={{
                             padding: '1px 7px',
-                            background: 'var(--bg, #f1f5f9)',
-                            color: 'var(--ink, #334155)',
+                            background: 'var(--surface-2)',
+                            color: 'var(--ink)',
                             borderRadius: '4px',
-                            border: '1px solid var(--line, #e2e8f0)',
+                            border: '1px solid var(--line)',
                           }}
                         >
                           {person}
@@ -630,9 +623,9 @@ export function HistoryTimelinePage() {
               ))}
 
               {filteredEvents.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--card-bg, #ffffff)', borderRadius: '12px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <h3 style={{ fontSize: '18px', color: 'var(--ink, #0f172a)', margin: '0 0 6px' }}>No historical events match your search</h3>
-                  <p style={{ fontSize: '14px', color: 'var(--ink2, #64748b)', margin: 0 }}>
+                <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                  <h3 style={{ fontSize: '18px', color: 'var(--ink)', margin: '0 0 6px' }}>No historical events match your search</h3>
+                  <p style={{ fontSize: '14px', color: 'var(--ink2)', margin: 0 }}>
                     Try searching another keyword or switch to "All Eras".
                   </p>
                 </div>
@@ -644,16 +637,7 @@ export function HistoryTimelinePage() {
               {displayedTimeline.length < filteredEvents.length && (
                 <button
                   onClick={() => setVisibleCount((prev) => prev + 35)}
-                  style={{
-                    padding: '10px 24px',
-                    fontSize: '14px',
-                    fontWeight: 700,
-                    borderRadius: '8px',
-                    border: '1px solid var(--line, #cbd5e1)',
-                    background: 'var(--card-bg, #ffffff)',
-                    color: 'var(--brand, #0f766e)',
-                    cursor: 'pointer',
-                  }}
+                  className="study-btn-secondary"
                 >
                   Load More Events in this Era ({filteredEvents.length - displayedTimeline.length} remaining)
                 </button>
@@ -661,12 +645,12 @@ export function HistoryTimelinePage() {
 
               {/* Sequential Era Navigator */}
               {nextEraInfo && eraFilter !== 'all' && (
-                <div style={{ width: '100%', marginTop: '16px', padding: '16px 20px', background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ width: '100%', marginTop: '16px', padding: '16px 20px', background: 'var(--card-bg)', border: '1px solid var(--line)', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
                   <div>
-                    <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink2, #64748b)', fontWeight: 700, letterSpacing: '0.4px', display: 'block' }}>
+                    <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink3)', fontWeight: 700, letterSpacing: '0.4px', display: 'block' }}>
                       Completed this section?
                     </span>
-                    <strong style={{ fontSize: '14.5px', color: 'var(--ink, #0f172a)' }}>
+                    <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>
                       Continue Chronology: {nextEraInfo.years} ({nextEraInfo.name})
                     </strong>
                   </div>
@@ -678,17 +662,17 @@ export function HistoryTimelinePage() {
                       alignItems: 'center',
                       gap: '6px',
                       padding: '9px 18px',
-                      background: 'var(--brand, #0f766e)',
-                      color: '#ffffff',
                       borderRadius: '8px',
-                      fontSize: '13.5px',
-                      fontWeight: 700,
+                      background: 'var(--brand)',
+                      color: '#ffffff',
                       border: 'none',
+                      fontWeight: 700,
+                      fontSize: '13px',
                       cursor: 'pointer',
                     }}
                   >
-                    <span>Load {nextEraInfo.years}</span>
-                    <ArrowRight size={15} />
+                    <span>Proceed to {nextEraInfo.name}</span>
+                    <ArrowRight size={14} />
                   </button>
                 </div>
               )}
@@ -701,8 +685,8 @@ export function HistoryTimelinePage() {
           <div>
             <div
               style={{
-                background: 'var(--card-bg, #ffffff)',
-                border: '1px solid var(--line, #e2e8f0)',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--line)',
                 borderRadius: '12px',
                 padding: '16px 20px',
                 marginBottom: '20px',
@@ -714,34 +698,30 @@ export function HistoryTimelinePage() {
               }}
             >
               <div>
-                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--brand, #0f766e)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--brand)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <UserCheck size={14} />
                   Chronological Registry (1773 – 1950)
                 </span>
-                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '4px 0 4px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink)', margin: '4px 0 4px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                   Governor-Generals and Viceroys of India
                 </h2>
-                <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5', maxWidth: '680px' }}>
+                <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5', maxWidth: '680px' }}>
                   Complete chronological timeline from Warren Hastings (1773) to C. Rajagopalachari (1948–1950). All key reforms, wars, acts, and commissions during their tenures in concise points.
                 </p>
               </div>
 
               <div style={{ position: 'relative', minWidth: '260px' }}>
-                <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
+                <Search size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink3)' }} />
                 <input
                   type="text"
+                  className="study-control-input"
                   placeholder="Search Governor-General or policy..."
                   value={govSearch}
                   onChange={(e) => setGovSearch(e.target.value)}
                   style={{
                     width: '100%',
                     padding: '8px 12px 8px 32px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--line, #cbd5e1)',
                     fontSize: '13px',
-                    outline: 'none',
-                    background: 'var(--bg, #f8fafc)',
-                    color: 'var(--ink, #0f172a)',
                   }}
                 />
               </div>
@@ -754,8 +734,8 @@ export function HistoryTimelinePage() {
                   key={gov.id}
                   style={{
                     padding: '18px 20px',
-                    background: 'var(--card-bg, #ffffff)',
-                    border: '1px solid var(--line, #e2e8f0)',
+                    background: 'var(--card-bg)',
+                    border: '1px solid var(--line)',
                     borderRadius: '10px',
                   }}
                 >
@@ -769,7 +749,7 @@ export function HistoryTimelinePage() {
                           width: '28px',
                           height: '28px',
                           borderRadius: '50%',
-                          background: 'var(--brand, #0f766e)',
+                          background: 'var(--brand)',
                           color: '#ffffff',
                           fontWeight: 800,
                           fontSize: '12px',
@@ -777,10 +757,10 @@ export function HistoryTimelinePage() {
                       >
                         #{idx + 1}
                       </span>
-                      <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                      <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)', margin: 0, fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                         {gov.name}
                       </h3>
-                      <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--ink3)' }}>
                         ({gov.title})
                       </span>
                     </div>
@@ -791,9 +771,9 @@ export function HistoryTimelinePage() {
                         fontWeight: 700,
                         padding: '3px 10px',
                         borderRadius: '12px',
-                        background: 'var(--bg, #f1f5f9)',
-                        color: 'var(--ink, #0f172a)',
-                        border: '1px solid var(--line, #e2e8f0)',
+                        background: 'var(--surface-2)',
+                        color: 'var(--ink)',
+                        border: '1px solid var(--line)',
                       }}
                     >
                       🗓️ {gov.tenure}
@@ -801,8 +781,8 @@ export function HistoryTimelinePage() {
                   </div>
 
                   {/* Bullet points of facts */}
-                  <div style={{ background: 'var(--bg, #f8fafc)', padding: '12px 16px', borderRadius: '8px', borderLeft: '3px solid var(--brand, #0f766e)', marginTop: '8px' }}>
-                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.6' }}>
+                  <div className="study-card-note" style={{ marginTop: '8px' }}>
+                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink2)', lineHeight: '1.6' }}>
                       {gov.keyFacts.map((fact, fIdx) => (
                         <li key={fIdx} style={{ marginBottom: '4px' }}>{fact}</li>
                       ))}
@@ -812,8 +792,8 @@ export function HistoryTimelinePage() {
               ))}
 
               {filteredGovGenerals.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--card-bg, #ffffff)', borderRadius: '12px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <p style={{ fontSize: '14px', color: 'var(--ink2, #64748b)', margin: 0 }}>
+                <div style={{ textAlign: 'center', padding: '40px 20px', background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                  <p style={{ fontSize: '14px', color: 'var(--ink2)', margin: 0 }}>
                     No Governor-General matches "{govSearch}".
                   </p>
                 </div>
@@ -827,8 +807,8 @@ export function HistoryTimelinePage() {
           <div>
             <div
               style={{
-                background: 'var(--card-bg, #ffffff)',
-                border: '1px solid var(--line, #e2e8f0)',
+                background: 'var(--card-bg)',
+                border: '1px solid var(--line)',
                 borderRadius: '12px',
                 padding: '18px 22px',
                 marginBottom: '20px',
@@ -840,21 +820,21 @@ export function HistoryTimelinePage() {
               }}
             >
               <div>
-                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--red)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Award size={14} />
                   Examination Frequency Ranking
                 </span>
-                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '4px 0 6px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink)', margin: '4px 0 6px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                   Most Asked Modern Indian History Events
                 </h2>
-                <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5', maxWidth: '640px' }}>
+                <p style={{ fontSize: '13.5px', color: 'var(--ink2)', margin: 0, lineHeight: '1.5', maxWidth: '640px' }}>
                   Events ranked in descending order of how frequently they appear in UPSC CSE, State PSCs, and SSC exams.
                 </p>
               </div>
 
-              <div style={{ background: '#fffbeb', border: '1px solid #fde68a', padding: '8px 16px', borderRadius: '10px', textAlign: 'center' }}>
-                <div style={{ fontSize: '20px', fontWeight: 800, color: '#b45309' }}>{mostAskedEvents.length}</div>
-                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#92400e' }}>Ranked Events</div>
+              <div style={{ background: 'var(--hl-bg)', border: '1px solid var(--hl-border)', padding: '8px 16px', borderRadius: '10px', textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--hl-dark)' }}>{mostAskedEvents.length}</div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: 'var(--hl-dark)' }}>Ranked Events</div>
               </div>
             </div>
 
@@ -868,8 +848,8 @@ export function HistoryTimelinePage() {
                     id={ev.id}
                     style={{
                       padding: '18px 20px',
-                      background: 'var(--card-bg, #ffffff)',
-                      border: '1px solid var(--line, #e2e8f0)',
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--line)',
                       borderRadius: '10px',
                     }}
                   >
@@ -881,7 +861,7 @@ export function HistoryTimelinePage() {
                             fontWeight: 800,
                             padding: '2px 7px',
                             borderRadius: '4px',
-                            background: rank <= 5 ? '#dc2626' : rank <= 15 ? '#d97706' : 'var(--brand, #0f766e)',
+                            background: rank <= 5 ? 'var(--red)' : rank <= 15 ? 'var(--hl-dark)' : 'var(--brand)',
                             color: '#ffffff',
                           }}
                         >
@@ -891,13 +871,13 @@ export function HistoryTimelinePage() {
                           style={{
                             fontSize: '20px',
                             fontWeight: 800,
-                            color: 'var(--brand, #0f766e)',
+                            color: 'var(--brand)',
                             fontFamily: 'var(--font-heading, "Fraunces", serif)',
                           }}
                         >
                           {ev.year}
                         </span>
-                        <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0 }}>
+                        <h3 style={{ fontSize: '17px', fontWeight: 700, color: 'var(--ink)', margin: 0 }}>
                           {ev.title}
                         </h3>
                       </div>
@@ -908,23 +888,23 @@ export function HistoryTimelinePage() {
                           fontWeight: 700,
                           padding: '2px 8px',
                           borderRadius: '6px',
-                          background: '#fffbeb',
-                          color: '#b45309',
-                          border: '1px solid #fde68a',
+                          background: 'var(--hl-bg)',
+                          color: 'var(--hl-dark)',
+                          border: '1px solid var(--hl-border)',
                         }}
                       >
                         🔥 {ev.pyqCount} Direct PYQs Tested
                       </span>
                     </div>
 
-                    <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.55', margin: '0 0 10px' }}>
+                    <p style={{ fontSize: '13.5px', color: 'var(--ink)', lineHeight: '1.55', margin: '0 0 10px' }}>
                       {ev.summary}
                     </p>
 
                     {/* Points */}
                     {ev.points && ev.points.length > 0 && (
-                      <div style={{ background: 'var(--bg, #f8fafc)', padding: '10px 14px', borderRadius: '6px', borderLeft: '3px solid #b45309' }}>
-                        <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.55' }}>
+                      <div className="study-card-note" style={{ borderLeft: '3px solid var(--hl-dark)' }}>
+                        <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink2)', lineHeight: '1.55' }}>
                           {ev.points.map((pt, pIdx) => (
                             <li key={pIdx} style={{ marginBottom: '3px' }}>{pt}</li>
                           ))}
@@ -945,8 +925,8 @@ export function HistoryTimelinePage() {
               <div
                 key={era.era}
                 style={{
-                  background: 'var(--card-bg, #ffffff)',
-                  border: '1px solid var(--line, #e2e8f0)',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--line)',
                   borderRadius: '12px',
                   padding: '20px',
                   display: 'flex',
@@ -955,13 +935,13 @@ export function HistoryTimelinePage() {
                 }}
               >
                 <div>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand, #0f766e)', display: 'block', marginBottom: '4px' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand)', display: 'block', marginBottom: '4px' }}>
                     {era.years}
                   </span>
-                  <h3 style={{ fontSize: '17px', margin: '0 0 8px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                  <h3 style={{ fontSize: '17px', margin: '0 0 8px', color: 'var(--ink)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                     {era.name}
                   </h3>
-                  <p style={{ fontSize: '13px', color: 'var(--ink2, #475569)', lineHeight: '1.6', margin: 0 }}>
+                  <p style={{ fontSize: '13px', color: 'var(--ink2)', lineHeight: '1.6', margin: 0 }}>
                     {era.description}
                   </p>
                 </div>
@@ -971,16 +951,11 @@ export function HistoryTimelinePage() {
                     setActiveTab('timeline')
                     handleSelectEra(era.era)
                   }}
+                  className="study-btn-secondary"
                   style={{
                     marginTop: '16px',
                     padding: '8px 14px',
-                    background: 'var(--bg, #f1f5f9)',
-                    border: '1px solid var(--line, #cbd5e1)',
-                    borderRadius: '6px',
                     fontSize: '12.5px',
-                    fontWeight: 700,
-                    color: 'var(--brand, #0f766e)',
-                    cursor: 'pointer',
                     textAlign: 'center',
                   }}
                 >
@@ -998,32 +973,32 @@ export function HistoryTimelinePage() {
               <article
                 key={act.id}
                 style={{
-                  background: 'var(--card-bg, #ffffff)',
-                  border: '1px solid var(--line, #e2e8f0)',
+                  background: 'var(--card-bg)',
+                  border: '1px solid var(--line)',
                   borderRadius: '10px',
                   padding: '18px 20px',
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: 0, fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--ink)', margin: 0, fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                     {act.title}
                   </h3>
-                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>
+                  <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand)' }}>
                     {act.year}
                   </span>
                 </div>
 
-                <div style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', marginBottom: '8px' }}>
+                <div style={{ fontSize: '12.5px', color: 'var(--ink2)', marginBottom: '8px' }}>
                   <strong>Governor-General:</strong> {act.viceroyOrGovGen}
                 </div>
 
-                <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.55', margin: '0 0 10px' }}>
+                <p style={{ fontSize: '13.5px', color: 'var(--ink)', lineHeight: '1.55', margin: '0 0 10px' }}>
                   {act.summary}
                 </p>
 
                 {act.points && act.points.length > 0 && (
-                  <div style={{ background: 'var(--bg, #f8fafc)', padding: '10px 14px', borderRadius: '6px', borderLeft: '3px solid #2563eb' }}>
-                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.55' }}>
+                  <div className="study-card-note" style={{ borderLeft: '3px solid var(--blue)' }}>
+                    <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: 'var(--ink2)', lineHeight: '1.55' }}>
                       {act.points.map((pt, pIdx) => (
                         <li key={pIdx} style={{ marginBottom: '3px' }}>{pt}</li>
                       ))}
@@ -1038,7 +1013,7 @@ export function HistoryTimelinePage() {
         {/* Tab 6: EXAM FAQS (5) */}
         {activeTab === 'faq' && (
           <div style={{ maxWidth: '840px', margin: '0 auto' }}>
-            <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink, #0f172a)' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink)' }}>
               Actual UPSC &amp; State PSC Questions on Modern Indian History
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -1048,8 +1023,8 @@ export function HistoryTimelinePage() {
                   <div
                     key={idx}
                     style={{
-                      background: 'var(--card-bg, #ffffff)',
-                      border: '1px solid var(--line, #e2e8f0)',
+                      background: 'var(--card-bg)',
+                      border: '1px solid var(--line)',
                       borderRadius: '10px',
                       overflow: 'hidden',
                     }}
@@ -1069,7 +1044,7 @@ export function HistoryTimelinePage() {
                         cursor: 'pointer',
                         fontSize: '15px',
                         fontWeight: 700,
-                        color: 'var(--ink, #0f172a)',
+                        color: 'var(--ink)',
                       }}
                     >
                       <div>
@@ -1080,9 +1055,9 @@ export function HistoryTimelinePage() {
                             fontWeight: 800,
                             padding: '2px 8px',
                             borderRadius: '6px',
-                            background: '#eff6ff',
-                            color: '#1d4ed8',
-                            border: '1px solid #bfdbfe',
+                            background: 'var(--blue-bg)',
+                            color: 'var(--blue)',
+                            border: '1px solid var(--blue-border)',
                             marginBottom: '6px',
                             textTransform: 'uppercase',
                             letterSpacing: '0.4px',
@@ -1091,13 +1066,13 @@ export function HistoryTimelinePage() {
                           {faq.examTag}
                         </span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <HelpCircle size={17} color="var(--brand, #0f766e)" style={{ flexShrink: 0 }} />
+                          <HelpCircle size={17} color="var(--brand)" style={{ flexShrink: 0 }} />
                           <span>{faq.q}</span>
                         </div>
                       </div>
                       <ChevronRight
                         size={18}
-                        color="var(--ink2, #64748b)"
+                        color="var(--ink2)"
                         style={{
                           transform: isOpen ? 'rotate(90deg)' : 'none',
                           transition: 'transform 0.2s',
@@ -1111,14 +1086,14 @@ export function HistoryTimelinePage() {
                         style={{
                           padding: '0 20px 16px',
                           fontSize: '14px',
-                          color: 'var(--ink2, #475569)',
+                          color: 'var(--ink2)',
                           lineHeight: '1.65',
-                          borderTop: '1px solid var(--line, #f1f5f9)',
+                          borderTop: '1px solid var(--line)',
                           paddingTop: '14px',
                         }}
                       >
                         <p style={{ margin: '0 0 10px' }}>{faq.a}</p>
-                        <div style={{ background: 'var(--bg, #f8fafc)', borderLeft: '3px solid var(--brand, #0f766e)', padding: '8px 12px', borderRadius: '0 6px 6px 0', fontSize: '12.5px', color: '#0f766e' }}>
+                        <div style={{ background: 'var(--surface-2)', borderLeft: '3px solid var(--brand)', padding: '8px 12px', borderRadius: '0 6px 6px 0', fontSize: '12.5px', color: 'var(--brand)' }}>
                           <strong>Exam Takeaway:</strong> {faq.takeaway}
                         </div>
                       </div>
@@ -1136,15 +1111,15 @@ export function HistoryTimelinePage() {
             marginTop: '44px',
             textAlign: 'center',
             padding: '28px 24px',
-            background: 'var(--card-bg, #ffffff)',
-            border: '1px solid var(--line, #e2e8f0)',
+            background: 'var(--card-bg)',
+            border: '1px solid var(--line)',
             borderRadius: '12px',
           }}
         >
-          <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
+          <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', margin: '0 0 8px', color: 'var(--ink)' }}>
             Practice Modern Indian History Previous Year Questions
           </h3>
-          <p style={{ fontSize: '14.5px', color: 'var(--ink2, #475569)', maxWidth: '620px', margin: '0 auto 18px', lineHeight: '1.5' }}>
+          <p style={{ fontSize: '14.5px', color: 'var(--ink2)', maxWidth: '620px', margin: '0 auto 18px', lineHeight: '1.5' }}>
             Solve actual UPSC CSE, JKPSC CCE, and State PSC questions on British acts, mass movements, and freedom fighters with verified explanations.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -1155,7 +1130,7 @@ export function HistoryTimelinePage() {
                 fontWeight: 700,
                 fontSize: '14px',
                 color: '#ffffff',
-                background: 'var(--brand, #0f766e)',
+                background: 'var(--brand)',
                 padding: '10px 22px',
                 borderRadius: '8px',
                 textDecoration: 'none',
@@ -1169,9 +1144,9 @@ export function HistoryTimelinePage() {
                 display: 'inline-block',
                 fontWeight: 600,
                 fontSize: '14px',
-                color: 'var(--brand, #0f766e)',
-                background: 'var(--brand-soft, #f0fdfa)',
-                border: '1px solid var(--brand-line, #ccfbf1)',
+                color: 'var(--brand)',
+                background: 'var(--brand-soft)',
+                border: '1px solid var(--brand-line)',
                 padding: '10px 20px',
                 borderRadius: '8px',
                 textDecoration: 'none',
@@ -1181,6 +1156,122 @@ export function HistoryTimelinePage() {
             </Link>
           </div>
         </div>
+
+        {/* Cross-Link Ecosystem: Related Study Suites */}
+        <section
+          style={{
+            marginTop: '36px',
+            padding: '24px',
+            background: 'var(--card-bg)',
+            borderRadius: '14px',
+            border: '1px solid var(--line)',
+          }}
+          aria-labelledby="history-related-suites-heading"
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brand)' }}>
+                Visual Learning Ecosystem
+              </span>
+              <h3 id="history-related-suites-heading" style={{ margin: '3px 0 0', fontSize: '19px', fontWeight: 800, color: 'var(--ink)' }}>
+                Explore Related Study Suites
+              </h3>
+            </div>
+            <Link
+              to="/study-material"
+              style={{
+                fontSize: '12.5px',
+                fontWeight: 700,
+                color: 'var(--brand)',
+                textDecoration: 'none',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '5px 12px',
+                borderRadius: '8px',
+                background: 'var(--brand-soft)',
+                border: '1px solid var(--brand-line)',
+              }}
+            >
+              <span>All Study Materials</span>
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px' }}>
+            <Link
+              to="/constitution-of-india"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '16px',
+                borderRadius: '10px',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>📜</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--brand)' }}>Polity</span>
+              </div>
+              <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>Constitution of India Explorer</strong>
+              <span style={{ fontSize: '12.5px', color: 'var(--ink2)', lineHeight: '1.45' }}>
+                Articles 1–395 linewise, Preamble, 25 Parts, 12 Schedules, and Supreme Court doctrines.
+              </span>
+            </Link>
+
+            <Link
+              to="/ramsar-wetlands-and-national-parks"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '16px',
+                borderRadius: '10px',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🌿</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--green)' }}>Environment</span>
+              </div>
+              <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>Ramsar Wetlands Timeline (1981–2026)</strong>
+              <span style={{ fontSize: '12.5px', color: 'var(--ink2)', lineHeight: '1.45' }}>
+                All 103 Ramsar sites in chronological order, Montreux Record registry, and river basin links.
+              </span>
+            </Link>
+
+            <Link
+              to="/india-physical-geography-map"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                padding: '16px',
+                borderRadius: '10px',
+                background: 'var(--card-bg-subtle)',
+                border: '1px solid var(--line)',
+                textDecoration: 'none',
+                color: 'inherit',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span style={{ fontSize: '16px' }}>🗺️</span>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--blue)' }}>Geography</span>
+              </div>
+              <strong style={{ fontSize: '14.5px', color: 'var(--ink)' }}>India Physical Geography Map</strong>
+              <span style={{ fontSize: '12.5px', color: 'var(--ink2)', lineHeight: '1.45' }}>
+                Interactive map of 13 major river basins, tributaries by bank, lakes, and reservoirs.
+              </span>
+            </Link>
+          </div>
+        </section>
       </div>
     </section>
   )

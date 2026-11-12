@@ -624,6 +624,122 @@ export function IndianRiversBlogPage() {
               Open the map <span aria-hidden="true">→</span>
             </Link>
           </section>
+
+          {/* Cross-Link Ecosystem: Related Study Suites */}
+          <section
+            style={{
+              marginTop: '36px',
+              padding: '24px',
+              background: 'var(--card-bg, #ffffff)',
+              borderRadius: '14px',
+              border: '1px solid var(--line, #e2e8f0)',
+            }}
+            aria-labelledby="river-related-suites-heading"
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--brand, #0f766e)' }}>
+                  Visual Learning Ecosystem
+                </span>
+                <h3 id="river-related-suites-heading" style={{ margin: '3px 0 0', fontSize: '19px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>
+                  Explore More Study Suites
+                </h3>
+              </div>
+              <Link
+                to="/study-material"
+                style={{
+                  fontSize: '12.5px',
+                  fontWeight: 700,
+                  color: 'var(--brand, #0f766e)',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 12px',
+                  borderRadius: '8px',
+                  background: 'var(--brand-soft, #f0fdf4)',
+                  border: '1px solid var(--brand-line, #bbf7d0)',
+                }}
+              >
+                <span>All Study Materials</span>
+                <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(230px, 1fr))', gap: '14px' }}>
+              <Link
+                to="/constitution-of-india"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  padding: '16px',
+                  borderRadius: '10px',
+                  background: 'var(--card-bg-subtle, #f8fafc)',
+                  border: '1px solid var(--line, #e2e8f0)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>📜</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--brand, #0f766e)' }}>Polity</span>
+                </div>
+                <strong style={{ fontSize: '14.5px', color: 'var(--ink, #0f172a)' }}>Constitution of India Explorer</strong>
+                <span style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', lineHeight: '1.45' }}>
+                  Articles 1–395 linewise, Preamble, 25 Parts, 12 Schedules, and Supreme Court doctrines.
+                </span>
+              </Link>
+
+              <Link
+                to="/modern-indian-history-timeline"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  padding: '16px',
+                  borderRadius: '10px',
+                  background: 'var(--card-bg-subtle, #f8fafc)',
+                  border: '1px solid var(--line, #e2e8f0)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>⏳</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--hl-dark, #b45309)' }}>History</span>
+                </div>
+                <strong style={{ fontSize: '14.5px', color: 'var(--ink, #0f172a)' }}>Modern History Timeline (1757–1947)</strong>
+                <span style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', lineHeight: '1.45' }}>
+                  Complete chronological Spectrum coverage, 35 Governor-Generals &amp; Viceroys, and British Acts.
+                </span>
+              </Link>
+
+              <Link
+                to="/ramsar-wetlands-and-national-parks"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '6px',
+                  padding: '16px',
+                  borderRadius: '10px',
+                  background: 'var(--card-bg-subtle, #f8fafc)',
+                  border: '1px solid var(--line, #e2e8f0)',
+                  textDecoration: 'none',
+                  color: 'inherit',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '16px' }}>🌿</span>
+                  <span style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', color: 'var(--green, #15803d)' }}>Environment</span>
+                </div>
+                <strong style={{ fontSize: '14.5px', color: 'var(--ink, #0f172a)' }}>Ramsar Wetlands Timeline (1981–2026)</strong>
+                <span style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', lineHeight: '1.45' }}>
+                  All 103 Ramsar sites in chronological order, Montreux Record registry, and river basin links.
+                </span>
+              </Link>
+            </div>
+          </section>
         </article>
       </main>
     </section>
