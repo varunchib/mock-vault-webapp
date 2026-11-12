@@ -307,15 +307,15 @@ const STATIC_META: Record<string, PageMeta> = {
     ],
   },
   '/constitution-of-india': {
-    title: 'Constitution of India: Articles 1–395, Preamble, Parts & Exam Rankings | Ministry of Papers',
-    description: 'Master the Constitution of India: Authentic Preamble, all 395+ articles across 25 parts, verified PYQ exam frequency rankings, student teaching notes, and landmark Supreme Court rulings.',
+    title: 'Constitution of India: Articles 1–395, Preamble & Schedules | Ministry of Papers',
+    description: 'Master the Constitution of India: Authentic Preamble, all 395+ articles across 25 parts, student teaching notes, and landmark Supreme Court rulings.',
     contentHtml: renderStaticPage('/constitution-of-india', createElement(ConstitutionExplorerPage)),
     jsonLd: [
       {
         '@context': 'https://schema.org',
         '@type': 'LearningResource',
-        name: 'Interactive Constitution of India Explorer: Preamble, Articles 1–395 & Exam Frequency',
-        description: 'Comprehensive pedagogical directory of the Constitution of India: full text of Preamble, all 395+ articles across 25 parts, student teaching notes, PYQ appearance rankings, and Supreme Court jurisprudence.',
+        name: 'Interactive Constitution of India Explorer: Preamble, Articles 1–395 & Schedules',
+        description: 'Comprehensive pedagogical directory of the Constitution of India: full text of Preamble, all 395+ articles across 25 parts, student teaching notes, and Supreme Court jurisprudence.',
         url: `${BASE}/constitution-of-india`,
         educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
         learningResourceType: 'Study guide and primary legal reference',

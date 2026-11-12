@@ -1,15 +1,14 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
-import { Search, MapPin, Calendar, Compass, ShieldAlert, Award, BookOpen, ChevronRight, Clock, CheckCircle2, AlertCircle } from 'lucide-react'
+import { Search, MapPin, Calendar, Compass, ShieldAlert, Award, BookOpen, ChevronRight } from 'lucide-react'
 import {
   RAMSAR_SITES_CHRONOLOGICAL,
-  RAMSAR_TENTATIVE_CANDIDATES,
   RAMSAR_FAQS,
   type RamsarSite,
 } from '../data/ramsarSitesIndia'
 
-type RamsarTab = 'timeline' | 'most-asked' | 'tentative' | 'montreux' | 'by-state' | 'faqs'
+type RamsarTab = 'timeline' | 'most-asked' | 'montreux' | 'by-state' | 'faqs'
 
 export function RamsarWetlandsPage() {
   const [activeTab, setActiveTab] = React.useState<RamsarTab>('timeline')
@@ -18,13 +17,9 @@ export function RamsarWetlandsPage() {
   const [eraFilter, setEraFilter] = React.useState<string>('all')
   const [onlyMontreux, setOnlyMontreux] = React.useState(false)
 
-  // Candidate tab filters
-  const [candidateYearFilter, setCandidateYearFilter] = React.useState<string>('all')
-  const [candidateStatusFilter, setCandidateStatusFilter] = React.useState<string>('all')
-
   usePageMeta({
     title: 'Ramsar Wetlands of India (103 Sites): Complete Chronological Timeline (1981–2026) | Ministry of Papers',
-    description: 'Complete vertical linewise explorer of all 103 Ramsar sites of India in strict chronological sequence (1981–2026). River basins, endemic fauna, Montreux Record status, tentative candidates, and real UPSC/PSC exam questions.',
+    description: 'Complete vertical linewise explorer of all 103 Ramsar sites of India in strict chronological sequence (1981–2026). River basins, endemic fauna, Montreux Record status, and real UPSC/PSC exam questions.',
     canonicalPath: '/ramsar-wetlands-and-national-parks',
   })
 
@@ -68,15 +63,6 @@ export function RamsarWetlandsPage() {
       return matchSearch && matchState && matchEra && matchMontreux
     })
   }, [search, stateFilter, eraFilter, onlyMontreux])
-
-  // Filtered tentative candidate sites
-  const filteredCandidates = React.useMemo(() => {
-    return RAMSAR_TENTATIVE_CANDIDATES.filter((candidate) => {
-      const matchYear = candidateYearFilter === 'all' || candidate.yearProposed.toString() === candidateYearFilter
-      const matchStatus = candidateStatusFilter === 'all' || candidate.currentStatus === candidateStatusFilter
-      return matchYear && matchStatus
-    })
-  }, [candidateYearFilter, candidateStatusFilter])
 
   // Most asked sites sorted by pyqCount descending
   const mostAskedSites = React.useMemo(() => {
@@ -135,37 +121,44 @@ export function RamsarWetlandsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
 
-      {/* Sleek Scroller & Custom Tab Scrollbar Styles */}
+      {/* Slim, Modern & Black Scroller with Dark Mode support */}
       <style>{`
         .custom-tab-scroller::-webkit-scrollbar {
-          height: 6px;
+          height: 4px;
         }
         .custom-tab-scroller::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 6px;
+          background: transparent;
         }
         .custom-tab-scroller::-webkit-scrollbar-thumb {
-          background: #99f6e4;
-          border-radius: 6px;
+          background: #0f172a;
+          border-radius: 4px;
         }
         .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
-          background: #0f766e;
+          background: #334155;
+        }
+        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb,
+        .dark .custom-tab-scroller::-webkit-scrollbar-thumb {
+          background: #475569;
+        }
+        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb:hover,
+        .dark .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
         }
       `}</style>
 
       <div className="public-shell" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px' }}>
         {/* Breadcrumb Navigation */}
-        <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: '#64748b' }}>
-          <Link to="/" style={{ color: '#0f766e', textDecoration: 'none' }}>Home</Link>
+        <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: 'var(--ink2, #64748b)' }}>
+          <Link to="/" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none' }}>Home</Link>
           <span aria-hidden="true">›</span>
-          <Link to="/india-physical-geography-map" style={{ color: '#0f766e', textDecoration: 'none' }}>Physical Geography</Link>
+          <Link to="/india-physical-geography-map" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none' }}>Physical Geography</Link>
           <span aria-hidden="true">›</span>
-          <span style={{ color: '#0f172a', fontWeight: 600 }}>Ramsar Wetlands (103 Sites)</span>
+          <span style={{ color: 'var(--ink, #0f172a)', fontWeight: 600 }}>Ramsar Wetlands (103 Sites)</span>
         </nav>
 
         {/* Hero Section */}
         <header style={{ marginBottom: '28px' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '16px', fontSize: '12px', fontWeight: 700, color: '#047857', letterSpacing: '0.4px', textTransform: 'uppercase', marginBottom: '12px' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '4px 12px', background: 'var(--brand-soft, #ecfdf5)', border: '1px solid var(--brand-line, #a7f3d0)', borderRadius: '16px', fontSize: '12px', fontWeight: 700, color: 'var(--brand, #047857)', letterSpacing: '0.4px', textTransform: 'uppercase', marginBottom: '12px' }}>
             <span>🌿</span>
             <span>UPSC &amp; State PSC Environment Masterclass • 103 Designated Sites (1981–2026)</span>
           </div>
@@ -173,7 +166,7 @@ export function RamsarWetlandsPage() {
             Ramsar Wetlands of India: Complete Chronological Timeline (1981–2026)
           </h1>
           <p style={{ fontSize: '15.5px', color: 'var(--ink2, #475569)', maxWidth: '880px', lineHeight: '1.65', margin: 0 }}>
-            Master all <strong>103 Ramsar Sites of India</strong> in strict chronological sequence from their inaugural designation in 1981 through the milestone 2026 additions. Explore river basin linkages, flagship endemic fauna, Montreux Record classifications, historical tentative candidates, and verified previous year exam questions.
+            Master all <strong>103 Ramsar Sites of India</strong> in strict chronological sequence from their inaugural designation in 1981 through the milestone 2026 additions. Explore river basin linkages, flagship endemic fauna, Montreux Record classifications, and verified previous year exam questions.
           </p>
         </header>
 
@@ -191,28 +184,28 @@ export function RamsarWetlandsPage() {
             boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
           }}
         >
-          <div style={{ borderRight: '1px solid #f1f5f9', paddingRight: '12px' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
+          <div style={{ borderRight: '1px solid var(--line, #f1f5f9)', paddingRight: '12px' }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink2, #64748b)', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
               Total Ramsar Sites
             </span>
             <div style={{ fontSize: '24px', fontWeight: 800, color: '#047857', marginTop: '2px' }}>103 Sites</div>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>1st in Asia • 3rd Globally</span>
+            <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>1st in Asia • 3rd Globally</span>
           </div>
 
-          <div style={{ borderRight: '1px solid #f1f5f9', paddingRight: '12px' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
+          <div style={{ borderRight: '1px solid var(--line, #f1f5f9)', paddingRight: '12px' }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink2, #64748b)', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
               Leading States
             </span>
             <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f766e', marginTop: '2px' }}>Tamil Nadu (20)</div>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>2nd: Uttar Pradesh (14)</span>
+            <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>2nd: Uttar Pradesh (14)</span>
           </div>
 
-          <div style={{ borderRight: '1px solid #f1f5f9', paddingRight: '12px' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#64748b', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
+          <div style={{ borderRight: '1px solid var(--line, #f1f5f9)', paddingRight: '12px' }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink2, #64748b)', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
               Largest &amp; Smallest
             </span>
-            <div style={{ fontSize: '18px', fontWeight: 800, color: '#1e293b', marginTop: '4px' }}>Sundarban / Renuka</div>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>4,230 km² vs 0.2 km² (20 ha)</span>
+            <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #1e293b)', marginTop: '4px' }}>Sundarban / Renuka</div>
+            <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>4,230 km² vs 0.2 km² (20 ha)</span>
           </div>
 
           <div>
@@ -220,11 +213,11 @@ export function RamsarWetlandsPage() {
               Montreux Record
             </span>
             <div style={{ fontSize: '24px', fontWeight: 800, color: '#b91c1c', marginTop: '2px' }}>2 Active Sites</div>
-            <span style={{ fontSize: '12px', color: '#64748b' }}>Keoladeo &amp; Loktak (Chilika removed)</span>
+            <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Keoladeo &amp; Loktak (Chilika removed)</span>
           </div>
         </div>
 
-        {/* Tab Switcher with Beautiful Custom Scroller */}
+        {/* Tab Switcher with Slim, Modern, Black Scroller */}
         <div
           role="tablist"
           className="custom-tab-scroller"
@@ -234,9 +227,9 @@ export function RamsarWetlandsPage() {
             borderBottom: '2px solid var(--line, #e2e8f0)',
             marginBottom: '24px',
             overflowX: 'auto',
-            paddingBottom: '8px',
+            paddingBottom: '6px',
             scrollbarWidth: 'thin',
-            scrollbarColor: '#99f6e4 #f1f5f9',
+            scrollbarColor: '#0f172a transparent',
           }}
         >
           <button
@@ -248,8 +241,8 @@ export function RamsarWetlandsPage() {
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'timeline' ? 700 : 500,
-              color: activeTab === 'timeline' ? '#047857' : '#64748b',
-              background: activeTab === 'timeline' ? '#ecfdf5' : 'transparent',
+              color: activeTab === 'timeline' ? '#047857' : 'var(--ink2, #64748b)',
+              background: activeTab === 'timeline' ? 'var(--brand-soft, #ecfdf5)' : 'transparent',
               border: 'none',
               borderBottom: activeTab === 'timeline' ? '3px solid #047857' : '3px solid transparent',
               borderRadius: '8px 8px 0 0',
@@ -267,38 +260,13 @@ export function RamsarWetlandsPage() {
           <button
             type="button"
             role="tab"
-            aria-selected={activeTab === 'tentative'}
-            onClick={() => setActiveTab('tentative')}
-            style={{
-              padding: '10px 18px',
-              fontSize: '14.5px',
-              fontWeight: activeTab === 'tentative' ? 700 : 500,
-              color: activeTab === 'tentative' ? '#0f766e' : '#64748b',
-              background: activeTab === 'tentative' ? '#f0fdfa' : 'transparent',
-              border: 'none',
-              borderBottom: activeTab === 'tentative' ? '3px solid #0f766e' : '3px solid transparent',
-              borderRadius: '8px 8px 0 0',
-              cursor: 'pointer',
-              whiteSpace: 'nowrap',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <Clock size={16} />
-            <span>Tentative &amp; Candidate Pipeline (By Year)</span>
-          </button>
-
-          <button
-            type="button"
-            role="tab"
             aria-selected={activeTab === 'most-asked'}
             onClick={() => setActiveTab('most-asked')}
             style={{
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'most-asked' ? 700 : 500,
-              color: activeTab === 'most-asked' ? '#b45309' : '#64748b',
+              color: activeTab === 'most-asked' ? '#b45309' : 'var(--ink2, #64748b)',
               background: activeTab === 'most-asked' ? '#fffbeb' : 'transparent',
               border: 'none',
               borderBottom: activeTab === 'most-asked' ? '3px solid #b45309' : '3px solid transparent',
@@ -323,7 +291,7 @@ export function RamsarWetlandsPage() {
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'montreux' ? 700 : 500,
-              color: activeTab === 'montreux' ? '#b91c1c' : '#64748b',
+              color: activeTab === 'montreux' ? '#b91c1c' : 'var(--ink2, #64748b)',
               background: activeTab === 'montreux' ? '#fef2f2' : 'transparent',
               border: 'none',
               borderBottom: activeTab === 'montreux' ? '3px solid #b91c1c' : '3px solid transparent',
@@ -348,7 +316,7 @@ export function RamsarWetlandsPage() {
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'by-state' ? 700 : 500,
-              color: activeTab === 'by-state' ? '#0f766e' : '#64748b',
+              color: activeTab === 'by-state' ? '#0f766e' : 'var(--ink2, #64748b)',
               background: activeTab === 'by-state' ? '#f0fdfa' : 'transparent',
               border: 'none',
               borderBottom: activeTab === 'by-state' ? '3px solid #0f766e' : '3px solid transparent',
@@ -373,7 +341,7 @@ export function RamsarWetlandsPage() {
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'faqs' ? 700 : 500,
-              color: activeTab === 'faqs' ? '#4338ca' : '#64748b',
+              color: activeTab === 'faqs' ? '#4338ca' : 'var(--ink2, #64748b)',
               background: activeTab === 'faqs' ? '#eef2ff' : 'transparent',
               border: 'none',
               borderBottom: activeTab === 'faqs' ? '3px solid #4338ca' : '3px solid transparent',
@@ -410,7 +378,7 @@ export function RamsarWetlandsPage() {
                 <div style={{ flex: '1 1 280px', position: 'relative' }}>
                   <Search
                     size={16}
-                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }}
+                    style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }}
                   />
                   <input
                     type="text"
@@ -421,7 +389,7 @@ export function RamsarWetlandsPage() {
                       width: '100%',
                       padding: '9px 12px 9px 36px',
                       borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
+                      border: '1px solid var(--line, #cbd5e1)',
                       fontSize: '14px',
                       background: 'var(--bg, #f8fafc)',
                       color: 'var(--ink, #0f172a)',
@@ -436,7 +404,7 @@ export function RamsarWetlandsPage() {
                   style={{
                     padding: '9px 14px',
                     borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
+                    border: '1px solid var(--line, #cbd5e1)',
                     fontSize: '13.5px',
                     background: 'var(--bg, #f8fafc)',
                     color: 'var(--ink, #0f172a)',
@@ -459,7 +427,7 @@ export function RamsarWetlandsPage() {
                     gap: '6px',
                     fontSize: '13px',
                     fontWeight: 600,
-                    color: onlyMontreux ? '#b91c1c' : '#475569',
+                    color: onlyMontreux ? '#b91c1c' : 'var(--ink2, #475569)',
                     cursor: 'pointer',
                     userSelect: 'none',
                   }}
@@ -475,8 +443,8 @@ export function RamsarWetlandsPage() {
               </div>
 
               {/* Era/Decade Quick Filter Pills */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', borderTop: '1px solid #f1f5f9', paddingTop: '10px' }}>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.4px', marginRight: '4px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', borderTop: '1px solid var(--line, #f1f5f9)', paddingTop: '10px' }}>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink2, #64748b)', textTransform: 'uppercase', letterSpacing: '0.4px', marginRight: '4px' }}>
                   Designation Wave:
                 </span>
                 {[
@@ -497,8 +465,8 @@ export function RamsarWetlandsPage() {
                       borderRadius: '20px',
                       fontSize: '12.5px',
                       fontWeight: eraFilter === pill.id ? 700 : 500,
-                      background: eraFilter === pill.id ? '#047857' : '#f1f5f9',
-                      color: eraFilter === pill.id ? '#ffffff' : '#475569',
+                      background: eraFilter === pill.id ? '#047857' : 'var(--bg, #f1f5f9)',
+                      color: eraFilter === pill.id ? '#ffffff' : 'var(--ink2, #475569)',
                       border: 'none',
                       cursor: 'pointer',
                       transition: 'all 0.15s ease',
@@ -511,7 +479,7 @@ export function RamsarWetlandsPage() {
             </div>
 
             {/* Results count banner */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', fontSize: '13.5px', color: '#64748b' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', fontSize: '13.5px', color: 'var(--ink2, #64748b)' }}>
               <span>
                 Showing <strong>{filteredSites.length}</strong> of <strong>103</strong> Ramsar Sites in strict chronological sequence:
               </span>
@@ -592,9 +560,9 @@ export function RamsarWetlandsPage() {
                             fontWeight: 700,
                             padding: '3px 10px',
                             borderRadius: '12px',
-                            background: '#f1f5f9',
-                            color: '#0f172a',
-                            border: '1px solid #e2e8f0',
+                            background: 'var(--bg, #f1f5f9)',
+                            color: 'var(--ink, #0f172a)',
+                            border: '1px solid var(--line, #e2e8f0)',
                           }}
                         >
                           📍 {site.state}
@@ -608,9 +576,9 @@ export function RamsarWetlandsPage() {
                             fontWeight: 700,
                             padding: '3px 10px',
                             borderRadius: '12px',
-                            background: '#ecfdf5',
+                            background: 'var(--brand-soft, #ecfdf5)',
                             color: '#047857',
-                            border: '1px solid #a7f3d0',
+                            border: '1px solid var(--brand-line, #a7f3d0)',
                           }}
                         >
                           🗓️ Added {site.yearDeclared}
@@ -659,19 +627,19 @@ export function RamsarWetlandsPage() {
                                 ? '#fffbeb'
                                 : site.pyqFrequency === 'Frequently Tested'
                                 ? '#eff6ff'
-                                : '#f8fafc',
+                                : 'var(--bg, #f8fafc)',
                             color:
                               site.pyqFrequency === 'Top Tested'
                                 ? '#b45309'
                                 : site.pyqFrequency === 'Frequently Tested'
                                 ? '#1d4ed8'
-                                : '#64748b',
+                                : 'var(--ink2, #64748b)',
                             border: `1px solid ${
                               site.pyqFrequency === 'Top Tested'
                                 ? '#fde68a'
                                 : site.pyqFrequency === 'Frequently Tested'
                                 ? '#bfdbfe'
-                                : '#e2e8f0'
+                                : 'var(--line, #e2e8f0)'
                             }`,
                           }}
                         >
@@ -687,25 +655,25 @@ export function RamsarWetlandsPage() {
                         display: 'grid',
                         gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
                         gap: '10px',
-                        background: '#f8fafc',
+                        background: 'var(--bg, #f8fafc)',
                         padding: '12px 14px',
                         borderRadius: '8px',
                         fontSize: '13px',
-                        border: '1px solid #edf2f7',
+                        border: '1px solid var(--line, #edf2f7)',
                       }}
                     >
                       <div>
                         <strong style={{ color: '#0369a1', display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '2px' }}>
                           🌊 River / Catchment Basin
                         </strong>
-                        <span style={{ color: '#1e293b', fontWeight: 600 }}>{site.riverOrBasin}</span>
+                        <span style={{ color: 'var(--ink, #1e293b)', fontWeight: 600 }}>{site.riverOrBasin}</span>
                       </div>
 
                       <div>
                         <strong style={{ color: '#047857', display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '2px' }}>
                           📐 Area Covered
                         </strong>
-                        <span style={{ color: '#1e293b', fontWeight: 600 }}>
+                        <span style={{ color: 'var(--ink, #1e293b)', fontWeight: 600 }}>
                           {site.areaSqKm.toLocaleString()} sq km ({Math.round(site.areaSqKm * 100).toLocaleString()} ha)
                         </span>
                       </div>
@@ -714,7 +682,7 @@ export function RamsarWetlandsPage() {
                         <strong style={{ color: '#7c3aed', display: 'block', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.4px', marginBottom: '2px' }}>
                           🦅 Flagship Fauna &amp; Key Ecology
                         </strong>
-                        <span style={{ color: '#334155' }}>{site.flagshipFauna}</span>
+                        <span style={{ color: 'var(--ink, #334155)' }}>{site.flagshipFauna}</span>
                       </div>
                     </div>
 
@@ -738,7 +706,7 @@ export function RamsarWetlandsPage() {
                     {/* High-Yield Exam Notes Box */}
                     <div
                       style={{
-                        background: '#fafaf9',
+                        background: 'var(--bg, #fafaf9)',
                         borderLeft: '4px solid #0f766e',
                         padding: '12px 14px',
                         borderRadius: '0 8px 8px 0',
@@ -750,13 +718,13 @@ export function RamsarWetlandsPage() {
                           High-Yield Exam Significance (UPSC / State PSC)
                         </strong>
                       </div>
-                      <p style={{ margin: 0, fontSize: '13.5px', color: '#334155', lineHeight: '1.55' }}>
+                      <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.55' }}>
                         {site.examFact}
                       </p>
                     </div>
 
                     {/* Footer Links */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid #f1f5f9', fontSize: '12.5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--line, #f1f5f9)', fontSize: '12.5px' }}>
                       <Link
                         to="/india-physical-geography-map"
                         style={{ color: '#0f766e', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -767,7 +735,7 @@ export function RamsarWetlandsPage() {
 
                       <Link
                         to="/blog/indian-rivers-and-tributaries"
-                        style={{ color: '#64748b', textDecoration: 'none' }}
+                        style={{ color: 'var(--ink2, #64748b)', textDecoration: 'none' }}
                       >
                         Read River &amp; Basin Notes ↗
                       </Link>
@@ -779,8 +747,8 @@ export function RamsarWetlandsPage() {
               {filteredSites.length === 0 && (
                 <div style={{ textAlign: 'center', padding: '48px 20px', background: 'var(--card-bg, #ffffff)', borderRadius: '12px', border: '1px solid var(--line, #e2e8f0)' }}>
                   <Compass size={36} style={{ color: '#94a3b8', margin: '0 auto 12px' }} />
-                  <h3 style={{ fontSize: '18px', color: '#0f172a', margin: '0 0 6px' }}>No Ramsar sites match your query</h3>
-                  <p style={{ fontSize: '14px', color: '#64748b', maxWidth: '420px', margin: '0 auto 16px' }}>
+                  <h3 style={{ fontSize: '18px', color: 'var(--ink, #0f172a)', margin: '0 0 6px' }}>No Ramsar sites match your query</h3>
+                  <p style={{ fontSize: '14px', color: 'var(--ink2, #64748b)', maxWidth: '420px', margin: '0 auto 16px' }}>
                     Try broadening your search keyword or clearing the state and wave filters.
                   </p>
                   <button
@@ -810,180 +778,7 @@ export function RamsarWetlandsPage() {
           </div>
         )}
 
-        {/* Tab 2: Tentative & Candidate Pipeline (By Year) */}
-        {activeTab === 'tentative' && (
-          <div>
-            <div style={{ background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '6px' }}>
-                <Clock size={20} style={{ color: '#0f766e' }} />
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#115e59', fontWeight: 700 }}>
-                  Tentative &amp; Candidate Wetlands Pipeline of India (Chronological Order by Year)
-                </h3>
-              </div>
-              <p style={{ margin: 0, fontSize: '14px', color: '#134e4a', lineHeight: '1.6' }}>
-                Track what wetlands were proposed on the tentative candidate list year by year by State Wetland Authorities and the MoEFCC under the <em>Amrit Dharohar</em> initiative and National Plan for Conservation of Aquatic Ecosystems (NPCA). See what was tentative at each year and their eventual designation trajectory.
-              </p>
-            </div>
-
-            {/* Filter controls for Tentative Pipeline */}
-            <div
-              style={{
-                background: 'var(--card-bg, #ffffff)',
-                border: '1px solid var(--line, #e2e8f0)',
-                borderRadius: '12px',
-                padding: '14px 18px',
-                marginBottom: '20px',
-                display: 'flex',
-                gap: '12px',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#475569', textTransform: 'uppercase', letterSpacing: '0.4px' }}>
-                  Filter by Year Proposed:
-                </span>
-                {['all', '2019', '2020', '2021', '2022', '2023', '2024', '2025', '2026'].map((yr) => (
-                  <button
-                    key={yr}
-                    type="button"
-                    onClick={() => setCandidateYearFilter(yr)}
-                    style={{
-                      padding: '4px 12px',
-                      borderRadius: '16px',
-                      fontSize: '12px',
-                      fontWeight: candidateYearFilter === yr ? 700 : 500,
-                      background: candidateYearFilter === yr ? '#0f766e' : '#f1f5f9',
-                      color: candidateYearFilter === yr ? '#ffffff' : '#475569',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                  >
-                    {yr === 'all' ? 'All Years (2019–2026)' : yr}
-                  </button>
-                ))}
-              </div>
-
-              <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: '#475569' }}>Status:</span>
-                <select
-                  value={candidateStatusFilter}
-                  onChange={(e) => setCandidateStatusFilter(e.target.value)}
-                  style={{
-                    padding: '6px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '13px',
-                    background: '#f8fafc',
-                    color: '#0f172a',
-                    cursor: 'pointer',
-                  }}
-                >
-                  <option value="all">All Candidate Statuses</option>
-                  <option value="Designated">Designated as Ramsar Site</option>
-                  <option value="Active Candidate">Active Candidate Pipeline</option>
-                </select>
-              </div>
-            </div>
-
-            {/* Candidate Linewise List */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {filteredCandidates.map((candidate) => (
-                <article
-                  key={`${candidate.siteName}-${candidate.yearProposed}`}
-                  style={{
-                    background: 'var(--card-bg, #ffffff)',
-                    border: candidate.currentStatus === 'Active Candidate' ? '1.5px solid #99f6e4' : '1px solid var(--line, #e2e8f0)',
-                    borderRadius: '12px',
-                    padding: '18px 20px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '10px',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: 800,
-                          padding: '3px 10px',
-                          borderRadius: '12px',
-                          background: '#e0f2fe',
-                          color: '#0369a1',
-                          border: '1px solid #bae6fd',
-                        }}
-                      >
-                        Year {candidate.yearProposed}
-                      </span>
-                      <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
-                        {candidate.siteName}
-                      </h3>
-                      <span style={{ fontSize: '12.5px', color: '#64748b' }}>📍 {candidate.state}</span>
-                    </div>
-
-                    <div>
-                      {candidate.currentStatus === 'Designated' ? (
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            padding: '3px 10px',
-                            borderRadius: '12px',
-                            background: '#ecfdf5',
-                            color: '#047857',
-                            border: '1px solid #a7f3d0',
-                          }}
-                        >
-                          <CheckCircle2 size={13} />
-                          <span>Officially Designated</span>
-                        </span>
-                      ) : (
-                        <span
-                          style={{
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            fontSize: '12px',
-                            fontWeight: 700,
-                            padding: '3px 10px',
-                            borderRadius: '12px',
-                            background: '#fffbeb',
-                            color: '#b45309',
-                            border: '1px solid #fde68a',
-                          }}
-                        >
-                          <AlertCircle size={13} />
-                          <span>Active Tentative Pipeline</span>
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div style={{ fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
-                    <strong>Proposing Authority:</strong> {candidate.proposalAuthority}
-                  </div>
-
-                  <div style={{ background: '#f8fafc', padding: '10px 14px', borderRadius: '8px', borderLeft: '3px solid #0f766e', fontSize: '13px', color: '#334155' }}>
-                    <strong>Status at Year {candidate.yearProposed}:</strong> {candidate.statusAtYear}
-                    <div style={{ marginTop: '4px', color: '#047857', fontWeight: 600 }}>
-                      👉 Outcome: {candidate.designationNote}
-                    </div>
-                  </div>
-
-                  <div style={{ fontSize: '13px', color: '#475569', lineHeight: '1.5' }}>
-                    <strong>Ecological Significance:</strong> {candidate.ecologicalSignificance}
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Tab 3: Most Asked Ramsar Sites */}
+        {/* Tab 2: Most Asked Ramsar Sites */}
         {activeTab === 'most-asked' && (
           <div>
             <div style={{ background: '#fffbeb', border: '1px solid #fef3c7', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px' }}>
@@ -1030,10 +825,10 @@ export function RamsarWetlandsPage() {
                       >
                         #{idx + 1}
                       </span>
-                      <h3 style={{ margin: 0, fontSize: '19px', fontFamily: 'var(--font-heading, "Fraunces", serif)', color: '#0f172a' }}>
+                      <h3 style={{ margin: 0, fontSize: '19px', fontFamily: 'var(--font-heading, "Fraunces", serif)', color: 'var(--ink, #0f172a)' }}>
                         {site.name}
                       </h3>
-                      <span style={{ fontSize: '12px', fontWeight: 600, color: '#64748b' }}>
+                      <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink2, #64748b)' }}>
                         📍 {site.state}
                       </span>
                     </div>
@@ -1052,17 +847,17 @@ export function RamsarWetlandsPage() {
                       >
                         🔥 {site.pyqCount} Direct PYQs Tested
                       </span>
-                      <span style={{ fontSize: '12px', color: '#64748b' }}>
+                      <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>
                         Added in {site.yearDeclared}
                       </span>
                     </div>
                   </div>
 
-                  <div style={{ fontSize: '13.5px', color: '#334155' }}>
+                  <div style={{ fontSize: '13.5px', color: 'var(--ink, #334155)' }}>
                     <strong>River / Basin:</strong> {site.riverOrBasin} | <strong>Flagship Fauna:</strong> {site.flagshipFauna}
                   </div>
 
-                  <div style={{ background: '#f8fafc', padding: '12px 14px', borderRadius: '8px', borderLeft: '4px solid #b45309', fontSize: '13.5px', color: '#1e293b', lineHeight: '1.55' }}>
+                  <div style={{ background: 'var(--bg, #f8fafc)', padding: '12px 14px', borderRadius: '8px', borderLeft: '4px solid #b45309', fontSize: '13.5px', color: 'var(--ink, #1e293b)', lineHeight: '1.55' }}>
                     <strong style={{ display: 'block', fontSize: '11px', textTransform: 'uppercase', color: '#b45309', letterSpacing: '0.5px', marginBottom: '4px' }}>
                       Why UPSC Frequently Tests This:
                     </strong>
@@ -1074,7 +869,7 @@ export function RamsarWetlandsPage() {
           </div>
         )}
 
-        {/* Tab 4: Montreux Record Explained */}
+        {/* Tab 3: Montreux Record Explained */}
         {activeTab === 'montreux' && (
           <div>
             <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
@@ -1096,15 +891,15 @@ export function RamsarWetlandsPage() {
                   <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: '#fef2f2', color: '#b91c1c' }}>
                     ⚠️ Active on Record (Since 1990)
                   </span>
-                  <span style={{ fontSize: '12px', color: '#64748b' }}>Rajasthan</span>
+                  <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Rajasthan</span>
                 </div>
-                <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: '#0f172a', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                   Keoladeo Ghana National Park
                 </h3>
-                <div style={{ fontSize: '13px', color: '#475569' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink2, #475569)' }}>
                   <strong>Confluence:</strong> Gambhir &amp; Banganga Rivers (Bharatpur)
                 </div>
-                <div style={{ fontSize: '13px', color: '#334155', lineHeight: '1.5', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.5', background: 'var(--bg, #f8fafc)', padding: '10px', borderRadius: '8px' }}>
                   <strong>Reason for Inclusion:</strong> Listed in 1990 due to severe water shortages caused by upstream dam diversions (Panchana Dam) and uncontrolled growth of the invasive grass <em>Paspalum distichum</em>, which choked migratory waterfowl foraging grounds.
                 </div>
               </div>
@@ -1115,15 +910,15 @@ export function RamsarWetlandsPage() {
                   <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: '#fef2f2', color: '#b91c1c' }}>
                     ⚠️ Active on Record (Since 1993)
                   </span>
-                  <span style={{ fontSize: '12px', color: '#64748b' }}>Manipur</span>
+                  <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Manipur</span>
                 </div>
-                <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: '#0f172a', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                   Loktak Lake &amp; Keibul Lamjao
                 </h3>
-                <div style={{ fontSize: '13px', color: '#475569' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink2, #475569)' }}>
                   <strong>Basin:</strong> Manipur River (Chindwin / Irrawaddy basin)
                 </div>
-                <div style={{ fontSize: '13px', color: '#334155', lineHeight: '1.5', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.5', background: 'var(--bg, #f8fafc)', padding: '10px', borderRadius: '8px' }}>
                   <strong>Reason for Inclusion:</strong> Listed in 1993 due to severe ecological disruption caused by the Ithai Barrage for the Loktak Hydroelectric Project. The barrage converted naturally fluctuating wetland water levels into a permanent reservoir, causing thinning and drowning of floating <em>Phumdis</em> (the exclusive habitat of the endangered Sangai deer).
                 </div>
               </div>
@@ -1134,15 +929,15 @@ export function RamsarWetlandsPage() {
                   <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: '#f0fdf4', color: '#15803d' }}>
                     ✅ Successfully Removed (1993–2002)
                   </span>
-                  <span style={{ fontSize: '12px', color: '#64748b' }}>Odisha</span>
+                  <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Odisha</span>
                 </div>
-                <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: '#0f172a', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                <h3 style={{ margin: '4px 0 0', fontSize: '18px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                   Chilika Lake (Restoration Milestone)
                 </h3>
-                <div style={{ fontSize: '13px', color: '#475569' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink2, #475569)' }}>
                   <strong>Confluence:</strong> Daya &amp; Bhargavi Rivers (Mahanadi Delta)
                 </div>
-                <div style={{ fontSize: '13px', color: '#334155', lineHeight: '1.5', background: '#f8fafc', padding: '10px', borderRadius: '8px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.5', background: 'var(--bg, #f8fafc)', padding: '10px', borderRadius: '8px' }}>
                   <strong>Restoration Victory:</strong> Placed on the Montreux Record in 1993 due to heavy siltation and choking of its sea-mouth. In 2000, the Chilika Development Authority opened an artificial sea mouth at Sipakuda, successfully restoring salinity balance and fish catches. Removed from the Record in 2002; received the prestigious <strong>Ramsar Wetland Conservation Award</strong>.
                 </div>
               </div>
@@ -1150,17 +945,17 @@ export function RamsarWetlandsPage() {
           </div>
         )}
 
-        {/* Tab 5: State-wise Directory */}
+        {/* Tab 4: State-wise Directory */}
         {activeTab === 'by-state' && (
           <div>
-            <div style={{ background: '#f0fdfa', border: '1px solid #ccfbf1', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px' }}>
+            <div style={{ background: 'var(--brand-soft, #f0fdfa)', border: '1px solid var(--brand-line, #ccfbf1)', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                 <MapPin size={18} style={{ color: '#0f766e' }} />
-                <h3 style={{ margin: 0, fontSize: '16px', color: '#115e59', fontWeight: 700 }}>
+                <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--ink, #115e59)', fontWeight: 700 }}>
                   State-wise Distribution of India’s 103 Ramsar Sites
                 </h3>
               </div>
-              <p style={{ margin: 0, fontSize: '14px', color: '#134e4a', lineHeight: '1.5' }}>
+              <p style={{ margin: 0, fontSize: '14px', color: 'var(--ink2, #134e4a)', lineHeight: '1.5' }}>
                 Tamil Nadu leads the country with <strong>20 sites</strong>, followed by Uttar Pradesh with <strong>14 sites</strong>. Explore each State and UT’s declared wetlands below.
               </p>
             </div>
@@ -1176,10 +971,10 @@ export function RamsarWetlandsPage() {
                     padding: '18px 20px',
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', borderBottom: '1px solid var(--line, #f1f5f9)', paddingBottom: '8px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '18px' }}>📍</span>
-                      <h3 style={{ margin: 0, fontSize: '18px', color: '#0f172a', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                      <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
                         {stateName}
                       </h3>
                     </div>
@@ -1189,9 +984,9 @@ export function RamsarWetlandsPage() {
                         fontWeight: 700,
                         padding: '3px 10px',
                         borderRadius: '12px',
-                        background: '#ecfdf5',
+                        background: 'var(--brand-soft, #ecfdf5)',
                         color: '#047857',
-                        border: '1px solid #a7f3d0',
+                        border: '1px solid var(--brand-line, #a7f3d0)',
                       }}
                     >
                       {sites.length} {sites.length === 1 ? 'Site' : 'Sites'}
@@ -1203,20 +998,20 @@ export function RamsarWetlandsPage() {
                       <div
                         key={s.id}
                         style={{
-                          background: '#f8fafc',
+                          background: 'var(--bg, #f8fafc)',
                           padding: '10px 12px',
                           borderRadius: '8px',
-                          border: '1px solid #e2e8f0',
+                          border: '1px solid var(--line, #e2e8f0)',
                         }}
                       >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                          <strong style={{ fontSize: '13.5px', color: '#0f172a' }}>{s.name}</strong>
-                          <span style={{ fontSize: '11px', fontWeight: 600, color: '#64748b' }}>{s.yearDeclared}</span>
+                          <strong style={{ fontSize: '13.5px', color: 'var(--ink, #0f172a)' }}>{s.name}</strong>
+                          <span style={{ fontSize: '11px', fontWeight: 600, color: 'var(--ink2, #64748b)' }}>{s.yearDeclared}</span>
                         </div>
                         <div style={{ fontSize: '12px', color: '#0369a1', marginBottom: '2px' }}>
                           🌊 {s.riverOrBasin}
                         </div>
-                        <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                        <div style={{ fontSize: '11.5px', color: 'var(--ink2, #64748b)' }}>
                           📐 {s.areaSqKm.toLocaleString()} sq km
                         </div>
                       </div>
@@ -1228,7 +1023,7 @@ export function RamsarWetlandsPage() {
           </div>
         )}
 
-        {/* Tab 6: Real Exam Questions & FAQs */}
+        {/* Tab 5: Real Exam Questions & FAQs */}
         {activeTab === 'faqs' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div style={{ background: '#eef2ff', border: '1px solid #c7d2fe', borderRadius: '12px', padding: '16px 20px', marginBottom: '8px' }}>
@@ -1271,13 +1066,13 @@ export function RamsarWetlandsPage() {
                   </span>
                 </div>
 
-                <h3 style={{ margin: '0 0 10px', fontSize: '16.5px', color: '#0f172a', fontFamily: 'var(--font-heading, "Fraunces", serif)', lineHeight: '1.4' }}>
+                <h3 style={{ margin: '0 0 10px', fontSize: '16.5px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)', lineHeight: '1.4' }}>
                   Q{idx + 1}. {faq.question}
                 </h3>
-                <p style={{ margin: '0 0 12px', fontSize: '14px', color: '#334155', lineHeight: '1.65' }}>
+                <p style={{ margin: '0 0 12px', fontSize: '14px', color: 'var(--ink, #334155)', lineHeight: '1.65' }}>
                   {faq.answer}
                 </p>
-                <div style={{ background: '#f8fafc', borderLeft: '3px solid #4338ca', padding: '10px 14px', borderRadius: '0 6px 6px 0', fontSize: '13px', color: '#312e81' }}>
+                <div style={{ background: 'var(--bg, #f8fafc)', borderLeft: '3px solid #4338ca', padding: '10px 14px', borderRadius: '0 6px 6px 0', fontSize: '13px', color: '#312e81' }}>
                   <strong>Key Takeaway Rule:</strong> {faq.examTakeaway}
                 </div>
               </div>
@@ -1300,7 +1095,7 @@ export function RamsarWetlandsPage() {
             Practice UPSC &amp; State PSC Environment Questions
           </h3>
           <p style={{ fontSize: '14.5px', color: 'var(--ink2, #475569)', maxWidth: '620px', margin: '0 auto 18px', lineHeight: '1.5' }}>
-            Test your knowledge of India’s 103 Ramsar sites, candidate wetlands, river networks, and biodiversity hotspots with actual previous year questions and verified explanations.
+            Test your knowledge of India’s 103 Ramsar sites, river networks, and biodiversity hotspots with actual previous year questions and verified explanations.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
@@ -1324,9 +1119,9 @@ export function RamsarWetlandsPage() {
                 display: 'inline-block',
                 fontWeight: 600,
                 fontSize: '14px',
-                color: '#0f766e',
-                background: '#f0fdfa',
-                border: '1px solid #ccfbf1',
+                color: 'var(--brand, #0f766e)',
+                background: 'var(--brand-soft, #f0fdfa)',
+                border: '1px solid var(--brand-line, #ccfbf1)',
                 padding: '10px 20px',
                 borderRadius: '8px',
                 textDecoration: 'none',

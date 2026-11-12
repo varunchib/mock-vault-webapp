@@ -207,8 +207,8 @@ export function ConstitutionExplorerPage() {
   const articlesTopRef = React.useRef<HTMLDivElement>(null)
 
   usePageMeta({
-    title: 'Constitution of India: Articles 1–395, Preamble, Parts & Exam Rankings | Ministry of Papers',
-    description: 'Master the Constitution of India: Authentic Preamble, all 395+ articles across 25 parts, verified PYQ exam frequency rankings, student teaching notes, and landmark Supreme Court rulings for UPSC, JKPSC CCE, and State PSCs.',
+    title: 'Constitution of India: Articles 1–395, Preamble & Schedules | Ministry of Papers',
+    description: 'Master the Constitution of India: Authentic Preamble, all 395+ articles across 25 parts, student teaching notes, and landmark Supreme Court rulings for UPSC, JKPSC CCE, and State PSCs.',
     canonicalPath: '/constitution-of-india',
   })
 
@@ -405,21 +405,28 @@ export function ConstitutionExplorerPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Sleek Custom Tab Scrollbar Styles */}
+      {/* Slim, Modern & Black Scroller with Dark Mode support */}
       <style>{`
         .custom-tab-scroller::-webkit-scrollbar {
-          height: 6px;
+          height: 4px;
         }
         .custom-tab-scroller::-webkit-scrollbar-track {
-          background: #f1f5f9;
-          border-radius: 6px;
+          background: transparent;
         }
         .custom-tab-scroller::-webkit-scrollbar-thumb {
-          background: #99f6e4;
-          border-radius: 6px;
+          background: #0f172a;
+          border-radius: 4px;
         }
         .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
-          background: #0f766e;
+          background: #334155;
+        }
+        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb,
+        .dark .custom-tab-scroller::-webkit-scrollbar-thumb {
+          background: #475569;
+        }
+        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb:hover,
+        .dark .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
+          background: #94a3b8;
         }
       `}</style>
 
@@ -438,7 +445,7 @@ export function ConstitutionExplorerPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="public-kicker" style={{ margin: 0 }}>Interactive Polity Study Suite</span>
             <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
-              Preamble + Articles 1–395 · 25 Parts · Verified PYQs
+              Preamble + Articles 1–395 · 25 Parts · All 12 Schedules
             </span>
           </div>
           <h1
@@ -451,7 +458,7 @@ export function ConstitutionExplorerPage() {
               lineHeight: '1.2',
             }}
           >
-            Constitution of India: Preamble, Articles &amp; Exam Rankings
+            Constitution of India: Preamble, Articles 1–395 &amp; Schedules
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
             Read and master every article of the Indian Constitution line by line. Explore the foundational Preamble, seamlessly navigate all 25 Parts, discover the most frequently asked articles in competitive exams, and understand core legal principles with student-friendly explanations.
