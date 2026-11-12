@@ -405,31 +405,6 @@ export function ConstitutionExplorerPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Slim, Modern & Black Scroller with Dark Mode support */}
-      <style>{`
-        .custom-tab-scroller::-webkit-scrollbar {
-          height: 4px;
-        }
-        .custom-tab-scroller::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-tab-scroller::-webkit-scrollbar-thumb {
-          background: #0f172a;
-          border-radius: 4px;
-        }
-        .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
-          background: #334155;
-        }
-        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb,
-        .dark .custom-tab-scroller::-webkit-scrollbar-thumb {
-          background: #475569;
-        }
-        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb:hover,
-        .dark .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-      `}</style>
-
       <div className="public-shell">
         {/* Breadcrumb Navigation */}
         <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ marginBottom: '16px' }}>

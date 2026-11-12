@@ -121,31 +121,6 @@ export function RamsarWetlandsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }}
       />
 
-      {/* Slim, Modern & Black Scroller with Dark Mode support */}
-      <style>{`
-        .custom-tab-scroller::-webkit-scrollbar {
-          height: 4px;
-        }
-        .custom-tab-scroller::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-tab-scroller::-webkit-scrollbar-thumb {
-          background: #0f172a;
-          border-radius: 4px;
-        }
-        .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
-          background: #334155;
-        }
-        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb,
-        .dark .custom-tab-scroller::-webkit-scrollbar-thumb {
-          background: #475569;
-        }
-        :root[data-theme='dark'] .custom-tab-scroller::-webkit-scrollbar-thumb:hover,
-        .dark .custom-tab-scroller::-webkit-scrollbar-thumb:hover {
-          background: #94a3b8;
-        }
-      `}</style>
-
       <div className="public-shell" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px' }}>
         {/* Breadcrumb Navigation */}
         <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: 'var(--ink2, #64748b)' }}>
@@ -162,7 +137,7 @@ export function RamsarWetlandsPage() {
             <span>🌿</span>
             <span>UPSC &amp; State PSC Environment Masterclass • 103 Designated Sites (1981–2026)</span>
           </div>
-          <h1 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: 'clamp(28px, 4.5vw, 42px)', lineHeight: '1.2', margin: '0 0 14px', color: 'var(--ink, #0f172a)', letterSpacing: '-0.02em' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: 'clamp(24px, 3.5vw, 36px)', lineHeight: '1.2', margin: '0 0 10px', color: 'var(--ink, #0f172a)', letterSpacing: '-0.02em', fontWeight: 800 }}>
             Ramsar Wetlands of India: Complete Chronological Timeline (1981–2026)
           </h1>
           <p style={{ fontSize: '15.5px', color: 'var(--ink2, #475569)', maxWidth: '880px', lineHeight: '1.65', margin: 0 }}>
