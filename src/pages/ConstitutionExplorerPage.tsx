@@ -8,11 +8,13 @@ import {
   Bookmark,
   BookOpen,
   Filter,
-  AlertTriangle,
   HelpCircle,
   Sparkles,
   ChevronRight,
   RotateCcw,
+  ArrowRight,
+  ArrowLeft,
+  Award,
 } from 'lucide-react'
 import {
   ALL_CONSTITUTION_ARTICLES,
@@ -162,7 +164,7 @@ const SCHEDULES_DATABASE: ConstitutionalSchedule[] = [
 const POLITY_FAQS = [
   {
     q: 'How many articles are there in the Constitution of India?',
-    a: 'Originally, the Constitution of India had 395 articles divided into 22 parts and 8 schedules (adopted on 26 November 1949 and enacted on 26 January 1950). Due to numerous amendments, there are now over 448 articles organized into 25 parts and 12 schedules, but the numbering ends at Article 395 with newly inserted articles tagged as 21A, 39A, 51A, 243A-ZG, 300A, 338B, etc.',
+    a: 'Originally, the Constitution of India had 395 articles divided into 22 parts and 8 schedules (adopted on 26 November 1949 and enacted on 26 January 1950). Due to numerous amendments, there are now 25 parts and 12 schedules, with over 448 articles. The sequential numbering still ends at Article 395, with newer articles inserted with letter suffixes such as 21A, 39A, 51A, 243A-ZG, 300A, 338B, and 371A-J.',
   },
   {
     q: 'Which articles of the Indian Constitution are the most frequently asked in UPSC and State PSC exams?',
@@ -184,33 +186,46 @@ const POLITY_FAQS = [
 
 export function ConstitutionExplorerPage() {
   const [search, setSearch] = React.useState('')
-  const [activeTab, setActiveTab] = React.useState<'articles' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
-  const [partFilter, setPartFilter] = React.useState('all')
+  const [activeTab, setActiveTab] = React.useState<'articles' | 'most-asked' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
+  // On coming to this page, Part I is automatically selected as requested
+  const [partFilter, setPartFilter] = React.useState<string>('Part I')
   const [frequencyFilter, setFrequencyFilter] = React.useState<'all' | ExamFrequency>('all')
-  const [visibleCount, setVisibleCount] = React.useState(30)
+  const [visibleCount, setVisibleCount] = React.useState(35)
   const [openFaqIndex, setOpenFaqIndex] = React.useState<number | null>(null)
+  const articlesTopRef = React.useRef<HTMLDivElement>(null)
 
   usePageMeta({
-    title: 'Interactive Constitution of India Explorer: All Articles 1–395, Exam Frequency & Traps | Ministry of Papers',
-    description: 'Master the Constitution of India with verified PYQ frequency tags, student-friendly explanations, landmark Supreme Court cases, and examiner traps for UPSC, JKPSC CCE, JKSSB, and State PSCs.',
+    title: 'Constitution of India: Articles 1–395, Exam Frequency & Teaching Guide | Ministry of Papers',
+    description: 'Master every article of the Indian Constitution with linewise student explanations, verified past examination frequency rankings (UPSC, JKPSC, SSC, State PSCs), and landmark Supreme Court rulings.',
     canonicalPath: '/constitution-of-india',
   })
 
-  // Filtered Articles with Search, Part, and Frequency Filter
+  // Current selected part metadata and next part calculation
+  const currentPartIndex = React.useMemo(() => {
+    return CONSTITUTION_PARTS.findIndex((p) => p.part === partFilter)
+  }, [partFilter])
+
+  const currentPartInfo = currentPartIndex >= 0 ? CONSTITUTION_PARTS[currentPartIndex] : null
+  const nextPartInfo = currentPartIndex >= 0 && currentPartIndex < CONSTITUTION_PARTS.length - 1
+    ? CONSTITUTION_PARTS[currentPartIndex + 1]
+    : null
+  const prevPartInfo = currentPartIndex > 0 ? CONSTITUTION_PARTS[currentPartIndex - 1] : null
+
+  // Filtered Articles for "All Articles (395+)" Tab
   const filteredArticles = React.useMemo(() => {
     const q = search.trim().toLowerCase()
     return ALL_CONSTITUTION_ARTICLES.filter((art) => {
+      // Part match (Part I default)
+      if (partFilter !== 'all' && art.part !== partFilter) {
+        return false
+      }
+
       // Frequency match
       if (frequencyFilter !== 'all' && art.frequency !== frequencyFilter) {
         return false
       }
 
-      // Part match
-      if (partFilter !== 'all' && art.part !== partFilter) {
-        return false
-      }
-
-      // Query match
+      // Search match
       if (!q) return true
 
       return (
@@ -220,18 +235,36 @@ export function ConstitutionExplorerPage() {
         art.partName.toLowerCase().includes(q) ||
         art.summary.toLowerCase().includes(q) ||
         art.simpleExplanation.toLowerCase().includes(q) ||
-        art.examTrap.toLowerCase().includes(q) ||
         (art.landmarkCase && art.landmarkCase.toLowerCase().includes(q))
       )
     })
   }, [search, partFilter, frequencyFilter])
 
-  // Reset pagination when filter criteria change
-  React.useEffect(() => {
-    setVisibleCount(30)
-  }, [search, partFilter, frequencyFilter])
+  // "Most Asked Articles in Exams" Tab: Sorted strictly descending by pyqCount (highest on top)
+  const mostAskedArticles = React.useMemo(() => {
+    const q = search.trim().toLowerCase()
+    const sorted = [...ALL_CONSTITUTION_ARTICLES].sort((a, b) => b.pyqCount - a.pyqCount)
 
-  // Frequency count badges
+    return sorted.filter((art) => {
+      if (!q) return true
+      return (
+        art.article.toLowerCase().includes(q) ||
+        art.title.toLowerCase().includes(q) ||
+        art.part.toLowerCase().includes(q) ||
+        art.partName.toLowerCase().includes(q) ||
+        art.summary.toLowerCase().includes(q) ||
+        art.simpleExplanation.toLowerCase().includes(q) ||
+        (art.landmarkCase && art.landmarkCase.toLowerCase().includes(q))
+      )
+    })
+  }, [search])
+
+  // Reset visible count when filters change
+  React.useEffect(() => {
+    setVisibleCount(35)
+  }, [search, partFilter, frequencyFilter, activeTab])
+
+  // Frequency count badges across total articles
   const frequencyCounts = React.useMemo(() => {
     let top = 0
     let freq = 0
@@ -277,12 +310,17 @@ export function ConstitutionExplorerPage() {
     return filteredArticles.slice(0, visibleCount)
   }, [filteredArticles, visibleCount])
 
-  // Reset all filters
-  const resetFilters = () => {
-    setSearch('')
-    setPartFilter('all')
-    setFrequencyFilter('all')
-    setVisibleCount(30)
+  const displayedMostAsked = React.useMemo(() => {
+    return mostAskedArticles.slice(0, visibleCount)
+  }, [mostAskedArticles, visibleCount])
+
+  // Handler to smoothly advance to the next constitutional part
+  const loadNextPart = (nextPart: string) => {
+    setPartFilter(nextPart)
+    setVisibleCount(35)
+    if (articlesTopRef.current) {
+      articlesTopRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }
   }
 
   // Schema.org Structured Data
@@ -291,8 +329,8 @@ export function ConstitutionExplorerPage() {
     '@graph': [
       {
         '@type': 'Article',
-        headline: 'Interactive Constitution of India Explorer: All Articles 1–395 and Exam Frequency',
-        description: 'Comprehensive pedagogical directory of all articles of the Indian Constitution categorized by exam frequency, simple conceptual breakdowns, and common traps for UPSC and State PSC exams.',
+        headline: 'Constitution of India: Linewise Articles 1–395 and Exam Frequency',
+        description: 'Complete directory of Indian Constitution articles with linewise student explanations, exam frequency rankings, and landmark Supreme Court rulings for UPSC and State PSC exams.',
         author: {
           '@type': 'Organization',
           name: 'Ministry of Papers Editorial Board',
@@ -343,11 +381,11 @@ export function ConstitutionExplorerPage() {
         </nav>
 
         {/* Master Header */}
-        <header style={{ marginBottom: '24px' }}>
+        <header style={{ marginBottom: '22px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="public-kicker" style={{ margin: 0 }}>Interactive Polity Study Suite</span>
             <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
-              All 395 Articles + Frequency Tags
+              All 395 Articles · 25 Parts · Verified PYQs
             </span>
           </div>
           <h1
@@ -360,50 +398,50 @@ export function ConstitutionExplorerPage() {
               lineHeight: '1.2',
             }}
           >
-            Constitution of India: Articles, PYQ Frequency &amp; Teaching Guide
+            Constitution of India: Articles, Parts &amp; Exam Rankings
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
-            Master every article of the Indian Constitution with plain-English student explanations, verified past examination frequency tags (UPSC, JKPSC, SSC, State PSCs), landmark Supreme Court rulings, and common examiner trick traps.
+            Read and learn every article of the Indian Constitution line by line. Easily switch through all 25 Parts, discover the most frequently asked articles in competitive exams, and understand foundational principles with student-friendly explanations.
           </p>
 
           {/* Quick Metrics Ribbon */}
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
               gap: '12px',
-              marginTop: '20px',
+              marginTop: '18px',
             }}
           >
-            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <BookOpen size={20} color="var(--brand, #0f766e)" />
+            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <BookOpen size={18} color="var(--brand, #0f766e)" />
               <div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>{frequencyCounts.total}</div>
-                <div style={{ fontSize: '11.5px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Constitutional Articles</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>{frequencyCounts.total}</div>
+                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Articles (1–395+)</div>
               </div>
             </div>
 
-            <div style={{ background: '#fef2f2', padding: '12px 16px', borderRadius: '10px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Flame size={20} color="#dc2626" />
+            <div style={{ background: '#fef2f2', padding: '12px 14px', borderRadius: '10px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Flame size={18} color="#dc2626" />
               <div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#991b1b' }}>{frequencyCounts.top}</div>
-                <div style={{ fontSize: '11.5px', color: '#b91c1c', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: '#991b1b' }}>{frequencyCounts.top}</div>
+                <div style={{ fontSize: '11px', color: '#b91c1c', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
               </div>
             </div>
 
-            <div style={{ background: '#fffbeb', padding: '12px 16px', borderRadius: '10px', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Zap size={20} color="#d97706" />
+            <div style={{ background: '#fffbeb', padding: '12px 14px', borderRadius: '10px', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Zap size={18} color="#d97706" />
               <div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#92400e' }}>{frequencyCounts.freq}</div>
-                <div style={{ fontSize: '11.5px', color: '#b45309', fontWeight: 600 }}>Frequently Tested</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: '#92400e' }}>{CONSTITUTION_PARTS.length}</div>
+                <div style={{ fontSize: '11px', color: '#b45309', fontWeight: 600 }}>Constitutional Parts</div>
               </div>
             </div>
 
-            <div style={{ background: '#eff6ff', padding: '12px 16px', borderRadius: '10px', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={20} color="#2563eb" />
+            <div style={{ background: '#eff6ff', padding: '12px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={18} color="#2563eb" />
               <div>
-                <div style={{ fontSize: '18px', fontWeight: 800, color: '#1e40af' }}>106</div>
-                <div style={{ fontSize: '11.5px', color: '#1d4ed8', fontWeight: 600 }}>Key Amendments</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: '#1e40af' }}>{KEY_AMENDMENTS.length}</div>
+                <div style={{ fontSize: '11px', color: '#1d4ed8', fontWeight: 600 }}>Landmark Amendments</div>
               </div>
             </div>
           </div>
@@ -413,7 +451,7 @@ export function ConstitutionExplorerPage() {
         <div
           style={{
             display: 'flex',
-            gap: '8px',
+            gap: '6px',
             borderBottom: '2px solid var(--line, #e2e8f0)',
             marginBottom: '20px',
             overflowX: 'auto',
@@ -423,7 +461,7 @@ export function ConstitutionExplorerPage() {
           <button
             onClick={() => setActiveTab('articles')}
             style={{
-              padding: '10px 16px',
+              padding: '10px 14px',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -437,10 +475,33 @@ export function ConstitutionExplorerPage() {
           >
             All Articles (395+)
           </button>
+
+          <button
+            onClick={() => setActiveTab('most-asked')}
+            style={{
+              padding: '10px 14px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'most-asked' ? '3px solid #dc2626' : '3px solid transparent',
+              color: activeTab === 'most-asked' ? '#dc2626' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '5px',
+            }}
+          >
+            <Flame size={15} color={activeTab === 'most-asked' ? '#dc2626' : 'var(--ink2, #64748b)'} />
+            Most Asked Articles in Exams
+          </button>
+
           <button
             onClick={() => setActiveTab('parts')}
             style={{
-              padding: '10px 16px',
+              padding: '10px 14px',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -454,10 +515,11 @@ export function ConstitutionExplorerPage() {
           >
             Parts of Constitution ({CONSTITUTION_PARTS.length})
           </button>
+
           <button
             onClick={() => setActiveTab('amendments')}
             style={{
-              padding: '10px 16px',
+              padding: '10px 14px',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -471,10 +533,11 @@ export function ConstitutionExplorerPage() {
           >
             Landmark Amendments ({KEY_AMENDMENTS.length})
           </button>
+
           <button
             onClick={() => setActiveTab('schedules')}
             style={{
-              padding: '10px 16px',
+              padding: '10px 14px',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -488,10 +551,11 @@ export function ConstitutionExplorerPage() {
           >
             All 12 Schedules
           </button>
+
           <button
             onClick={() => setActiveTab('faq')}
             style={{
-              padding: '10px 16px',
+              padding: '10px 14px',
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer',
@@ -507,10 +571,13 @@ export function ConstitutionExplorerPage() {
           </button>
         </div>
 
-        {/* Tab 1: ALL ARTICLES EXPLORER */}
+        {/* Anchor for smooth scrolling when switching parts */}
+        <div ref={articlesTopRef} />
+
+        {/* Tab 1: ALL ARTICLES (LINEWISE, PART I DEFAULT, LOAD NEXT PART AT BOTTOM) */}
         {activeTab === 'articles' && (
           <div>
-            {/* Filter Controls Box */}
+            {/* Filter Bar with Part Selector & Search */}
             <div
               style={{
                 background: 'var(--card-bg, #ffffff)',
@@ -520,18 +587,17 @@ export function ConstitutionExplorerPage() {
                 marginBottom: '20px',
               }}
             >
-              {/* Row 1: Search & Part Selector */}
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '14px' }}>
-                <div style={{ flex: '1 1 300px', position: 'relative' }}>
+                <div style={{ flex: '1 1 280px', position: 'relative' }}>
                   <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
                   <input
                     type="text"
-                    placeholder="Search by article number (e.g. 21), topic (e.g. untouchability, money bill), keyword, or case law..."
+                    placeholder="Search by article number (e.g. 1, 21), keyword, or doctrine..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     style={{
                       width: '100%',
-                      padding: '10px 12px 10px 36px',
+                      padding: '9px 12px 9px 36px',
                       borderRadius: '8px',
                       border: '1px solid var(--line, #cbd5e1)',
                       fontSize: '14px',
@@ -542,13 +608,14 @@ export function ConstitutionExplorerPage() {
                   />
                 </div>
 
+                {/* Part Switcher Dropdown (Part I selected by default) */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Filter size={15} color="var(--ink2, #64748b)" />
                   <select
                     value={partFilter}
                     onChange={(e) => setPartFilter(e.target.value)}
                     style={{
-                      padding: '10px 14px',
+                      padding: '9px 12px',
                       borderRadius: '8px',
                       border: '1px solid var(--line, #cbd5e1)',
                       fontSize: '13.5px',
@@ -556,10 +623,10 @@ export function ConstitutionExplorerPage() {
                       color: 'var(--ink, #0f172a)',
                       outline: 'none',
                       cursor: 'pointer',
-                      fontWeight: 500,
+                      fontWeight: 600,
                     }}
                   >
-                    <option value="all">All 22 Parts</option>
+                    <option value="all">All 25 Parts (Show All 395+ Articles)</option>
                     {CONSTITUTION_PARTS.map((p) => (
                       <option key={p.part} value={p.part}>
                         {p.part}: {p.name} ({p.articlesRange})
@@ -569,18 +636,18 @@ export function ConstitutionExplorerPage() {
                 </div>
               </div>
 
-              {/* Row 2: Frequency Pills Filter */}
+              {/* Frequency Filter Pills */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
-                <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--ink2, #64748b)', marginRight: '4px' }}>
-                  PYQ Frequency:
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink2, #64748b)' }}>
+                  Filter by PYQ Frequency:
                 </span>
 
                 <button
                   onClick={() => setFrequencyFilter('all')}
                   style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '12.5px',
+                    padding: '4px 10px',
+                    borderRadius: '16px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
@@ -589,15 +656,15 @@ export function ConstitutionExplorerPage() {
                     borderColor: frequencyFilter === 'all' ? 'var(--ink, #0f172a)' : 'var(--line, #cbd5e1)',
                   }}
                 >
-                  All ({frequencyCounts.total})
+                  All
                 </button>
 
                 <button
                   onClick={() => setFrequencyFilter('Top Tested')}
                   style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '12.5px',
+                    padding: '4px 10px',
+                    borderRadius: '16px',
+                    fontSize: '12px',
                     fontWeight: 700,
                     cursor: 'pointer',
                     border: '1px solid',
@@ -609,16 +676,16 @@ export function ConstitutionExplorerPage() {
                     borderColor: frequencyFilter === 'Top Tested' ? '#dc2626' : '#fecaca',
                   }}
                 >
-                  <Flame size={13} />
+                  <Flame size={12} />
                   Top Tested ({frequencyCounts.top})
                 </button>
 
                 <button
                   onClick={() => setFrequencyFilter('Frequently Tested')}
                   style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '12.5px',
+                    padding: '4px 10px',
+                    borderRadius: '16px',
+                    fontSize: '12px',
                     fontWeight: 700,
                     cursor: 'pointer',
                     border: '1px solid',
@@ -630,16 +697,16 @@ export function ConstitutionExplorerPage() {
                     borderColor: frequencyFilter === 'Frequently Tested' ? '#d97706' : '#fde68a',
                   }}
                 >
-                  <Zap size={13} />
+                  <Zap size={12} />
                   Frequently Tested ({frequencyCounts.freq})
                 </button>
 
                 <button
                   onClick={() => setFrequencyFilter('Moderately Tested')}
                   style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '12.5px',
+                    padding: '4px 10px',
+                    borderRadius: '16px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
@@ -651,16 +718,16 @@ export function ConstitutionExplorerPage() {
                     borderColor: frequencyFilter === 'Moderately Tested' ? '#2563eb' : '#bfdbfe',
                   }}
                 >
-                  <Bookmark size={13} />
+                  <Bookmark size={12} />
                   Moderately Tested ({frequencyCounts.mod})
                 </button>
 
                 <button
                   onClick={() => setFrequencyFilter('Foundational')}
                   style={{
-                    padding: '6px 12px',
-                    borderRadius: '20px',
-                    fontSize: '12.5px',
+                    padding: '4px 10px',
+                    borderRadius: '16px',
+                    fontSize: '12px',
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
@@ -672,13 +739,17 @@ export function ConstitutionExplorerPage() {
                   Foundational ({frequencyCounts.found})
                 </button>
 
-                {(search || partFilter !== 'all' || frequencyFilter !== 'all') && (
+                {(search || partFilter !== 'Part I' || frequencyFilter !== 'all') && (
                   <button
-                    onClick={resetFilters}
+                    onClick={() => {
+                      setSearch('')
+                      setPartFilter('Part I')
+                      setFrequencyFilter('all')
+                    }}
                     style={{
-                      padding: '5px 10px',
-                      borderRadius: '8px',
-                      fontSize: '12px',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      fontSize: '11.5px',
                       fontWeight: 600,
                       cursor: 'pointer',
                       border: 'none',
@@ -690,27 +761,48 @@ export function ConstitutionExplorerPage() {
                       marginLeft: 'auto',
                     }}
                   >
-                    <RotateCcw size={12} />
-                    Reset Filters
+                    <RotateCcw size={11} />
+                    Reset to Part I
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Results Count Banner */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', padding: '0 4px' }}>
-              <span style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', fontWeight: 500 }}>
-                Showing <strong>{displayedArticles.length}</strong> of <strong>{filteredArticles.length}</strong> matching articles
-              </span>
-              {filteredArticles.length > displayedArticles.length && (
-                <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>
-                  Scroll down to load more
-                </span>
-              )}
-            </div>
+            {/* Current Part Banner */}
+            {currentPartInfo && partFilter !== 'all' && (
+              <div
+                style={{
+                  background: 'linear-gradient(to right, #f0fdf4, #f8fafc)',
+                  border: '1px solid #bbf7d0',
+                  borderRadius: '10px',
+                  padding: '14px 18px',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '10px',
+                }}
+              >
+                <div>
+                  <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#15803d' }}>
+                    Currently Reading: {currentPartInfo.part}
+                  </span>
+                  <h2 style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)', margin: '2px 0 4px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                    {currentPartInfo.name} ({currentPartInfo.articlesRange})
+                  </h2>
+                  <p style={{ fontSize: '13px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    {currentPartInfo.description}
+                  </p>
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 700, color: '#15803d', background: '#ffffff', padding: '6px 12px', borderRadius: '8px', border: '1px solid #86efac' }}>
+                  {filteredArticles.length} Articles in this Part
+                </div>
+              </div>
+            )}
 
-            {/* Articles Teaching Cards Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+            {/* LINEWISE VERTICAL LIST OF ARTICLES */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {displayedArticles.map((art: ConstitutionArticleData) => {
                 const isTopTested = art.frequency === 'Top Tested'
                 const isFreqTested = art.frequency === 'Frequently Tested'
@@ -725,138 +817,122 @@ export function ConstitutionExplorerPage() {
                     key={art.id}
                     id={art.id}
                     style={{
-                      padding: '22px',
+                      padding: '20px 24px',
                       background: 'var(--card-bg, #ffffff)',
                       border: '1px solid var(--line, #e2e8f0)',
                       borderRadius: '12px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      boxShadow: isTopTested ? '0 2px 8px rgba(220, 38, 38, 0.06)' : 'none',
-                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                      boxShadow: isTopTested ? '0 1px 4px rgba(220, 38, 38, 0.05)' : '0 1px 2px rgba(0,0,0,0.02)',
                     }}
                   >
-                    <div>
-                      {/* Meta header: Part & Frequency Badge */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
-                        <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--brand, #0f766e)' }}>
-                          {art.part} · {art.partName}
-                        </span>
+                    {/* Linewise Top Header: Article Number, Title, and Frequency Tag */}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px', flexWrap: 'wrap' }}>
                         <span
                           style={{
-                            fontSize: '11px',
-                            fontWeight: 700,
-                            padding: '3px 8px',
-                            borderRadius: '12px',
-                            background: badgeBg,
-                            color: badgeColor,
-                            border: `1px solid ${badgeBorder}`,
-                            display: 'inline-flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                          }}
-                        >
-                          {isTopTested && <Flame size={12} />}
-                          {isFreqTested && <Zap size={12} />}
-                          {art.frequency} ({art.pyqCount} PYQs)
-                        </span>
-                      </div>
-
-                      {/* Article Number & Title */}
-                      <h2
-                        style={{
-                          fontSize: '19px',
-                          margin: '0 0 8px',
-                          color: 'var(--ink, #0f172a)',
-                          fontFamily: 'var(--font-heading, "Fraunces", serif)',
-                          lineHeight: '1.3',
-                        }}
-                      >
-                        {art.article}: {art.title}
-                      </h2>
-
-                      {/* Official Text / Summary */}
-                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 14px' }}>
-                        {art.summary}
-                      </p>
-
-                      {/* Teaching Card 1: In Simple Words */}
-                      <div
-                        style={{
-                          background: 'var(--bg, #f8fafc)',
-                          padding: '12px 14px',
-                          borderRadius: '8px',
-                          borderLeft: '3px solid var(--brand, #0f766e)',
-                          marginBottom: '10px',
-                        }}
-                      >
-                        <strong
-                          style={{
-                            fontSize: '11.5px',
-                            textTransform: 'uppercase',
+                            fontSize: '20px',
+                            fontWeight: 800,
                             color: 'var(--brand, #0f766e)',
-                            letterSpacing: '0.4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                            marginBottom: '4px',
+                            fontFamily: 'var(--font-heading, "Fraunces", serif)',
                           }}
                         >
-                          <BookOpen size={13} />
-                          In Simple Words (Teaching Breakdown)
-                        </strong>
-                        <div style={{ fontSize: '13px', color: 'var(--ink2, #334155)', lineHeight: '1.55' }}>
-                          {art.simpleExplanation}
-                        </div>
+                          {art.article}
+                        </span>
+                        <h2
+                          style={{
+                            fontSize: '17px',
+                            fontWeight: 700,
+                            color: 'var(--ink, #0f172a)',
+                            margin: 0,
+                            lineHeight: '1.3',
+                          }}
+                        >
+                          {art.title}
+                        </h2>
                       </div>
 
-                      {/* Teaching Card 2: Common Examiner Trap */}
+                      {/* Exam Frequency Pill */}
+                      <span
+                        style={{
+                          fontSize: '11.5px',
+                          fontWeight: 700,
+                          padding: '3px 10px',
+                          borderRadius: '12px',
+                          background: badgeBg,
+                          color: badgeColor,
+                          border: `1px solid ${badgeBorder}`,
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          whiteSpace: 'nowrap',
+                        }}
+                      >
+                        {isTopTested && <Flame size={12} />}
+                        {isFreqTested && <Zap size={12} />}
+                        {art.frequency} ({art.pyqCount} PYQs)
+                      </span>
+                    </div>
+
+                    {/* Official Constitutional Text / Summary */}
+                    <p style={{ fontSize: '14px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 12px' }}>
+                      {art.summary}
+                    </p>
+
+                    {/* Teaching Breakdown: In Simple Words (Examiner trap removed as requested) */}
+                    <div
+                      style={{
+                        background: 'var(--bg, #f8fafc)',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        borderLeft: '3px solid var(--brand, #0f766e)',
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <strong
+                        style={{
+                          fontSize: '11.5px',
+                          textTransform: 'uppercase',
+                          color: 'var(--brand, #0f766e)',
+                          letterSpacing: '0.4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        <BookOpen size={13} />
+                        In Simple Words (Student Teaching Note)
+                      </strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #334155)', lineHeight: '1.55', margin: 0 }}>
+                        {art.simpleExplanation}
+                      </p>
+                    </div>
+
+                    {/* Landmark Judicial Precedent if available */}
+                    {art.landmarkCase && (
                       <div
                         style={{
-                          background: '#fffdf5',
-                          padding: '12px 14px',
-                          borderRadius: '8px',
-                          borderLeft: '3px solid #f59e0b',
+                          fontSize: '13px',
+                          color: 'var(--ink2, #475569)',
+                          background: '#f1f5f9',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
                           marginBottom: '12px',
                         }}
                       >
-                        <strong
-                          style={{
-                            fontSize: '11.5px',
-                            textTransform: 'uppercase',
-                            color: '#b45309',
-                            letterSpacing: '0.4px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '5px',
-                            marginBottom: '4px',
-                          }}
-                        >
-                          <AlertTriangle size={13} />
-                          Common Examiner Trap
-                        </strong>
-                        <div style={{ fontSize: '13px', color: '#78350f', lineHeight: '1.5' }}>
-                          {art.examTrap}
-                        </div>
+                        <strong style={{ color: 'var(--ink, #1e293b)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
                       </div>
+                    )}
 
-                      {/* Landmark Judicial Reference */}
-                      {art.landmarkCase && (
-                        <div style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', background: '#f1f5f9', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px' }}>
-                          <strong style={{ color: 'var(--ink, #1e293b)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Bottom Practice CTA */}
+                    {/* Linewise Bottom Navigation & Practice Link */}
                     <div
                       style={{
-                        marginTop: '14px',
-                        paddingTop: '12px',
-                        borderTop: '1px solid var(--line, #e2e8f0)',
                         display: 'flex',
                         justifyContent: 'space-between',
                         alignItems: 'center',
+                        paddingTop: '10px',
+                        borderTop: '1px solid var(--line, #f1f5f9)',
+                        flexWrap: 'wrap',
+                        gap: '8px',
                       }}
                     >
                       <Link
@@ -871,11 +947,12 @@ export function ConstitutionExplorerPage() {
                           gap: '4px',
                         }}
                       >
-                        Solve Indian Polity PYQs on this Topic
-                        <ChevronRight size={14} />
+                        Solve Indian Polity PYQs on {art.article}
+                        <ChevronRight size={13} />
                       </Link>
-                      <span style={{ fontSize: '11.5px', color: 'var(--ink2, #94a3b8)', fontWeight: 600 }}>
-                        {art.article}
+
+                      <span style={{ fontSize: '12px', color: 'var(--ink2, #94a3b8)', fontWeight: 600 }}>
+                        {art.part} · {art.partName}
                       </span>
                     </div>
                   </article>
@@ -883,13 +960,323 @@ export function ConstitutionExplorerPage() {
               })}
             </div>
 
-            {/* Load More Button */}
+            {/* Pagination / Load Next Part Controls */}
             {displayedArticles.length < filteredArticles.length && (
-              <div style={{ textAlign: 'center', marginTop: '30px' }}>
+              <div style={{ textAlign: 'center', marginTop: '24px' }}>
                 <button
-                  onClick={() => setVisibleCount((prev) => prev + 30)}
+                  onClick={() => setVisibleCount((prev) => prev + 35)}
                   style={{
-                    padding: '12px 28px',
+                    padding: '10px 24px',
+                    fontSize: '13.5px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    background: '#f1f5f9',
+                    color: 'var(--ink, #0f172a)',
+                    border: '1px solid var(--line, #cbd5e1)',
+                    cursor: 'pointer',
+                  }}
+                >
+                  Load More Articles in this Part ({filteredArticles.length - displayedArticles.length} remaining)
+                </button>
+              </div>
+            )}
+
+            {/* "LOAD NEXT PART" BUTTON AT THE BOTTOM OF THE CURRENT PART */}
+            {partFilter !== 'all' && nextPartInfo && displayedArticles.length >= filteredArticles.length && (
+              <div
+                style={{
+                  marginTop: '36px',
+                  padding: '24px 20px',
+                  background: 'var(--card-bg, #ffffff)',
+                  border: '1.5px dashed var(--brand, #0f766e)',
+                  borderRadius: '12px',
+                  textAlign: 'center',
+                }}
+              >
+                <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--ink2, #64748b)', textTransform: 'uppercase', letterSpacing: '0.4px', display: 'block', marginBottom: '6px' }}>
+                  Finished reading {currentPartInfo?.part} ({currentPartInfo?.name})
+                </span>
+                <h3 style={{ fontSize: '19px', fontFamily: 'var(--font-heading, "Fraunces", serif)', margin: '0 0 12px', color: 'var(--ink, #0f172a)' }}>
+                  Continue Reading {nextPartInfo.part}: {nextPartInfo.name}
+                </h3>
+                <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', maxWidth: '560px', margin: '0 auto 16px', lineHeight: '1.5' }}>
+                  {nextPartInfo.description} ({nextPartInfo.articlesRange})
+                </p>
+                <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                  {prevPartInfo && (
+                    <button
+                      onClick={() => loadNextPart(prevPartInfo.part)}
+                      style={{
+                        padding: '10px 18px',
+                        fontSize: '13.5px',
+                        fontWeight: 600,
+                        borderRadius: '8px',
+                        background: '#f8fafc',
+                        color: 'var(--ink, #0f172a)',
+                        border: '1px solid var(--line, #cbd5e1)',
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                      }}
+                    >
+                      <ArrowLeft size={15} />
+                      Previous: {prevPartInfo.part}
+                    </button>
+                  )}
+                  <button
+                    onClick={() => loadNextPart(nextPartInfo.part)}
+                    style={{
+                      padding: '11px 26px',
+                      fontSize: '14px',
+                      fontWeight: 700,
+                      borderRadius: '8px',
+                      background: 'var(--brand, #0f766e)',
+                      color: '#ffffff',
+                      border: 'none',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      boxShadow: '0 2px 8px rgba(15, 118, 110, 0.25)',
+                    }}
+                  >
+                    Load {nextPartInfo.part}: {nextPartInfo.name} ({nextPartInfo.articlesRange})
+                    <ArrowRight size={16} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: 🔥 MOST ASKED ARTICLES IN EXAMS (ORDERED BY MOST ASKED ON TOP) */}
+        {activeTab === 'most-asked' && (
+          <div>
+            {/* Banner */}
+            <div
+              style={{
+                background: 'linear-gradient(to right, #fef2f2, #fffbeb)',
+                border: '1px solid #fecaca',
+                borderRadius: '12px',
+                padding: '18px 22px',
+                marginBottom: '20px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div>
+                <span style={{ fontSize: '11.5px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px', color: '#dc2626', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Award size={14} />
+                  Historical Examination PYQ Ranking
+                </span>
+                <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#991b1b', margin: '4px 0 6px', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
+                  Most Asked Articles in Indian Competitive Exams
+                </h2>
+                <p style={{ fontSize: '13.5px', color: '#7f1d1d', margin: 0, lineHeight: '1.5', maxWidth: '640px' }}>
+                  Articles ranked in strict descending order of how frequently they appear in UPSC CSE Prelims, JKPSC CCE, SSC CGL, and State PSCs.
+                </p>
+              </div>
+
+              <div style={{ background: '#ffffff', border: '1px solid #fca5a5', padding: '8px 16px', borderRadius: '10px', textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: '#dc2626' }}>{mostAskedArticles.length}</div>
+                <div style={{ fontSize: '11.5px', fontWeight: 700, color: '#991b1b' }}>Ranked Articles</div>
+              </div>
+            </div>
+
+            {/* Search Box in Most Asked */}
+            <div style={{ position: 'relative', marginBottom: '18px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
+              <input
+                type="text"
+                placeholder="Search ranked articles by number, title, or topic..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '9px 12px 9px 36px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--line, #cbd5e1)',
+                  fontSize: '14px',
+                  outline: 'none',
+                  background: 'var(--card-bg, #ffffff)',
+                  color: 'var(--ink, #0f172a)',
+                }}
+              />
+            </div>
+
+            {/* Linewise Vertical List Ranked by Frequency */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {displayedMostAsked.map((art: ConstitutionArticleData, idx: number) => {
+                const rank = idx + 1
+                const isTop5 = rank <= 5
+                const isTop15 = rank <= 15
+
+                return (
+                  <article
+                    key={art.id}
+                    id={art.id}
+                    style={{
+                      padding: '20px 24px',
+                      background: 'var(--card-bg, #ffffff)',
+                      border: isTop5 ? '1.5px solid #f87171' : '1px solid var(--line, #e2e8f0)',
+                      borderRadius: '12px',
+                      boxShadow: isTop5 ? '0 2px 8px rgba(220, 38, 38, 0.08)' : '0 1px 2px rgba(0,0,0,0.02)',
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                        {/* Rank Badge */}
+                        <span
+                          style={{
+                            fontSize: '12px',
+                            fontWeight: 800,
+                            padding: '3px 8px',
+                            borderRadius: '6px',
+                            background: isTop5 ? '#dc2626' : isTop15 ? '#d97706' : '#2563eb',
+                            color: '#ffffff',
+                          }}
+                        >
+                          #{rank} Most Asked
+                        </span>
+
+                        <span
+                          style={{
+                            fontSize: '20px',
+                            fontWeight: 800,
+                            color: 'var(--brand, #0f766e)',
+                            fontFamily: 'var(--font-heading, "Fraunces", serif)',
+                          }}
+                        >
+                          {art.article}
+                        </span>
+
+                        <h2
+                          style={{
+                            fontSize: '17px',
+                            fontWeight: 700,
+                            color: 'var(--ink, #0f172a)',
+                            margin: 0,
+                            lineHeight: '1.3',
+                          }}
+                        >
+                          {art.title}
+                        </h2>
+                      </div>
+
+                      {/* Appearance Pill */}
+                      <span
+                        style={{
+                          fontSize: '12px',
+                          fontWeight: 700,
+                          padding: '3px 10px',
+                          borderRadius: '12px',
+                          background: '#fef2f2',
+                          color: '#991b1b',
+                          border: '1px solid #fecaca',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        <Flame size={13} color="#dc2626" />
+                        {art.pyqCount} Historical PYQs
+                      </span>
+                    </div>
+
+                    <p style={{ fontSize: '14px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 12px' }}>
+                      {art.summary}
+                    </p>
+
+                    <div
+                      style={{
+                        background: 'var(--bg, #f8fafc)',
+                        padding: '12px 16px',
+                        borderRadius: '8px',
+                        borderLeft: '3px solid var(--brand, #0f766e)',
+                        marginBottom: '12px',
+                      }}
+                    >
+                      <strong
+                        style={{
+                          fontSize: '11.5px',
+                          textTransform: 'uppercase',
+                          color: 'var(--brand, #0f766e)',
+                          letterSpacing: '0.4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '5px',
+                          marginBottom: '4px',
+                        }}
+                      >
+                        <BookOpen size={13} />
+                        In Simple Words (Student Teaching Note)
+                      </strong>
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink2, #334155)', lineHeight: '1.55', margin: 0 }}>
+                        {art.simpleExplanation}
+                      </p>
+                    </div>
+
+                    {art.landmarkCase && (
+                      <div
+                        style={{
+                          fontSize: '13px',
+                          color: 'var(--ink2, #475569)',
+                          background: '#f1f5f9',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          marginBottom: '12px',
+                        }}
+                      >
+                        <strong style={{ color: 'var(--ink, #1e293b)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
+                      </div>
+                    )}
+
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        paddingTop: '10px',
+                        borderTop: '1px solid var(--line, #f1f5f9)',
+                        flexWrap: 'wrap',
+                        gap: '8px',
+                      }}
+                    >
+                      <Link
+                        to={`/exam/upsc-cse?tab=subjects&subject=Indian%20Polity`}
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 700,
+                          color: 'var(--brand, #0f766e)',
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        Practice Solved PYQs for {art.article}
+                        <ChevronRight size={13} />
+                      </Link>
+
+                      <span style={{ fontSize: '12px', color: 'var(--ink2, #94a3b8)', fontWeight: 600 }}>
+                        {art.part} · {art.partName}
+                      </span>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+
+            {displayedMostAsked.length < mostAskedArticles.length && (
+              <div style={{ textAlign: 'center', marginTop: '28px' }}>
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 35)}
+                  style={{
+                    padding: '11px 26px',
                     fontSize: '14px',
                     fontWeight: 700,
                     borderRadius: '8px',
@@ -897,17 +1284,16 @@ export function ConstitutionExplorerPage() {
                     color: '#ffffff',
                     border: 'none',
                     cursor: 'pointer',
-                    boxShadow: '0 2px 6px rgba(15, 118, 110, 0.2)',
                   }}
                 >
-                  Load More Articles ({filteredArticles.length - displayedArticles.length} remaining)
+                  Load Next Ranked Articles ({mostAskedArticles.length - displayedMostAsked.length} remaining)
                 </button>
               </div>
             )}
           </div>
         )}
 
-        {/* Tab 2: PARTS OF THE CONSTITUTION */}
+        {/* Tab 3: PARTS OF THE CONSTITUTION (25 PARTS) */}
         {activeTab === 'parts' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
             {CONSTITUTION_PARTS.map((p) => (
@@ -956,7 +1342,7 @@ export function ConstitutionExplorerPage() {
                       gap: '4px',
                     }}
                   >
-                    View All Articles in {p.part} →
+                    Read All Articles in {p.part} →
                   </button>
                 </div>
               </div>
@@ -964,57 +1350,61 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 3: LANDMARK AMENDMENTS */}
+        {/* Tab 4: LANDMARK AMENDMENTS (15) */}
         {activeTab === 'amendments' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {filteredAmendments.map((am) => (
               <article
                 key={am.amendment}
                 style={{
-                  padding: '20px',
+                  padding: '20px 24px',
                   background: 'var(--card-bg, #ffffff)',
                   border: '1px solid var(--line, #e2e8f0)',
                   borderRadius: '12px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>Year: {am.year}</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>
+                      {am.amendment}
+                    </span>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--ink2, #64748b)' }}>
+                      ({am.year})
+                    </span>
+                  </div>
                   <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: '#eff6ff', color: '#1d4ed8' }}>
                     Constitutional Amendment
                   </span>
                 </div>
-                <h3 style={{ fontSize: '18px', margin: '0 0 6px', color: 'var(--ink, #0f172a)' }}>
-                  {am.amendment}
-                </h3>
-                <h4 style={{ fontSize: '14px', fontWeight: 600, color: 'var(--ink2, #64748b)', margin: '0 0 10px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--ink, #0f172a)', margin: '0 0 8px' }}>
                   {am.title}
-                </h4>
-                <p style={{ fontSize: '13.5px', lineHeight: '1.6', color: 'var(--ink, #334155)', margin: '0 0 12px' }}>
+                </h3>
+                <p style={{ fontSize: '13.5px', lineHeight: '1.6', color: 'var(--ink, #334155)', margin: '0 0 10px' }}>
                   {am.significance}
                 </p>
-                <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '10px 12px', borderRadius: '8px', fontSize: '12.5px', color: '#854d0e' }}>
-                  <strong>💡 Exam Trap &amp; Takeaway:</strong> {am.examNote}
+                <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '10px 14px', borderRadius: '8px', fontSize: '12.5px', color: '#854d0e' }}>
+                  <strong>💡 Exam Takeaway:</strong> {am.examNote}
                 </div>
               </article>
             ))}
           </div>
         )}
 
-        {/* Tab 4: ALL 12 SCHEDULES */}
+        {/* Tab 5: ALL 12 SCHEDULES */}
         {activeTab === 'schedules' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {filteredSchedules.map((sch) => (
               <article
                 key={sch.schedule}
                 style={{
-                  padding: '20px',
+                  padding: '20px 24px',
                   background: 'var(--card-bg, #ffffff)',
                   border: '1px solid var(--line, #e2e8f0)',
                   borderRadius: '12px',
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--brand, #0f766e)' }}>{sch.schedule}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', flexWrap: 'wrap', gap: '8px' }}>
+                  <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--brand, #0f766e)', fontWeight: 800 }}>{sch.schedule}</h3>
                   <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>{sch.articles}</span>
                 </div>
                 <h4 style={{ fontSize: '15px', color: 'var(--ink, #0f172a)', margin: '0 0 8px' }}>{sch.subject}</h4>
@@ -1026,7 +1416,7 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 5: EXAM FAQS */}
+        {/* Tab 6: EXAM FAQS (5) */}
         {activeTab === 'faq' && (
           <div style={{ maxWidth: '840px', margin: '0 auto' }}>
             <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink, #0f172a)' }}>
