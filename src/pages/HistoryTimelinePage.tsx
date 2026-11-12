@@ -255,32 +255,32 @@ export function HistoryTimelinePage() {
             </div>
 
             <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <UserCheck size={18} color="#0f766e" />
+              <UserCheck size={18} color="var(--brand, #0f766e)" />
               <div>
                 <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>{GOVERNOR_GENERALS_TIMELINE.length}</div>
                 <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Gov-Generals &amp; Viceroys</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Award size={18} color="#dc2626" />
+            <div style={{ background: 'var(--red-bg, #fef2f2)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--red-border, #fecaca)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Award size={18} color="var(--red, #dc2626)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: '#dc2626' }}>{ALL_MODERN_HISTORY_EVENTS.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Total Milestone Events</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--red, #dc2626)' }}>{ALL_MODERN_HISTORY_EVENTS.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--red, #b91c1c)', fontWeight: 600 }}>Total Milestone Events</div>
               </div>
             </div>
 
-            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={18} color="#2563eb" />
+            <div style={{ background: 'var(--blue-bg, #eff6ff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border, #bfdbfe)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={18} color="var(--blue, #2563eb)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: '#2563eb' }}>{legislativeActs.length}</div>
-                <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Landmark Acts &amp; Reforms</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue, #2563eb)' }}>{legislativeActs.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--blue, #1d4ed8)', fontWeight: 600 }}>Landmark Acts &amp; Reforms</div>
               </div>
             </div>
           </div>
         </header>
 
-        {/* Global Tab Switcher with Slim Modern Black Scroller */}
+        {/* Global Tab Switcher with Slim Modern Scroller */}
         <div
           role="tablist"
           className="custom-tab-scroller"
@@ -291,8 +291,6 @@ export function HistoryTimelinePage() {
             marginBottom: '20px',
             overflowX: 'auto',
             paddingBottom: '6px',
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#0f172a transparent',
           }}
         >
           <button
@@ -572,9 +570,9 @@ export function HistoryTimelinePage() {
                           fontWeight: 700,
                           padding: '2px 8px',
                           borderRadius: '6px',
-                          background: ev.frequency === 'Top Tested' ? '#fffbeb' : '#f8fafc',
-                          color: ev.frequency === 'Top Tested' ? '#b45309' : 'var(--ink2, #64748b)',
-                          border: `1px solid ${ev.frequency === 'Top Tested' ? '#fde68a' : 'var(--line, #e2e8f0)'}`,
+                          background: ev.frequency === 'Top Tested' ? 'var(--hl-bg, #fffbeb)' : 'var(--card-bg-subtle, #f8fafc)',
+                          color: ev.frequency === 'Top Tested' ? 'var(--hl-dark, #b45309)' : 'var(--ink2, #64748b)',
+                          border: `1px solid ${ev.frequency === 'Top Tested' ? 'var(--hl-border, #fde68a)' : 'var(--line, #e2e8f0)'}`,
                         }}
                       >
                         {ev.frequency === 'Top Tested' ? '🔥 ' : ''}{ev.frequency} ({ev.pyqCount} PYQs)

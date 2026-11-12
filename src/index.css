@@ -61,6 +61,12 @@
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, .07), 0 2px 4px -2px rgba(0, 0, 0, .05);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, .08), 0 4px 6px -4px rgba(0, 0, 0, .05);
   --bg: #f7f8fa;
+  --card-bg: #FFFFFF;
+  --card-bg-subtle: #F7F8FA;
+  --brand: #0f766e;
+  --brand-soft: #f0fdf4;
+  --brand-line: #bbf7d0;
+  --brand-text: #166534;
   color-scheme: light;
 }
 
@@ -102,6 +108,12 @@ html[data-theme="dark"] {
   --shadow: 0 1px 2px rgba(0, 0, 0, .5), 0 1px 3px rgba(0, 0, 0, .4);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, .5), 0 2px 4px -2px rgba(0, 0, 0, .4);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, .55), 0 4px 6px -4px rgba(0, 0, 0, .45);
+  --card-bg: #252526;
+  --card-bg-subtle: #2D2D30;
+  --brand: #2dd4bf;
+  --brand-soft: rgba(45, 212, 191, 0.12);
+  --brand-line: rgba(45, 212, 191, 0.28);
+  --brand-text: #2dd4bf;
   color-scheme: dark;
 }
 
@@ -22926,13 +22938,13 @@ html {
   .river-article-page .river-entry-highlight { font-size: 15px; }
 }
 
-/* ── Modern Translucent Scroller (Barely visible, sleek, modern SaaS UI) ── */
+/* ── Modern Slim Scroller (First slim style from design component) ── */
 .custom-tab-scroller,
 .translucent-scroller,
 .river-guide-table-wrap,
 .river-pills-wrap {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.18) transparent;
+  scrollbar-color: rgba(0, 0, 0, 0.28) rgba(0, 0, 0, 0.05);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -22940,29 +22952,30 @@ html[data-theme="dark"] .custom-tab-scroller,
 html[data-theme="dark"] .translucent-scroller,
 html[data-theme="dark"] .river-guide-table-wrap,
 html[data-theme="dark"] .river-pills-wrap {
-  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.32) rgba(255, 255, 255, 0.08);
 }
 
 .custom-tab-scroller::-webkit-scrollbar,
 .translucent-scroller::-webkit-scrollbar,
 .river-guide-table-wrap::-webkit-scrollbar,
 .river-pills-wrap::-webkit-scrollbar {
-  height: 3.5px;
-  width: 3.5px;
+  height: 3px;
+  width: 3px;
 }
 
 .custom-tab-scroller::-webkit-scrollbar-track,
 .translucent-scroller::-webkit-scrollbar-track,
 .river-guide-table-wrap::-webkit-scrollbar-track,
 .river-pills-wrap::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 9999px;
 }
 
 .custom-tab-scroller::-webkit-scrollbar-thumb,
 .translucent-scroller::-webkit-scrollbar-thumb,
 .river-guide-table-wrap::-webkit-scrollbar-thumb,
 .river-pills-wrap::-webkit-scrollbar-thumb {
-  background: rgba(100, 116, 139, 0.18);
+  background: rgba(0, 0, 0, 0.28);
   border-radius: 9999px;
   transition: background 0.2s ease;
 }
@@ -22971,20 +22984,27 @@ html[data-theme="dark"] .river-pills-wrap {
 .translucent-scroller::-webkit-scrollbar-thumb:hover,
 .river-guide-table-wrap::-webkit-scrollbar-thumb:hover,
 .river-pills-wrap::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.38);
+  background: rgba(0, 0, 0, 0.52);
+}
+
+html[data-theme="dark"] .custom-tab-scroller::-webkit-scrollbar-track,
+html[data-theme="dark"] .translucent-scroller::-webkit-scrollbar-track,
+html[data-theme="dark"] .river-guide-table-wrap::-webkit-scrollbar-track,
+html[data-theme="dark"] .river-pills-wrap::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 html[data-theme="dark"] .custom-tab-scroller::-webkit-scrollbar-thumb,
 html[data-theme="dark"] .translucent-scroller::-webkit-scrollbar-thumb,
 html[data-theme="dark"] .river-guide-table-wrap::-webkit-scrollbar-thumb,
 html[data-theme="dark"] .river-pills-wrap::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.32);
 }
 
 html[data-theme="dark"] .custom-tab-scroller::-webkit-scrollbar-thumb:hover,
 html[data-theme="dark"] .translucent-scroller::-webkit-scrollbar-thumb:hover,
 html[data-theme="dark"] .river-guide-table-wrap::-webkit-scrollbar-thumb:hover,
 html[data-theme="dark"] .river-pills-wrap::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.36);
+  background: rgba(255, 255, 255, 0.58);
 }
 

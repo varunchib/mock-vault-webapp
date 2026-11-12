@@ -163,7 +163,7 @@ export function RamsarWetlandsPage() {
             <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink2, #64748b)', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
               Total Ramsar Sites
             </span>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: '#047857', marginTop: '2px' }}>103 Sites</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--brand-text, #047857)', marginTop: '2px' }}>103 Sites</div>
             <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>1st in Asia • 3rd Globally</span>
           </div>
 
@@ -171,7 +171,7 @@ export function RamsarWetlandsPage() {
             <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--ink2, #64748b)', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
               Leading States
             </span>
-            <div style={{ fontSize: '22px', fontWeight: 800, color: '#0f766e', marginTop: '2px' }}>Tamil Nadu (20)</div>
+            <div style={{ fontSize: '22px', fontWeight: 800, color: 'var(--brand, #0f766e)', marginTop: '2px' }}>Tamil Nadu (20)</div>
             <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>2nd: Uttar Pradesh (14)</span>
           </div>
 
@@ -184,15 +184,15 @@ export function RamsarWetlandsPage() {
           </div>
 
           <div>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#b91c1c', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--red, #b91c1c)', fontWeight: 700, letterSpacing: '0.5px', display: 'block' }}>
               Montreux Record
             </span>
-            <div style={{ fontSize: '24px', fontWeight: 800, color: '#b91c1c', marginTop: '2px' }}>2 Active Sites</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, color: 'var(--red, #b91c1c)', marginTop: '2px' }}>2 Active Sites</div>
             <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Keoladeo &amp; Loktak (Chilika removed)</span>
           </div>
         </div>
 
-        {/* Tab Switcher with Slim, Modern, Black Scroller */}
+        {/* Tab Switcher with Slim Modern Scroller */}
         <div
           role="tablist"
           className="custom-tab-scroller"
@@ -203,8 +203,6 @@ export function RamsarWetlandsPage() {
             marginBottom: '24px',
             overflowX: 'auto',
             paddingBottom: '6px',
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#0f172a transparent',
           }}
         >
           <button
@@ -241,10 +239,10 @@ export function RamsarWetlandsPage() {
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'most-asked' ? 700 : 500,
-              color: activeTab === 'most-asked' ? '#b45309' : 'var(--ink2, #64748b)',
-              background: activeTab === 'most-asked' ? '#fffbeb' : 'transparent',
+              color: activeTab === 'most-asked' ? 'var(--hl-dark, #b45309)' : 'var(--ink2, #64748b)',
+              background: activeTab === 'most-asked' ? 'var(--hl-bg, #fffbeb)' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'most-asked' ? '3px solid #b45309' : '3px solid transparent',
+              borderBottom: activeTab === 'most-asked' ? '3px solid var(--hl-dark, #b45309)' : '3px solid transparent',
               borderRadius: '8px 8px 0 0',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
@@ -266,10 +264,10 @@ export function RamsarWetlandsPage() {
               padding: '10px 18px',
               fontSize: '14.5px',
               fontWeight: activeTab === 'montreux' ? 700 : 500,
-              color: activeTab === 'montreux' ? '#b91c1c' : 'var(--ink2, #64748b)',
-              background: activeTab === 'montreux' ? '#fef2f2' : 'transparent',
+              color: activeTab === 'montreux' ? 'var(--red, #b91c1c)' : 'var(--ink2, #64748b)',
+              background: activeTab === 'montreux' ? 'var(--red-bg, #fef2f2)' : 'transparent',
               border: 'none',
-              borderBottom: activeTab === 'montreux' ? '3px solid #b91c1c' : '3px solid transparent',
+              borderBottom: activeTab === 'montreux' ? '3px solid var(--red, #b91c1c)' : '3px solid transparent',
               borderRadius: '8px 8px 0 0',
               cursor: 'pointer',
               whiteSpace: 'nowrap',
@@ -847,23 +845,23 @@ export function RamsarWetlandsPage() {
         {/* Tab 3: Montreux Record Explained */}
         {activeTab === 'montreux' && (
           <div>
-            <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+            <div style={{ background: 'var(--red-bg, #fef2f2)', border: '1px solid var(--red-border, #fecaca)', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                <ShieldAlert size={22} style={{ color: '#b91c1c' }} />
-                <h3 style={{ margin: 0, fontSize: '18px', color: '#991b1b', fontWeight: 800 }}>
+                <ShieldAlert size={22} style={{ color: 'var(--red, #b91c1c)' }} />
+                <h3 style={{ margin: 0, fontSize: '18px', color: 'var(--red, #991b1b)', fontWeight: 800 }}>
                   What is the Montreux Record? (UPSC Core Concept)
                 </h3>
               </div>
-              <p style={{ margin: 0, fontSize: '14.5px', color: '#7f1d1d', lineHeight: '1.6' }}>
+              <p style={{ margin: 0, fontSize: '14.5px', color: 'var(--ink2, #7f1d1d)', lineHeight: '1.6' }}>
                 The <strong>Montreux Record</strong> is a principal register established under Article 3.2 of the Ramsar Convention listing wetland sites on the Ramsar List where ecological changes have occurred, are occurring, or are likely to occur as a result of technological developments, pollution, or other human interference.
               </p>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(310px, 1fr))', gap: '16px', marginBottom: '28px' }}>
               {/* Site 1: Keoladeo Ghana */}
-              <div style={{ background: 'var(--card-bg, #ffffff)', border: '2px solid #fca5a5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ background: 'var(--card-bg, #ffffff)', border: '2px solid var(--red-border, #fca5a5)', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: '#fef2f2', color: '#b91c1c' }}>
+                  <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: 'var(--red-bg, #fef2f2)', color: 'var(--red, #b91c1c)' }}>
                     ⚠️ Active on Record (Since 1990)
                   </span>
                   <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Rajasthan</span>
@@ -880,9 +878,9 @@ export function RamsarWetlandsPage() {
               </div>
 
               {/* Site 2: Loktak Lake */}
-              <div style={{ background: 'var(--card-bg, #ffffff)', border: '2px solid #fca5a5', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ background: 'var(--card-bg, #ffffff)', border: '2px solid var(--red-border, #fca5a5)', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: '#fef2f2', color: '#b91c1c' }}>
+                  <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: 'var(--red-bg, #fef2f2)', color: 'var(--red, #b91c1c)' }}>
                     ⚠️ Active on Record (Since 1993)
                   </span>
                   <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Manipur</span>
@@ -893,15 +891,15 @@ export function RamsarWetlandsPage() {
                 <div style={{ fontSize: '13px', color: 'var(--ink2, #475569)' }}>
                   <strong>Basin:</strong> Manipur River (Chindwin / Irrawaddy basin)
                 </div>
-                <div style={{ fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.5', background: 'var(--bg, #f8fafc)', padding: '10px', borderRadius: '8px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--ink, #334155)', lineHeight: '1.5', background: 'var(--card-bg-subtle, #f8fafc)', padding: '10px', borderRadius: '8px' }}>
                   <strong>Reason for Inclusion:</strong> Listed in 1993 due to severe ecological disruption caused by the Ithai Barrage for the Loktak Hydroelectric Project. The barrage converted naturally fluctuating wetland water levels into a permanent reservoir, causing thinning and drowning of floating <em>Phumdis</em> (the exclusive habitat of the endangered Sangai deer).
                 </div>
               </div>
 
               {/* Site 3: Chilika Lake (Removed) */}
-              <div style={{ background: 'var(--card-bg, #ffffff)', border: '2px solid #86efac', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              <div style={{ background: 'var(--card-bg, #ffffff)', border: '2px solid var(--green-border, #86efac)', borderRadius: '12px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: '#f0fdf4', color: '#15803d' }}>
+                  <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 8px', borderRadius: '10px', background: 'var(--green-bg, #f0fdf4)', color: 'var(--green, #15803d)' }}>
                     ✅ Successfully Removed (1993–2002)
                   </span>
                   <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>Odisha</span>

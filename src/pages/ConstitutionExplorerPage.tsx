@@ -456,27 +456,27 @@ export function ConstitutionExplorerPage() {
               </div>
             </div>
 
-            <div style={{ background: '#fef2f2', padding: '12px 14px', borderRadius: '10px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Flame size={18} color="#dc2626" />
+            <div style={{ background: 'var(--red-bg, #fef2f2)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--red-border, #fecaca)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Flame size={18} color="var(--red, #dc2626)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: '#991b1b' }}>{frequencyCounts.top}</div>
-                <div style={{ fontSize: '11px', color: '#b91c1c', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--red, #991b1b)' }}>{frequencyCounts.top}</div>
+                <div style={{ fontSize: '11px', color: 'var(--red, #b91c1c)', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
               </div>
             </div>
 
-            <div style={{ background: '#fffbeb', padding: '12px 14px', borderRadius: '10px', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Zap size={18} color="#d97706" />
+            <div style={{ background: 'var(--hl-bg, #fffbeb)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--hl-border, #fde68a)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Zap size={18} color="var(--hl-dark, #d97706)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: '#92400e' }}>{CONSTITUTION_PARTS.length}</div>
-                <div style={{ fontSize: '11px', color: '#b45309', fontWeight: 600 }}>Constitutional Parts</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--hl-dark, #92400e)' }}>{CONSTITUTION_PARTS.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--hl-dark, #b45309)', fontWeight: 600 }}>Constitutional Parts</div>
               </div>
             </div>
 
-            <div style={{ background: '#eff6ff', padding: '12px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <Sparkles size={18} color="#2563eb" />
+            <div style={{ background: 'var(--blue-bg, #eff6ff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border, #bfdbfe)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={18} color="var(--blue, #2563eb)" />
               <div>
-                <div style={{ fontSize: '17px', fontWeight: 800, color: '#1e40af' }}>{KEY_AMENDMENTS.length}</div>
-                <div style={{ fontSize: '11px', color: '#1d4ed8', fontWeight: 600 }}>Landmark Amendments</div>
+                <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue, #1e40af)' }}>{KEY_AMENDMENTS.length}</div>
+                <div style={{ fontSize: '11px', color: 'var(--blue, #1d4ed8)', fontWeight: 600 }}>Landmark Amendments</div>
               </div>
             </div>
           </div>
@@ -493,8 +493,6 @@ export function ConstitutionExplorerPage() {
             marginBottom: '20px',
             overflowX: 'auto',
             paddingBottom: '6px',
-            scrollbarWidth: 'thin',
-            scrollbarColor: '#99f6e4 #f1f5f9',
           }}
         >
           <button
@@ -691,9 +689,9 @@ export function ConstitutionExplorerPage() {
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
-                    background: frequencyFilter === 'all' ? 'var(--ink, #0f172a)' : 'transparent',
+                    background: frequencyFilter === 'all' ? 'var(--brand, #0f766e)' : 'transparent',
                     color: frequencyFilter === 'all' ? '#ffffff' : 'var(--ink2, #475569)',
-                    borderColor: frequencyFilter === 'all' ? 'var(--ink, #0f172a)' : 'var(--line, #cbd5e1)',
+                    borderColor: frequencyFilter === 'all' ? 'var(--brand, #0f766e)' : 'var(--line, #cbd5e1)',
                   }}
                 >
                   All
@@ -711,9 +709,9 @@ export function ConstitutionExplorerPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    background: frequencyFilter === 'Top Tested' ? '#dc2626' : '#fef2f2',
-                    color: frequencyFilter === 'Top Tested' ? '#ffffff' : '#991b1b',
-                    borderColor: frequencyFilter === 'Top Tested' ? '#dc2626' : '#fecaca',
+                    background: frequencyFilter === 'Top Tested' ? 'var(--red, #dc2626)' : 'var(--red-bg, #fef2f2)',
+                    color: frequencyFilter === 'Top Tested' ? '#ffffff' : 'var(--red, #991b1b)',
+                    borderColor: frequencyFilter === 'Top Tested' ? 'var(--red, #dc2626)' : 'var(--red-border, #fecaca)',
                   }}
                 >
                   <Flame size={12} />
@@ -732,9 +730,9 @@ export function ConstitutionExplorerPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    background: frequencyFilter === 'Frequently Tested' ? '#d97706' : '#fffbeb',
-                    color: frequencyFilter === 'Frequently Tested' ? '#ffffff' : '#92400e',
-                    borderColor: frequencyFilter === 'Frequently Tested' ? '#d97706' : '#fde68a',
+                    background: frequencyFilter === 'Frequently Tested' ? 'var(--hl-dark, #d97706)' : 'var(--hl-bg, #fffbeb)',
+                    color: frequencyFilter === 'Frequently Tested' ? '#ffffff' : 'var(--hl-dark, #92400e)',
+                    borderColor: frequencyFilter === 'Frequently Tested' ? 'var(--hl-dark, #d97706)' : 'var(--hl-border, #fde68a)',
                   }}
                 >
                   <Zap size={12} />
@@ -753,9 +751,9 @@ export function ConstitutionExplorerPage() {
                     display: 'inline-flex',
                     alignItems: 'center',
                     gap: '4px',
-                    background: frequencyFilter === 'Moderately Tested' ? '#2563eb' : '#eff6ff',
-                    color: frequencyFilter === 'Moderately Tested' ? '#ffffff' : '#1e40af',
-                    borderColor: frequencyFilter === 'Moderately Tested' ? '#2563eb' : '#bfdbfe',
+                    background: frequencyFilter === 'Moderately Tested' ? 'var(--blue, #2563eb)' : 'var(--blue-bg, #eff6ff)',
+                    color: frequencyFilter === 'Moderately Tested' ? '#ffffff' : 'var(--blue, #1e40af)',
+                    borderColor: frequencyFilter === 'Moderately Tested' ? 'var(--blue, #2563eb)' : 'var(--blue-border, #bfdbfe)',
                   }}
                 >
                   <Bookmark size={12} />
@@ -771,9 +769,9 @@ export function ConstitutionExplorerPage() {
                     fontWeight: 600,
                     cursor: 'pointer',
                     border: '1px solid',
-                    background: frequencyFilter === 'Foundational' ? '#475569' : '#f8fafc',
-                    color: frequencyFilter === 'Foundational' ? '#ffffff' : '#64748b',
-                    borderColor: frequencyFilter === 'Foundational' ? '#475569' : '#e2e8f0',
+                    background: frequencyFilter === 'Foundational' ? 'var(--brand, #0f766e)' : 'var(--card-bg-subtle, #f8fafc)',
+                    color: frequencyFilter === 'Foundational' ? '#ffffff' : 'var(--ink2, #64748b)',
+                    borderColor: frequencyFilter === 'Foundational' ? 'var(--brand, #0f766e)' : 'var(--line, #e2e8f0)',
                   }}
                 >
                   Foundational ({frequencyCounts.found})
@@ -1131,9 +1129,9 @@ export function ConstitutionExplorerPage() {
                 const isFreqTested = art.frequency === 'Frequently Tested'
                 const isModTested = art.frequency === 'Moderately Tested'
 
-                const badgeBg = isTopTested ? '#fef2f2' : isFreqTested ? '#fffbeb' : isModTested ? '#eff6ff' : '#f8fafc'
-                const badgeColor = isTopTested ? '#991b1b' : isFreqTested ? '#92400e' : isModTested ? '#1e40af' : '#475569'
-                const badgeBorder = isTopTested ? '#fecaca' : isFreqTested ? '#fde68a' : isModTested ? '#bfdbfe' : '#e2e8f0'
+                const badgeBg = isTopTested ? 'var(--red-bg, #fef2f2)' : isFreqTested ? 'var(--hl-bg, #fffbeb)' : isModTested ? 'var(--blue-bg, #eff6ff)' : 'var(--card-bg-subtle, #f8fafc)'
+                const badgeColor = isTopTested ? 'var(--red, #991b1b)' : isFreqTested ? 'var(--hl-dark, #92400e)' : isModTested ? 'var(--blue, #1e40af)' : 'var(--ink2, #475569)'
+                const badgeBorder = isTopTested ? 'var(--red-border, #fecaca)' : isFreqTested ? 'var(--hl-border, #fde68a)' : isModTested ? 'var(--blue-border, #bfdbfe)' : 'var(--line, #e2e8f0)'
 
                 return (
                   <article

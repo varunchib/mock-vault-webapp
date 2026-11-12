@@ -9,6 +9,9 @@ const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 const BLOG_URL = `${BASE}/blog`
 const ARTICLE_URL = `${BASE}/blog/indian-rivers-and-tributaries`
+const CONSTITUTION_URL = `${BASE}/constitution-of-india`
+const HISTORY_URL = `${BASE}/modern-indian-history-timeline`
+const RAMSAR_URL = `${BASE}/ramsar-wetlands-and-national-parks`
 
 async function generate() {
   console.log('Generating sitemap fallback...')
@@ -20,19 +23,14 @@ async function generate() {
     `${BASE}/rivers-of-india`,
     `${BASE}/india-physical-geography-map`,
   )
-  if (!xml.includes(`<loc>${ARTICLE_URL}</loc>`)) {
-    if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-    xml = xml.replace(
-      '</urlset>',
-      `  <url>\n    <loc>${ARTICLE_URL}</loc>\n  </url>\n</urlset>`,
-    )
-  }
-  if (!xml.includes(`<loc>${BLOG_URL}</loc>`)) {
-    if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-    xml = xml.replace(
-      '</urlset>',
-      `  <url>\n    <loc>${BLOG_URL}</loc>\n  </url>\n</urlset>`,
-    )
+  for (const extraUrl of [ARTICLE_URL, BLOG_URL, CONSTITUTION_URL, HISTORY_URL, RAMSAR_URL]) {
+    if (!xml.includes(`<loc>${extraUrl}</loc>`)) {
+      if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+      xml = xml.replace(
+        '</urlset>',
+        `  <url>\n    <loc>${extraUrl}</loc>\n  </url>\n</urlset>`,
+      )
+    }
   }
   const locations = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1])
   const urlCount = [...xml.matchAll(/<url(?:\s|>)/g)].length

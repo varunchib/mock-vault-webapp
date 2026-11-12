@@ -1916,33 +1916,17 @@ export default {
           const blogUrl = `${BASE}/blog`
           const contactUrl = `${BASE}/contact`
           const disclaimerUrl = `${BASE}/disclaimer`
-          if (!sitemap.includes(`<loc>${articleUrl}</loc>`)) {
-            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-            sitemap = sitemap.replace(
-              '</urlset>',
-              `  <url>\n    <loc>${articleUrl}</loc>\n  </url>\n</urlset>`,
-            )
-          }
-          if (!sitemap.includes(`<loc>${blogUrl}</loc>`)) {
-            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-            sitemap = sitemap.replace(
-              '</urlset>',
-              `  <url>\n    <loc>${blogUrl}</loc>\n  </url>\n</urlset>`,
-            )
-          }
-          if (!sitemap.includes(`<loc>${contactUrl}</loc>`)) {
-            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-            sitemap = sitemap.replace(
-              '</urlset>',
-              `  <url>\n    <loc>${contactUrl}</loc>\n  </url>\n</urlset>`,
-            )
-          }
-          if (!sitemap.includes(`<loc>${disclaimerUrl}</loc>`)) {
-            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-            sitemap = sitemap.replace(
-              '</urlset>',
-              `  <url>\n    <loc>${disclaimerUrl}</loc>\n  </url>\n</urlset>`,
-            )
+          const constitutionUrl = `${BASE}/constitution-of-india`
+          const historyUrl = `${BASE}/modern-indian-history-timeline`
+          const ramsarUrl = `${BASE}/ramsar-wetlands-and-national-parks`
+          for (const extraUrl of [articleUrl, blogUrl, contactUrl, disclaimerUrl, constitutionUrl, historyUrl, ramsarUrl]) {
+            if (!sitemap.includes(`<loc>${extraUrl}</loc>`)) {
+              if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+              sitemap = sitemap.replace(
+                '</urlset>',
+                `  <url>\n    <loc>${extraUrl}</loc>\n  </url>\n</urlset>`,
+              )
+            }
           }
           headers.delete('content-length')
           return new Response(sitemap, { status: 200, headers })
