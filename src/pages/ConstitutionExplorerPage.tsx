@@ -15,6 +15,8 @@ import {
   ArrowRight,
   ArrowLeft,
   Award,
+  ScrollText,
+  Scale,
 } from 'lucide-react'
 import {
   ALL_CONSTITUTION_ARTICLES,
@@ -38,7 +40,7 @@ export type ConstitutionalSchedule = {
   articles: string
 }
 
-const KEY_AMENDMENTS: ConstitutionalAmendment[] = [
+export const KEY_AMENDMENTS: ConstitutionalAmendment[] = [
   {
     amendment: '1st Amendment Act, 1951',
     year: 1951,
@@ -146,7 +148,7 @@ const KEY_AMENDMENTS: ConstitutionalAmendment[] = [
   },
 ]
 
-const SCHEDULES_DATABASE: ConstitutionalSchedule[] = [
+export const SCHEDULES_DATABASE: ConstitutionalSchedule[] = [
   { schedule: '1st Schedule', subject: 'States and Union Territories', details: 'Names of the 28 States and 8 Union Territories along with their territorial jurisdictions and boundary extents.', articles: 'Articles 1 and 4' },
   { schedule: '2nd Schedule', subject: 'Salaries, Allowances & Emoluments', details: 'Provisions relating to the President, Governors, Speaker/Deputy Speaker of Lok Sabha & Chairman/Deputy Chairman of Rajya Sabha, Judges of Supreme Court & High Courts, and CAG.', articles: 'Articles 59(3), 65(3), 75(6), 97, 125, 148(3), 158(3), 164(5), 186, 221' },
   { schedule: '3rd Schedule', subject: 'Forms of Oaths and Affirmations', details: 'Oaths of office and secrecy for Union Ministers, MPs, Judges of Supreme Court, CAG, State Ministers, MLAs/MLCs, and Judges of High Courts. (Note: President, Vice-President, and Governor oaths are under Articles 60, 69, and 159 respectively, NOT the 3rd Schedule).', articles: 'Articles 75(4), 84(a), 99, 124(6), 148(2), 164(3), 173(a), 188, 219' },
@@ -161,32 +163,32 @@ const SCHEDULES_DATABASE: ConstitutionalSchedule[] = [
   { schedule: '12th Schedule', subject: 'Municipalities (Urban Local Government)', details: 'Added by 74th Amendment (1992). Contains 18 functional matters of Municipalities (urban planning, regulation of land use, roads, bridges, public health, fire services, solid waste management).', articles: 'Article 243W' },
 ]
 
-const POLITY_FAQS = [
+export const CONSTITUTION_EXPLORER_FAQS = [
   {
-    q: 'How many articles are there in the Constitution of India?',
-    a: 'Originally, the Constitution of India had 395 articles divided into 22 parts and 8 schedules (adopted on 26 November 1949 and enacted on 26 January 1950). Due to numerous amendments, there are now 25 parts and 12 schedules, with over 448 articles. The sequential numbering still ends at Article 395, with newer articles inserted with letter suffixes such as 21A, 39A, 51A, 243A-ZG, 300A, 338B, and 371A-J.',
+    q: 'How many articles, parts, and schedules are in the Constitution of India?',
+    a: 'Originally, the Constitution of India had 395 articles divided into 22 parts and 8 schedules (adopted on 26 November 1949 and enacted on 26 January 1950). Following numerous constitutional amendments, it now encompasses over 448 articles across 25 parts and 12 schedules. The sequential numbering continues to end at Article 395, with newly created provisions inserted with alphabetical suffixes (e.g. Articles 21A, 39A, 51A, 243A–ZG, 300A, 338B, and 371A–J).',
   },
   {
-    q: 'Which articles of the Indian Constitution are the most frequently asked in UPSC and State PSC exams?',
-    a: 'The highest-yield articles tested repeatedly in competitive exams include: Article 14 (Equality before law), Article 19 (6 Freedoms), Article 21 (Life and Personal Liberty), Article 21A (Right to Education), Article 32 (Constitutional Remedies & 5 Writs), Article 44 (Uniform Civil Code), Article 51A (Fundamental Duties), Article 72 (Presidential Pardons), Article 110 (Money Bills), Article 123 (Presidential Ordinances), Article 148 (CAG), Article 280 (Finance Commission), Article 324 (Election Commission), Article 352/356/360 (Emergency Provisions), and Article 368 (Constitutional Amendments).',
+    q: 'What is the Preamble of the Constitution of India and can it be amended?',
+    a: 'The Preamble is the preface or introduction to the Constitution, based on the "Objectives Resolution" moved by Jawaharlal Nehru on 13 December 1946. In the landmark Kesavananda Bharati case (1973), the Supreme Court ruled that the Preamble is an integral part of the Constitution and can be amended under Article 368, provided such amendment does not alter the "Basic Structure". It has been amended once by the 42nd Amendment Act (1976), which added the words "Socialist", "Secular", and "Integrity".',
   },
   {
-    q: 'What is the difference between Article 2 and Article 3 of the Constitution?',
-    a: 'Article 2 empowers Parliament to admit into the Union or establish new States that were NOT previously part of the territory of India (external territory admission, such as Sikkim). Article 3 empowers Parliament to reorganize, form new states, alter boundaries, or change names of existing Indian states by simple majority (internal reorganization).',
+    q: 'Which articles of the Indian Constitution are the most frequently asked in competitive exams?',
+    a: 'The highest-yield articles tested repeatedly in UPSC, JKPSC, and State PSC exams include: Article 14 (Equality before Law), Article 19 (6 Fundamental Freedoms), Article 21 (Protection of Life & Personal Liberty), Article 21A (Right to Education), Article 32 (Constitutional Remedies & 5 Writs), Article 44 (Uniform Civil Code), Article 51A (Fundamental Duties), Article 72 (Presidential Pardons), Article 110 (Money Bills), Article 123 (Presidential Ordinances), Article 148 (CAG), Article 280 (Finance Commission), Article 324 (Election Commission of India), Article 352/356/360 (Emergency Provisions), and Article 368 (Constituent Amendment Power).',
   },
   {
-    q: 'Why can Articles 20 and 21 not be suspended during a National Emergency?',
-    a: 'Following the abuses of the 1975–1977 Emergency, the 44th Constitutional Amendment Act, 1978 amended Article 359 to explicitly mandate that the right to protection in respect of conviction for offences (Article 20) and the right to life and personal liberty (Article 21) cannot be suspended by Presidential order even during a National Emergency.',
+    q: 'Why can Fundamental Rights under Articles 20 and 21 never be suspended during a National Emergency?',
+    a: 'Following extensive executive abuses during the 1975–1977 Emergency, the 44th Constitutional Amendment Act, 1978 amended Article 359 to mandate that the right to protection in respect of conviction for offences (Article 20) and the right to life and personal liberty (Article 21) cannot be suspended by Presidential order under any circumstances, even during a National Emergency.',
   },
   {
-    q: 'What is the distinction between "Equality Before Law" and "Equal Protection of the Laws" in Article 14?',
-    a: '"Equality before the law" is a British negative concept implying the absence of any special privileges in favor of any individual and the equal subjection of all classes to ordinary law. "Equal protection of the laws" is an American positive concept implying equality of treatment under equal circumstances, allowing the State to make reasonable classifications for affirmative action.',
+    q: 'Is the Preamble legally enforceable in an Indian court of law?',
+    a: 'No, the Preamble of the Constitution of India is non-justiciable. It is neither a direct source of power to the legislature nor a prohibition upon the powers of the legislature. Its provisions cannot be directly enforced in a court of law, but it serves as an interpretive guide for constitutional courts when statutes are ambiguous.',
   },
 ]
 
 export function ConstitutionExplorerPage() {
   const [search, setSearch] = React.useState('')
-  const [activeTab, setActiveTab] = React.useState<'articles' | 'most-asked' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
+  const [activeTab, setActiveTab] = React.useState<'articles' | 'preamble' | 'most-asked' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
   // On coming to this page, Part I is automatically selected as requested
   const [partFilter, setPartFilter] = React.useState<string>('Part I')
   const [frequencyFilter, setFrequencyFilter] = React.useState<'all' | ExamFrequency>('all')
@@ -195,8 +197,8 @@ export function ConstitutionExplorerPage() {
   const articlesTopRef = React.useRef<HTMLDivElement>(null)
 
   usePageMeta({
-    title: 'Constitution of India: Articles 1–395, Exam Frequency & Teaching Guide | Ministry of Papers',
-    description: 'Master every article of the Indian Constitution with linewise student explanations, verified past examination frequency rankings (UPSC, JKPSC, SSC, State PSCs), and landmark Supreme Court rulings.',
+    title: 'Constitution of India: Articles 1–395, Preamble, Parts & Exam Rankings | Ministry of Papers',
+    description: 'Master the Constitution of India: Authentic Preamble, all 395+ articles across 25 parts, verified PYQ exam frequency rankings, student teaching notes, and landmark Supreme Court rulings for UPSC, JKPSC CCE, and State PSCs.',
     canonicalPath: '/constitution-of-india',
   })
 
@@ -328,8 +330,31 @@ export function ConstitutionExplorerPage() {
     '@context': 'https://schema.org',
     '@graph': [
       {
+        '@type': 'LearningResource',
+        name: 'Interactive Constitution of India Explorer: Preamble, Articles 1–395 & Exam Frequency',
+        description: 'Comprehensive pedagogical directory of the Constitution of India: full text of Preamble, all 395+ articles across 25 parts, student teaching notes, PYQ appearance rankings, and Supreme Court jurisprudence.',
+        url: 'https://ministryofpapers.com/constitution-of-india',
+        educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
+        learningResourceType: 'Study guide and primary legal reference',
+        isAccessibleForFree: true,
+        inLanguage: 'en-IN',
+        provider: {
+          '@type': 'Organization',
+          name: 'Ministry of Papers',
+          url: 'https://ministryofpapers.com',
+        },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
+            { '@type': 'ListItem', position: 2, name: 'Study Tools', item: 'https://ministryofpapers.com/exams' },
+            { '@type': 'ListItem', position: 3, name: 'Constitution of India Explorer', item: 'https://ministryofpapers.com/constitution-of-india' },
+          ],
+        },
+      },
+      {
         '@type': 'Article',
-        headline: 'Constitution of India: Linewise Articles 1–395 and Exam Frequency',
+        headline: 'Constitution of India: Articles 1–395, Preamble, Parts & Exam Frequency Rankings',
         description: 'Complete directory of Indian Constitution articles with linewise student explanations, exam frequency rankings, and landmark Supreme Court rulings for UPSC and State PSC exams.',
         author: {
           '@type': 'Organization',
@@ -351,7 +376,7 @@ export function ConstitutionExplorerPage() {
       },
       {
         '@type': 'FAQPage',
-        mainEntity: POLITY_FAQS.map((faq) => ({
+        mainEntity: CONSTITUTION_EXPLORER_FAQS.map((faq) => ({
           '@type': 'Question',
           name: faq.q,
           acceptedAnswer: {
@@ -385,7 +410,7 @@ export function ConstitutionExplorerPage() {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
             <span className="public-kicker" style={{ margin: 0 }}>Interactive Polity Study Suite</span>
             <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
-              All 395 Articles · 25 Parts · Verified PYQs
+              Preamble + Articles 1–395 · 25 Parts · Verified PYQs
             </span>
           </div>
           <h1
@@ -398,10 +423,10 @@ export function ConstitutionExplorerPage() {
               lineHeight: '1.2',
             }}
           >
-            Constitution of India: Articles, Parts &amp; Exam Rankings
+            Constitution of India: Preamble, Articles &amp; Exam Rankings
           </h1>
           <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
-            Read and learn every article of the Indian Constitution line by line. Easily switch through all 25 Parts, discover the most frequently asked articles in competitive exams, and understand foundational principles with student-friendly explanations.
+            Read and master every article of the Indian Constitution line by line. Explore the foundational Preamble, seamlessly navigate all 25 Parts, discover the most frequently asked articles in competitive exams, and understand core legal principles with student-friendly explanations.
           </p>
 
           {/* Quick Metrics Ribbon */}
@@ -474,6 +499,28 @@ export function ConstitutionExplorerPage() {
             }}
           >
             All Articles (395+)
+          </button>
+
+          <button
+            onClick={() => setActiveTab('preamble')}
+            style={{
+              padding: '10px 14px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'preamble' ? '3px solid #b45309' : '3px solid transparent',
+              color: activeTab === 'preamble' ? '#b45309' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            <ScrollText size={15} color={activeTab === 'preamble' ? '#b45309' : 'var(--ink2, #64748b)'} />
+            Preamble of India
           </button>
 
           <button
@@ -567,7 +614,7 @@ export function ConstitutionExplorerPage() {
               whiteSpace: 'nowrap',
             }}
           >
-            Exam FAQs ({POLITY_FAQS.length})
+            Exam FAQs ({CONSTITUTION_EXPLORER_FAQS.length})
           </button>
         </div>
 
@@ -584,7 +631,7 @@ export function ConstitutionExplorerPage() {
                 padding: '16px 20px',
                 borderRadius: '12px',
                 border: '1px solid var(--line, #e2e8f0)',
-                marginBottom: '20px',
+                marginBottom: '16px',
               }}
             >
               <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '14px' }}>
@@ -767,6 +814,53 @@ export function ConstitutionExplorerPage() {
                 )}
               </div>
             </div>
+
+            {/* Preamble Callout Card when on Part I */}
+            {partFilter === 'Part I' && (
+              <div
+                style={{
+                  background: 'linear-gradient(135deg, #fefce8, #fffbeb)',
+                  border: '1px solid #fde68a',
+                  borderRadius: '10px',
+                  padding: '14px 18px',
+                  marginBottom: '16px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '10px',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <ScrollText size={22} color="#b45309" />
+                  <div>
+                    <strong style={{ fontSize: '13.5px', color: '#92400e', display: 'block' }}>
+                      Preceding Part I: The Preamble of the Constitution of India
+                    </strong>
+                    <span style={{ fontSize: '12.5px', color: '#78350f' }}>
+                      &ldquo;We, the People of India, having solemnly resolved to constitute India into a Sovereign Socialist Secular Democratic Republic...&rdquo;
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setActiveTab('preamble')}
+                  style={{
+                    padding: '6px 14px',
+                    borderRadius: '6px',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    background: '#b45309',
+                    color: '#ffffff',
+                    border: 'none',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  Read Full Preamble Breakdown →
+                </button>
+              </div>
+            )}
 
             {/* Current Part Banner */}
             {currentPartInfo && partFilter !== 'all' && (
@@ -1050,7 +1144,244 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 2: 🔥 MOST ASKED ARTICLES IN EXAMS (ORDERED BY MOST ASKED ON TOP) */}
+        {/* Tab 2: 📜 PREAMBLE OF INDIA (FULL ANALYSIS, KEYWORDS, LANDMARK CASES) */}
+        {activeTab === 'preamble' && (
+          <div style={{ maxWidth: '860px', margin: '0 auto' }}>
+            {/* Authentic Ornate Preamble Plaque */}
+            <div
+              style={{
+                background: 'linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%)',
+                border: '2px solid #d97706',
+                borderRadius: '16px',
+                padding: '36px 32px',
+                boxShadow: '0 4px 20px rgba(180, 83, 9, 0.12)',
+                marginBottom: '28px',
+                textAlign: 'center',
+              }}
+            >
+              <span style={{ fontSize: '13px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '2px', color: '#b45309', display: 'block', marginBottom: '8px' }}>
+                The Constitution of India
+              </span>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-heading, "Fraunces", serif)',
+                  fontSize: 'clamp(26px, 4vw, 36px)',
+                  color: '#78350f',
+                  margin: '0 0 20px',
+                  letterSpacing: '1px',
+                }}
+              >
+                PREAMBLE
+              </h2>
+
+              <div
+                style={{
+                  fontSize: '16px',
+                  lineHeight: '2.1',
+                  color: '#451a03',
+                  textAlign: 'justify',
+                  maxWidth: '720px',
+                  margin: '0 auto',
+                  fontFamily: 'Georgia, "Times New Roman", serif',
+                }}
+              >
+                <p style={{ margin: '0 0 16px' }}>
+                  <strong>WE, THE PEOPLE OF INDIA</strong>, having solemnly resolved to constitute India into a{' '}
+                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOVEREIGN</strong>{' '}
+                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SOCIALIST</strong>{' '}
+                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>SECULAR</strong>{' '}
+                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>DEMOCRATIC</strong>{' '}
+                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>REPUBLIC</strong> and to secure to all its citizens:
+                </p>
+
+                <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
+                  <strong>JUSTICE</strong>, social, economic and political;
+                </p>
+
+                <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
+                  <strong>LIBERTY</strong> of thought, expression, belief, faith and worship;
+                </p>
+
+                <p style={{ margin: '0 0 12px', paddingLeft: '20px' }}>
+                  <strong>EQUALITY</strong> of status and of opportunity; and to promote among them all;
+                </p>
+
+                <p style={{ margin: '0 0 20px', paddingLeft: '20px' }}>
+                  <strong>FRATERNITY</strong> assuring the dignity of the individual and the{' '}
+                  <strong style={{ color: '#92400e', textDecoration: 'underline' }}>unity and integrity of the Nation</strong>;
+                </p>
+
+                <p style={{ margin: 0, fontStyle: 'italic', fontWeight: 600 }}>
+                  <strong>IN OUR CONSTITUENT ASSEMBLY</strong> this twenty-sixth day of November, 1949, do{' '}
+                  <strong>HEREBY ADOPT, ENACT AND GIVE TO OURSELVES THIS CONSTITUTION</strong>.
+                </p>
+              </div>
+
+              <div style={{ marginTop: '24px', paddingTop: '16px', borderTop: '1px solid #fde68a', fontSize: '12px', color: '#92400e', fontWeight: 600 }}>
+                Adopted by the Constituent Assembly on 26 November 1949 · Enacted on 26 January 1950 · Amended once via 42nd Amendment Act 1976
+              </div>
+            </div>
+
+            {/* 4 Core Ingredients Breakdown */}
+            <div style={{ marginBottom: '28px' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
+                4 Core Ingredients of the Preamble
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '14px' }}>
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>1. Source of Authority</strong>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    Derives its authority directly from the people of India (<em>&ldquo;We, the People&rdquo;</em>). Sovereignty resides with the citizens, not with any external power or hereditary ruler.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>2. Nature of the Indian State</strong>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    Declares India to be a Sovereign, Socialist, Secular, Democratic, and Republican polity.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>3. Statement of Objectives</strong>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    Specifies Justice (social, economic, political), Liberty, Equality, and Fraternity as the grand constitutional objectives to be secured for all citizens.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <strong style={{ color: 'var(--brand, #0f766e)', fontSize: '13px', display: 'block', marginBottom: '4px' }}>4. Date of Adoption</strong>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    Adopted on November 26, 1949 (celebrated nationwide as <em>Constitution Day / Samvidhan Diwas</em>). Came into full force on January 26, 1950 (Republic Day).
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Keyword Semantic Analysis */}
+            <div style={{ marginBottom: '28px' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px' }}>
+                Key Constitutional Terms Explained
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Sovereign</h4>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    India is completely independent, supreme internally, and free from any external control. India can acquire foreign territory or cede a part of its territory in accordance with constitutional procedures (Article 1 to 4).
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
+                    Socialist <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
+                  </h4>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    India adheres to <strong>Democratic Socialism</strong> (a mixed economy where public and private sectors co-exist), not Communist state socialism. Its goal is the elimination of poverty, disease, and inequality of opportunity through welfare policies.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>
+                    Secular <span style={{ fontSize: '11px', background: '#fef3c7', color: '#92400e', padding: '2px 6px', borderRadius: '4px', marginLeft: '6px' }}>Added by 42nd Amendment 1976</span>
+                  </h4>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    Follows the <strong>positive concept of secularism</strong> (<em>Sarva Dharma Sambhava</em>): all religions in India enjoy equal status, protection, and respect from the State, operationalized via Articles 25 to 28.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Democratic &amp; Republic</h4>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    <strong>Democratic:</strong> Established on representative parliamentary democracy, regular periodic elections, universal adult suffrage (Article 326), and judicial review.
+                    <br />
+                    <strong>Republic:</strong> The head of the State (President of India) is elected indirectly by the people for a fixed term of 5 years (not hereditary like the British Crown). All public offices are open to all citizens without discrimination.
+                  </p>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)' }}>
+                  <h4 style={{ fontSize: '16px', color: 'var(--brand, #0f766e)', margin: '0 0 6px' }}>Justice, Liberty, Equality &amp; Fraternity</h4>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', margin: 0, lineHeight: '1.6' }}>
+                    <strong>Justice:</strong> Social, Economic, and Political (borrowed from the 1917 Russian Revolution).
+                    <br />
+                    <strong>Liberty, Equality &amp; Fraternity:</strong> Ideals borrowed from the 1789 French Revolution. The word <strong>&ldquo;Integrity&rdquo;</strong> was inserted into Fraternity by the 42nd Constitutional Amendment Act, 1976.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Landmark Judicial Doctrine on Preamble */}
+            <div style={{ marginBottom: '28px' }}>
+              <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', color: 'var(--ink, #0f172a)', margin: '0 0 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Scale size={20} color="var(--brand, #0f766e)" />
+                Landmark Supreme Court Jurisprudence on the Preamble
+              </h3>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: '10px', padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '15px', color: '#991b1b' }}>In re Berubari Union Case (1960)</strong>
+                    <span style={{ fontSize: '11.5px', background: '#fee2e2', color: '#b91c1c', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>8-Judge Bench</span>
+                  </div>
+                  <p style={{ fontSize: '13.5px', color: '#7f1d1d', margin: 0, lineHeight: '1.5' }}>
+                    The Supreme Court opined that the Preamble is a key to open the mind of the constitution makers, but held that <strong>the Preamble is NOT a part of the Constitution</strong>.
+                  </p>
+                </div>
+
+                <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '10px', padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '15px', color: '#166534' }}>Kesavananda Bharati v. State of Kerala (1973)</strong>
+                    <span style={{ fontSize: '11.5px', background: '#dcfce7', color: '#15803d', padding: '2px 8px', borderRadius: '4px', fontWeight: 700 }}>Historic 13-Judge Bench</span>
+                  </div>
+                  <p style={{ fontSize: '13.5px', color: '#14532d', margin: '0 0 6px', lineHeight: '1.5' }}>
+                    Overruled the Berubari opinion and established three core constitutional doctrines:
+                  </p>
+                  <ul style={{ margin: 0, paddingLeft: '18px', fontSize: '13px', color: '#14532d', lineHeight: '1.5' }}>
+                    <li>The Preamble <strong>IS an integral part of the Constitution</strong>.</li>
+                    <li>The Preamble <strong>can be amended</strong> under Article 368.</li>
+                    <li>Amendments to the Preamble cannot damage or destroy the <strong>Basic Structure</strong>.</li>
+                  </ul>
+                </div>
+
+                <div style={{ background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '10px', padding: '16px 20px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                    <strong style={{ fontSize: '15px', color: 'var(--ink, #0f172a)' }}>LIC of India Case (1995)</strong>
+                    <span style={{ fontSize: '11.5px', background: '#f1f5f9', color: '#475569', padding: '2px 8px', borderRadius: '4px', fontWeight: 600 }}>Reaffirmation</span>
+                  </div>
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', margin: 0, lineHeight: '1.5' }}>
+                    Supreme Court once again reaffirmed that the Preamble is an integral part of the Constitution. However, it confirmed that the Preamble is <strong>non-justiciable</strong> (its provisions are not enforceable in courts of law).
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Practice Banner on Preamble */}
+            <div style={{ textAlign: 'center', padding: '20px', background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '12px' }}>
+              <h4 style={{ fontSize: '16px', margin: '0 0 6px', color: 'var(--ink, #0f172a)' }}>
+                Test Your Knowledge on the Preamble
+              </h4>
+              <p style={{ fontSize: '13px', color: 'var(--ink2, #475569)', margin: '0 0 12px' }}>
+                Practice UPSC &amp; State PSC previous year questions on the Objectives Resolution, 42nd Amendment, and Supreme Court rulings.
+              </p>
+              <Link
+                to="/exam/upsc-cse?tab=subjects&subject=Indian%20Polity"
+                style={{
+                  display: 'inline-block',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  color: '#ffffff',
+                  background: 'var(--brand, #0f766e)',
+                  padding: '8px 18px',
+                  borderRadius: '6px',
+                  textDecoration: 'none',
+                }}
+              >
+                Solve Preamble PYQs Free →
+              </Link>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: 🔥 MOST ASKED ARTICLES IN EXAMS (ORDERED BY MOST ASKED ON TOP) */}
         {activeTab === 'most-asked' && (
           <div>
             {/* Banner */}
@@ -1293,7 +1624,7 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 3: PARTS OF THE CONSTITUTION (25 PARTS) */}
+        {/* Tab 4: PARTS OF THE CONSTITUTION (25 PARTS) */}
         {activeTab === 'parts' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
             {CONSTITUTION_PARTS.map((p) => (
@@ -1350,7 +1681,7 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 4: LANDMARK AMENDMENTS (15) */}
+        {/* Tab 5: LANDMARK AMENDMENTS (15) */}
         {activeTab === 'amendments' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {filteredAmendments.map((am) => (
@@ -1390,7 +1721,7 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 5: ALL 12 SCHEDULES */}
+        {/* Tab 6: ALL 12 SCHEDULES */}
         {activeTab === 'schedules' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             {filteredSchedules.map((sch) => (
@@ -1416,14 +1747,14 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Tab 6: EXAM FAQS (5) */}
+        {/* Tab 7: EXAM FAQS (5) */}
         {activeTab === 'faq' && (
           <div style={{ maxWidth: '840px', margin: '0 auto' }}>
             <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink, #0f172a)' }}>
               Frequently Asked Questions on the Constitution of India
             </h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {POLITY_FAQS.map((faq, idx) => {
+              {CONSTITUTION_EXPLORER_FAQS.map((faq, idx) => {
                 const isOpen = openFaqIndex === idx
                 return (
                   <div
@@ -1507,7 +1838,7 @@ export function ConstitutionExplorerPage() {
             Practice Solved Indian Polity Previous Year Questions
           </h2>
           <p style={{ fontSize: '14px', color: 'var(--ink2, #475569)', maxWidth: '640px', margin: '0 auto 18px', lineHeight: '1.6' }}>
-            Test your understanding of Fundamental Rights, DPSP, Parliament, Executive, and Constitutional Amendments against real exam questions from UPSC Prelims, JKPSC CCE, SSC CGL, and CDS.
+            Test your understanding of the Preamble, Fundamental Rights, DPSP, Parliament, Executive, and Constitutional Amendments against real exam questions from UPSC Prelims, JKPSC CCE, SSC CGL, and CDS.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link

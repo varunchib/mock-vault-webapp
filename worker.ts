@@ -19,6 +19,7 @@ import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
 import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
 import { TermsPage } from './src/pages/TermsPage'
 import { RiversOfIndiaPage, GEOGRAPHY_MAP_FAQS } from './src/pages/RiversOfIndiaPage'
+import { ConstitutionExplorerPage, CONSTITUTION_EXPLORER_FAQS } from './src/pages/ConstitutionExplorerPage'
 import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
@@ -292,6 +293,45 @@ const STATIC_META: Record<string, PageMeta> = {
         '@context': 'https://schema.org',
         '@type': 'FAQPage',
         mainEntity: GEOGRAPHY_MAP_FAQS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      },
+    ],
+  },
+  '/constitution-of-india': {
+    title: 'Constitution of India: Articles 1–395, Preamble, Parts & Exam Rankings | Ministry of Papers',
+    description: 'Master the Constitution of India: Authentic Preamble, all 395+ articles across 25 parts, verified PYQ exam frequency rankings, student teaching notes, and landmark Supreme Court rulings.',
+    contentHtml: renderStaticPage('/constitution-of-india', createElement(ConstitutionExplorerPage)),
+    jsonLd: [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'LearningResource',
+        name: 'Interactive Constitution of India Explorer: Preamble, Articles 1–395 & Exam Frequency',
+        description: 'Comprehensive pedagogical directory of the Constitution of India: full text of Preamble, all 395+ articles across 25 parts, student teaching notes, PYQ appearance rankings, and Supreme Court jurisprudence.',
+        url: `${BASE}/constitution-of-india`,
+        educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
+        learningResourceType: 'Study guide and primary legal reference',
+        isAccessibleForFree: true,
+        inLanguage: 'en-IN',
+        provider: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+        breadcrumb: {
+          '@type': 'BreadcrumbList',
+          itemListElement: [
+            { '@type': 'ListItem', position: 1, name: 'Home', item: BASE },
+            { '@type': 'ListItem', position: 2, name: 'Study Tools', item: `${BASE}/exams` },
+            { '@type': 'ListItem', position: 3, name: 'Constitution of India Explorer', item: `${BASE}/constitution-of-india` },
+          ],
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: CONSTITUTION_EXPLORER_FAQS.map((faq) => ({
           '@type': 'Question',
           name: faq.q,
           acceptedAnswer: {
