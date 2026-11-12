@@ -10,6 +10,45 @@ export function stripQuestionNumberPrefix(text: string): string {
 }
 
 /**
+ * Strip paper-level passage range headers such as "**Passage for Questions (96-100)**"
+ * or "Directions (Q. 91-95): Read the following passage..." so standalone question pages
+ * render the passage cleanly without question-range numbers.
+ */
+export function cleanPassageText(text: string | undefined | null): string {
+  if (!text) return ''
+  return text
+    .replace(/^\s*(?:\*\*?)?(?:passage|directions?)\s*(?:for\s+questions?)?\s*\(?q?\.?\s*\d+\s*[-–—to]+\s*\d+\)?\s*:?(?:\*\*?)?\s*(?:read\s+the\s+following\s+passage[^\n]*\n+)?\s*/i, '')
+    .replace(/^\s*read\s+the\s+following\s+passage\s+and\s+answer[^\n]*\n+\s*/i, '')
+    .trim()
+}
+
+/**
+ * Build a concise, non-repetitive exam/paper appearance badge for a standalone question page
+ * (e.g., "JKCCE Prelims 2025 - GS Paper II (Set B)" or "UPSC CSE 2025 · GS Paper I").
+ */
+export function formatQuestionExamTag(q: { examName?: string; year?: string | number; paper?: string }): string {
+  const exam = (q.examName ?? '').trim()
+  const year = String(q.year ?? '').trim()
+  const paper = (q.paper ?? '').trim()
+  if (!paper) return year && !exam.includes(year) ? `${exam} (${year})` : exam
+
+  // Extract acronym inside parentheses if present, e.g. "JKPSC Combined Competitive Examination (JKCCE)" -> "JKCCE"
+  const parenAcronym = exam.match(/\(([A-Z0-9\s-]{3,})\)/)?.[1]?.trim()
+  const firstWord = exam.split(/\s+/)[0] ?? ''
+  const paperHasExam =
+    paper.toLowerCase().includes(exam.toLowerCase()) ||
+    (parenAcronym && paper.toLowerCase().includes(parenAcronym.toLowerCase())) ||
+    (firstWord.length >= 3 && paper.toLowerCase().startsWith(firstWord.toLowerCase()))
+
+  if (paperHasExam) {
+    if (year && !paper.includes(year)) return `${paper} (${year})`
+    return paper
+  }
+  const baseExam = parenAcronym ? exam.replace(/\s*\([^)]+\)/, ` (${parenAcronym})`) : exam
+  return `${baseExam}${year && !baseExam.includes(year) ? ` ${year}` : ''} · ${paper}`
+}
+
+/**
  * Turn question text into a short, hyphenated keyword slug for the URL.
  *
  * MUST stay byte-identical to keywordify() in

@@ -33,7 +33,16 @@ function pipeCount(line: string): number {
 }
 
 function cells(line: string): string[] {
-  return line.split('|').map(c => c.trim())
+  const trimmed = line.trim()
+  const inner =
+    trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length >= 2
+      ? trimmed.slice(1, -1)
+      : line
+  return inner.split('|').map(c => c.trim())
+}
+
+function isMarkdownSeparatorRow(row: string[]): boolean {
+  return row.length > 0 && row.every(c => /^:?-{2,}:?$/.test(c))
 }
 
 export function splitTableBlocks(text: string): TextSegment[] {
@@ -63,9 +72,10 @@ export function splitTableBlocks(text: string): TextSegment[] {
     let j = i
     while (j < lines.length && pipeCount(lines[j]) === count) j++
 
-    if (j - i >= MIN_ROWS) {
+    const parsedRows = lines.slice(i, j).map(cells).filter(r => !isMarkdownSeparatorRow(r))
+    if (parsedRows.length >= MIN_ROWS) {
       flushText()
-      out.push({ kind: 'table', rows: lines.slice(i, j).map(cells) })
+      out.push({ kind: 'table', rows: parsedRows })
     } else {
       for (let k = i; k < j; k++) buffer.push(lines[k])
     }

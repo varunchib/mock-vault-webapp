@@ -154,13 +154,16 @@ function parsePipeMatch(text: string): MatchData | null {
 
 const PAIR_MARKER_RE = /^(\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+([\s\S]+)$/
 const PAIR_ROW_RE = /^(?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+(.+?)\s+—\s+(.+)$/
+const PAIR_EMPTY_LEFT_RE = /^—\s+((?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+.+)$/
 
 function splitEmDash(line: string): string[] {
+  const m = line.match(PAIR_EMPTY_LEFT_RE)
+  if (m) return ['', m[1].trim()]
   return line.split(/\s+—\s+/).map(c => c.trim())
 }
 
 function isPairRow(line: string): boolean {
-  return line.includes(' — ') && PAIR_ROW_RE.test(line)
+  return (line.includes(' — ') && PAIR_ROW_RE.test(line)) || PAIR_EMPTY_LEFT_RE.test(line)
 }
 
 function isPairHeader(line: string, expectedCols: number): boolean {
@@ -252,9 +255,9 @@ function isInstructionLine(line: string): boolean {
 // statement list gave the eye nothing to latch onto. Each role below now gets
 // its own treatment.
 
-// "Assertion (A): …", "Reason (R): …", "Statement I: …"
+// "Assertion (A): …", "Reason (R): …", "Reasoning (R): …", "(A) …", "(R)(1) …", "Statement I: …"
 const LABELLED_RE =
-  /^((?:Assertion|Reason)\s*\([AR]\)|Statement\s*(?:[-–—]\s*)?(?:I{1,3}|IV|[1-4])|Statement\s*\([A-D]\))\s*:\s*([\s\S]+)$/i
+  /^((?:Assertion|Reason(?:ing)?)\s*\([AR]\)(?:\(\d+\))?\s*:|\([AR]\)(?:\(\d+\))?(?:\s*:)?|Statement\s*(?:[-–—]\s*)?(?:I{1,3}|IV|[1-4])\s*:|Statement\s*\([A-D]\)\s*:)\s*([\s\S]+)$/i
 
 // "1. Kathmandu", "A. Appalachian", "2) Nathu La", and the Roman-numeral
 // statement lists UPSC uses ("I. There is wide occurrence of spindle-whorls…").
@@ -456,7 +459,7 @@ function MultilineText({ text, className, asH1 }: { text: string; className?: st
     if (header) { blocks.push({ k: 'colhead', label: header[1] }); continue }
 
     const labelled = line.match(LABELLED_RE)
-    if (labelled) { blocks.push({ k: 'claim', label: labelled[1], body: labelled[2] }); continue }
+    if (labelled) { blocks.push({ k: 'claim', label: labelled[1].replace(/\s*:\s*$/, ''), body: labelled[2] }); continue }
 
     // A numbered/lettered list, but only when at least two such lines run
     // together — a lone "A. P. J. Abdul Kalam was…" is prose, not a list.

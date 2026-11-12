@@ -35,6 +35,7 @@ import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/qu
 import { ExplanationText } from '../components/common/ExplanationText'
 import { Logo } from '../components/ui/Logo'
 import { paperPath } from '../lib/paperSeo'
+import { cleanPassageText } from '../lib/questionUrl'
 import { usePageMeta } from '../lib/usePageMeta'
 import { paperAttemptSeoTitle } from '../lib/pageTitles'
 
@@ -1214,7 +1215,7 @@ export function PaperAttemptPage() {
                 {localizedCurrent?.passage && (
                   <div className="pyq-passage">
                     <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
-                    <QuestionRenderer text={localizedCurrent.passage} />
+                    <QuestionRenderer text={cleanPassageText(localizedCurrent.passage)} />
                   </div>
                 )}
                 <div className="pa-q-text">

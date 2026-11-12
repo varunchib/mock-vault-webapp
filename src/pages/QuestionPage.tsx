@@ -12,7 +12,7 @@ import { usePageMeta } from '../lib/usePageMeta'
 import { questionSeoTitle, questionSeoDescription } from '../lib/pageTitles'
 import { env } from '../lib/env'
 import { paperPath } from '../lib/paperSeo'
-import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from '../lib/questionUrl'
+import { cleanPassageText, formatQuestionExamTag, questionPath, questionRealSlug, stripQuestionNumberPrefix } from '../lib/questionUrl'
 import { questionHeadingLine } from '../lib/questionHeading'
 import { removeRedundantAnswerLead } from '../lib/explanationText'
 
@@ -119,7 +119,11 @@ export function QuestionPage() {
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
           { '@type': 'ListItem', position: 2, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug}` },
-          { '@type': 'ListItem', position: 3, name: `Q.${question.questionNo}`, item: `https://ministryofpapers.com${questionPath(question.urlCode ?? question.slug, question.question)}` },
+          ...(question.paperSlug
+            ? [{ '@type': 'ListItem', position: 3, name: question.paper || `${question.year} question paper`, item: `https://ministryofpapers.com${paperPath(question.paperSlug)}` }]
+            : question.subject
+            ? [{ '@type': 'ListItem', position: 3, name: question.subject, item: `https://ministryofpapers.com/exam/${question.examSlug}` }]
+            : []),
         ],
       },
     } : undefined,
@@ -144,6 +148,7 @@ export function QuestionPage() {
   const isPending = question.answerKey === 'Pending'
   const localized = getLocalizedQuestion(question, language)
   const displayQuestion = stripQuestionNumberPrefix(localized.question)
+  const cleanedPassage = cleanPassageText(localized.passage)
   const hasHindiVersion = hasHindi(question)
   const answerOption = question.options.find(o => o.key === question.answerKey)
 
@@ -157,7 +162,7 @@ export function QuestionPage() {
     <section className="public-page">
       <div className="public-shell narrow">
 
-        {/* Keep the public breadcrumb on the exam and paper hierarchy. */}
+        {/* Keep the public breadcrumb on the exam, paper, and subject hierarchy. */}
         <nav className="ep-breadcrumb" aria-label="Breadcrumb">
           <Link to="/">Home</Link>
           <ChevronRight size={13} />
@@ -168,16 +173,19 @@ export function QuestionPage() {
               <Link to={paperPath(question.paperSlug)}>{question.paper || `${question.year} question paper`}</Link>
             </>
           )}
-          <ChevronRight size={13} />
-          <span>Question {question.questionNo}</span>
+          {question.subject && (
+            <>
+              <ChevronRight size={13} />
+              <span>{question.subject}</span>
+            </>
+          )}
         </nav>
 
-        {/* Unified Question + Solution Card (industry-standard single header) */}
+        {/* Unified Question + Solution Card (standalone question view) */}
         <article className="pyq-question-card">
 
           <div className="pyq-q-header qpage-card-header">
             <div className="qpage-card-meta">
-              <span className="pyq-q-num">Q.{question.questionNo}</span>
               {question.subject && (
                 <Link
                   className="pyq-q-subject pyq-q-subject-link"
@@ -188,15 +196,19 @@ export function QuestionPage() {
                   {question.subject}
                 </Link>
               )}
-              <span className="qpage-card-source">
-                {question.examName}{question.year ? ` (${question.year})` : ''}
-                {question.paperSlug && (
-                  <>
-                    {' · '}
-                    <Link to={paperPath(question.paperSlug)}>{question.paper}</Link>
-                  </>
-                )}
-              </span>
+              {question.paperSlug ? (
+                <Link
+                  className="qpage-exam-tag"
+                  to={paperPath(question.paperSlug)}
+                  title={`Appeared in ${formatQuestionExamTag(question)}`}
+                >
+                  {formatQuestionExamTag(question)}
+                </Link>
+              ) : (
+                <Link className="qpage-exam-tag" to={`/exam/${question.examSlug}`}>
+                  {formatQuestionExamTag(question)}
+                </Link>
+              )}
             </div>
             <div className="qpage-card-actions">
               {hasHindiVersion && (
@@ -211,10 +223,10 @@ export function QuestionPage() {
             </div>
           </div>
 
-          {localized.passage && (
+          {cleanedPassage && (
             <div className="pyq-passage">
               <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
-              <QuestionRenderer text={localized.passage} />
+              <QuestionRenderer text={cleanedPassage} />
             </div>
           )}
 
@@ -224,7 +236,7 @@ export function QuestionPage() {
                 <img
                   key={i}
                   src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`}
-                  alt={`${question.examName} ${question.year} Q${question.questionNo} diagram`}
+                  alt={`${question.examName} ${question.year} ${question.subject || 'question'} diagram`}
                   className="pyq-q-img"
                 />
               ))}

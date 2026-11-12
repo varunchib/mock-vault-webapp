@@ -19,6 +19,7 @@ import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { paperGuideMap } from '../data/postGuides'
 import { apiPaperSlug, paperPath, paperSeoOverride } from '../lib/paperSeo'
+import { cleanPassageText } from '../lib/questionUrl'
 import { buildPaperFaqs, formatHeldOn, paperFaqJsonLd } from '../lib/paperFaqs'
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D']
@@ -291,6 +292,32 @@ export function PyqPaperPage() {
       <div className="pyq-question-list">
         {visibleQuestions.map((q, index) => {
           const localized = getLocalizedQuestion(q, language)
+          const cleanedPassage = cleanPassageText(localized.passage)
+          const prevPassage = index > 0
+            ? cleanPassageText(getLocalizedQuestion(visibleQuestions[index - 1], language).passage)
+            : ''
+          const isRepeatedPassage = Boolean(cleanedPassage && cleanedPassage === prevPassage)
+          let groupStart = index + 1
+          let groupEnd = index + 1
+          if (cleanedPassage) {
+            while (
+              groupStart > 1 &&
+              cleanPassageText(getLocalizedQuestion(visibleQuestions[groupStart - 2], language).passage) === cleanedPassage
+            ) {
+              groupStart--
+            }
+            while (
+              groupEnd < visibleQuestions.length &&
+              cleanPassageText(getLocalizedQuestion(visibleQuestions[groupEnd], language).passage) === cleanedPassage
+            ) {
+              groupEnd++
+            }
+          }
+          const passageLabel = language === 'hi'
+            ? 'अनुच्छेद'
+            : groupEnd > groupStart
+            ? `Passage (Q${groupStart}–Q${groupEnd})`
+            : 'Passage'
           const isDeleted = q.answerKey === 'Deleted'
           const chosen = selectedAnswers[q.slug]
           const isRevealed = revealed[q.slug]
@@ -312,11 +339,21 @@ export function PyqPaperPage() {
                 {isDeleted && <span className="pyq-deleted-badge">Deleted</span>}
               </div>
 
-              {localized.passage && (
-                <div className="pyq-passage">
-                  <strong>{language === 'hi' ? 'अनुच्छेद' : 'Passage'}</strong>
-                  <QuestionRenderer text={localized.passage} />
-                </div>
+              {cleanedPassage && (
+                isRepeatedPassage ? (
+                  <details className="pyq-passage pyq-passage--repeat">
+                    <summary>
+                      <strong>{passageLabel}</strong>
+                      <span>{language === 'hi' ? 'अनुच्छेद दिखाएँ' : 'Show passage'}</span>
+                    </summary>
+                    <QuestionRenderer text={cleanedPassage} />
+                  </details>
+                ) : (
+                  <div className="pyq-passage">
+                    <strong>{passageLabel}</strong>
+                    <QuestionRenderer text={cleanedPassage} />
+                  </div>
+                )
               )}
 
               {q.images && q.images.length > 0 && (

@@ -18546,6 +18546,37 @@ html {
   margin: 0;
   line-height: 1.65;
 }
+.pyq-passage--repeat {
+  padding: 10px 14px;
+}
+.pyq-passage--repeat > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.pyq-passage--repeat > summary::-webkit-details-marker {
+  display: none;
+}
+.pyq-passage--repeat > summary strong {
+  color: var(--ink);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+.pyq-passage-toggle-hint {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.pyq-passage--repeat[open] > summary {
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+}
 
 /* Resumed notice bar */
 .pa-resumed-notice {
@@ -19644,6 +19675,29 @@ html {
 
 .qpage-card-source a:hover {
   text-decoration: underline;
+}
+
+/* Exam appearance badge on standalone QuestionPage (Testbook-style tag) */
+.qpage-exam-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--paper2, var(--line2));
+  border: 1px solid var(--line);
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.qpage-exam-tag:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  text-decoration: none;
 }
 
 .qpage-card-actions {

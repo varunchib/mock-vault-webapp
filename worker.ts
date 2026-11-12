@@ -5,7 +5,7 @@ import { postGuides } from './src/data/postGuides'
 import { figureSvg, figures } from './src/data/figures'
 import { splitTableBlocks, tableToText } from './src/lib/textTables'
 import { apiPaperSlug, canonicalPaperSlug, paperPath, paperSeoOverride } from './src/lib/paperSeo'
-import { questionPath, questionRealSlug, stripQuestionNumberPrefix } from './src/lib/questionUrl'
+import { cleanPassageText, formatQuestionExamTag, questionPath, questionRealSlug, stripQuestionNumberPrefix } from './src/lib/questionUrl'
 import { questionTopic } from './src/lib/questionTopic'
 import { guidePathForExam } from './src/lib/examLinks'
 import { buildPaperFaqs, paperFaqJsonLd } from './src/lib/paperFaqs'
@@ -359,7 +359,9 @@ const STATIC_META: Record<string, PageMeta> = {
 // tags that merely repeat the exam, year or subject.
 // '28' refreshes the edge cache for the human-rewritten JKCCE 2025 GS-I
 // explanations and curated topic tags.
-const API_CACHE_VERSION = '30'
+// '31' refreshes the edge cache for JKCCE Prelims 2025 GS-II (Set B) and
+// JKCCE Prelims 2024 GS-I (Set A) passage extraction, pair tables, and tags.
+const API_CACHE_VERSION = '31'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -595,14 +597,17 @@ function tableHtml(rows: string[][]): string {
 
 const SSR_PAIR_MARKER_RE = /^(\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+([\s\S]+)$/
 const SSR_PAIR_ROW_RE = /^(?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+(.+?)\s+—\s+(.+)$/
+const SSR_PAIR_EMPTY_LEFT_RE = /^—\s+((?:\(?(\d{1,2}|[A-Za-z]|[IVXivx]{1,4})[.)])\s+.+)$/
 const SSR_ITEM_RE = /^(\(?(\d{1,2}|[A-H]|[IVX]{1,4}|[ivx]{1,4})[.)])\s+(.+)$/
 
 function splitSsrEmDash(line: string): string[] {
+  const emptyLeft = line.match(SSR_PAIR_EMPTY_LEFT_RE)
+  if (emptyLeft) return ['', emptyLeft[1].trim()]
   return line.split(/\s+—\s+/).map((c) => c.trim())
 }
 
 function isSsrPairRow(line: string): boolean {
-  return line.includes(' — ') && SSR_PAIR_ROW_RE.test(line)
+  return SSR_PAIR_EMPTY_LEFT_RE.test(line) || (line.includes(' — ') && SSR_PAIR_ROW_RE.test(line))
 }
 
 function isSsrPairHeader(line: string, expectedCols: number): boolean {
@@ -818,12 +823,13 @@ function topicFromQuestion(lines: string[]): string {
 // It deliberately omits the " | Ministry of Papers" suffix: 21 chars of brand
 // crowd out the topic keywords that win long-tail queries, and the exam+subject
 // already identify the page. Capped at 65 chars so Google shows it in full.
-function questionTitle(examLabel: string, year: string, subject: string, no: string | number, topic: string): string {
+function questionTitle(examLabel: string, year: string, subject: string, _no: string | number, topic: string): string {
   const CAP = 65
   const tail = ' - Solved Answer'
   // With a topic present the subject is redundant and only eats budget the
-  // keyword needs ("JKCCE 2025 Environment & Ecology Q38: Blue Flag Certifi…").
-  const base = `${examLabel}${year ? ' ' + year : ''}${topic ? '' : subject ? ' ' + subject : ''} Q${no}`
+  // keyword needs; question number is omitted so standalone question pages
+  // read as individual topic questions rather than paper-numbered items.
+  const base = `${examLabel}${year ? ' ' + year : ''}${topic ? '' : subject ? ' ' + subject : ''}`
   if (!topic) return `${base}${tail}`.slice(0, CAP)
 
   const full = `${base}: ${topic}${tail}`
@@ -1006,28 +1012,34 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
     .slice(0, 8)
     .map(tag => `<span>${htmlText(tag)}</span>`)
     .join(' ')
+  const examTag = formatQuestionExamTag(q)
+  const examTagLink = q.paperSlug
+    ? `<a class="qpage-exam-tag" href="${paperPath(q.paperSlug)}">${htmlText(examTag)}</a>`
+    : `<a class="qpage-exam-tag" href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(examTag)}</a>`
   const paperLink = q.paperSlug
     ? `<p><a href="${paperPath(q.paperSlug)}">View the full solved paper: ${htmlText(q.paper)}</a></p>`
     : ''
   const images = (q.images ?? [])
-    .map((src, i) => `<img src="${esc(src)}" alt="${htmlText(q.examName)} ${htmlText(q.year)} Q${htmlText(q.questionNo)} figure ${i + 1}" loading="lazy" />`)
+    .map((src, i) => `<img src="${esc(src)}" alt="${htmlText(q.examName)} ${htmlText(q.year)} ${htmlText(q.subject || 'question')} figure ${i + 1}" loading="lazy" />`)
     .join('')
 
   // Hindi rendering (P0 #3) — index the bilingual content on the same page.
   const hi = q.translations?.hi
+  const hiPassage = cleanPassageText(hi?.passage)
   const hiOptions = (hi?.options ?? [])
     .map((t, i) => `<li><strong>${String.fromCharCode(65 + i)}.</strong> ${htmlText(t)}</li>`)
     .join('')
   const hindiSection = hi?.question
     ? `<section lang="hi">
       <h2>प्रश्न (हिन्दी में)</h2>
-      ${hi.passage ? paragraph(hi.passage) : ''}
+      ${hiPassage ? paragraph(hiPassage) : ''}
       ${paragraph(hi.question)}
       ${hiOptions ? `<ol type="A">${hiOptions}</ol>` : ''}
     </section>`
     : ''
 
   const solution = richText(q.explanation)
+  const cleanedPassage = cleanPassageText(q.passage)
 
   // Real anchors, rendered server-side. This is the whole point of the block:
   // question pages linked only up to their exam and paper, so ~3,000 of them
@@ -1048,11 +1060,11 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
   return `<article class="seo-rendered">
     ${renderBreadcrumb(crumbs)}
     <header class="qpage-card-header">
-      <p><strong>Q.${htmlText(q.questionNo)}</strong> · ${htmlText(q.subject ? q.subject + ' · ' : '')}Previously asked in <a href="/exam/${encodeURIComponent(q.examSlug)}">${htmlText(q.examName)}</a>${q.year ? ` (${htmlText(q.year)})` : ''}</p>
+      <p>${q.subject ? `<span class="pyq-q-subject">${htmlText(q.subject)}</span> · ` : ''}${examTagLink}</p>
       ${paperLink}
     </header>
     ${images ? `<figure>${images}</figure>` : ''}
-    ${q.passage ? `<section><h2>Passage</h2>${paragraph(q.passage)}</section>` : ''}
+    ${cleanedPassage ? `<section><h2>Passage</h2>${paragraph(cleanedPassage)}</section>` : ''}
     <section>
       ${paragraph(stripQuestionNumberPrefix(q.question), true)}
       ${optionItems ? `<ol type="A">${optionItems}</ol>` : ''}
@@ -1449,11 +1461,10 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         { name: 'Home', item: BASE },
         { name: q.examName, item: `${BASE}/exam/${q.examSlug}` },
         ...(q.paperSlug
-          ? [
-              { name: q.paper, item: `${BASE}${paperPath(q.paperSlug)}` },
-              { name: `Q${q.questionNo}`, item: qUrl },
-            ]
-          : [{ name: `Q${q.questionNo}`, item: qUrl }]),
+          ? [{ name: q.paper, item: `${BASE}${paperPath(q.paperSlug)}` }]
+          : q.subject
+            ? [{ name: q.subject, item: `${BASE}/exam/${q.examSlug}?tab=subjects&subject=${encodeURIComponent(q.subject)}` }]
+            : []),
       ]
       // questions.exam_name holds the long official name ("UPSC Civil Services
       // Examination"); the exam record has a compact shortName ("UPSC CSE") that
@@ -1481,16 +1492,17 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       const qLines = q.question.split('\n').map((l) => stripQuestionNumberPrefix(stripMarkdown(l)).trim()).filter(Boolean)
       const multiline = qLines.length > 2
       const actualQuestion = substantiveQuestionLine(q.question)
+      const expandedHeading = expandGenericHeading(q.question, actualQuestion)
       // Curated tag first (67% of rows have one), else derive from the text.
       const topic = questionTopic(q) || topicFromQuestion(qLines)
       // The brand suffix is deliberately gone: 21 chars of " | Ministry of
       // Papers" pushed the topic keywords past what Google renders, and Search
       // now appends the site name itself.
-      const pageTitle = isGenericStem(actualQuestion, multiline)
+      const pageTitle = isGenericStem(expandedHeading, multiline)
         ? questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic)
-        : actualQuestion.length > 65
-          ? actualQuestion.slice(0, 64).trimEnd() + '…'
-          : actualQuestion
+        : expandedHeading.length > 65
+          ? expandedHeading.slice(0, 64).trimEnd() + '…'
+          : expandedHeading
       // Descriptions lead with the FULL question text — the same source the URL
       // keywords come from — not the trailing stem, which is identical across
       // papers and gave every statement-list page one shared snippet.
@@ -1500,11 +1512,12 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       // lines in source order opened every Assertion & Reason snippet with the
       // same boilerplate sentence, so 20 pages in a paper shared a lead.
       const flatQuestion = [
-        actualQuestion,
-        ...qLines.filter((l) => !l.includes(actualQuestion)),
+        expandedHeading,
+        ...qLines.filter((l) => !l.includes(expandedHeading) && !l.includes(actualQuestion)),
       ].join(' ').replace(/\s+/g, ' ').trim()
       const descLead =
         flatQuestion.length > leadRoom ? flatQuestion.slice(0, leadRoom - 1).trimEnd() + '…' : flatQuestion
+      const cleanedPassage = cleanPassageText(q.passage)
       return {
         title: pageTitle,
         description: `${descLead}${descTail}`,
@@ -1513,7 +1526,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
           {
             '@context': 'https://schema.org',
             '@type': 'QAPage',
-            name: `${q.examName} ${q.year} Q${q.questionNo} - Solved Answer`,
+            name: pageTitle,
             url: qUrl,
             inLanguage: q.translations?.hi ? ['en', 'hi'] : 'en',
             ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
@@ -1527,7 +1540,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
               name: flatQuestion.slice(0, 300),
               // The passage is part of what is being asked; without it the
               // Q&A entry is a question about a text that is nowhere present.
-              text: stripMarkdownKeepLines(q.passage ? `${q.passage}
+              text: stripMarkdownKeepLines(cleanedPassage ? `${cleanedPassage}
 
 ${stripQuestionNumberPrefix(q.question)}` : stripQuestionNumberPrefix(q.question)),
               answerCount: 1,
