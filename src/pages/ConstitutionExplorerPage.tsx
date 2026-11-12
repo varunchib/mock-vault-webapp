@@ -1,18 +1,25 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
-import { Search } from 'lucide-react'
-
-export type ConstitutionalArticle = {
-  article: string
-  title: string
-  part: string
-  partName: string
-  description: string
-  examTakeaway: string
-  pyqFrequency: 'High' | 'Very High' | 'Medium'
-  landmarkCase?: string
-}
+import {
+  Search,
+  Flame,
+  Zap,
+  Bookmark,
+  BookOpen,
+  Filter,
+  AlertTriangle,
+  HelpCircle,
+  Sparkles,
+  ChevronRight,
+  RotateCcw,
+} from 'lucide-react'
+import {
+  ALL_CONSTITUTION_ARTICLES,
+  CONSTITUTION_PARTS,
+  type ConstitutionArticleData,
+  type ExamFrequency,
+} from '../data/constitutionArticles'
 
 export type ConstitutionalAmendment = {
   amendment: string
@@ -29,291 +36,304 @@ export type ConstitutionalSchedule = {
   articles: string
 }
 
-const ARTICLES_DATABASE: ConstitutionalArticle[] = [
-  {
-    article: 'Article 14',
-    title: 'Equality before Law & Equal Protection of Laws',
-    part: 'Part III',
-    partName: 'Fundamental Rights',
-    description: 'The State shall not deny to any person equality before the law or the equal protection of the laws within the territory of India.',
-    examTakeaway: '"Equality before law" is British negative concept; "Equal protection of laws" is American positive concept. Reasonable classification is permitted (Rule of Law).',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'State of West Bengal v. Anwar Ali Sarkar (1952)',
-  },
-  {
-    article: 'Article 19',
-    title: 'Protection of 6 Fundamental Freedoms',
-    part: 'Part III',
-    partName: 'Fundamental Rights',
-    description: 'Guarantees 6 basic freedoms to citizens: speech & expression, peaceful assembly, forming associations/cooperatives, free movement, residence, and practicing any profession.',
-    examTakeaway: 'Originally had 7 freedoms; Right to Property (19(1)(f)) was deleted by 44th Amendment 1978. Freedoms are subject to reasonable restrictions under Article 19(2)-(6).',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'Romesh Thappar v. State of Madras (1950)',
-  },
-  {
-    article: 'Article 21',
-    title: 'Protection of Life and Personal Liberty',
-    part: 'Part III',
-    partName: 'Fundamental Rights',
-    description: 'No person shall be deprived of his life or personal liberty except according to procedure established by law.',
-    examTakeaway: 'Expanded through Maneka Gandhi case to mean "Due Process of Law" (just, fair, and reasonable). Cannot be suspended even during National Emergency (along with Art 20).',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'Maneka Gandhi v. Union of India (1978); K.S. Puttaswamy (Right to Privacy 2017)',
-  },
-  {
-    article: 'Article 21A',
-    title: 'Right to Education',
-    part: 'Part III',
-    partName: 'Fundamental Rights',
-    description: 'The State shall provide free and compulsory education to all children of the age of six to fourteen years.',
-    examTakeaway: 'Inserted by 86th Constitutional Amendment Act, 2002. Enforced via RTE Act, 2009. Corresponds to Fundamental Duty Article 51A(k).',
-    pyqFrequency: 'Very High',
-  },
-  {
-    article: 'Article 32',
-    title: 'Remedies for Enforcement of Fundamental Rights (Constitutional Remedies)',
-    part: 'Part III',
-    partName: 'Fundamental Rights',
-    description: 'Right to move Supreme Court by appropriate proceedings for enforcement of Fundamental Rights. SC can issue 5 writs: Habeas Corpus, Mandamus, Prohibition, Quo Warranto, Certiorari.',
-    examTakeaway: 'Dr. B.R. Ambedkar called it the "Heart and Soul of the Constitution". Part of Basic Structure. High Courts issue writs under Article 226 (which has wider jurisdiction).',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'Fertilizer Corporation Kamgar Union v. UOI (1981)',
-  },
-  {
-    article: 'Article 44',
-    title: 'Uniform Civil Code for the Citizens',
-    part: 'Part IV',
-    partName: 'Directive Principles (DPSP)',
-    description: 'The State shall endeavour to secure for the citizens a Uniform Civil Code throughout the territory of India.',
-    examTakeaway: 'Non-justiciable Directive Principle. Goa is the first state with common civil law (inherited Portuguese Civil Code); Uttarakhand passed UCC Bill in 2024.',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'Shah Bano Begum case (1985); Sarla Mudgal (1995)',
-  },
-  {
-    article: 'Article 51A',
-    title: 'Fundamental Duties',
-    part: 'Part IVA',
-    partName: 'Fundamental Duties',
-    description: 'Lists 11 civic and patriotic duties for Indian citizens (cherishing national struggle, protecting sovereignty, promoting harmony, safeguarding public property).',
-    examTakeaway: 'Recommended by Swaran Singh Committee (1976). Added by 42nd Amendment (10 duties). 11th duty (education for 6-14 years) added by 86th Amendment (2002). Non-justiciable.',
-    pyqFrequency: 'Very High',
-  },
-  {
-    article: 'Article 72',
-    title: 'Pardoning Power of the President',
-    part: 'Part V',
-    partName: 'The Union Executive',
-    description: 'Empowers President to grant pardons, reprieves, respites or remissions of punishment, or suspend, remit or commute sentences in court-martial, union laws, and death sentences.',
-    examTakeaway: 'President exercises this on aid and advice of Union Council of Ministers. Governor has pardoning power under Art 161 (Governor cannot pardon death sentence or court martial).',
-    pyqFrequency: 'High',
-    landmarkCase: 'Kehar Singh v. Union of India (1989)',
-  },
-  {
-    article: 'Article 110',
-    title: 'Definition of Money Bills',
-    part: 'Part V',
-    partName: 'The Union Parliament',
-    description: 'Bill containing only provisions dealing with imposition, abolition, or regulation of tax, borrowing by government, or expenditure from Consolidated Fund of India.',
-    examTakeaway: 'Speaker of Lok Sabha has final authority to certify whether a bill is a Money Bill. Rajya Sabha cannot reject or amend; must return within 14 days. No joint sitting (Art 108).',
-    pyqFrequency: 'Very High',
-  },
-  {
-    article: 'Article 112',
-    title: 'Annual Financial Statement (Budget)',
-    part: 'Part V',
-    partName: 'The Union Parliament',
-    description: 'Statement of estimated receipts and expenditure of the Government of India for every financial year.',
-    examTakeaway: 'The term "Budget" does not appear in the Constitution; it is officially termed "Annual Financial Statement". Distinguishes expenditure charged upon Consolidated Fund.',
-    pyqFrequency: 'High',
-  },
-  {
-    article: 'Article 123',
-    title: 'Power of President to Promulgate Ordinances',
-    part: 'Part V',
-    partName: 'The Union Executive',
-    description: 'President can issue ordinances when either House of Parliament is not in session and circumstances require immediate action.',
-    examTakeaway: 'Same force and effect as an Act of Parliament. Must be laid before Parliament within 6 weeks of reassembly; maximum validity without approval is 6 months + 6 weeks.',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'D.C. Wadhwa v. State of Bihar (1987) on ordinance repromulgation',
-  },
-  {
-    article: 'Article 148',
-    title: 'Comptroller and Auditor General of India (CAG)',
-    part: 'Part V',
-    partName: 'The Union',
-    description: 'Provides for an independent Comptroller and Auditor General appointed by the President by warrant under his hand and seal.',
-    examTakeaway: 'Guardian of the Public Purse. Tenure: 6 years or 65 years of age. Removed like a Supreme Court judge. Reports submitted to President who lays them before Parliament (PAC reviews).',
-    pyqFrequency: 'High',
-  },
-  {
-    article: 'Article 280',
-    title: 'Finance Commission',
-    part: 'Part XII',
-    partName: 'Finance, Property, Contracts',
-    description: 'President constitutes a Finance Commission every 5th year to recommend distribution of net tax proceeds between Union and States, and principles of grants-in-aid.',
-    examTakeaway: 'Quasi-judicial body consisting of a Chairman + 4 other members. Recommendations are advisory in nature. 16th Finance Commission headed by Dr. Arvind Panagariya.',
-    pyqFrequency: 'Very High',
-  },
-  {
-    article: 'Article 324',
-    title: 'Superintendence, Direction & Control of Elections in Election Commission',
-    part: 'Part XV',
-    partName: 'Elections',
-    description: 'Vests superintendence, direction, and control of elections to Parliament, State Legislatures, President, and Vice-President in the Election Commission of India.',
-    examTakeaway: 'Panchayat & Municipal elections are conducted by State Election Commissions (Arts 243K & 243ZA), NOT by ECI. CEC removed like an SC judge.',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'T.N. Seshan v. Union of India (1995)',
-  },
-  {
-    article: 'Article 352',
-    title: 'Proclamation of National Emergency',
-    part: 'Part XVIII',
-    partName: 'Emergency Provisions',
-    description: 'President can proclaim National Emergency on grounds of War, External Aggression, or Armed Rebellion.',
-    examTakeaway: '"Armed Rebellion" replaced "Internal Disturbance" via 44th Amendment (1978). Written recommendation from Union Cabinet is mandatory. Approved by special majority within 1 month.',
-    pyqFrequency: 'Very High',
-  },
-  {
-    article: 'Article 356',
-    title: 'President’s Rule (State Emergency)',
-    part: 'Part XVIII',
-    partName: 'Emergency Provisions',
-    description: 'Proclamation on failure of constitutional machinery in a State, upon receipt of a report from Governor or otherwise.',
-    examTakeaway: 'Approved by simple majority within 2 months. Maximum duration is 3 years with periodic renewals every 6 months. Subject to judicial review.',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'S.R. Bommai v. Union of India (1994)',
-  },
-  {
-    article: 'Article 368',
-    title: 'Power of Parliament to Amend the Constitution',
-    part: 'Part XX',
-    partName: 'Amendment of the Constitution',
-    description: 'Parliament may in exercise of its constituent power amend by way of addition, variation or repeal any provision of the Constitution.',
-    examTakeaway: 'Two types of amendments under 368: Special Majority (2/3 present & voting + majority of total membership) AND Special Majority + Ratification by half of States. Cannot alter "Basic Structure".',
-    pyqFrequency: 'Very High',
-    landmarkCase: 'Kesavananda Bharati v. State of Kerala (1973)',
-  },
-]
-
 const KEY_AMENDMENTS: ConstitutionalAmendment[] = [
+  {
+    amendment: '1st Amendment Act, 1951',
+    year: 1951,
+    title: 'Land Reforms & Ninth Schedule',
+    significance: 'Added the Ninth Schedule and Article 31B to protect land reform laws from judicial review on Fundamental Rights grounds. Placed reasonable restrictions on free speech under Article 19(2).',
+    examNote: 'Enacted under provisional Parliament before the first Lok Sabha elections. Landmark judgment: Shankari Prasad (1951).',
+  },
+  {
+    amendment: '7th Amendment Act, 1956',
+    year: 1956,
+    title: 'States Reorganisation Act Implementation',
+    significance: 'Abolished the four-fold classification of States (Part A, B, C, D) and reorganized India into 14 States and 6 Union Territories. Introduced common High Courts for two or more states.',
+    examNote: 'Based on the recommendations of the Fazal Ali Commission (State Reorganisation Commission 1953).',
+  },
   {
     amendment: '42nd Amendment Act, 1976',
     year: 1976,
     title: 'The "Mini-Constitution"',
-    significance: 'Added words "Socialist, Secular, Integrity" to Preamble. Added Part IVA (Fundamental Duties). Added Part XIVA (Tribunals). Curtailed judicial review.',
-    examNote: 'Enacted during Internal Emergency under Indira Gandhi. Many anti-democratic provisions were reversed by 44th Amendment.',
+    significance: 'Added words "Socialist, Secular, Integrity" to Preamble. Added Part IVA (Fundamental Duties, Art 51A). Added Part XIVA (Tribunals). Transferred 5 subjects from State List to Concurrent List (Education, Forests, Weights & Measures, Protection of Wild Animals/Birds, Administration of Justice).',
+    examNote: 'Enacted during Internal Emergency under Indira Gandhi on recommendations of the Swaran Singh Committee. Most heavily tested amendment across UPSC & State PSCs.',
   },
   {
     amendment: '44th Amendment Act, 1978',
     year: 1978,
     title: 'Restoration of Democratic Safeguards',
-    significance: 'Replaced "internal disturbance" with "armed rebellion" in Art 352. Removed Right to Property from Fundamental Rights (made legal right under 300A). Art 20 & 21 cannot be suspended in emergency.',
-    examNote: 'Enacted by Janata Party government under Morarji Desai.',
+    significance: 'Replaced "internal disturbance" with "armed rebellion" in Art 352. Removed Right to Property (Art 19(1)(f) and Art 31) from Fundamental Rights and made it a constitutional legal right under Art 300A. Mandated that Articles 20 and 21 cannot be suspended during National Emergency.',
+    examNote: 'Enacted by Janata Party government under Morarji Desai to prevent executive abuse.',
+  },
+  {
+    amendment: '52nd Amendment Act, 1985',
+    year: 1985,
+    title: 'Anti-Defection Law (10th Schedule)',
+    significance: 'Added the 10th Schedule to disqualify MPs and MLAs on grounds of defection from their political party. Presiding Officer (Speaker/Chairman) given final decision-making power.',
+    examNote: 'Subject to judicial review post Kihoto Hollohan case (1992). Originally permitted split if 1/3 members defected; split exception deleted by 91st Amendment (2003).',
+  },
+  {
+    amendment: '61st Amendment Act, 1988',
+    year: 1988,
+    title: 'Lowering Voting Age from 21 to 18 Years',
+    significance: 'Amended Article 326 of the Constitution to lower the minimum voting age for Lok Sabha and State Legislative Assembly elections from 21 years to 18 years.',
+    examNote: 'Came into force in March 1989. Led to the expansion of Election Commission of India into a multi-member body.',
   },
   {
     amendment: '73rd & 74th Amendment Acts, 1992',
     year: 1992,
     title: 'Panchayati Raj & Municipalities',
-    significance: 'Gave constitutional status to rural (73rd) and urban (74th) local self-governments. Added Part IX & 11th Schedule (29 items), and Part IXA & 12th Schedule (18 items).',
-    examNote: 'Mandatory 33% reservation for women in local bodies.',
+    significance: 'Gave constitutional status to rural (73rd) and urban (74th) local self-governments. Added Part IX & 11th Schedule (29 subjects), and Part IXA & 12th Schedule (18 subjects). Mandated 33% reservation for women and set up State Finance Commissions & State Election Commissions.',
+    examNote: 'Landmark step for democratic decentralization; 24th April celebrated as National Panchayati Raj Day.',
   },
   {
     amendment: '86th Amendment Act, 2002',
     year: 2002,
     title: 'Right to Education as Fundamental Right',
-    significance: 'Inserted Article 21A (free & compulsory education for children 6-14). Altered DPSP Article 45. Added 11th Fundamental Duty Article 51A(k).',
-    examNote: 'One of the most repeatedly asked amendment questions across UPSC & State PSCs.',
+    significance: 'Inserted Article 21A (free & compulsory education for children 6-14). Substituted DPSP Article 45 (early childhood care). Added 11th Fundamental Duty Article 51A(k).',
+    examNote: 'Operated through the Right to Education (RTE) Act, 2009. Top-tier favorite of UPSC & SSC examiners.',
+  },
+  {
+    amendment: '91st Amendment Act, 2003',
+    year: 2003,
+    title: 'Limitation on Council of Ministers & Anti-Defection',
+    significance: 'Capped the size of the Union and State Council of Ministers to a maximum of 15% of the total strength of Lok Sabha or State Assembly (minimum 12 ministers for States). Removed "split" defense from 10th Schedule.',
+    examNote: 'Delhi is an exception: Delhi Council of Ministers is capped at 10% under Article 239AA.',
   },
   {
     amendment: '101st Amendment Act, 2016',
     year: 2016,
     title: 'Goods and Services Tax (GST)',
     significance: 'Introduced nationwide unified indirect tax (GST). Inserted Article 246A (concurrent power to levy GST) and Article 279A (GST Council headed by Union Finance Minister).',
-    examNote: 'Requires Special Majority + 50% State ratification.',
+    examNote: 'Required Special Majority + 50% State ratification under Article 368.',
+  },
+  {
+    amendment: '102nd Amendment Act, 2018',
+    year: 2018,
+    title: 'Constitutional Status to NCBC',
+    significance: 'Gave constitutional status to the National Commission for Backward Classes (NCBC) by inserting Article 338B and Article 342A, on par with NCSC (Art 338) and NCST (Art 338A).',
+    examNote: 'Relieved the Statutory NCBC Act 1993 and transferred jurisdiction to a constitutional body.',
   },
   {
     amendment: '103rd Amendment Act, 2019',
     year: 2019,
     title: '10% EWS Reservation',
-    significance: 'Provided up to 10% reservation for Economically Weaker Sections (EWS) in educational admissions and public appointments by amending Articles 15(6) and 16(6).',
-    examNote: 'Upheld by Supreme Court in Janhit Abhiyan v. Union of India (2022).',
+    significance: 'Provided up to 10% reservation for Economically Weaker Sections (EWS) of citizens in educational institutions and public employment by amending Articles 15(6) and 16(6).',
+    examNote: 'Upheld as constitutional and not violating Basic Structure by Supreme Court in Janhit Abhiyan v. Union of India (2022).',
+  },
+  {
+    amendment: '104th Amendment Act, 2019',
+    year: 2019,
+    title: 'SC/ST Seats Extension & Discontinuation of Anglo-Indian Nomination',
+    significance: 'Extended reservation of seats for SCs and STs in Lok Sabha and State Assemblies for another 10 years (until 2030) under Article 334. Discontinued the nomination of 2 Anglo-Indian members to Lok Sabha and State Assemblies.',
+    examNote: 'Articles 331 and 333 effectively ceased to operate for Anglo-Indian nominations.',
+  },
+  {
+    amendment: '105th Amendment Act, 2021',
+    year: 2021,
+    title: 'Restoration of States’ Power to Specify SEBCs',
+    significance: 'Restored the power of State Governments and Union Territories to identify and notify their own Socially and Educationally Backward Classes (SEBCs/OBCs).',
+    examNote: 'Clarified the scope of Article 342A following the Supreme Court judgment in the Maratha Reservation case (Jaishri Laxmanrao Patil).',
   },
   {
     amendment: '106th Amendment Act, 2023',
     year: 2023,
     title: 'Nari Shakti Vandan Adhiniyam (Women Reservation)',
-    significance: 'Provides 33% reservation for women in Lok Sabha, State Legislative Assemblies, and Delhi Assembly for 15 years after delimitation.',
-    examNote: 'Inserted Article 330A, 332A, and 334A.',
+    significance: 'Provides 33% (one-third) reservation for women in Lok Sabha, State Legislative Assemblies, and National Capital Territory of Delhi Assembly for 15 years.',
+    examNote: 'Inserted Articles 330A, 332A, and 334A. Reservation will take effect after delimitation following the first census conducted after the enactment.',
   },
 ]
 
 const SCHEDULES_DATABASE: ConstitutionalSchedule[] = [
-  { schedule: '1st Schedule', subject: 'States and Union Territories', details: 'Names of States and Union Territories and their territorial jurisdictions.', articles: 'Articles 1 and 4' },
-  { schedule: '2nd Schedule', subject: 'Salaries and Emoluments', details: 'Provisions relating to President, Governors, Speaker, Judges of SC/HC, CAG.', articles: 'Articles 59, 65, 75, 97, 125, 148, 158' },
-  { schedule: '3rd Schedule', subject: 'Forms of Oaths and Affirmations', details: 'Oaths for Ministers, MPs, MLAs, Judges, CAG. (President & VP oaths are under Arts 60 & 69).', articles: 'Articles 75, 84, 99, 124, 146, 173' },
-  { schedule: '4th Schedule', subject: 'Allocation of Seats in Rajya Sabha', details: 'Allocation of Council of States seats to States and UTs on population basis.', articles: 'Articles 4 and 80' },
-  { schedule: '5th Schedule', subject: 'Scheduled Areas and Scheduled Tribes', details: 'Administration and control of Scheduled Areas and Scheduled Tribes in states other than Assam, Meghalaya, Tripura, Mizoram.', articles: 'Article 244(1)' },
-  { schedule: '6th Schedule', subject: 'Tribal Areas in Northeast (AMTM)', details: 'Administration of tribal areas in Assam, Meghalaya, Tripura, and Mizoram through Autonomous District Councils (ADCs).', articles: 'Articles 244(2) and 275(1)' },
-  { schedule: '7th Schedule', subject: 'Division of Powers (Three Lists)', details: 'Union List (originally 97, now 100), State List (originally 66, now 61), Concurrent List (originally 47, now 52).', articles: 'Article 246' },
-  { schedule: '8th Schedule', subject: 'Official Languages of India', details: 'Recognises 22 official languages (originally 14; Sindhi added 1967; Konkani, Manipuri, Nepali added 1992; Bodo, Dogri, Maithili, Santhali added 2003).', articles: 'Articles 344 and 351' },
-  { schedule: '9th Schedule', subject: 'Validation of Certain Acts and Regulations', details: 'Added by 1st Amendment (1951) to protect land reform laws from judicial review on ground of Fundamental Rights violation. Subject to basic structure review post-1973 (I.R. Coelho).', articles: 'Article 31B' },
-  { schedule: '10th Schedule', subject: 'Anti-Defection Law', details: 'Added by 52nd Amendment (1985). Disqualification of legislators on grounds of defection. Presiding officer decides disqualification.', articles: 'Articles 102(2) and 191(2)' },
-  { schedule: '11th Schedule', subject: 'Panchayats (Rural Local Government)', details: 'Added by 73rd Amendment (1992). Contains 29 functional matters of Panchayats.', articles: 'Article 243G' },
-  { schedule: '12th Schedule', subject: 'Municipalities (Urban Local Government)', details: 'Added by 74th Amendment (1992). Contains 18 functional matters of Municipalities.', articles: 'Article 243W' },
+  { schedule: '1st Schedule', subject: 'States and Union Territories', details: 'Names of the 28 States and 8 Union Territories along with their territorial jurisdictions and boundary extents.', articles: 'Articles 1 and 4' },
+  { schedule: '2nd Schedule', subject: 'Salaries, Allowances & Emoluments', details: 'Provisions relating to the President, Governors, Speaker/Deputy Speaker of Lok Sabha & Chairman/Deputy Chairman of Rajya Sabha, Judges of Supreme Court & High Courts, and CAG.', articles: 'Articles 59(3), 65(3), 75(6), 97, 125, 148(3), 158(3), 164(5), 186, 221' },
+  { schedule: '3rd Schedule', subject: 'Forms of Oaths and Affirmations', details: 'Oaths of office and secrecy for Union Ministers, MPs, Judges of Supreme Court, CAG, State Ministers, MLAs/MLCs, and Judges of High Courts. (Note: President, Vice-President, and Governor oaths are under Articles 60, 69, and 159 respectively, NOT the 3rd Schedule).', articles: 'Articles 75(4), 84(a), 99, 124(6), 148(2), 164(3), 173(a), 188, 219' },
+  { schedule: '4th Schedule', subject: 'Allocation of Seats in Rajya Sabha', details: 'Allocation of seats in the Council of States (Rajya Sabha) to States and Union Territories based on their proportional population figures.', articles: 'Articles 4(1) and 80(2)' },
+  { schedule: '5th Schedule', subject: 'Scheduled Areas and Scheduled Tribes', details: 'Provisions as to the Administration and Control of Scheduled Areas and Scheduled Tribes in states other than Assam, Meghalaya, Tripura, and Mizoram. Establishes Tribes Advisory Councils (TAC).', articles: 'Article 244(1)' },
+  { schedule: '6th Schedule', subject: 'Tribal Areas in Northeast (AMTM)', details: 'Administration of tribal areas in the four northeastern states: Assam, Meghalaya, Tripura, and Mizoram through Autonomous District Councils (ADCs) with legislative and judicial powers.', articles: 'Articles 244(2) and 275(1)' },
+  { schedule: '7th Schedule', subject: 'Division of Powers (Three Legislative Lists)', details: 'Division of subjects between Union and States: List I (Union List: 100 items), List II (State List: 61 items), and List III (Concurrent List: 52 items). Residuary powers vest in Parliament under Art 248.', articles: 'Article 246' },
+  { schedule: '8th Schedule', subject: 'Official Languages of India', details: 'Recognises 22 official languages (originally 14; Sindhi added by 21st Amend 1967; Konkani, Manipuri, Nepali added by 71st Amend 1992; Bodo, Dogri, Maithili, Santhali added by 92nd Amend 2003). English is NOT in the 8th Schedule.', articles: 'Articles 344(1) and 351' },
+  { schedule: '9th Schedule', subject: 'Validation of Certain Acts and Regulations', details: 'Added by 1st Amendment (1951) to protect agrarian land reform and abolition of Zamindari laws from judicial challenge. In I.R. Coelho (2007), Supreme Court ruled that laws added post April 24, 1973 are open to judicial review if they violate Basic Structure.', articles: 'Article 31B' },
+  { schedule: '10th Schedule', subject: 'Anti-Defection Law', details: 'Added by 52nd Amendment (1985). Disqualification of legislators on grounds of voluntary giving up party membership or voting contrary to party whip. Presiding officer decides; subject to judicial review (Kihoto Hollohan 1992).', articles: 'Articles 102(2) and 191(2)' },
+  { schedule: '11th Schedule', subject: 'Panchayats (Rural Local Government)', details: 'Added by 73rd Amendment (1992). Contains 29 functional matters of Panchayats (agriculture, rural housing, drinking water, roads, poverty alleviation, primary education, etc.).', articles: 'Article 243G' },
+  { schedule: '12th Schedule', subject: 'Municipalities (Urban Local Government)', details: 'Added by 74th Amendment (1992). Contains 18 functional matters of Municipalities (urban planning, regulation of land use, roads, bridges, public health, fire services, solid waste management).', articles: 'Article 243W' },
+]
+
+const POLITY_FAQS = [
+  {
+    q: 'How many articles are there in the Constitution of India?',
+    a: 'Originally, the Constitution of India had 395 articles divided into 22 parts and 8 schedules (adopted on 26 November 1949 and enacted on 26 January 1950). Due to numerous amendments, there are now over 448 articles organized into 25 parts and 12 schedules, but the numbering ends at Article 395 with newly inserted articles tagged as 21A, 39A, 51A, 243A-ZG, 300A, 338B, etc.',
+  },
+  {
+    q: 'Which articles of the Indian Constitution are the most frequently asked in UPSC and State PSC exams?',
+    a: 'The highest-yield articles tested repeatedly in competitive exams include: Article 14 (Equality before law), Article 19 (6 Freedoms), Article 21 (Life and Personal Liberty), Article 21A (Right to Education), Article 32 (Constitutional Remedies & 5 Writs), Article 44 (Uniform Civil Code), Article 51A (Fundamental Duties), Article 72 (Presidential Pardons), Article 110 (Money Bills), Article 123 (Presidential Ordinances), Article 148 (CAG), Article 280 (Finance Commission), Article 324 (Election Commission), Article 352/356/360 (Emergency Provisions), and Article 368 (Constitutional Amendments).',
+  },
+  {
+    q: 'What is the difference between Article 2 and Article 3 of the Constitution?',
+    a: 'Article 2 empowers Parliament to admit into the Union or establish new States that were NOT previously part of the territory of India (external territory admission, such as Sikkim). Article 3 empowers Parliament to reorganize, form new states, alter boundaries, or change names of existing Indian states by simple majority (internal reorganization).',
+  },
+  {
+    q: 'Why can Articles 20 and 21 not be suspended during a National Emergency?',
+    a: 'Following the abuses of the 1975–1977 Emergency, the 44th Constitutional Amendment Act, 1978 amended Article 359 to explicitly mandate that the right to protection in respect of conviction for offences (Article 20) and the right to life and personal liberty (Article 21) cannot be suspended by Presidential order even during a National Emergency.',
+  },
+  {
+    q: 'What is the distinction between "Equality Before Law" and "Equal Protection of the Laws" in Article 14?',
+    a: '"Equality before the law" is a British negative concept implying the absence of any special privileges in favor of any individual and the equal subjection of all classes to ordinary law. "Equal protection of the laws" is an American positive concept implying equality of treatment under equal circumstances, allowing the State to make reasonable classifications for affirmative action.',
+  },
 ]
 
 export function ConstitutionExplorerPage() {
   const [search, setSearch] = React.useState('')
-  const [activeTab, setActiveTab] = React.useState<'articles' | 'amendments' | 'schedules'>('articles')
+  const [activeTab, setActiveTab] = React.useState<'articles' | 'parts' | 'amendments' | 'schedules' | 'faq'>('articles')
   const [partFilter, setPartFilter] = React.useState('all')
+  const [frequencyFilter, setFrequencyFilter] = React.useState<'all' | ExamFrequency>('all')
+  const [visibleCount, setVisibleCount] = React.useState(30)
+  const [openFaqIndex, setOpenFaqIndex] = React.useState<number | null>(null)
 
   usePageMeta({
-    title: 'Interactive Constitution of India Explorer: Articles, Parts & Amendments | Ministry of Papers',
-    description: 'Explore the Constitution of India interactively. Search Articles 1-395, Schedules 1-12, landmark amendments, and exam key takeaways with verified PYQs for UPSC & State PSCs.',
+    title: 'Interactive Constitution of India Explorer: All Articles 1–395, Exam Frequency & Traps | Ministry of Papers',
+    description: 'Master the Constitution of India with verified PYQ frequency tags, student-friendly explanations, landmark Supreme Court cases, and examiner traps for UPSC, JKPSC CCE, JKSSB, and State PSCs.',
     canonicalPath: '/constitution-of-india',
   })
 
+  // Filtered Articles with Search, Part, and Frequency Filter
   const filteredArticles = React.useMemo(() => {
-    return ARTICLES_DATABASE.filter((art) => {
-      const matchSearch =
-        search === '' ||
-        art.article.toLowerCase().includes(search.toLowerCase()) ||
-        art.title.toLowerCase().includes(search.toLowerCase()) ||
-        art.description.toLowerCase().includes(search.toLowerCase()) ||
-        art.examTakeaway.toLowerCase().includes(search.toLowerCase())
+    const q = search.trim().toLowerCase()
+    return ALL_CONSTITUTION_ARTICLES.filter((art) => {
+      // Frequency match
+      if (frequencyFilter !== 'all' && art.frequency !== frequencyFilter) {
+        return false
+      }
 
-      const matchPart = partFilter === 'all' || art.part === partFilter
-      return matchSearch && matchPart
+      // Part match
+      if (partFilter !== 'all' && art.part !== partFilter) {
+        return false
+      }
+
+      // Query match
+      if (!q) return true
+
+      return (
+        art.article.toLowerCase().includes(q) ||
+        art.title.toLowerCase().includes(q) ||
+        art.part.toLowerCase().includes(q) ||
+        art.partName.toLowerCase().includes(q) ||
+        art.summary.toLowerCase().includes(q) ||
+        art.simpleExplanation.toLowerCase().includes(q) ||
+        art.examTrap.toLowerCase().includes(q) ||
+        (art.landmarkCase && art.landmarkCase.toLowerCase().includes(q))
+      )
     })
-  }, [search, partFilter])
+  }, [search, partFilter, frequencyFilter])
+
+  // Reset pagination when filter criteria change
+  React.useEffect(() => {
+    setVisibleCount(30)
+  }, [search, partFilter, frequencyFilter])
+
+  // Frequency count badges
+  const frequencyCounts = React.useMemo(() => {
+    let top = 0
+    let freq = 0
+    let mod = 0
+    let found = 0
+    for (const a of ALL_CONSTITUTION_ARTICLES) {
+      if (a.frequency === 'Top Tested') top++
+      else if (a.frequency === 'Frequently Tested') freq++
+      else if (a.frequency === 'Moderately Tested') mod++
+      else if (a.frequency === 'Foundational') found++
+    }
+    return { top, freq, mod, found, total: ALL_CONSTITUTION_ARTICLES.length }
+  }, [])
 
   const filteredAmendments = React.useMemo(() => {
+    const q = search.trim().toLowerCase()
     return KEY_AMENDMENTS.filter((am) => {
+      if (!q) return true
       return (
-        search === '' ||
-        am.amendment.toLowerCase().includes(search.toLowerCase()) ||
-        am.title.toLowerCase().includes(search.toLowerCase()) ||
-        am.significance.toLowerCase().includes(search.toLowerCase()) ||
-        am.examNote.toLowerCase().includes(search.toLowerCase())
+        am.amendment.toLowerCase().includes(q) ||
+        am.title.toLowerCase().includes(q) ||
+        am.significance.toLowerCase().includes(q) ||
+        am.examNote.toLowerCase().includes(q) ||
+        am.year.toString().includes(q)
       )
     })
   }, [search])
 
   const filteredSchedules = React.useMemo(() => {
+    const q = search.trim().toLowerCase()
     return SCHEDULES_DATABASE.filter((sch) => {
+      if (!q) return true
       return (
-        search === '' ||
-        sch.schedule.toLowerCase().includes(search.toLowerCase()) ||
-        sch.subject.toLowerCase().includes(search.toLowerCase()) ||
-        sch.details.toLowerCase().includes(search.toLowerCase()) ||
-        sch.articles.toLowerCase().includes(search.toLowerCase())
+        sch.schedule.toLowerCase().includes(q) ||
+        sch.subject.toLowerCase().includes(q) ||
+        sch.details.toLowerCase().includes(q) ||
+        sch.articles.toLowerCase().includes(q)
       )
     })
   }, [search])
 
+  const displayedArticles = React.useMemo(() => {
+    return filteredArticles.slice(0, visibleCount)
+  }, [filteredArticles, visibleCount])
+
+  // Reset all filters
+  const resetFilters = () => {
+    setSearch('')
+    setPartFilter('all')
+    setFrequencyFilter('all')
+    setVisibleCount(30)
+  }
+
+  // Schema.org Structured Data
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Article',
+        headline: 'Interactive Constitution of India Explorer: All Articles 1–395 and Exam Frequency',
+        description: 'Comprehensive pedagogical directory of all articles of the Indian Constitution categorized by exam frequency, simple conceptual breakdowns, and common traps for UPSC and State PSC exams.',
+        author: {
+          '@type': 'Organization',
+          name: 'Ministry of Papers Editorial Board',
+          url: 'https://ministryofpapers.com',
+        },
+        publisher: {
+          '@type': 'Organization',
+          name: 'Ministry of Papers',
+          url: 'https://ministryofpapers.com',
+          logo: {
+            '@type': 'ImageObject',
+            url: 'https://ministryofpapers.com/favicon.svg',
+          },
+        },
+        datePublished: '2026-03-01T00:00:00Z',
+        dateModified: '2026-11-12T00:00:00Z',
+        mainEntityOfPage: 'https://ministryofpapers.com/constitution-of-india',
+      },
+      {
+        '@type': 'FAQPage',
+        mainEntity: POLITY_FAQS.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      },
+    ],
+  }
+
   return (
-    <section className="public-page">
+    <section className="public-page" style={{ paddingBottom: '60px' }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+
       <div className="public-shell">
+        {/* Breadcrumb Navigation */}
         <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ marginBottom: '16px' }}>
           <Link to="/">Home</Link>
           <span aria-hidden="true">›</span>
@@ -322,192 +342,631 @@ export function ConstitutionExplorerPage() {
           <span>Constitution of India Explorer</span>
         </nav>
 
-        <header style={{ marginBottom: '28px' }}>
-          <span className="public-kicker">Interactive Polity Study Suite</span>
-          <h1 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: 'clamp(28px, 4vw, 42px)', margin: '8px 0 10px', color: 'var(--ink, #0f172a)' }}>
-            Constitution of India Explorer
-          </h1>
-          <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '780px', lineHeight: '1.6', margin: 0 }}>
-            Master Articles, Schedules, Landmark Amendments, and Supreme Court Doctrines for UPSC, JKPSC, JKSSB, and State PSC exams. Filter high-yield articles and test your preparation against real past questions.
-          </p>
-        </header>
-
-        {/* Tab Switcher & Search Bar */}
-        <div style={{ background: 'var(--card-bg, #ffffff)', padding: '16px 20px', borderRadius: '12px', border: '1px solid var(--line, #e2e8f0)', marginBottom: '24px' }}>
-          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '16px' }}>
-            <button
-              onClick={() => setActiveTab('articles')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                border: '1px solid',
-                background: activeTab === 'articles' ? 'var(--brand, #0f766e)' : 'transparent',
-                color: activeTab === 'articles' ? '#ffffff' : 'var(--ink, #0f172a)',
-                borderColor: activeTab === 'articles' ? 'var(--brand, #0f766e)' : 'var(--line, #e2e8f0)',
-              }}
-            >
-              Key Exam Articles ({ARTICLES_DATABASE.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('amendments')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                border: '1px solid',
-                background: activeTab === 'amendments' ? 'var(--brand, #0f766e)' : 'transparent',
-                color: activeTab === 'amendments' ? '#ffffff' : 'var(--ink, #0f172a)',
-                borderColor: activeTab === 'amendments' ? 'var(--brand, #0f766e)' : 'var(--line, #e2e8f0)',
-              }}
-            >
-              Landmark Amendments ({KEY_AMENDMENTS.length})
-            </button>
-            <button
-              onClick={() => setActiveTab('schedules')}
-              style={{
-                padding: '8px 16px',
-                borderRadius: '8px',
-                fontSize: '14px',
-                fontWeight: 600,
-                cursor: 'pointer',
-                border: '1px solid',
-                background: activeTab === 'schedules' ? 'var(--brand, #0f766e)' : 'transparent',
-                color: activeTab === 'schedules' ? '#ffffff' : 'var(--ink, #0f172a)',
-                borderColor: activeTab === 'schedules' ? 'var(--brand, #0f766e)' : 'var(--line, #e2e8f0)',
-              }}
-            >
-              All 12 Schedules ({SCHEDULES_DATABASE.length})
-            </button>
+        {/* Master Header */}
+        <header style={{ marginBottom: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+            <span className="public-kicker" style={{ margin: 0 }}>Interactive Polity Study Suite</span>
+            <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#ecfdf5', color: '#047857', border: '1px solid #a7f3d0' }}>
+              All 395 Articles + Frequency Tags
+            </span>
           </div>
+          <h1
+            style={{
+              fontFamily: 'var(--font-heading, "Fraunces", serif)',
+              fontSize: 'clamp(28px, 4vw, 40px)',
+              margin: '0 0 10px',
+              color: 'var(--ink, #0f172a)',
+              letterSpacing: '-0.02em',
+              lineHeight: '1.2',
+            }}
+          >
+            Constitution of India: Articles, PYQ Frequency &amp; Teaching Guide
+          </h1>
+          <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: 0 }}>
+            Master every article of the Indian Constitution with plain-English student explanations, verified past examination frequency tags (UPSC, JKPSC, SSC, State PSCs), landmark Supreme Court rulings, and common examiner trick traps.
+          </p>
 
-          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
-            <div style={{ flex: '1 1 280px', position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
-              <input
-                type="text"
-                placeholder={`Search ${activeTab} by number, topic, or keyword (e.g. "Article 21", "GST", "Emergency")...`}
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '9px 12px 9px 36px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--line, #cbd5e1)',
-                  fontSize: '14px',
-                  outline: 'none',
-                  background: 'var(--bg, #f8fafc)',
-                  color: 'var(--ink, #0f172a)',
-                }}
-              />
+          {/* Quick Metrics Ribbon */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))',
+              gap: '12px',
+              marginTop: '20px',
+            }}
+          >
+            <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 16px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <BookOpen size={20} color="var(--brand, #0f766e)" />
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>{frequencyCounts.total}</div>
+                <div style={{ fontSize: '11.5px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Constitutional Articles</div>
+              </div>
             </div>
 
-            {activeTab === 'articles' && (
-              <select
-                value={partFilter}
-                onChange={(e) => setPartFilter(e.target.value)}
-                style={{
-                  padding: '9px 12px',
-                  borderRadius: '8px',
-                  border: '1px solid var(--line, #cbd5e1)',
-                  fontSize: '13.5px',
-                  background: 'var(--bg, #f8fafc)',
-                  color: 'var(--ink, #0f172a)',
-                  outline: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <option value="all">All Parts</option>
-                <option value="Part III">Part III: Fundamental Rights</option>
-                <option value="Part IV">Part IV: Directive Principles (DPSP)</option>
-                <option value="Part IVA">Part IVA: Fundamental Duties</option>
-                <option value="Part V">Part V: The Union (Exec &amp; Parliament)</option>
-                <option value="Part XII">Part XII: Finance (Finance Commission)</option>
-                <option value="Part XV">Part XV: Elections</option>
-                <option value="Part XVIII">Part XVIII: Emergency Provisions</option>
-                <option value="Part XX">Part XX: Amendments</option>
-              </select>
-            )}
+            <div style={{ background: '#fef2f2', padding: '12px 16px', borderRadius: '10px', border: '1px solid #fecaca', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Flame size={20} color="#dc2626" />
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#991b1b' }}>{frequencyCounts.top}</div>
+                <div style={{ fontSize: '11.5px', color: '#b91c1c', fontWeight: 600 }}>Top Tested (15+ PYQs)</div>
+              </div>
+            </div>
+
+            <div style={{ background: '#fffbeb', padding: '12px 16px', borderRadius: '10px', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Zap size={20} color="#d97706" />
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#92400e' }}>{frequencyCounts.freq}</div>
+                <div style={{ fontSize: '11.5px', color: '#b45309', fontWeight: 600 }}>Frequently Tested</div>
+              </div>
+            </div>
+
+            <div style={{ background: '#eff6ff', padding: '12px 16px', borderRadius: '10px', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <Sparkles size={20} color="#2563eb" />
+              <div>
+                <div style={{ fontSize: '18px', fontWeight: 800, color: '#1e40af' }}>106</div>
+                <div style={{ fontSize: '11.5px', color: '#1d4ed8', fontWeight: 600 }}>Key Amendments</div>
+              </div>
+            </div>
           </div>
+        </header>
+
+        {/* Global Tab Switcher */}
+        <div
+          style={{
+            display: 'flex',
+            gap: '8px',
+            borderBottom: '2px solid var(--line, #e2e8f0)',
+            marginBottom: '20px',
+            overflowX: 'auto',
+            paddingBottom: '2px',
+          }}
+        >
+          <button
+            onClick={() => setActiveTab('articles')}
+            style={{
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'articles' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
+              color: activeTab === 'articles' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            All Articles (395+)
+          </button>
+          <button
+            onClick={() => setActiveTab('parts')}
+            style={{
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'parts' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
+              color: activeTab === 'parts' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Parts of Constitution ({CONSTITUTION_PARTS.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('amendments')}
+            style={{
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'amendments' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
+              color: activeTab === 'amendments' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Landmark Amendments ({KEY_AMENDMENTS.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('schedules')}
+            style={{
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'schedules' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
+              color: activeTab === 'schedules' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            All 12 Schedules
+          </button>
+          <button
+            onClick={() => setActiveTab('faq')}
+            style={{
+              padding: '10px 16px',
+              fontSize: '14px',
+              fontWeight: 700,
+              cursor: 'pointer',
+              background: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'faq' ? '3px solid var(--brand, #0f766e)' : '3px solid transparent',
+              color: activeTab === 'faq' ? 'var(--brand, #0f766e)' : 'var(--ink2, #64748b)',
+              marginBottom: '-2px',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Exam FAQs ({POLITY_FAQS.length})
+          </button>
         </div>
 
-        {/* Content View */}
+        {/* Tab 1: ALL ARTICLES EXPLORER */}
         {activeTab === 'articles' && (
+          <div>
+            {/* Filter Controls Box */}
+            <div
+              style={{
+                background: 'var(--card-bg, #ffffff)',
+                padding: '16px 20px',
+                borderRadius: '12px',
+                border: '1px solid var(--line, #e2e8f0)',
+                marginBottom: '20px',
+              }}
+            >
+              {/* Row 1: Search & Part Selector */}
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', marginBottom: '14px' }}>
+                <div style={{ flex: '1 1 300px', position: 'relative' }}>
+                  <Search size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--ink2, #64748b)' }} />
+                  <input
+                    type="text"
+                    placeholder="Search by article number (e.g. 21), topic (e.g. untouchability, money bill), keyword, or case law..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '10px 12px 10px 36px',
+                      borderRadius: '8px',
+                      border: '1px solid var(--line, #cbd5e1)',
+                      fontSize: '14px',
+                      outline: 'none',
+                      background: 'var(--bg, #f8fafc)',
+                      color: 'var(--ink, #0f172a)',
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Filter size={15} color="var(--ink2, #64748b)" />
+                  <select
+                    value={partFilter}
+                    onChange={(e) => setPartFilter(e.target.value)}
+                    style={{
+                      padding: '10px 14px',
+                      borderRadius: '8px',
+                      border: '1px solid var(--line, #cbd5e1)',
+                      fontSize: '13.5px',
+                      background: 'var(--bg, #f8fafc)',
+                      color: 'var(--ink, #0f172a)',
+                      outline: 'none',
+                      cursor: 'pointer',
+                      fontWeight: 500,
+                    }}
+                  >
+                    <option value="all">All 22 Parts</option>
+                    {CONSTITUTION_PARTS.map((p) => (
+                      <option key={p.part} value={p.part}>
+                        {p.part}: {p.name} ({p.articlesRange})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Row 2: Frequency Pills Filter */}
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
+                <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--ink2, #64748b)', marginRight: '4px' }}>
+                  PYQ Frequency:
+                </span>
+
+                <button
+                  onClick={() => setFrequencyFilter('all')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    background: frequencyFilter === 'all' ? 'var(--ink, #0f172a)' : 'transparent',
+                    color: frequencyFilter === 'all' ? '#ffffff' : 'var(--ink2, #475569)',
+                    borderColor: frequencyFilter === 'all' ? 'var(--ink, #0f172a)' : 'var(--line, #cbd5e1)',
+                  }}
+                >
+                  All ({frequencyCounts.total})
+                </button>
+
+                <button
+                  onClick={() => setFrequencyFilter('Top Tested')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    background: frequencyFilter === 'Top Tested' ? '#dc2626' : '#fef2f2',
+                    color: frequencyFilter === 'Top Tested' ? '#ffffff' : '#991b1b',
+                    borderColor: frequencyFilter === 'Top Tested' ? '#dc2626' : '#fecaca',
+                  }}
+                >
+                  <Flame size={13} />
+                  Top Tested ({frequencyCounts.top})
+                </button>
+
+                <button
+                  onClick={() => setFrequencyFilter('Frequently Tested')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    background: frequencyFilter === 'Frequently Tested' ? '#d97706' : '#fffbeb',
+                    color: frequencyFilter === 'Frequently Tested' ? '#ffffff' : '#92400e',
+                    borderColor: frequencyFilter === 'Frequently Tested' ? '#d97706' : '#fde68a',
+                  }}
+                >
+                  <Zap size={13} />
+                  Frequently Tested ({frequencyCounts.freq})
+                </button>
+
+                <button
+                  onClick={() => setFrequencyFilter('Moderately Tested')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    background: frequencyFilter === 'Moderately Tested' ? '#2563eb' : '#eff6ff',
+                    color: frequencyFilter === 'Moderately Tested' ? '#ffffff' : '#1e40af',
+                    borderColor: frequencyFilter === 'Moderately Tested' ? '#2563eb' : '#bfdbfe',
+                  }}
+                >
+                  <Bookmark size={13} />
+                  Moderately Tested ({frequencyCounts.mod})
+                </button>
+
+                <button
+                  onClick={() => setFrequencyFilter('Foundational')}
+                  style={{
+                    padding: '6px 12px',
+                    borderRadius: '20px',
+                    fontSize: '12.5px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    background: frequencyFilter === 'Foundational' ? '#475569' : '#f8fafc',
+                    color: frequencyFilter === 'Foundational' ? '#ffffff' : '#64748b',
+                    borderColor: frequencyFilter === 'Foundational' ? '#475569' : '#e2e8f0',
+                  }}
+                >
+                  Foundational ({frequencyCounts.found})
+                </button>
+
+                {(search || partFilter !== 'all' || frequencyFilter !== 'all') && (
+                  <button
+                    onClick={resetFilters}
+                    style={{
+                      padding: '5px 10px',
+                      borderRadius: '8px',
+                      fontSize: '12px',
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      border: 'none',
+                      background: 'transparent',
+                      color: 'var(--brand, #0f766e)',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      marginLeft: 'auto',
+                    }}
+                  >
+                    <RotateCcw size={12} />
+                    Reset Filters
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Results Count Banner */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', padding: '0 4px' }}>
+              <span style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', fontWeight: 500 }}>
+                Showing <strong>{displayedArticles.length}</strong> of <strong>{filteredArticles.length}</strong> matching articles
+              </span>
+              {filteredArticles.length > displayedArticles.length && (
+                <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>
+                  Scroll down to load more
+                </span>
+              )}
+            </div>
+
+            {/* Articles Teaching Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '20px' }}>
+              {displayedArticles.map((art: ConstitutionArticleData) => {
+                const isTopTested = art.frequency === 'Top Tested'
+                const isFreqTested = art.frequency === 'Frequently Tested'
+                const isModTested = art.frequency === 'Moderately Tested'
+
+                const badgeBg = isTopTested ? '#fef2f2' : isFreqTested ? '#fffbeb' : isModTested ? '#eff6ff' : '#f8fafc'
+                const badgeColor = isTopTested ? '#991b1b' : isFreqTested ? '#92400e' : isModTested ? '#1e40af' : '#475569'
+                const badgeBorder = isTopTested ? '#fecaca' : isFreqTested ? '#fde68a' : isModTested ? '#bfdbfe' : '#e2e8f0'
+
+                return (
+                  <article
+                    key={art.id}
+                    id={art.id}
+                    style={{
+                      padding: '22px',
+                      background: 'var(--card-bg, #ffffff)',
+                      border: '1px solid var(--line, #e2e8f0)',
+                      borderRadius: '12px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      boxShadow: isTopTested ? '0 2px 8px rgba(220, 38, 38, 0.06)' : 'none',
+                      transition: 'border-color 0.2s, box-shadow 0.2s',
+                    }}
+                  >
+                    <div>
+                      {/* Meta header: Part & Frequency Badge */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px', marginBottom: '10px' }}>
+                        <span style={{ fontSize: '12.5px', fontWeight: 700, color: 'var(--brand, #0f766e)' }}>
+                          {art.part} · {art.partName}
+                        </span>
+                        <span
+                          style={{
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            padding: '3px 8px',
+                            borderRadius: '12px',
+                            background: badgeBg,
+                            color: badgeColor,
+                            border: `1px solid ${badgeBorder}`,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                          }}
+                        >
+                          {isTopTested && <Flame size={12} />}
+                          {isFreqTested && <Zap size={12} />}
+                          {art.frequency} ({art.pyqCount} PYQs)
+                        </span>
+                      </div>
+
+                      {/* Article Number & Title */}
+                      <h2
+                        style={{
+                          fontSize: '19px',
+                          margin: '0 0 8px',
+                          color: 'var(--ink, #0f172a)',
+                          fontFamily: 'var(--font-heading, "Fraunces", serif)',
+                          lineHeight: '1.3',
+                        }}
+                      >
+                        {art.article}: {art.title}
+                      </h2>
+
+                      {/* Official Text / Summary */}
+                      <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 14px' }}>
+                        {art.summary}
+                      </p>
+
+                      {/* Teaching Card 1: In Simple Words */}
+                      <div
+                        style={{
+                          background: 'var(--bg, #f8fafc)',
+                          padding: '12px 14px',
+                          borderRadius: '8px',
+                          borderLeft: '3px solid var(--brand, #0f766e)',
+                          marginBottom: '10px',
+                        }}
+                      >
+                        <strong
+                          style={{
+                            fontSize: '11.5px',
+                            textTransform: 'uppercase',
+                            color: 'var(--brand, #0f766e)',
+                            letterSpacing: '0.4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            marginBottom: '4px',
+                          }}
+                        >
+                          <BookOpen size={13} />
+                          In Simple Words (Teaching Breakdown)
+                        </strong>
+                        <div style={{ fontSize: '13px', color: 'var(--ink2, #334155)', lineHeight: '1.55' }}>
+                          {art.simpleExplanation}
+                        </div>
+                      </div>
+
+                      {/* Teaching Card 2: Common Examiner Trap */}
+                      <div
+                        style={{
+                          background: '#fffdf5',
+                          padding: '12px 14px',
+                          borderRadius: '8px',
+                          borderLeft: '3px solid #f59e0b',
+                          marginBottom: '12px',
+                        }}
+                      >
+                        <strong
+                          style={{
+                            fontSize: '11.5px',
+                            textTransform: 'uppercase',
+                            color: '#b45309',
+                            letterSpacing: '0.4px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '5px',
+                            marginBottom: '4px',
+                          }}
+                        >
+                          <AlertTriangle size={13} />
+                          Common Examiner Trap
+                        </strong>
+                        <div style={{ fontSize: '13px', color: '#78350f', lineHeight: '1.5' }}>
+                          {art.examTrap}
+                        </div>
+                      </div>
+
+                      {/* Landmark Judicial Reference */}
+                      {art.landmarkCase && (
+                        <div style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', background: '#f1f5f9', padding: '6px 10px', borderRadius: '6px', marginBottom: '12px' }}>
+                          <strong style={{ color: 'var(--ink, #1e293b)' }}>⚖️ Landmark Precedent:</strong> {art.landmarkCase}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Bottom Practice CTA */}
+                    <div
+                      style={{
+                        marginTop: '14px',
+                        paddingTop: '12px',
+                        borderTop: '1px solid var(--line, #e2e8f0)',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                      }}
+                    >
+                      <Link
+                        to={`/exam/upsc-cse?tab=subjects&subject=Indian%20Polity`}
+                        style={{
+                          fontSize: '12.5px',
+                          fontWeight: 700,
+                          color: 'var(--brand, #0f766e)',
+                          textDecoration: 'none',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                        }}
+                      >
+                        Solve Indian Polity PYQs on this Topic
+                        <ChevronRight size={14} />
+                      </Link>
+                      <span style={{ fontSize: '11.5px', color: 'var(--ink2, #94a3b8)', fontWeight: 600 }}>
+                        {art.article}
+                      </span>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+
+            {/* Load More Button */}
+            {displayedArticles.length < filteredArticles.length && (
+              <div style={{ textAlign: 'center', marginTop: '30px' }}>
+                <button
+                  onClick={() => setVisibleCount((prev) => prev + 30)}
+                  style={{
+                    padding: '12px 28px',
+                    fontSize: '14px',
+                    fontWeight: 700,
+                    borderRadius: '8px',
+                    background: 'var(--brand, #0f766e)',
+                    color: '#ffffff',
+                    border: 'none',
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 6px rgba(15, 118, 110, 0.2)',
+                  }}
+                >
+                  Load More Articles ({filteredArticles.length - displayedArticles.length} remaining)
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tab 2: PARTS OF THE CONSTITUTION */}
+        {activeTab === 'parts' && (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
-            {filteredArticles.map((art) => (
-              <article
-                key={art.article}
+            {CONSTITUTION_PARTS.map((p) => (
+              <div
+                key={p.part}
                 style={{
-                  padding: '20px',
                   background: 'var(--card-bg, #ffffff)',
-                  border: '1px solid var(--line, #e2e8f0)',
+                  padding: '20px',
                   borderRadius: '12px',
+                  border: '1px solid var(--line, #e2e8f0)',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'space-between',
                 }}
               >
                 <div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--brand, #0f766e)' }}>{art.part} · {art.partName}</span>
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        fontWeight: 700,
-                        padding: '2px 8px',
-                        borderRadius: '10px',
-                        background: art.pyqFrequency === 'Very High' ? '#fef2f2' : '#f0fdf4',
-                        color: art.pyqFrequency === 'Very High' ? '#b91c1c' : '#15803d',
-                        border: `1px solid ${art.pyqFrequency === 'Very High' ? '#fecaca' : '#bbf7d0'}`,
-                      }}
-                    >
-                      {art.pyqFrequency} PYQ Frequency
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '13px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>{p.part}</span>
+                    <span style={{ fontSize: '11.5px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: 'var(--bg, #f1f5f9)', color: 'var(--ink2, #475569)' }}>
+                      {p.articlesRange}
                     </span>
                   </div>
-
-                  <h3 style={{ fontSize: '18px', margin: '0 0 6px', color: 'var(--ink, #0f172a)', fontFamily: 'var(--font-heading, "Fraunces", serif)' }}>
-                    {art.article}: {art.title}
+                  <h3 style={{ fontSize: '17px', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
+                    {p.name}
                   </h3>
-
-                  <p style={{ fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.6', margin: '0 0 12px' }}>
-                    {art.description}
+                  <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', lineHeight: '1.6', margin: 0 }}>
+                    {p.description}
                   </p>
-
-                  <div style={{ background: 'var(--bg, #f8fafc)', padding: '12px', borderRadius: '8px', borderLeft: '3px solid var(--brand, #0f766e)', marginBottom: '12px' }}>
-                    <strong style={{ fontSize: '12px', textTransform: 'uppercase', color: 'var(--brand, #0f766e)', letterSpacing: '0.4px', display: 'block', marginBottom: '4px' }}>
-                      Key Exam Takeaway
-                    </strong>
-                    <span style={{ fontSize: '13px', color: 'var(--ink2, #475569)', lineHeight: '1.5' }}>
-                      {art.examTakeaway}
-                    </span>
-                  </div>
-
-                  {art.landmarkCase && (
-                    <div style={{ fontSize: '12.5px', color: 'var(--ink2, #64748b)', marginBottom: '12px' }}>
-                      <strong>Landmark Judicial Reference:</strong> {art.landmarkCase}
-                    </div>
-                  )}
                 </div>
-
-                <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: '1px solid var(--line, #e2e8f0)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Link
-                    to={`/exam/upsc-cse?tab=subjects&subject=Indian%20Polity`}
-                    style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--brand, #0f766e)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid var(--line, #e2e8f0)' }}>
+                  <button
+                    onClick={() => {
+                      setPartFilter(p.part)
+                      setActiveTab('articles')
+                    }}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      padding: 0,
+                      color: 'var(--brand, #0f766e)',
+                      fontSize: '13px',
+                      fontWeight: 700,
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                    }}
                   >
-                    Solve Polity Questions on this Article →
-                  </Link>
+                    View All Articles in {p.part} →
+                  </button>
                 </div>
-              </article>
+              </div>
             ))}
           </div>
         )}
 
+        {/* Tab 3: LANDMARK AMENDMENTS */}
         {activeTab === 'amendments' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '16px' }}>
             {filteredAmendments.map((am) => (
               <article
                 key={am.amendment}
@@ -519,7 +978,7 @@ export function ConstitutionExplorerPage() {
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--brand, #0f766e)' }}>Year: {am.year}</span>
+                  <span style={{ fontSize: '12.5px', fontWeight: 800, color: 'var(--brand, #0f766e)' }}>Year: {am.year}</span>
                   <span style={{ fontSize: '11px', fontWeight: 600, padding: '2px 8px', borderRadius: '10px', background: '#eff6ff', color: '#1d4ed8' }}>
                     Constitutional Amendment
                   </span>
@@ -534,15 +993,16 @@ export function ConstitutionExplorerPage() {
                   {am.significance}
                 </p>
                 <div style={{ background: '#fefce8', border: '1px solid #fef08a', padding: '10px 12px', borderRadius: '8px', fontSize: '12.5px', color: '#854d0e' }}>
-                  <strong>Exam Tip:</strong> {am.examNote}
+                  <strong>💡 Exam Trap &amp; Takeaway:</strong> {am.examNote}
                 </div>
               </article>
             ))}
           </div>
         )}
 
+        {/* Tab 4: ALL 12 SCHEDULES */}
         {activeTab === 'schedules' && (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '16px' }}>
             {filteredSchedules.map((sch) => (
               <article
                 key={sch.schedule}
@@ -555,7 +1015,7 @@ export function ConstitutionExplorerPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                   <h3 style={{ fontSize: '17px', margin: 0, color: 'var(--brand, #0f766e)' }}>{sch.schedule}</h3>
-                  <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)' }}>{sch.articles}</span>
+                  <span style={{ fontSize: '12px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>{sch.articles}</span>
                 </div>
                 <h4 style={{ fontSize: '15px', color: 'var(--ink, #0f172a)', margin: '0 0 8px' }}>{sch.subject}</h4>
                 <p style={{ fontSize: '13.5px', color: 'var(--ink2, #475569)', lineHeight: '1.6', margin: 0 }}>
@@ -566,29 +1026,136 @@ export function ConstitutionExplorerPage() {
           </div>
         )}
 
-        {/* Bottom Educational Banner */}
-        <div style={{ marginTop: '36px', textAlign: 'center', padding: '24px', background: 'var(--card-bg, #ffffff)', border: '1px solid var(--line, #e2e8f0)', borderRadius: '12px' }}>
-          <h3 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '20px', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
-            Practice Indian Polity Previous Year Questions
-          </h3>
-          <p style={{ fontSize: '14px', color: 'var(--ink2, #475569)', maxWidth: '600px', margin: '0 auto 16px' }}>
-            Put these articles and constitutional amendments into practice with hundreds of solved questions from UPSC Prelims, JKPSC CCE, and SSC CGL.
+        {/* Tab 5: EXAM FAQS */}
+        {activeTab === 'faq' && (
+          <div style={{ maxWidth: '840px', margin: '0 auto' }}>
+            <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '24px', margin: '0 0 16px', color: 'var(--ink, #0f172a)' }}>
+              Frequently Asked Questions on the Constitution of India
+            </h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {POLITY_FAQS.map((faq, idx) => {
+                const isOpen = openFaqIndex === idx
+                return (
+                  <div
+                    key={idx}
+                    style={{
+                      background: 'var(--card-bg, #ffffff)',
+                      border: '1px solid var(--line, #e2e8f0)',
+                      borderRadius: '10px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <button
+                      onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                      style={{
+                        width: '100%',
+                        padding: '16px 20px',
+                        background: 'none',
+                        border: 'none',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '12px',
+                        textAlign: 'left',
+                        cursor: 'pointer',
+                        fontSize: '15px',
+                        fontWeight: 700,
+                        color: 'var(--ink, #0f172a)',
+                      }}
+                    >
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <HelpCircle size={17} color="var(--brand, #0f766e)" />
+                        {faq.q}
+                      </span>
+                      <ChevronRight
+                        size={18}
+                        color="var(--ink2, #64748b)"
+                        style={{
+                          transform: isOpen ? 'rotate(90deg)' : 'none',
+                          transition: 'transform 0.2s',
+                          flexShrink: 0,
+                        }}
+                      />
+                    </button>
+                    {isOpen && (
+                      <div
+                        style={{
+                          padding: '0 20px 16px',
+                          fontSize: '14px',
+                          color: 'var(--ink2, #475569)',
+                          lineHeight: '1.65',
+                          borderTop: '1px solid var(--line, #f1f5f9)',
+                          paddingTop: '14px',
+                        }}
+                      >
+                        {faq.a}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Practice Banner */}
+        <div
+          style={{
+            marginTop: '44px',
+            textAlign: 'center',
+            padding: '28px 24px',
+            background: 'var(--card-bg, #ffffff)',
+            border: '1px solid var(--line, #e2e8f0)',
+            borderRadius: '14px',
+            boxShadow: '0 1px 4px rgba(0,0,0,0.03)',
+          }}
+        >
+          <span style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.6px', color: 'var(--brand, #0f766e)', display: 'block', marginBottom: '6px' }}>
+            Zero Paywall Question Bank
+          </span>
+          <h2 style={{ fontFamily: 'var(--font-heading, "Fraunces", serif)', fontSize: '22px', margin: '0 0 8px', color: 'var(--ink, #0f172a)' }}>
+            Practice Solved Indian Polity Previous Year Questions
+          </h2>
+          <p style={{ fontSize: '14px', color: 'var(--ink2, #475569)', maxWidth: '640px', margin: '0 auto 18px', lineHeight: '1.6' }}>
+            Test your understanding of Fundamental Rights, DPSP, Parliament, Executive, and Constitutional Amendments against real exam questions from UPSC Prelims, JKPSC CCE, SSC CGL, and CDS.
           </p>
-          <Link
-            to="/exam/upsc-cse?tab=subjects&subject=Indian%20Polity"
-            style={{
-              display: 'inline-block',
-              fontWeight: 700,
-              fontSize: '13.5px',
-              color: '#ffffff',
-              background: 'var(--brand, #0f766e)',
-              padding: '9px 20px',
-              borderRadius: '8px',
-              textDecoration: 'none',
-            }}
-          >
-            Solve Indian Polity PYQs (Free) →
-          </Link>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link
+              to="/exam/upsc-cse?tab=subjects&subject=Indian%20Polity"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 700,
+                fontSize: '13.5px',
+                color: '#ffffff',
+                background: 'var(--brand, #0f766e)',
+                padding: '10px 22px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+              }}
+            >
+              Solve UPSC Polity PYQs Free →
+            </Link>
+            <Link
+              to="/exam/jkpsc-cce?tab=subjects&subject=Indian%20Polity"
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                fontWeight: 700,
+                fontSize: '13.5px',
+                color: 'var(--ink, #0f172a)',
+                background: 'var(--bg, #f1f5f9)',
+                border: '1px solid var(--line, #cbd5e1)',
+                padding: '10px 22px',
+                borderRadius: '8px',
+                textDecoration: 'none',
+              }}
+            >
+              JKPSC CCE Polity PYQs →
+            </Link>
+          </div>
         </div>
       </div>
     </section>
