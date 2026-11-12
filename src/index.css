@@ -22511,3 +22511,262 @@ html {
 .river-guide-faq { border-bottom: 1px solid var(--line); padding: 12px 0; }
 .river-guide-faq summary { cursor: pointer; font-weight: 600; color: var(--ink); }
 .river-guide-faq p { margin: 8px 0 0; color: var(--ink2); line-height: 1.75; }
+
+/* ── Modern River Guide Visual Makeover (10/10 UX & Google Policy Cues) ── */
+.river-guide-entry, .river-guide-system {
+  scroll-margin-top: 80px !important;
+}
+
+.river-guide-map-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(30, 136, 229, 0.08) 0%, rgba(38, 166, 154, 0.08) 100%);
+  border: 1px solid rgba(30, 136, 229, 0.22);
+}
+
+.river-map-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.river-map-banner-tag {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+
+.river-map-banner-copy strong {
+  font-size: 15px;
+  color: var(--ink);
+}
+
+.river-map-banner-copy p {
+  margin: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+  color: var(--ink2) !important;
+}
+
+.river-map-banner-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  background: var(--solid);
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  flex-shrink: 0;
+}
+
+.river-map-banner-btn:hover {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+/* Individual River Entry Header */
+.river-guide-entry-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 10px;
+}
+
+.river-guide-entry-header h3 {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  color: var(--ink);
+}
+
+.river-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.river-entry-map-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: var(--line2);
+  border: 1px solid var(--line);
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.river-entry-map-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+  text-decoration: none;
+}
+
+/* River Quick Chips Bar */
+.river-quick-chips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.river-quick-chip {
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.river-chip-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink3);
+}
+
+.river-chip-val {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  line-height: 1.4;
+}
+
+/* Exam Highlight Card per River */
+.river-entry-highlight {
+  margin: 12px 0 16px;
+  padding: 12px 16px;
+  background: rgba(255, 179, 0, 0.08);
+  border-left: 3px solid #ffb300;
+  border-radius: 0 8px 8px 0;
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--ink2);
+}
+
+.river-entry-highlight strong {
+  color: var(--ink);
+}
+
+/* Left & Right Bank Pills Breakdown */
+.river-guide-banks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  margin: 12px 0 16px;
+}
+
+.river-bank-card {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.river-bank-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--line);
+}
+
+.river-bank-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.river-bank-badge.left {
+  background: rgba(30, 136, 229, 0.12);
+  color: #0284c7;
+}
+
+.river-bank-badge.right {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+
+.river-bank-count {
+  font-size: 12px;
+  color: var(--ink3);
+  font-weight: 500;
+}
+
+.river-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.river-pill {
+  display: inline-block;
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.river-pill.left {
+  background: rgba(30, 136, 229, 0.08);
+  border: 1px solid rgba(30, 136, 229, 0.2);
+  color: var(--ink);
+}
+
+.river-pill.right {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: var(--ink);
+}
+
+.river-guide-note {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background: var(--line2);
+  border-radius: 6px;
+  font-size: 12.5px;
+  color: var(--ink2);
+  line-height: 1.55;
+}
+
+@media (max-width: 640px) {
+  .river-guide-map-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .river-guide-banks-grid {
+    grid-template-columns: 1fr;
+  }
+}

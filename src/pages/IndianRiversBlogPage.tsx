@@ -68,58 +68,132 @@ function riverId(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 }
 
+const RIVER_HIGHLIGHTS: Record<string, { label: string; text: string }> = {
+  Indus: {
+    label: 'Indus Waters Treaty & Panjnad Confluence',
+    text: 'Under the 1960 Indus Waters Treaty, the Eastern Rivers (Ravi, Beas, Sutlej) were allocated to India for exclusive use, while the Western Rivers (Indus, Jhelum, Chenab) are allocated to Pakistan with specified permissible uses for India. The 5 Punjab rivers do not join the Indus individually — they meet at the Panjnad before entering the main Indus channel.',
+  },
+  Ganga: {
+    label: 'Devprayag & The Panch Prayag System',
+    text: 'The river is called the Ganga only from Devprayag, where the Alaknanda (from Satopanth glacier) joins the Bhagirathi (from Gaumukh/Gangotri). Upstream, the Alaknanda forms Vishnuprayag (with Dhauliganga), Nandprayag (with Nandakini), Karnaprayag (with Pindar), and Rudraprayag (with Mandakini). Only Yamuna and Son join from the right (south) bank.',
+  },
+  Brahmaputra: {
+    label: 'Antecedent Course & Name Changes',
+    text: 'An antecedent river older than the Himalayas, the river is called the Yarlung Tsangpo in Tibet, cuts a dramatic gorge around Namcha Barwa, enters Arunachal Pradesh as the Siang/Dihang, becomes the Brahmaputra in Assam after receiving the Dibang and Lohit, and flows as the Jamuna in Bangladesh before meeting the Padma.',
+  },
+  Godavari: {
+    label: 'Dakshin Ganga & Indravati/Pranhita Basin',
+    text: 'Longest peninsular river in India (1,465 km). Often called "Dakshin Ganga" or "Vridha Ganga". The Pranhita is its largest tributary by volume, combining the Wardha and Wainganga rivers. Indravati and Sabari are critical left-bank contributors from the Dandakaranya plateau.',
+  },
+  Narmada: {
+    label: 'Rift Valley & Estuary (West Flowing)',
+    text: 'Rises at Amarkantak and flows strictly west through a linear fault/rift valley between the Vindhya and Satpura ranges. Unlike east-flowing peninsular rivers, it builds an estuary at the Gulf of Khambhat rather than a delta.',
+  },
+}
+
 function RiverFacts({ river }: { river: River }) {
   const details = RIVER_STUDY_DETAILS[river.name]
   const hasBankLists = Boolean(details?.leftBank.length || details?.rightBank.length)
 
   return (
-    <section className="river-guide-facts" aria-label={`${river.name} river facts`}>
-      <dl>
-        <dt>Source</dt>
-        <dd>{river.source}</dd>
-
-        <dt>States / UTs in India</dt>
-        <dd>{river.states.join(', ')}</dd>
-
-        <dt>Length</dt>
-        <dd>{river.length}</dd>
-
-        <dt>Drainage</dt>
-        <dd>{river.mouth}</dd>
-      </dl>
+    <div className="river-guide-facts" aria-label={`${river.name} river facts`}>
+      <div className="river-quick-chips">
+        <div className="river-quick-chip">
+          <span className="river-chip-label">Origin / Source</span>
+          <span className="river-chip-val">{river.source}</span>
+        </div>
+        <div className="river-quick-chip">
+          <span className="river-chip-label">Length</span>
+          <span className="river-chip-val">{river.length}</span>
+        </div>
+        <div className="river-quick-chip">
+          <span className="river-chip-label">States in India</span>
+          <span className="river-chip-val">{river.states.join(', ')}</span>
+        </div>
+        <div className="river-quick-chip">
+          <span className="river-chip-label">Outflow / Mouth</span>
+          <span className="river-chip-val">{river.mouth}</span>
+        </div>
+      </div>
 
       <div className="river-guide-tributaries">
-        <h4>Key tributaries and connections</h4>
+        <h4>Tributaries Breakdown</h4>
         {hasBankLists ? (
-          <div className="river-guide-banks">
+          <div className="river-guide-banks-grid">
             {details.leftBank.length > 0 && (
-              <p><strong>Left bank:</strong> {details.leftBank.join(', ')}.</p>
+              <div className="river-bank-card river-bank-left">
+                <div className="river-bank-header">
+                  <span className="river-bank-badge left">Left Bank</span>
+                  <span className="river-bank-count">{details.leftBank.length} tributaries</span>
+                </div>
+                <div className="river-pills-wrap">
+                  {details.leftBank.map((trib) => (
+                    <span key={trib} className="river-pill left">{trib}</span>
+                  ))}
+                </div>
+              </div>
             )}
             {details.rightBank.length > 0 && (
-              <p><strong>Right bank:</strong> {details.rightBank.join(', ')}.</p>
+              <div className="river-bank-card river-bank-right">
+                <div className="river-bank-header">
+                  <span className="river-bank-badge right">Right Bank</span>
+                  <span className="river-bank-count">{details.rightBank.length} tributaries</span>
+                </div>
+                <div className="river-pills-wrap">
+                  {details.rightBank.map((trib) => (
+                    <span key={trib} className="river-pill right">{trib}</span>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
         ) : (
           <p>{river.tributaries}</p>
         )}
-        {details?.tributaryNote && <p className="river-guide-note">{details.tributaryNote}</p>}
+        {details?.tributaryNote && (
+          <p className="river-guide-note">
+            <strong>Exam Note:</strong> {details.tributaryNote}
+          </p>
+        )}
       </div>
-
-    </section>
+    </div>
   )
 }
 
 function RiverEntry({ river }: { river: River }) {
   const [routeExplanation, tributaryExplanation] = RIVER_GUIDE_EXPLANATIONS[river.name]
+  const highlight = RIVER_HIGHLIGHTS[river.name]
+  const riverParam = riverId(river.name)
 
   return (
-    <section className="river-guide-entry" id={riverId(river.name)} aria-labelledby={`${riverId(river.name)}-heading`}>
-      <h3 id={`${riverId(river.name)}-heading`}>{river.name}</h3>
+    <article className="river-guide-entry" id={riverId(river.name)} aria-labelledby={`${riverId(river.name)}-heading`}>
+      <div className="river-guide-entry-header">
+        <h3 id={`${riverId(river.name)}-heading`}>
+          <span className="river-dot" style={{ backgroundColor: river.color }} />
+          {river.name}
+        </h3>
+        <Link
+          to={`/india-physical-geography-map?river=${encodeURIComponent(riverParam)}`}
+          className="river-entry-map-btn"
+          title={`View ${river.name} and its full course on the interactive map`}
+        >
+          <span>Explore on Interactive Map</span>
+          <span aria-hidden="true">↗</span>
+        </Link>
+      </div>
+
       <p className="river-guide-context">{river.info}</p>
+
+      {highlight && (
+        <aside className="river-entry-highlight" aria-label={`${river.name} key exam concept`}>
+          <strong>{highlight.label}:</strong> {highlight.text}
+        </aside>
+      )}
+
       <p>{routeExplanation}</p>
       <p>{tributaryExplanation}</p>
       <RiverFacts river={river} />
-    </section>
+    </article>
   )
 }
 
@@ -145,11 +219,17 @@ export function IndianRiversBlogPage() {
 
         <article className="river-guide-article">
           <header className="river-guide-header">
-            <p className="river-guide-map-cta">
-              <Link to="/india-physical-geography-map">
-                View the interactive rivers map <span aria-hidden="true">→</span>
+            <div className="river-guide-map-banner">
+              <div className="river-map-banner-copy">
+                <span className="river-map-banner-tag">Interactive Resource</span>
+                <strong>Explore India's Physical Geography Map</strong>
+                <p>Zoom into all 13 river routes, filter tributaries by bank, and locate major lakes and reservoirs across Indian states.</p>
+              </div>
+              <Link to="/india-physical-geography-map" className="river-map-banner-btn">
+                <span>Launch Interactive Map</span>
+                <span aria-hidden="true">→</span>
               </Link>
-            </p>
+            </div>
             <p className="river-guide-kicker">Geography</p>
             <h1>{INDIAN_RIVERS_ARTICLE_HEADLINE}</h1>
             <p className="river-guide-deck">

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
 
 type MapTributary = {
@@ -822,6 +822,7 @@ function GeographyStudyGuide() {
 }
 
 export function RiversOfIndiaPage() {
+  const [searchParams] = useSearchParams()
   const [selectedRiver, setSelectedRiver] = React.useState<number | null>(null)
   const [selectedTributary, setSelectedTributary] = React.useState<string | null>(null)
   const [tributaryScrollRequest, setTributaryScrollRequest] = React.useState(0)
@@ -933,6 +934,19 @@ export function RiversOfIndiaPage() {
 
     setRiverLabelPositions(positions)
   }, [filter, mapData])
+
+  // Select river from URL query param e.g. /india-physical-geography-map?river=indus
+  React.useEffect(() => {
+    const riverParam = searchParams.get('river')
+    if (!riverParam || !mapData) return
+    const target = riverParam.toLowerCase().replace(/[^a-z0-9]/g, '')
+    const matchIndex = RIVERS.findIndex(
+      (r) => r.name.toLowerCase().replace(/[^a-z0-9]/g, '') === target
+    )
+    if (matchIndex !== -1) {
+      selectRiver(matchIndex)
+    }
+  }, [searchParams, mapData])
 
   usePageMeta({
     title: 'India Physical Geography Map: Rivers, Lakes & Exam Facts',
