@@ -359,9 +359,8 @@ const STATIC_META: Record<string, PageMeta> = {
 // tags that merely repeat the exam, year or subject.
 // '28' refreshes the edge cache for the human-rewritten JKCCE 2025 GS-I
 // explanations and curated topic tags.
-// '31' refreshes the edge cache for JKCCE Prelims 2025 GS-II (Set B) and
-// JKCCE Prelims 2024 GS-I (Set A) passage extraction, pair tables, and tags.
-const API_CACHE_VERSION = '31'
+// '32' refreshes the edge cache after consolidating JKSSB subjects into clean canonical names.
+const API_CACHE_VERSION = '32'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
