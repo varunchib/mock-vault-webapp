@@ -286,8 +286,8 @@ const STATIC_META: Record<string, PageMeta> = {
     },
   },
   '/blog': {
-    title: 'Study Guides & Geography Articles | Ministry of Papers',
-    description: 'Explore comprehensive study guides, interactive physical geography maps, and solved paper breakdowns for UPSC, SSC, and State PSC exams.',
+    title: 'Blog: Study Guides and Articles | Ministry of Papers',
+    description: 'Study guides and articles for UPSC, SSC and State PSC aspirants, starting with a complete guide to Indian rivers and their tributaries.',
     contentHtml: renderStaticPage('/blog', createElement(BlogIndexPage)),
     jsonLd: {
       '@context': 'https://schema.org',
