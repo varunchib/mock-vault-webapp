@@ -6,7 +6,9 @@
 // without changing question IDs in the database.
 
 export function stripQuestionNumberPrefix(text: string): string {
-  return text.replace(/^(\s*)(?:(?:question)\s*#?\s*|q\s*\.?\s*)\d+\s*(?:[.):-]|–|—)\s*/i, '$1')
+  return text
+    .replace(/^(\s*)(?:question\s*#?\s*|q\s*\.?\s*)\d+\s*(?:[.):–—\-]|(?=\s+[A-Za-z(]))\s*/i, '$1')
+    .replace(/^(\s*)\b\d{1,3}\s*[\.\:\–\—\-]\s+(?=[A-Za-z(])/i, '$1')
 }
 
 /**

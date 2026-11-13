@@ -1,5 +1,5 @@
 const REDUNDANT_ANSWER_LEAD =
-  /^\s*(?:the\s+)?correct\s+answer\s+is\s+\*\*[^*\r\n]+\*\*[.!]?[ \t]*(?:\r?\n|$)/i
+  /^\s*(?:#{1,3}\s*)?(?:the\s+)?(?:correct\s+(?:answer|option)|answer)\s*(?:is|:)\s*(?:\*\*)?[^*\r\n]+(?:\*\*)?[.!]?[ \t]*(?:\r?\n+|$)/i
 
 export function removeRedundantAnswerLead(text: string | undefined | null): string {
   return String(text ?? '')
