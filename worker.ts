@@ -1981,7 +1981,7 @@ export default {
             request.headers.get('CF-Connecting-IP') ?? undefined,
           )
           if (!exams) return serviceUnavailableResponse()
-          const visibleExams = exams.filter((e) => e.slug !== 'neet-ug' && !/\bneet\b/i.test(e.slug))
+          const visibleExams = exams.filter((e) => e.slug !== 'neet-ug' && e.slug !== 'nta' && !/\b(?:neet|nta)\b/i.test(e.slug))
           meta = {
             ...staticMeta,
             contentHtml: renderStaticPage('/exams', createElement(ExamCatalogPage, { initialExams: visibleExams })),
