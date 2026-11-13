@@ -1346,7 +1346,7 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     ? JKSSB_PREP_SECTIONS.map(sec => `
         <section>
           <h2>${htmlText(sec.heading)}</h2>
-          ${sec.paragraphs.map(paragraph).join('')}
+          ${sec.paragraphs.map(p => paragraph(p)).join('')}
           ${sec.bullets ? `<ul>${sec.bullets.map(b => `<li><strong>${htmlText(b.label)}:</strong> ${htmlText(b.text)}</li>`).join('')}</ul>` : ''}
         </section>`).join('')
     : ''
