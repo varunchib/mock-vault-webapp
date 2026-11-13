@@ -6775,7 +6775,12 @@ footer {
   border-radius: 14px;
   background: var(--surface);
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
+}
+
+.pyq-question-card > * {
+  min-width: 0;
 }
 
 .pyq-q-header {
@@ -7261,6 +7266,7 @@ footer {
    horizontally on small screens so a wide table never breaks the layout. */
 .expl-table-wrap {
   margin: 12px 0;
+  max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   border: 1px solid var(--line);
@@ -7274,10 +7280,12 @@ footer {
 .expl-table th,
 .expl-table td {
   padding: 8px 12px;
-  text-align: center;
+  text-align: left;
+  vertical-align: top;
   border-bottom: 1px solid var(--line);
   border-right: 1px solid var(--line);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: break-word;
 }
 .expl-table th:last-child,
 .expl-table td:last-child { border-right: none; }
