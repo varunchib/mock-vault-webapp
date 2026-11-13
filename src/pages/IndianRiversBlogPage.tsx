@@ -222,21 +222,21 @@ export function IndianRiversBlogPage() {
             {/* Master Header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
               <span className="public-kicker" style={{ margin: 0 }}>Geography &amp; River Systems</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: '#eff6ff', color: '#1d4ed8', border: '1px solid #bfdbfe' }}>
+              <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: 'var(--blue-bg)', color: 'var(--blue)', border: '1px solid var(--blue-border)' }}>
                 13 Major River Basins · Left &amp; Right Bank Tributaries · 2026 Updated
               </span>
             </div>
 
-            <h1 style={{ fontSize: 'clamp(22px, 3.2vw, 32px)', fontWeight: 800, margin: '0 0 10px', color: 'var(--ink, #0f172a)', letterSpacing: '-0.02em', lineHeight: '1.2' }}>
+            <h1>
               {INDIAN_RIVERS_ARTICLE_HEADLINE}
             </h1>
 
-            <p style={{ fontSize: '15px', color: 'var(--ink2, #475569)', maxWidth: '820px', lineHeight: '1.6', margin: '0 0 14px' }}>
+            <p className="river-guide-deck" style={{ margin: '0 0 14px' }}>
               From the glacier-fed antecedent rivers of the Himalaya to the ancient monsoon-shaped waterways of the Deccan Plateau, master India’s river systems, tributaries by bank, and high-yield exam traps for UPSC and State PSC exams.
             </p>
 
-            <p className="river-guide-byline" style={{ margin: '0 0 18px', fontSize: '13.5px', color: 'var(--ink2, #64748b)' }}>
-              By <Link to="/about" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none', fontWeight: 600 }}>Ministry of Papers Editorial Team</Link>{' '}
+            <p className="river-guide-byline" style={{ margin: '0 0 18px' }}>
+              By <Link to="/about" style={{ color: 'var(--brand)', textDecoration: 'none', fontWeight: 600 }}>Ministry of Papers Editorial Team</Link>{' '}
               <span aria-hidden="true">·</span> Published{' '}
               <time dateTime={INDIAN_RIVERS_PUBLISHED}>{fmtDate(INDIAN_RIVERS_PUBLISHED)}</time>{' '}
               <span aria-hidden="true">·</span> Updated{' '}
@@ -253,35 +253,35 @@ export function IndianRiversBlogPage() {
                 marginBottom: '20px',
               }}
             >
-              <div style={{ background: 'var(--card-bg, #ffffff)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line, #e2e8f0)', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '20px' }}>🏔️</span>
                 <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink, #0f172a)' }}>2</div>
-                  <div style={{ fontSize: '11px', color: 'var(--ink2, #64748b)', fontWeight: 600 }}>Drainage Systems (Himalayan / Peninsular)</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink)' }}>2</div>
+                  <div style={{ fontSize: '11px', color: 'var(--ink2)', fontWeight: 600 }}>Drainage Systems (Himalayan / Peninsular)</div>
                 </div>
               </div>
 
-              <div style={{ background: '#eff6ff', padding: '12px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: 'var(--blue-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '20px' }}>🌊</span>
                 <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#1e40af' }}>13</div>
-                  <div style={{ fontSize: '11px', color: '#2563eb', fontWeight: 600 }}>Major River Basins</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue)' }}>13</div>
+                  <div style={{ fontSize: '11px', color: 'var(--blue)', fontWeight: 600 }}>Major River Basins</div>
                 </div>
               </div>
 
-              <div style={{ background: '#f0fdf4', padding: '12px 14px', borderRadius: '10px', border: '1px solid #bbf7d0', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: 'var(--green-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--green-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '20px' }}>🌿</span>
                 <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#166534' }}>70+</div>
-                  <div style={{ fontSize: '11px', color: '#15803d', fontWeight: 600 }}>Tributaries by Bank</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--green)' }}>70+</div>
+                  <div style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600 }}>Tributaries by Bank</div>
                 </div>
               </div>
 
-              <div style={{ background: '#fffbeb', padding: '12px 14px', borderRadius: '10px', border: '1px solid #fde68a', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ background: 'var(--hl-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--hl-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{ fontSize: '20px' }}>🎯</span>
                 <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: '#92400e' }}>10+</div>
-                  <div style={{ fontSize: '11px', color: '#b45309', fontWeight: 600 }}>Solved Exam PYQs</div>
+                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--hl-dark)' }}>10+</div>
+                  <div style={{ fontSize: '11px', color: 'var(--hl-dark)', fontWeight: 600 }}>Solved Exam PYQs</div>
                 </div>
               </div>
             </div>

@@ -205,12 +205,12 @@ export function HistoryTimelinePage() {
 
       <div className="public-shell" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px' }}>
         {/* Breadcrumb Navigation */}
-        <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: 'var(--ink2, #64748b)' }}>
-          <Link to="/" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none' }}>Home</Link>
+        <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: 'var(--ink2)' }}>
+          <Link to="/" style={{ color: 'var(--brand)', textDecoration: 'none' }}>Home</Link>
           <span aria-hidden="true">›</span>
-          <Link to="/exams" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none' }}>Study Tools</Link>
+          <Link to="/study-material" style={{ color: 'var(--brand)', textDecoration: 'none' }}>Study Material</Link>
           <span aria-hidden="true">›</span>
-          <span style={{ color: 'var(--ink, #0f172a)', fontWeight: 600 }}>Modern History Timeline (1757–1947)</span>
+          <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Modern History Timeline (1757–1947)</span>
         </nav>
 
         {/* Master Header */}
@@ -511,7 +511,7 @@ export function HistoryTimelinePage() {
                     </span>
                   </div>
 
-                  <span style={{ fontSize: '12px', fontWeight: 700, padding: '3px 8px', borderRadius: '12px', background: 'var(--brand-soft, #ecfdf5)', color: '#047857' }}>
+                  <span style={{ fontSize: '12px', fontWeight: 700, padding: '3px 8px', borderRadius: '12px', background: 'var(--brand-soft)', color: 'var(--brand)' }}>
                     {filteredEvents.length} Milestones
                   </span>
                 </div>

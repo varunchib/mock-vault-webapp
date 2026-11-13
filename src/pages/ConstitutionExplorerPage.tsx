@@ -410,7 +410,7 @@ export function ConstitutionExplorerPage() {
         <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ marginBottom: '16px' }}>
           <Link to="/">Home</Link>
           <span aria-hidden="true">›</span>
-          <Link to="/exams">Study Tools</Link>
+          <Link to="/study-material">Study Material</Link>
           <span aria-hidden="true">›</span>
           <span>Constitution of India Explorer</span>
         </nav>
@@ -1253,9 +1253,9 @@ export function ConstitutionExplorerPage() {
                         fontSize: '13.5px',
                         fontWeight: 600,
                         borderRadius: '8px',
-                        background: '#f8fafc',
-                        color: 'var(--ink, #0f172a)',
-                        border: '1px solid var(--line, #cbd5e1)',
+                        background: 'var(--surface-2)',
+                        color: 'var(--ink)',
+                        border: '1px solid var(--line)',
                         cursor: 'pointer',
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -1782,6 +1782,62 @@ export function ConstitutionExplorerPage() {
             </Link>
           </div>
         </div>
+
+        {/* SSR-Crawlable Complete Constitution Index (Parts I–XXV, Schedules & Amendments) */}
+        <details className="study-ssr-index" style={{ marginTop: '28px' }}>
+          <summary>
+            Complete Constitution Reference Index — All 25 Parts, 395+ Articles, 12 Schedules &amp; 15 Landmark Amendments
+          </summary>
+          <div className="study-ssr-index-body">
+            <h3>Parts &amp; Articles Directory</h3>
+            <div className="study-ssr-parts-grid">
+              {CONSTITUTION_PARTS.map((p) => {
+                const partArts = ALL_CONSTITUTION_ARTICLES.filter((a) => a.part === p.part)
+                return (
+                  <div key={p.part} className="study-ssr-part-block">
+                    <button
+                      type="button"
+                      className="study-ssr-part-link"
+                      onClick={() => {
+                        setActiveTab('articles')
+                        setSelectedPart(p.part)
+                        window.scrollTo({ top: 0, behavior: 'smooth' })
+                      }}
+                    >
+                      {p.part}: {p.name} ({p.articlesRange})
+                    </button>
+                    <p>{p.description}</p>
+                    <ul>
+                      {partArts.map((a) => (
+                        <li key={a.article}>
+                          <strong>{a.article}:</strong> {a.title}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )
+              })}
+            </div>
+
+            <h3>All 12 Schedules</h3>
+            <ul>
+              {SCHEDULES_DATABASE.map((s) => (
+                <li key={s.schedule}>
+                  <strong>{s.schedule} ({s.articles}):</strong> {s.subject} — {s.details}
+                </li>
+              ))}
+            </ul>
+
+            <h3>Landmark Constitutional Amendments</h3>
+            <ul>
+              {KEY_AMENDMENTS.map((am) => (
+                <li key={am.amendment}>
+                  <strong>{am.amendment} ({am.year}):</strong> {am.title} — {am.significance}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </details>
 
         {/* Cross-Link Ecosystem: Related Study Suites */}
         <section

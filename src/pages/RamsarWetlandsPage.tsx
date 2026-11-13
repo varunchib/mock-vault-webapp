@@ -123,12 +123,12 @@ export function RamsarWetlandsPage() {
 
       <div className="public-shell" style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 16px' }}>
         {/* Breadcrumb Navigation */}
-        <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: 'var(--ink2, #64748b)' }}>
-          <Link to="/" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none' }}>Home</Link>
+        <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ margin: '20px 0 16px', display: 'flex', gap: '8px', alignItems: 'center', fontSize: '13.5px', color: 'var(--ink2)' }}>
+          <Link to="/" style={{ color: 'var(--brand)', textDecoration: 'none' }}>Home</Link>
           <span aria-hidden="true">›</span>
-          <Link to="/india-physical-geography-map" style={{ color: 'var(--brand, #0f766e)', textDecoration: 'none' }}>Physical Geography</Link>
+          <Link to="/study-material" style={{ color: 'var(--brand)', textDecoration: 'none' }}>Study Material</Link>
           <span aria-hidden="true">›</span>
-          <span style={{ color: 'var(--ink, #0f172a)', fontWeight: 600 }}>Ramsar Wetlands (103 Sites)</span>
+          <span style={{ color: 'var(--ink)', fontWeight: 600 }}>Ramsar Wetlands (103 Sites)</span>
         </nav>
 
         {/* Hero Section */}
@@ -672,28 +672,28 @@ export function RamsarWetlandsPage() {
                     {/* High-Yield Exam Notes Box */}
                     <div
                       style={{
-                        background: 'var(--bg, #fafaf9)',
-                        borderLeft: '4px solid #0f766e',
+                        background: 'var(--card-bg-subtle)',
+                        borderLeft: '4px solid var(--brand)',
                         padding: '12px 14px',
                         borderRadius: '0 8px 8px 0',
                       }}
                     >
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '4px' }}>
-                        <Award size={14} style={{ color: '#0f766e' }} />
-                        <strong style={{ fontSize: '11.5px', textTransform: 'uppercase', color: '#0f766e', letterSpacing: '0.5px' }}>
+                        <Award size={14} style={{ color: 'var(--brand)' }} />
+                        <strong style={{ fontSize: '11.5px', textTransform: 'uppercase', color: 'var(--brand)', letterSpacing: '0.5px' }}>
                           High-Yield Exam Significance (UPSC / State PSC)
                         </strong>
                       </div>
-                      <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--ink, #334155)', lineHeight: '1.55' }}>
+                      <p style={{ margin: 0, fontSize: '13.5px', color: 'var(--ink)', lineHeight: '1.55' }}>
                         {site.examFact}
                       </p>
                     </div>
 
                     {/* Footer Links */}
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--line, #f1f5f9)', fontSize: '12.5px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid var(--line)', fontSize: '12.5px' }}>
                       <Link
                         to="/india-physical-geography-map"
-                        style={{ color: '#0f766e', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+                        style={{ color: 'var(--brand)', fontWeight: 600, textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
                       >
                         <span>View on Physical Geography Map</span>
                         <ChevronRight size={14} />
@@ -701,7 +701,7 @@ export function RamsarWetlandsPage() {
 
                       <Link
                         to="/blog/indian-rivers-and-tributaries"
-                        style={{ color: 'var(--ink2, #64748b)', textDecoration: 'none' }}
+                        style={{ color: 'var(--ink2)', textDecoration: 'none' }}
                       >
                         Read River &amp; Basin Notes ↗
                       </Link>
@@ -711,10 +711,10 @@ export function RamsarWetlandsPage() {
               })}
 
               {filteredSites.length === 0 && (
-                <div style={{ textAlign: 'center', padding: '48px 20px', background: 'var(--card-bg, #ffffff)', borderRadius: '12px', border: '1px solid var(--line, #e2e8f0)' }}>
-                  <Compass size={36} style={{ color: '#94a3b8', margin: '0 auto 12px' }} />
-                  <h3 style={{ fontSize: '18px', color: 'var(--ink, #0f172a)', margin: '0 0 6px' }}>No Ramsar sites match your query</h3>
-                  <p style={{ fontSize: '14px', color: 'var(--ink2, #64748b)', maxWidth: '420px', margin: '0 auto 16px' }}>
+                <div style={{ textAlign: 'center', padding: '48px 20px', background: 'var(--card-bg)', borderRadius: '12px', border: '1px solid var(--line)' }}>
+                  <Compass size={36} style={{ color: 'var(--ink3)', margin: '0 auto 12px' }} />
+                  <h3 style={{ fontSize: '18px', color: 'var(--ink)', margin: '0 0 6px' }}>No Ramsar sites match your query</h3>
+                  <p style={{ fontSize: '14px', color: 'var(--ink2)', maxWidth: '420px', margin: '0 auto 16px' }}>
                     Try broadening your search keyword or clearing the state and wave filters.
                   </p>
                   <button
@@ -726,7 +726,7 @@ export function RamsarWetlandsPage() {
                       setOnlyMontreux(false)
                     }}
                     style={{
-                      background: '#047857',
+                      background: 'var(--brand)',
                       color: '#ffffff',
                       border: 'none',
                       padding: '8px 18px',
@@ -1071,7 +1071,7 @@ export function RamsarWetlandsPage() {
                 fontWeight: 700,
                 fontSize: '14px',
                 color: '#ffffff',
-                background: '#047857',
+                background: 'var(--brand)',
                 padding: '10px 22px',
                 borderRadius: '8px',
                 textDecoration: 'none',
