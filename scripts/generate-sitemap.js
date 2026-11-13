@@ -22,7 +22,7 @@ async function generate() {
 
   let xml = (await res.text())
     .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
-    .replace(/<url>\s*<loc>[^<]*neet-ug[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+    .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/))[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
   const studyLastMod = '2026-11-13'
   for (const extraUrl of [ARTICLE_URL, BLOG_URL, CONSTITUTION_URL, HISTORY_URL, RAMSAR_URL, STUDY_MATERIAL_URL]) {
     if (!xml.includes(`<loc>${extraUrl}</loc>`)) {

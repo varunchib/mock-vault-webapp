@@ -1910,7 +1910,7 @@ export default {
           headers.set('cache-control', 'public, max-age=600')
           let sitemap = (await res.text())
             .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
-            .replace(/<url>\s*<loc>[^<]*neet-ug[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+            .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/))[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
           const studyLastMod = '2026-11-13'
           const articleUrl = `${BASE}/blog/indian-rivers-and-tributaries`
           const blogUrl = `${BASE}/blog`
