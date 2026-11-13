@@ -1495,6 +1495,17 @@ function notFoundResponse(certainty: 'inferred' | 'decided' = 'inferred'): Respo
   })
 }
 
+function goneResponse(): Response {
+  return new Response('<!doctype html><title>410 Gone</title><h1>410 Gone</h1>', {
+    status: 410,
+    headers: {
+      'content-type': 'text/html; charset=UTF-8',
+      'cache-control': 'public, max-age=3600',
+      'x-robots-tag': 'noindex',
+    },
+  })
+}
+
 async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta | null> {
   try {
     const examMatch = pathname.match(/^\/exam\/([^/]+)$/)
@@ -1868,6 +1879,17 @@ export default {
       dest.pathname = postGuides[slug] ? `/guide/${slug}` : `/exam/${slug}`
       dest.search = ''
       return Response.redirect(dest.toString(), 301)
+    }
+
+    // Retired NTA / NEET-UG URLs → 410 Gone so previously crawled URLs drop
+    // cleanly from search indexes.
+    if (
+      /^\/exam\/(?:nta|neet-ug)(?:\/|$)/i.test(path) ||
+      /^\/paper\/neet-ug-/i.test(path) ||
+      /^\/question\/neet-ug-/i.test(path) ||
+      /^\/guide\/neet-ug(?:\/|$)/i.test(path)
+    ) {
+      return goneResponse()
     }
 
     if (path === '/exams' && url.searchParams.get('q')?.includes('{search_term_string}')) {

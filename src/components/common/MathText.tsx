@@ -63,6 +63,7 @@ type Token =
   | { kind: 'bold';         content: string }
   | { kind: 'italic';       content: string }
   | { kind: 'bold-italic';  content: string }
+  | { kind: 'code';         content: string }
   | { kind: 'flip';         content: string; axis: FlipAxis }
   | { kind: 'figure';       content: string }
   | { kind: 'table';        rows: string[][] }
@@ -162,14 +163,32 @@ function tokenizeInline(text: string): Token[] {
       }
     }
 
+    // Inline code `...`
+    if (text[i] === '`') {
+      const end = text.indexOf('`', i + 1)
+      if (end !== -1) {
+        const inner = text.slice(i + 1, end)
+        if (!inner.includes('\n')) {
+          tokens.push({ kind: 'code', content: inner })
+          i = end + 1
+          continue
+        }
+      }
+      tokens.push({ kind: 'text', content: '`' })
+      i += 1
+      continue
+    }
+
     // Plain text — scan forward to the next special char (start from i+1)
     let next = text.length
     const d = text.indexOf('$', i + 1)
     const b = text.indexOf('*', i + 1)
     const f = text.indexOf('[[', i + 1)
+    const c = text.indexOf('`', i + 1)
     if (d !== -1 && d < next) next = d
     if (b !== -1 && b < next) next = b
     if (f !== -1 && f < next) next = f
+    if (c !== -1 && c < next) next = c
     // next is always > i here, so i always advances
     tokens.push({ kind: 'text', content: text.slice(i, next) })
     i = next
@@ -215,7 +234,7 @@ function tokenize(text: string): Token[] {
     // '[[' must be in this fast-path check too: a bare "[[water:MARKET]]" has
     // neither $ nor *, so without it the token would never be parsed and the
     // raw markup would render as literal text.
-    if (!(text.includes('$') || text.includes('*') || text.includes('[[') || text.includes('|'))) return null
+    if (!(text.includes('$') || text.includes('*') || text.includes('`') || text.includes('[[') || text.includes('|'))) return null
     return tokenize(text)
   }, [text])
 
@@ -262,6 +281,22 @@ function tokenize(text: string): Token[] {
           return <em key={i}>{tok.content}</em>
         case 'bold-italic':
           return <strong key={i} className="qr-highlight"><em>{tok.content}</em></strong>
+        case 'code':
+          return (
+            <code
+              key={i}
+              className="mv-inline-code"
+              style={{
+                fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+                fontSize: '0.9em',
+                padding: '1px 5px',
+                borderRadius: '4px',
+                background: 'rgba(148, 163, 184, 0.16)',
+              }}
+            >
+              {tok.content}
+            </code>
+          )
         case 'figure': {
           const svg = figureSvg(tok.content)
           // An unknown key must not vanish silently — showing it makes a bad

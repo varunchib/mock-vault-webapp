@@ -50,15 +50,17 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
   const query = queryState.searchKey === searchKey ? queryState.value : searchQuery
   const setQuery = (value: string) => setQueryState({ searchKey, value })
 
+  const catalogCountLabel = allExams.length > 0 ? `${allExams.length} ` : ''
+
   usePageMeta({
-    title: 'Exam Catalog — Browse 240+ Competitive Exams | Ministry of Papers',
-    description: 'Browse 240+ competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.',
+    title: `Exam Catalog — Browse ${catalogCountLabel}Competitive Exams | Ministry of Papers`,
+    description: `Browse ${catalogCountLabel}competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.`,
     canonicalPath: '/exams',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Exam Catalog — Ministry of Papers',
-      description: 'Browse competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for 240+ exams.',
+      description: `Browse ${catalogCountLabel}competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.`,
       url: 'https://ministryofpapers.com/exams',
       publisher: {
         '@type': 'Organization',
