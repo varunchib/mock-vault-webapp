@@ -9,7 +9,7 @@ export function Exams() {
       <SectionHeader
         eyebrow="250+ Exams"
         title="Find your exam"
-        subtitle="Central, state, banking, railway, teaching, medical — every competitive exam in India."
+        subtitle="Central, state, banking, railway, defence, teaching — every competitive exam in India."
       />
       <div className="exam-grid">
         {examCatalog.map((exam) => (

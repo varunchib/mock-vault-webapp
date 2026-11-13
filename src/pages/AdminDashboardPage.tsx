@@ -1814,7 +1814,7 @@ export function AdminDashboardPage() {
                     <label className="admin-field">
                       Category
                       <select value={examDraft.category} onChange={(e) => updateExamDraft('category', e.target.value)}>
-                        {['Central','Banking','States','Railways','Teaching','Medical','Engineering'].map((c) => (
+                        {['Central','Banking','States','Railways','Teaching','Engineering'].map((c) => (
                           <option key={c}>{c}</option>
                         ))}
                       </select>

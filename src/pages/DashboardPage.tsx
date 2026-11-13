@@ -24,7 +24,6 @@ export const categoryOrder = [
   'States',
   'Railways',
   'Teaching',
-  'Medical',
   'Engineering',
 ]
 
@@ -34,7 +33,6 @@ export const categoryIcons: Record<string, string> = {
   states: '📍',
   railways: '🚂',
   teaching: '📚',
-  medical: '🏥',
   engineering: '⚙️',
 }
 
@@ -44,7 +42,6 @@ export const categoryFullLabels: Record<string, string> = {
   states: 'State Government',
   railways: 'Railways',
   teaching: 'Teaching',
-  medical: 'Medical',
   engineering: 'Engineering',
 }
 
@@ -53,7 +50,6 @@ export function normalizeExamCategory(category: string): string {
   if (n.includes('bank') || n.includes('ibps') || n.includes('rbi') || n.includes('nabard')) return 'Banking'
   if (n.includes('rail') || n.includes('rrb') || n.includes('ntpc')) return 'Railways'
   if (n.includes('teach') || n.includes('ctet') || n.includes(' tet') || n.startsWith('tet')) return 'Teaching'
-  if (n.includes('medical') || n.includes('neet') || n.includes('aiims')) return 'Medical'
   if (n.includes('engineer') || n.includes('jee') || n.includes('gate')) return 'Engineering'
   if (
     n.includes('central') || n.includes('ssc') || n.includes('upsc') ||
