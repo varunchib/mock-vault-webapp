@@ -94,14 +94,14 @@ export const examCutoffs: Record<string, ExamCutoff> = {
     ],
     avgScore: 55, stdDev: 12,
   },
-  'neet-ug': {
-    examName: 'NEET UG', stage: 'Cut-off (General)', totalMarks: 720, year: '2024',
-    cutoffs: [
-      { category: 'General', marks: 164 },
-      { category: 'OBC/SC/ST', marks: 129 },
-    ],
-    avgScore: 300, stdDev: 100,
-  },
+  // 'neet-ug': {
+  //   examName: 'NEET UG', stage: 'Cut-off (General)', totalMarks: 720, year: '2024',
+  //   cutoffs: [
+  //     { category: 'General', marks: 164 },
+  //     { category: 'OBC/SC/ST', marks: 129 },
+  //   ],
+  //   avgScore: 300, stdDev: 100,
+  // },
 }
 
 // ── Percentile estimation (Abramowitz & Stegun approximation) ─────────────

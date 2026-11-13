@@ -37,7 +37,7 @@ export function Hero() {
         </h1>
 
         <p className="hero-sub">
-          Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams - with complete answers and explanations.
+          Search previous year questions from UPSC, SSC, State PSCs, JEE and 200+ exams - with complete answers and explanations.
         </p>
 
         <div className="search-outer">

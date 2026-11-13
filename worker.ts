@@ -196,7 +196,7 @@ const LEGACY_REDIRECTS: Record<string, string> = {
   '/blog/ibps-po-exam': '/guide/ibps-po',
   '/blog/ssc-cgl-exam': '/guide/ssc-cgl',
   '/blog/upsc-cse-exam': '/guide/upsc-cse',
-  '/blog/neet-ug-exam': '/guide/neet-ug',
+  // '/blog/neet-ug-exam': '/guide/neet-ug',
   '/blog/bpsc-exam': '/guide/bpsc-cce',
   '/blog/jkpsc-jkcce-exam': '/guide/jkcce',
   '/blog/rssb-patwari-exam': '/guide/rssb-patwari',
@@ -216,14 +216,14 @@ const LEGACY_REDIRECTS: Record<string, string> = {
 const STATIC_META: Record<string, PageMeta> = {
   '/': {
     title: 'Ministry of Papers - Every Exam Paper. Solved & Free.',
-    description: 'Search previous year questions from UPSC, SSC, State PSCs, NEET, JEE and 200+ exams. Every answer solved, explained, and free - no login needed.',
+    description: 'Search previous year questions from UPSC, SSC, State PSCs, JEE and 200+ exams. Every answer solved, explained, and free - no login needed.',
     // The homepage is served through the Worker now (assets run_worker_first),
     // so give bots a real <h1> and crawlable intro instead of the empty SPA
     // shell. Keeps the homepage from being flagged for a missing <h1>.
     contentHtml: `<article class="seo-rendered">
       <h1>Ministry of Papers — Free Previous Year Question Papers, Solved &amp; Explained</h1>
       <p>Ministry of Papers is India's free platform for <strong>previous year question papers (PYQs)</strong> and <strong>mock tests</strong>. Every question is <strong>fully solved</strong> with the official answer key and a detailed explanation — no login, no paywall.</p>
-      <p>Practise solved papers for <strong>UPSC Civil Services, SSC CGL, State PSCs (BPSC, JKSSB, JKPSC, RSSB), Banking (IBPS PO), NEET UG</strong> and 200+ competitive exams, in both <strong>English and Hindi</strong>.</p>
+      <p>Practise solved papers for <strong>UPSC Civil Services, SSC CGL, State PSCs (BPSC, JKSSB, JKPSC, RSSB), Banking (IBPS PO)</strong> and 200+ competitive exams, in both <strong>English and Hindi</strong>.</p>
       <nav aria-label="Browse exams">
         <a href="/exams">Browse all exams</a>
         <a href="/exam/upsc-cse">UPSC CSE</a>
@@ -239,7 +239,7 @@ const STATIC_META: Record<string, PageMeta> = {
       name: 'Ministry of Papers',
       alternateName: 'MinistryOfPapers',
       url: BASE,
-      description: 'Free previous year question papers and mock tests for UPSC, SSC, State PSCs, NEET and 200+ exams — every answer solved and explained.',
+      description: 'Free previous year question papers and mock tests for UPSC, SSC, State PSCs, JEE and 200+ exams — every answer solved and explained.',
       publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
       potentialAction: {
         '@type': 'SearchAction',
@@ -1903,15 +1903,15 @@ export default {
         // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=17`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=18`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
           headers.set('cache-control', 'public, max-age=600')
-          let sitemap = (await res.text()).replaceAll(
-            `${BASE}/rivers-of-india`,
-            `${BASE}/india-physical-geography-map`,
-          )
+          let sitemap = (await res.text())
+            .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
+            .replace(/<url>\s*<loc>[^<]*neet-ug[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+          const studyLastMod = '2026-11-13'
           const articleUrl = `${BASE}/blog/indian-rivers-and-tributaries`
           const blogUrl = `${BASE}/blog`
           const contactUrl = `${BASE}/contact`
@@ -1925,7 +1925,7 @@ export default {
               if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
               sitemap = sitemap.replace(
                 '</urlset>',
-                `  <url>\n    <loc>${extraUrl}</loc>\n  </url>\n</urlset>`,
+                `  <url>\n    <loc>${extraUrl}</loc>\n    <lastmod>${studyLastMod}</lastmod>\n  </url>\n</urlset>`,
               )
             }
           }
@@ -1981,9 +1981,10 @@ export default {
             request.headers.get('CF-Connecting-IP') ?? undefined,
           )
           if (!exams) return serviceUnavailableResponse()
+          const visibleExams = exams.filter((e) => e.slug !== 'neet-ug' && !/\bneet\b/i.test(e.slug))
           meta = {
             ...staticMeta,
-            contentHtml: renderStaticPage('/exams', createElement(ExamCatalogPage, { initialExams: exams })),
+            contentHtml: renderStaticPage('/exams', createElement(ExamCatalogPage, { initialExams: visibleExams })),
           }
         }
         const baseRes = await env.ASSETS.fetch(indexRequest)

@@ -20,16 +20,16 @@ async function generate() {
   const res = await fetch(`${API}/sitemap.xml`, { signal: AbortSignal.timeout(30000) })
   if (!res.ok) throw new Error(`/sitemap.xml -> ${res.status}`)
 
-  let xml = (await res.text()).replaceAll(
-    `${BASE}/rivers-of-india`,
-    `${BASE}/india-physical-geography-map`,
-  )
+  let xml = (await res.text())
+    .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
+    .replace(/<url>\s*<loc>[^<]*neet-ug[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+  const studyLastMod = '2026-11-13'
   for (const extraUrl of [ARTICLE_URL, BLOG_URL, CONSTITUTION_URL, HISTORY_URL, RAMSAR_URL, STUDY_MATERIAL_URL]) {
     if (!xml.includes(`<loc>${extraUrl}</loc>`)) {
       if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
       xml = xml.replace(
         '</urlset>',
-        `  <url>\n    <loc>${extraUrl}</loc>\n  </url>\n</urlset>`,
+        `  <url>\n    <loc>${extraUrl}</loc>\n    <lastmod>${studyLastMod}</lastmod>\n  </url>\n</urlset>`,
       )
     }
   }

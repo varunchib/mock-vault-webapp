@@ -19,12 +19,14 @@ import {
 
 const ALL = 'All'
 
+const isHiddenExam = (e: Exam) => e.slug === 'neet-ug' || /\bneet\b/i.test(e.slug) || /\bnta\b/i.test(e.name)
+
 function requestExamCatalog() {
   return Promise.all([
     fetchExamCatalog(),
     fetchEnrolledSlugs().catch(() => ({ slugs: [] as string[] })),
   ]).then(([catalog, enrolled]) => {
-    const all = catalog ?? []
+    const all = (catalog ?? []).filter((e) => !isHiddenExam(e))
     return { all, boards: topLevelBoards(all), enrolled: new Set(enrolled.slugs) }
   })
 }
@@ -33,10 +35,11 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
   const [searchParams] = useSearchParams()
   const searchKey = searchParams.toString()
   const searchQuery = searchParams.get('q') ?? ''
-  const [exams, setExams] = useState<Exam[]>(() => initialExams ? topLevelBoards(initialExams) : [])
+  const visibleInitial = initialExams ? initialExams.filter((e) => !isHiddenExam(e)) : undefined
+  const [exams, setExams] = useState<Exam[]>(() => visibleInitial ? topLevelBoards(visibleInitial) : [])
   // Full catalog including sub-exams. The grid browses boards only, but search
   // spans everything — otherwise sub-exams like JKSSB Patwari are unreachable.
-  const [allExams, setAllExams] = useState<Exam[]>(initialExams ?? [])
+  const [allExams, setAllExams] = useState<Exam[]>(visibleInitial ?? [])
   const [enrolledSlugs, setEnrolledSlugs] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(initialExams === undefined)
   const [error, setError] = useState(false)

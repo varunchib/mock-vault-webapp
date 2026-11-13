@@ -1,4 +1,4 @@
-﻿export type ExamCatalogItem = {
+export type ExamCatalogItem = {
   slug: string
   name: string
   shortName: string
@@ -68,19 +68,19 @@ export const examCatalog: ExamCatalogItem[] = [
     popularYears: ['2024', '2023', '2022', '2021'],
     subjects: ['Finance', 'Accounts', 'JK GK', 'Reasoning', 'Maths'],
   },
-  {
-    slug: 'neet-ug',
-    name: 'NEET UG',
-    shortName: 'NEET UG',
-    category: 'Medical',
-    icon: '🧬',
-    totalQuestions: '12,000+',
-    papers: '90+',
-    mocks: '100',
-    description: 'NEET UG biology, physics, and chemistry previous year questions with chapter-wise explanations and free practice.',
-    popularYears: ['2024', '2023', '2022', '2021'],
-    subjects: ['Biology', 'Physics', 'Chemistry'],
-  },
+  // {
+  //   slug: 'neet-ug',
+  //   name: 'NEET UG',
+  //   shortName: 'NEET UG',
+  //   category: 'Medical',
+  //   icon: '🧬',
+  //   totalQuestions: '12,000+',
+  //   papers: '90+',
+  //   mocks: '100',
+  //   description: 'NEET UG biology, physics, and chemistry previous year questions with chapter-wise explanations and free practice.',
+  //   popularYears: ['2024', '2023', '2022', '2021'],
+  //   subjects: ['Biology', 'Physics', 'Chemistry'],
+  // },
 ]
 
 export const questionCatalog: QuestionCatalogItem[] = [

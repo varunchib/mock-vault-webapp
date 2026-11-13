@@ -1,4 +1,4 @@
-﻿export type Exam = {
+export type Exam = {
   icon: string
   name: string
   questions: string
@@ -23,7 +23,7 @@ export const quickTags = [
   { label: 'UPSC', query: 'UPSC' },
   { label: 'SSC CGL', query: 'SSC CGL' },
   { label: 'JKSSB', query: 'JKSSB' },
-  { label: 'NEET', query: 'NEET' },
+  // { label: 'NEET', query: 'NEET' },
   { label: 'RRB NTPC', query: 'RRB NTPC' },
   { label: 'Patwari', query: 'Patwari' },
 ] as const
@@ -33,7 +33,7 @@ export const tickerItems = [
   '🔥 UPSC 2025 uploaded',
   '📄 SSC CGL 2025 all shifts live',
   '⚡ JKSSB 2025 answer key out',
-  '🎯 NEET 2025 solved',
+  // '🎯 NEET 2025 solved',
   '📝 Bihar PSC 2025 paper added',
   '🔒 UP Police 2025 uploaded',
 ] as const
@@ -73,7 +73,7 @@ export const exams: Exam[] = [
   { icon: '🏛️', name: 'UPSC CSE', questions: '18,000+ questions', badge: 'Central' },
   { icon: '📋', name: 'SSC CGL', questions: '24,000+ questions', badge: 'Central' },
   { icon: '🏦', name: 'IBPS PO / Clerk', questions: '15,000+ questions', badge: 'Banking' },
-  { icon: '🧬', name: 'NEET UG', questions: '12,000+ questions', badge: 'Medical' },
+  // { icon: '🧬', name: 'NEET UG', questions: '12,000+ questions', badge: 'Medical' },
   { icon: '⚗️', name: 'JEE Main', questions: '20,000+ questions', badge: 'Engineering' },
   { icon: '📜', name: 'JKSSB', questions: '8,000+ questions', badge: 'J&K' },
   { icon: '🌾', name: 'Raj. Patwari', questions: '3,000+ questions', badge: 'Rajasthan' },
@@ -108,7 +108,7 @@ export const seoLinks: SeoLink[] = [
   { title: 'SSC CGL 2023 Tier-1 All Shifts Solved', count: '900 Qs' },
   { title: 'JKSSB Finance Accounts 2024 Paper', count: '150 Qs' },
   { title: 'IBPS PO 2023 Reasoning Section PDF', count: '400 Qs' },
-  { title: 'NEET 2023 Biology Chapter-wise PYQs', count: '2,100 Qs' },
+  // { title: 'NEET 2023 Biology Chapter-wise PYQs', count: '2,100 Qs' },
   { title: 'RRB NTPC 2022 GK with Explanations', count: '1,800 Qs' },
   { title: 'Rajasthan Patwari 2023 Morning Shift', count: '150 Qs' },
   { title: 'Bihar PSC 2022 Prelims Solved Paper', count: '500 Qs' },
@@ -146,7 +146,7 @@ export const testimonials: Testimonial[] = [
 ]
 
 export const footerColumns = [
-  { title: 'Exams', links: ['UPSC CSE', 'SSC CGL / CHSL', 'IBPS PO / Clerk', 'NEET UG', 'JEE Main', 'State PSCs'] },
+  { title: 'Exams', links: ['UPSC CSE', 'SSC CGL / CHSL', 'IBPS PO / Clerk', 'JEE Main', 'State PSCs'] },
   { title: 'Platform', links: ['Mock Tests', 'PYQ Search', 'Answer Keys', 'Study Planner', 'Leaderboard'] },
   { title: 'Company', links: ['About', 'For Institutes', 'Privacy Policy', 'Contact Us'] },
 ] as const
