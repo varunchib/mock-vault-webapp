@@ -11614,11 +11614,51 @@ footer {
   color: var(--ink);
 }
 .ep-paper-card-main { flex: 1; min-width: 0; }
-.ep-paper-card-main strong {
+.ep-paper-card-main strong,
+.ep-paper-card-main .ep-paper-title {
   display: block;
   font-size: 14px;
   font-weight: 700;
-  margin-bottom: 3px;
+  margin: 0 0 3px;
+  color: inherit;
+  line-height: 1.35;
+}
+.ep-seo-hub {
+  margin-top: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.ep-seo-guides h2,
+.ep-seo-block h2 {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 10px;
+  color: var(--ink1);
+}
+.ep-seo-article {
+  background: var(--card-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 12px;
+  padding: 20px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.ep-seo-block p,
+.ep-seo-block li {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--ink2);
+}
+.ep-seo-block p { margin: 0 0 10px; }
+.ep-seo-block p:last-child { margin-bottom: 0; }
+.ep-seo-block ul {
+  margin: 6px 0 0;
+  padding-left: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 .ep-paper-card-main small {
   font-size: 12px;

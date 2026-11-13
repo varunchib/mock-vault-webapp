@@ -27,6 +27,9 @@ import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
 import { buildGuideFaqs } from './src/lib/guideFaqs'
+import { examFaqs } from './src/data/examFaq'
+import { JKSSB_GUIDES_LINKS, JKSSB_PREP_SECTIONS } from './src/data/jkssbSeoHub'
+import { examHubSeoDescription, examHubSeoTitle } from './src/lib/pageTitles'
 import { MemoryRouter } from 'react-router-dom'
 import type { Exam } from './src/lib/api'
 
@@ -1317,8 +1320,8 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(x => `<li><a href="/exam/${encodeURIComponent(x.slug)}">${htmlText(x.name)}</a> <small>${x.papers ?? 0} papers${x.mocks ? ` - ${x.mocks} mocks` : ''}</small></li>`)
     .join('')
   const paperLinks = papers
-    .slice(0, 30)
-    .map(p => `<li><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a> <small>${p.questions ?? 0} questions</small></li>`)
+    .slice(0, 150)
+    .map(p => `<li><h3><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a></h3> <small>${p.questions ?? 0} questions${p.year ? ` · ${htmlText(p.year)}` : ''}</small></li>`)
     .join('')
   const mockLinks = mocks
     // Empty series are still not linked for crawlers: the mock hub is noindex
@@ -1336,7 +1339,25 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
   const resourceLinks = guideHref
     ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`
     : ''
-  return renderPageShell(`${e.name} PYQ papers and mock tests`, `
+  const jkssbGuidesSection = e.slug === 'jkssb'
+    ? `<section><h2>JKSSB Syllabus &amp; Exam Pattern Guides</h2><ul>${JKSSB_GUIDES_LINKS.map(g => `<li><a href="/guide/${encodeURIComponent(g.slug)}">${htmlText(g.title)}</a> — <small>${htmlText(g.subtitle)}</small></li>`).join('')}</ul></section>`
+    : ''
+  const jkssbPrepSection = e.slug === 'jkssb'
+    ? JKSSB_PREP_SECTIONS.map(sec => `
+        <section>
+          <h2>${htmlText(sec.heading)}</h2>
+          ${sec.paragraphs.map(paragraph).join('')}
+          ${sec.bullets ? `<ul>${sec.bullets.map(b => `<li><strong>${htmlText(b.label)}:</strong> ${htmlText(b.text)}</li>`).join('')}</ul>` : ''}
+        </section>`).join('')
+    : ''
+  const faqs = examFaqs[e.slug] ?? []
+  const faqSection = faqs.length > 0
+    ? `<section><h2>Frequently Asked Questions</h2><dl>${faqs.map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl></section>`
+    : ''
+  const heading = e.slug === 'jkssb'
+    ? `${e.name} (${e.shortName}) Previous Year Question Papers`
+    : `${e.name} PYQ papers and mock tests`
+  return renderPageShell(heading, `
     ${paragraph(e.description)}
     <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
     ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
@@ -1344,6 +1365,9 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
+    ${jkssbGuidesSection}
+    ${jkssbPrepSection}
+    ${faqSection}
   `, crumbs)
 }
 
@@ -1530,23 +1554,57 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         { name: 'Exams', item: `${BASE}/exams` },
         { name: e.shortName, item: `${BASE}/exam/${slug}` },
       ]
+      const seoTitle = slug === 'jkssb'
+        ? examHubSeoTitle({
+            slug,
+            shortName: e.shortName,
+            name: e.name,
+            totalQuestions: e.totalQuestions,
+          })
+        : titleFit(`${e.shortName} PYQ Papers & Free Mock Tests`)
+      const seoDescription = slug === 'jkssb'
+        ? examHubSeoDescription({
+            slug,
+            shortName: e.shortName,
+            name: e.name,
+            papers: e.papers ?? papers.length,
+            mocks: e.mocks,
+            totalQuestions: e.totalQuestions,
+            description: e.description,
+          })
+        : (e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`)
+      const faqs = examFaqs[slug] ?? []
+      const collectionSchema = {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: `${e.shortName} - Mock Tests & PYQ Papers`,
+        description: seoDescription,
+        url: `${BASE}/exam/${slug}`,
+        publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
+        breadcrumb: breadcrumbJsonLd(examCrumbs),
+      }
       return {
-        title: titleFit(`${e.shortName} PYQ Papers & Free Mock Tests`),
-        description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
+        title: seoTitle,
+        description: seoDescription,
         // A board hub is useful even with one child: it is the canonical entry
         // point for that board and its paper collection. Only empty exams stay
         // out of the index.
         robots: examEmpty ? 'noindex, follow' : undefined,
         contentHtml: renderExamContent(e, papers ?? [], examMocks, subExams, examCrumbs),
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
-          name: `${e.shortName} - Mock Tests & PYQ Papers`,
-          description: e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`,
-          url: `${BASE}/exam/${slug}`,
-          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
-          breadcrumb: breadcrumbJsonLd(examCrumbs),
-        },
+        jsonLd: faqs.length > 0
+          ? [
+              collectionSchema,
+              {
+                '@context': 'https://schema.org',
+                '@type': 'FAQPage',
+                mainEntity: faqs.map(f => ({
+                  '@type': 'Question',
+                  name: f.q,
+                  acceptedAnswer: { '@type': 'Answer', text: f.a },
+                })),
+              },
+            ]
+          : collectionSchema,
       }
     }
 

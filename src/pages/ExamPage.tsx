@@ -40,6 +40,12 @@ import { ExplanationText } from '../components/common/ExplanationText'
 import { examFaqs } from '../data/examFaq'
 import { FaqAccordion } from '../components/common/FaqAccordion'
 import { postGuides } from '../data/postGuides'
+import {
+  JKSSB_DEPARTMENTS,
+  JKSSB_GUIDES_LINKS,
+  JKSSB_PREP_SECTIONS,
+  matchJkssbDepartment,
+} from '../data/jkssbSeoHub'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
@@ -173,12 +179,14 @@ export function ExamPage() {
   // under its slug. Adding a sub-exam reclassifies its parent automatically.
   const isBoard = subExams.length > 0
   const [showAllSubExams, setShowAllSubExams] = useState(false)
+  const [jkssbDept, setJkssbDept] = useState('all')
 
   useEffect(() => {
     if (!slug) return
     setLoading(true)
     setError(false)
     setPaperSearch('')
+    setJkssbDept('all')
 
     const tabFromUrl = (searchParams.get('tab') as Tab | null) ?? 'papers'
     const subjectFromUrl = searchParams.get('subject')
@@ -251,15 +259,17 @@ export function ExamPage() {
 
   const filteredPapers = useMemo(() => {
     const q = paperSearch.trim().toLowerCase()
-    if (!q) return papers
-    return papers.filter(
-      (p) =>
+    return papers.filter((p) => {
+      if (slug === 'jkssb' && !matchJkssbDepartment(p.title, jkssbDept)) return false
+      if (!q) return true
+      return (
         p.title.toLowerCase().includes(q) ||
         p.year.includes(q) ||
         p.shift.toLowerCase().includes(q) ||
-        p.subjects.some((s) => s.toLowerCase().includes(q)),
-    )
-  }, [papers, paperSearch])
+        p.subjects.some((s) => s.toLowerCase().includes(q))
+      )
+    })
+  }, [papers, paperSearch, slug, jkssbDept])
 
   const papersByYear = useMemo(() => {
     // Announced-but-not-yet-conducted papers (0 questions) surface first, in their
@@ -366,10 +376,23 @@ export function ExamPage() {
   const isGated = !isAuthenticated && filteredSubjectQuestions.length > FREE_QUESTION_LIMIT
 
   const seoTitle = exam
-    ? examHubSeoTitle({ shortName: exam.shortName, name: exam.name })
+    ? examHubSeoTitle({
+        slug: exam.slug,
+        shortName: exam.shortName,
+        name: exam.name,
+        totalQuestions: exam.totalQuestions,
+      })
     : 'Exam Hub | Ministry of Papers'
   const seoDesc = exam
-    ? examHubSeoDescription({ shortName: exam.shortName, name: exam.name, papers: exam.papers, mocks: exam.mocks, description: exam.description })
+    ? examHubSeoDescription({
+        slug: exam.slug,
+        shortName: exam.shortName,
+        name: exam.name,
+        papers: exam.papers,
+        mocks: exam.mocks,
+        totalQuestions: exam.totalQuestions,
+        description: exam.description,
+      })
     : 'Browse solved papers, mock tests, and subjects.'
 
   const faqs = exam ? (examFaqs[exam.slug] ?? null) : null
@@ -621,6 +644,21 @@ export function ExamPage() {
             <span>{papers.length}</span>
           </div>
 
+          {slug === 'jkssb' && (
+            <div className="ep-topic-chips" role="group" aria-label="Filter JKSSB papers by department">
+              {JKSSB_DEPARTMENTS.map((dept) => (
+                <button
+                  key={dept.id}
+                  type="button"
+                  className={`ep-topic-chip${jkssbDept === dept.id ? ' active' : ''}`}
+                  onClick={() => setJkssbDept(dept.id)}
+                >
+                  {dept.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <label className="ep-search-bar">
             <Search size={14} />
             <input
@@ -654,7 +692,7 @@ export function ExamPage() {
                       const inner = (
                         <>
                           <div className="ep-paper-card-main">
-                            <strong>{paperSeoOverride(paper.slug)?.h1 ?? paper.title}</strong>
+                            <h3 className="ep-paper-title">{paperSeoOverride(paper.slug)?.h1 ?? paper.title}</h3>
                             <div className="ep-paper-meta">
                               {(() => {
                                 const label = extractShiftLabel(paper.shift)
@@ -703,6 +741,45 @@ export function ExamPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {slug === 'jkssb' && (
+            <div className="ep-seo-hub">
+              <section className="ep-seo-guides">
+                <h2>JKSSB Syllabus &amp; Exam Pattern Guides</h2>
+                <div className="ep-subexam-row">
+                  {JKSSB_GUIDES_LINKS.map((g) => (
+                    <Link className="ep-subexam-chip" to={`/guide/${g.slug}`} key={g.slug}>
+                      <span className="ep-subexam-copy">
+                        <strong>{g.title}</strong>
+                        <small>{g.subtitle}</small>
+                      </span>
+                      <ChevronRight size={14} />
+                    </Link>
+                  ))}
+                </div>
+              </section>
+
+              <section className="ep-seo-article">
+                {JKSSB_PREP_SECTIONS.map((sec) => (
+                  <div key={sec.heading} className="ep-seo-block">
+                    <h2>{sec.heading}</h2>
+                    {sec.paragraphs.map((p, idx) => (
+                      <p key={idx}>{p}</p>
+                    ))}
+                    {sec.bullets && (
+                      <ul>
+                        {sec.bullets.map((b) => (
+                          <li key={b.label}>
+                            <strong>{b.label}:</strong> {b.text}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ))}
+              </section>
             </div>
           )}
 

@@ -93,25 +93,40 @@ export function paperSeoDescription(p: PaperMeta): string {
 // ── Exam hub ───────────────────────────────────────────────────────────────
 
 type ExamHubMeta = {
+  slug?: string
   shortName: string
   name?: string
   papers?: string | number
   mocks?: string | number
+  totalQuestions?: number
   description?: string
 }
 
 /** JKSSB Junior Assistant PYQ – Previous Year Papers & Mock Tests | Ministry of Papers */
 export function examHubSeoTitle(e: ExamHubMeta): string {
+  const qCount = Number(e.totalQuestions ?? 0)
+  if (e.slug === 'jkssb' && qCount > 0) {
+    const formatted = qCount.toLocaleString('en-IN')
+    return truncate(`JKSSB Previous Year Papers – ${formatted}+ Solved MCQs | ${BRAND}`, 72)
+  }
   const label = e.name?.trim() || e.shortName
   return `${label} PYQ – Previous Year Papers & Mock Tests | ${BRAND}`
 }
 
 export function examHubSeoDescription(e: ExamHubMeta): string {
+  const qCount = Number(e.totalQuestions ?? 0)
+  const p = Number(e.papers ?? 0)
+  if (e.slug === 'jkssb' && qCount > 0) {
+    const formatted = qCount.toLocaleString('en-IN')
+    return truncate(
+      `Practice ${formatted}+ official JKSSB previous year questions across ${p} solved papers (Patwari, FAA, Junior Assistant, JKPSI, Constable, Wildlife Guard) with answer keys and explanations.`,
+      160,
+    )
+  }
   const db = e.description?.trim() ?? ''
   if (db.length > 40) return truncate(db, 160)
 
   const label = e.name?.trim() || e.shortName
-  const p = Number(e.papers ?? 0)
   const m = Number(e.mocks ?? 0)
   let d = `Practice ${label} with`
   if (p > 0) d += ` ${p} solved PYQ papers`
