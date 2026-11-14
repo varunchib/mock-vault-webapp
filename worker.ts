@@ -28,7 +28,6 @@ import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
 import { buildGuideFaqs } from './src/lib/guideFaqs'
 import { examFaqs } from './src/data/examFaq'
-import { JKSSB_GUIDES_LINKS, JKSSB_PREP_SECTIONS } from './src/data/jkssbSeoHub'
 import { examHubSeoDescription, examHubSeoTitle } from './src/lib/pageTitles'
 import { MemoryRouter } from 'react-router-dom'
 import type { Exam } from './src/lib/api'
@@ -1339,23 +1338,12 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
   const resourceLinks = guideHref
     ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`
     : ''
-  const jkssbGuidesSection = e.slug === 'jkssb'
-    ? `<section><h2>JKSSB Syllabus &amp; Exam Pattern Guides</h2><ul>${JKSSB_GUIDES_LINKS.map(g => `<li><a href="/guide/${encodeURIComponent(g.slug)}">${htmlText(g.title)}</a> — <small>${htmlText(g.subtitle)}</small></li>`).join('')}</ul></section>`
-    : ''
-  const jkssbPrepSection = e.slug === 'jkssb'
-    ? JKSSB_PREP_SECTIONS.map(sec => `
-        <section>
-          <h2>${htmlText(sec.heading)}</h2>
-          ${sec.paragraphs.map(p => paragraph(p)).join('')}
-          ${sec.bullets ? `<ul>${sec.bullets.map(b => `<li><strong>${htmlText(b.label)}:</strong> ${htmlText(b.text)}</li>`).join('')}</ul>` : ''}
-        </section>`).join('')
-    : ''
   const faqs = examFaqs[e.slug] ?? []
   const faqSection = faqs.length > 0
     ? `<section><h2>Frequently Asked Questions</h2><dl>${faqs.map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl></section>`
     : ''
   const heading = e.slug === 'jkssb'
-    ? `${e.name} (${e.shortName}) Previous Year Question Papers`
+    ? `${e.name} — Previous Year Question Papers (PYQ)`
     : `${e.name} PYQ papers and mock tests`
   return renderPageShell(heading, `
     ${paragraph(e.description)}
@@ -1365,8 +1353,6 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
     ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
     ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
-    ${jkssbGuidesSection}
-    ${jkssbPrepSection}
     ${faqSection}
   `, crumbs)
 }
