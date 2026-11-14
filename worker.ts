@@ -1342,7 +1342,8 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
   const faqSection = faqs.length > 0
     ? `<section><h2>Frequently Asked Questions</h2><dl>${faqs.map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl></section>`
     : ''
-  const heading = e.slug === 'jkssb'
+  const isBoard = subExams.length > 0
+  const heading = isBoard || e.slug === 'jkssb'
     ? `${e.name} — Previous Year Question Papers (PYQ)`
     : `${e.name} PYQ papers and mock tests`
   return renderPageShell(heading, `
@@ -1540,17 +1541,20 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         { name: 'Exams', item: `${BASE}/exams` },
         { name: e.shortName, item: `${BASE}/exam/${slug}` },
       ]
-      const seoTitle = slug === 'jkssb'
+      const isBoard = subExams.length > 0
+      const seoTitle = isBoard || slug === 'jkssb'
         ? examHubSeoTitle({
             slug,
+            isBoard,
             shortName: e.shortName,
             name: e.name,
             totalQuestions: e.totalQuestions,
           })
         : titleFit(`${e.shortName} PYQ Papers & Free Mock Tests`)
-      const seoDescription = slug === 'jkssb'
+      const seoDescription = isBoard || slug === 'jkssb'
         ? examHubSeoDescription({
             slug,
+            isBoard,
             shortName: e.shortName,
             name: e.name,
             papers: e.papers ?? papers.length,

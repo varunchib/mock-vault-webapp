@@ -368,6 +368,7 @@ export function ExamPage() {
   const seoTitle = exam
     ? examHubSeoTitle({
         slug: exam.slug,
+        isBoard,
         shortName: exam.shortName,
         name: exam.name,
         totalQuestions: exam.totalQuestions,
@@ -376,6 +377,7 @@ export function ExamPage() {
   const seoDesc = exam
     ? examHubSeoDescription({
         slug: exam.slug,
+        isBoard,
         shortName: exam.shortName,
         name: exam.name,
         papers: exam.papers,
@@ -466,7 +468,7 @@ export function ExamPage() {
           <div className="ep-hero-info">
             <span className="ep-category-tag">{normalizeExamCategory(exam.category)}</span>
             <h1>
-              {exam.slug === 'jkssb'
+              {isBoard
                 ? `${exam.name} — Previous Year Question Papers (PYQ)`
                 : exam.name}
             </h1>

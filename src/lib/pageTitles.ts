@@ -94,6 +94,7 @@ export function paperSeoDescription(p: PaperMeta): string {
 
 type ExamHubMeta = {
   slug?: string
+  isBoard?: boolean
   shortName: string
   name?: string
   papers?: string | number
@@ -105,9 +106,9 @@ type ExamHubMeta = {
 /** JKSSB Junior Assistant PYQ – Previous Year Papers & Mock Tests | Ministry of Papers */
 export function examHubSeoTitle(e: ExamHubMeta): string {
   const qCount = Number(e.totalQuestions ?? 0)
-  if (e.slug === 'jkssb' && qCount > 0) {
+  if ((e.isBoard || e.slug === 'jkssb') && qCount > 0) {
     const formatted = qCount.toLocaleString('en-IN')
-    return truncate(`JKSSB Previous Year Papers – ${formatted}+ Solved MCQs | ${BRAND}`, 72)
+    return truncate(`${e.shortName} Previous Year Papers – ${formatted}+ Solved MCQs | ${BRAND}`, 72)
   }
   const label = e.name?.trim() || e.shortName
   return `${label} PYQ – Previous Year Papers & Mock Tests | ${BRAND}`
@@ -116,10 +117,12 @@ export function examHubSeoTitle(e: ExamHubMeta): string {
 export function examHubSeoDescription(e: ExamHubMeta): string {
   const qCount = Number(e.totalQuestions ?? 0)
   const p = Number(e.papers ?? 0)
-  if (e.slug === 'jkssb' && qCount > 0) {
+  if ((e.isBoard || e.slug === 'jkssb') && qCount > 0) {
     const formatted = qCount.toLocaleString('en-IN')
+    const db = e.description?.trim() ?? ''
+    if (db.length > 40) return truncate(db, 160)
     return truncate(
-      `Practice ${formatted}+ official JKSSB previous year questions across ${p} solved papers (Patwari, FAA, Junior Assistant, JKPSI, Constable, Wildlife Guard) with answer keys and explanations.`,
+      `Practice ${formatted}+ official ${e.shortName} previous year questions across ${p} solved papers with answer keys and detailed explanations on ${BRAND}.`,
       160,
     )
   }
