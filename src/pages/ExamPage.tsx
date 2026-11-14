@@ -448,7 +448,7 @@ export function ExamPage() {
     )
   }
 
-  const homeHref = isAuthenticated ? '/exams' : '/'
+  const homeHref = isAuthenticated ? '/dashboard' : '/'
   const totalQuestions = exam.totalQuestions || examQuestions.length
 
   const hub = (
@@ -456,7 +456,9 @@ export function ExamPage() {
 
       {/* ── Breadcrumb ─────────────────────────────── */}
       <nav className="ep-breadcrumb" aria-label="Breadcrumb">
-        <Link to={homeHref}>{isAuthenticated ? 'Exams' : 'Home'}</Link>
+        <Link to={homeHref}>{isAuthenticated ? 'Dashboard' : 'Home'}</Link>
+        <ChevronRight size={13} />
+        <Link to="/exams">Exams</Link>
         <ChevronRight size={13} />
         <span>{exam.shortName}</span>
       </nav>

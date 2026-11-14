@@ -192,6 +192,8 @@ export function PyqPaperPage() {
       <nav className="ep-breadcrumb" aria-label="Breadcrumb">
         <Link to={homeHref}>{isAuthenticated ? 'Dashboard' : 'Home'}</Link>
         <ChevronRight size={13} />
+        <Link to="/exams">Exams</Link>
+        <ChevronRight size={13} />
         <Link to={`/exam/${paper.examSlug}`}>{paper.examName}</Link>
         <ChevronRight size={13} />
         <span>{paper.year}</span>

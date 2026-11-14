@@ -118,11 +118,12 @@ export function QuestionPage() {
         '@type': 'BreadcrumbList',
         itemListElement: [
           { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
-          { '@type': 'ListItem', position: 2, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug}` },
+          { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
+          { '@type': 'ListItem', position: 3, name: question.examName, item: `https://ministryofpapers.com/exam/${question.examSlug}` },
           ...(question.paperSlug
-            ? [{ '@type': 'ListItem', position: 3, name: question.paper || `${question.year} question paper`, item: `https://ministryofpapers.com${paperPath(question.paperSlug)}` }]
+            ? [{ '@type': 'ListItem', position: 4, name: question.paper || `${question.year} question paper`, item: `https://ministryofpapers.com${paperPath(question.paperSlug)}` }]
             : question.subject
-            ? [{ '@type': 'ListItem', position: 3, name: question.subject, item: `https://ministryofpapers.com/exam/${question.examSlug}` }]
+            ? [{ '@type': 'ListItem', position: 4, name: question.subject, item: `https://ministryofpapers.com/exam/${question.examSlug}` }]
             : []),
         ],
       },
@@ -165,6 +166,8 @@ export function QuestionPage() {
         {/* Keep the public breadcrumb on the exam, paper, and subject hierarchy. */}
         <nav className="ep-breadcrumb" aria-label="Breadcrumb">
           <Link to="/">Home</Link>
+          <ChevronRight size={13} />
+          <Link to="/exams">Exams</Link>
           <ChevronRight size={13} />
           <Link to={`/exam/${question.examSlug}`}>{question.examName}</Link>
           {question.paperSlug && (
