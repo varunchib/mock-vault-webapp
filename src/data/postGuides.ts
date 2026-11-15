@@ -93,10 +93,13 @@ export const paperGuideMap: Record<string, string> = {
   'jkpsc-jkcce-prelims-2025-gs1-set-b':'jkpsc',
   'jkssb-patwari-2024-sep1-set-a':     'jkssb-patwari',
   'jkssb-junior-assistant-pyq':        'jkssb-junior-assistant',
+  'jkssb-accounts-assistant-finance-2026': 'jkssb-faa',
   'jkssb-finance-accounts-2024-paper': 'jkssb-faa',
+  'jkssb-accounts-assistant-finance-2022': 'jkssb-faa',
   'jkssb-wildlife-guard-2026-may-10':  'jkssb-wildlife-guard',
   'jkssb-veterinary-pharmacist-2025':  'jkssb-veterinary-pharmacist',
   'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb-patwari',
+  'ssc-cgl-2026-sep30-shift2':         'ssc-cgl',
   'ssc-cgl-2025-sep17-shift1':         'ssc-cgl',
   'ssc-cgl-2025-sep12-shift1':         'ssc-cgl',
   'upsc-cse-prelims-2026-gs1':         'upsc-cse',
@@ -1938,15 +1941,17 @@ export const postGuides: Record<string, PostGuideData> = {
 
   // ─── JKSSB Finance Account Assistant ─────────────────────────────────────────
   'jkssb-faa': {
-    title: 'JKSSB Finance Account Assistant (FAA) — Syllabus & Exam Pattern',
+    title: 'JKSSB Finance Account Assistant (FAA) — Syllabus, Exam Pattern & Solved Papers (2026, 2024, 2022)',
     shortName: 'JKSSB FAA',
-    tagline: 'JKSSB Finance Account Assistant exam — J&K Financial Code, Treasury Code, Government Accounting. 120 MCQs, −0.25 negative marking. 2024 solved paper.',
-    lastUpdated: '2026-08-03',
+    tagline: 'JKSSB Finance Account Assistant exam — Accountancy & Book Keeping, PFMS, Statistics, Economics & J&K GK. 120 MCQs, −0.25 negative marking. Includes solved 15 Nov 2026, Jan 2024 & Mar 2022 papers.',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkssb-faa',
 
     papers: [
+      { slug: 'jkssb-accounts-assistant-finance-2026', title: 'JKSSB Accounts Assistant (Finance) — 15 Nov 2026 (Set C)', year: '2026', questions: 120 },
       { slug: 'jkssb-finance-accounts-2024-paper', title: 'JKSSB Finance Account Assistant — Jan 2024', year: '2024', questions: 120 },
+      { slug: 'jkssb-accounts-assistant-finance-2022', title: 'JKSSB Accounts Assistant (Finance) — Mar 2022', year: '2022', questions: 120 },
     ],
 
     conductingBody: 'J&K Services Selection Board (JKSSB)',

@@ -22,8 +22,8 @@ async function generate() {
 
   let xml = (await res.text())
     .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
-    .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/))[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
-  const studyLastMod = '2026-11-13'
+    .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/)|\/pyq\/upsc-prelims-2023-gs-paper-1)[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+  const studyLastMod = '2026-11-16'
   for (const extraUrl of [ARTICLE_URL, BLOG_URL, CONSTITUTION_URL, HISTORY_URL, RAMSAR_URL, STUDY_MATERIAL_URL]) {
     if (!xml.includes(`<loc>${extraUrl}</loc>`)) {
       if (!xml.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')

@@ -114,6 +114,56 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
     review:
       'This JKSSB Finance Accounts Assistant paper is useful for revising the real FAA exam pattern, important accounting topics, general awareness and reasoning questions.',
   },
+  'jkssb-accounts-assistant-finance-2026': {
+    apiSlug: 'jkssb-accounts-assistant-finance-2026',
+    canonicalSlug: 'jkssb-accounts-assistant-finance-2026',
+    title: 'JKSSB Finance Accounts Assistant (FAA) Paper 2026 (15 Nov) - Solved & Answer Key',
+    h1: 'JKSSB Accounts Assistant (Finance) Question Paper 2026 (15 Nov, Set C) — Fully Solved',
+    description:
+      'Fully solved JKSSB Accounts Assistant (Finance / FAA) question paper held on 15 November 2026 (Set C) — all 120 questions with the official Provisional Answer Key and detailed step-by-step explanations.',
+    review:
+      'The JKSSB Accounts Assistant (Finance Department) written examination was held on 15 November 2026 in OMR mode with 120 questions for 120 marks in 2 hours and 0.25 negative marking per wrong answer. The Set C paper tested Accountancy and Book Keeping (30 marks), General Knowledge with special reference to J&K UT (30 marks), General English (10 marks), Statistics (10 marks), Mathematics (10 marks), Economics (10 marks), General Science (10 marks), and Computer Knowledge (10 marks). Use this complete solved paper to verify the official JKSSB Annexure-A Provisional Answer Key and study the full pedagogical explanation for every question.',
+  },
+  'jkssb-accounts-assistant-finance-2022': {
+    apiSlug: 'jkssb-accounts-assistant-finance-2022',
+    canonicalSlug: 'jkssb-accounts-assistant-finance-2022',
+    title: 'JKSSB Finance Accounts Assistant (FAA) Paper 2022 - Solved & Answer Key',
+    h1: 'JKSSB Accounts Assistant (Finance) Question Paper 2022 (6 March) — Fully Solved',
+    description:
+      'Fully solved JKSSB Accounts Assistant (Finance) question paper held on 6 March 2022 — all 120 questions with the official answer key, subject breakdown, and detailed explanations.',
+    review:
+      'The JKSSB Accounts Assistant (Finance) examination held on 6 March 2022 carried 120 MCQs for 120 marks with 0.25 negative marking across General Knowledge with special reference to J&K, Accountancy & Book Keeping, General English, Statistics, Mathematics, Economics, General Science, and Computer Knowledge. Practise all 120 solved questions with detailed explanations.',
+  },
+  'jkssb-social-forestry-worker-2026': {
+    apiSlug: 'jkssb-social-forestry-worker-2026',
+    canonicalSlug: 'jkssb-social-forestry-worker-2026',
+    title: 'JKSSB Social Forestry Worker Question Paper 2026 - Solved & Answer Key',
+    h1: 'JKSSB Social Forestry Worker Question Paper 2026 — All 120 Solved',
+    description:
+      'Fully solved JKSSB Social Forestry Worker 2026 question paper — all 120 questions with the official answer key, section-wise breakdown, and detailed explanations.',
+    review:
+      'The JKSSB Social Forestry Worker (Forest, Ecology & Environment Department) 2026 written examination comprised 120 objective questions covering Basic Mathematics, Basic Reasoning, Basic English, and General Awareness & Science. Review the complete solved paper with step-by-step solutions.',
+  },
+  'kashmir-university-jaa-2026-set-a': {
+    apiSlug: 'kashmir-university-jaa-2026-set-a',
+    canonicalSlug: 'kashmir-university-jaa-2026-set-a',
+    title: 'Kashmir University Junior Accounts Assistant Paper 2026 - Solved & Final Key',
+    h1: 'University of Kashmir Junior Accounts Assistant Question Paper 2026 (Set A) — Solved',
+    description:
+      'Fully solved University of Kashmir Junior Accounts Assistant (JAA) 2026 question paper (Series A) — all 100 questions verified against the official Final Answer Key with detailed explanations.',
+    review:
+      'The University of Kashmir Junior Accounts Assistant (2026, Series A) recruitment examination tested 100 objective questions across General Knowledge & Current Affairs, Accountancy & Auditing, General English, Economics & Statistics, Quantitative Aptitude & Reasoning, Financial Rules, and Computer Knowledge. Every question is solved and verified against the official KU Final Answer Key.',
+  },
+  'ssc-cgl-2026-sep30-shift2': {
+    apiSlug: 'ssc-cgl-2026-sep30-shift2',
+    canonicalSlug: 'ssc-cgl-2026-sep30-shift2',
+    title: 'SSC CGL 2026 Tier 1 Question Paper (30 Sep Shift 2) - Solved & Answer Key',
+    h1: 'SSC CGL Tier-I 2026 Question Paper (30 Sep 2026, Shift 2) — All 100 Solved',
+    description:
+      'Fully solved SSC CGL Tier-I question paper held on 30 September 2026 (Shift 2) — all 100 questions across Reasoning, General Awareness, Quantitative Aptitude, and English with detailed solutions.',
+    review:
+      'The SSC CGL Tier-I 2026 Shift 2 paper held on 30 September 2026 carried 100 questions for 200 marks in 60 minutes (25 questions each in General Intelligence & Reasoning, General Awareness, Quantitative Aptitude, and English Comprehension). Practise the complete shift paper with verified answers and step-by-step explanations.',
+  },
 }
 
 const API_SLUG_BY_CANONICAL = Object.fromEntries(

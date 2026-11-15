@@ -545,7 +545,8 @@ const STATIC_META: Record<string, PageMeta> = {
 // explanations and curated topic tags.
 // '32' refreshes the edge cache after consolidating JKSSB subjects into clean canonical names.
 // '33' refreshes edge cache with upgraded About, Contact, Disclaimer, Privacy, and Guide FAQ schema.
-const API_CACHE_VERSION = '33'
+// '34' refreshes edge cache with JKSSB FAA 2026 (15 Nov Set C) 120 solved explanations and sitewide quality upgrades.
+const API_CACHE_VERSION = '34'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -1628,8 +1629,8 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         apiJson<QuestionData[]>(`${API}/api/v1/papers/${slug}/questions`, 3600, clientIp),
       ])
       if (!p) return null
-      // Only noindex a paper when it has zero content (0 questions).
-      const paperThin = (questions ?? []).length === 0
+      // Noindex empty or stub papers (< 10 questions) so 1-question stubs never get indexed as thin pages.
+      const paperThin = (questions ?? []).length < 10
       const override = paperSeoOverride(p.slug)
       const canonical = `${BASE}${paperPath(p.slug)}`
       const title = override?.title ?? titleFit(`${p.title} PYQ - Solved Questions & Answers`)
@@ -1973,15 +1974,15 @@ export default {
         // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=18`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=19`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
           headers.set('cache-control', 'public, max-age=600')
           let sitemap = (await res.text())
             .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
-            .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/))[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
-          const studyLastMod = '2026-11-13'
+            .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/)|\/pyq\/upsc-prelims-2023-gs-paper-1)[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+          const studyLastMod = '2026-11-16'
           const articleUrl = `${BASE}/blog/indian-rivers-and-tributaries`
           const blogUrl = `${BASE}/blog`
           const contactUrl = `${BASE}/contact`
