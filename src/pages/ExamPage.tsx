@@ -37,7 +37,7 @@ import { subExamsOf } from '../lib/examTree'
 import { normalizeExamCategory } from './DashboardPage'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { ExplanationText } from '../components/common/ExplanationText'
-import { examFaqs } from '../data/examFaq'
+import { getExamFaqs } from '../data/examFaq'
 import { FaqAccordion } from '../components/common/FaqAccordion'
 import { postGuides } from '../data/postGuides'
 
@@ -371,6 +371,7 @@ export function ExamPage() {
         isBoard,
         shortName: exam.shortName,
         name: exam.name,
+        papers: exam.papers || papers.length,
         totalQuestions: exam.totalQuestions,
       })
     : 'Exam Hub | Ministry of Papers'
@@ -380,29 +381,46 @@ export function ExamPage() {
         isBoard,
         shortName: exam.shortName,
         name: exam.name,
-        papers: exam.papers,
+        papers: exam.papers || papers.length,
         mocks: exam.mocks,
         totalQuestions: exam.totalQuestions,
         description: exam.description,
       })
     : 'Browse solved papers, mock tests, and subjects.'
 
-  const faqs = exam ? (examFaqs[exam.slug] ?? null) : null
+  const faqs = exam ? getExamFaqs(exam) : null
 
   usePageMeta({
     title: seoTitle,
     description: seoDesc,
     canonicalPath: exam ? `/exam/${exam.slug}` : '/exam',
     jsonLd: exam
-      ? {
-          '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
-          name: seoTitle.replace(' | Ministry of Papers', ''),
-          description: seoDesc,
-          url: `https://ministryofpapers.com/exam/${exam.slug}`,
-          about: { '@type': 'Thing', name: exam.name },
-          publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
-          breadcrumb: {
+      ? [
+          {
+            '@context': 'https://schema.org',
+            '@type': 'CollectionPage',
+            name: `${exam.name} — Previous Year Question Papers (PYQ)`,
+            description: seoDesc,
+            url: `https://ministryofpapers.com/exam/${exam.slug}`,
+            about: { '@type': 'Thing', name: exam.name },
+            publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
+            ...(papers.length > 0
+              ? {
+                  mainEntity: {
+                    '@type': 'ItemList',
+                    numberOfItems: papers.length,
+                    itemListElement: papers.map((p, idx) => ({
+                      '@type': 'ListItem',
+                      position: idx + 1,
+                      name: paperSeoOverride(p.slug)?.h1 ?? p.title,
+                      url: `https://ministryofpapers.com${paperPath(p.slug)}`,
+                    })),
+                  },
+                }
+              : {}),
+          },
+          {
+            '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
@@ -410,17 +428,20 @@ export function ExamPage() {
               { '@type': 'ListItem', position: 3, name: exam.shortName, item: `https://ministryofpapers.com/exam/${exam.slug}` },
             ],
           },
-          ...(faqs && {
-            mainEntity: {
-              '@type': 'FAQPage',
-              mainEntity: faqs.map((f) => ({
-                '@type': 'Question',
-                name: f.q,
-                acceptedAnswer: { '@type': 'Answer', text: f.a },
-              })),
-            },
-          }),
-        }
+          ...(faqs && faqs.length > 0
+            ? [
+                {
+                  '@context': 'https://schema.org',
+                  '@type': 'FAQPage',
+                  mainEntity: faqs.map((f) => ({
+                    '@type': 'Question',
+                    name: f.q,
+                    acceptedAnswer: { '@type': 'Answer', text: f.a },
+                  })),
+                },
+              ]
+            : []),
+        ]
       : undefined,
   })
 
@@ -469,11 +490,7 @@ export function ExamPage() {
           <div className="ep-hero-icon">{exam.icon}</div>
           <div className="ep-hero-info">
             <span className="ep-category-tag">{normalizeExamCategory(exam.category)}</span>
-            <h1>
-              {isBoard
-                ? `${exam.name} — Previous Year Question Papers (PYQ)`
-                : exam.name}
-            </h1>
+            <h1>{`${exam.name} — Previous Year Question Papers (PYQ)`}</h1>
             <p className="ep-desc">{exam.description}</p>
 
             {/* Stats row */}

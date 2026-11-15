@@ -27,7 +27,7 @@ import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
 import { buildGuideFaqs } from './src/lib/guideFaqs'
-import { examFaqs } from './src/data/examFaq'
+import { getExamFaqs } from './src/data/examFaq'
 import { examHubSeoDescription, examHubSeoTitle } from './src/lib/pageTitles'
 import { MemoryRouter } from 'react-router-dom'
 import type { Exam } from './src/lib/api'
@@ -546,7 +546,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // '32' refreshes the edge cache after consolidating JKSSB subjects into clean canonical names.
 // '33' refreshes edge cache with upgraded About, Contact, Disclaimer, Privacy, and Guide FAQ schema.
 // '34' refreshes edge cache with JKSSB FAA 2026 (15 Nov Set C) 120 solved explanations and sitewide quality upgrades.
-const API_CACHE_VERSION = '35'
+const API_CACHE_VERSION = '38'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -1278,24 +1278,6 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     bySubject.get(s)!.push(q)
   }
 
-  const totalQs = Math.max(questions.length, 1)
-  const weightageRows = [...bySubject.entries()]
-    .sort((a, b) => b[1].length - a[1].length)
-    .map(([subj, qs]) => {
-      const pct = Math.round((qs.length / totalQs) * 100)
-      return `<tr><td><strong>${htmlText(subj)}</strong></td><td>${qs.length}</td><td>${pct}%</td></tr>`
-    })
-    .join('')
-  const weightageTable = bySubject.size > 1
-    ? `<section><h2>Section-Wise Question &amp; Weightage Breakdown</h2><table><thead><tr><th scope="col">Subject / Section</th><th scope="col">Questions Asked</th><th scope="col">Weightage</th></tr></thead><tbody>${weightageRows}</tbody></table></section>`
-    : ''
-
-  const seriesKeySection = override?.provisionalKeyAllSeries && override.provisionalKeyAllSeries.length > 0
-    ? `<section><h2>${htmlText(override.provisionalKeyTitle ?? 'Official Provisional Answer Key (Series A, Series B, Series C & Series D)')}</h2><table><thead><tr><th scope="col">Question No.</th><th scope="col">Series A</th><th scope="col">Series B</th><th scope="col">Series C</th><th scope="col">Series D</th></tr></thead><tbody>${override.provisionalKeyAllSeries
-        .map((r) => `<tr><td><strong>Q${r.q}</strong></td><td>${htmlText(r.a)}</td><td>${htmlText(r.b)}</td><td><strong>${htmlText(r.c)}</strong></td><td>${htmlText(r.d)}</td></tr>`)
-        .join('')}</tbody></table></section>`
-    : ''
-
   const questionLi = (q: QuestionData) => {
     const opts = (q.options ?? [])
       .map((o) => `(${htmlText(o.key)}) ${htmlText(o.text)}`)
@@ -1331,8 +1313,6 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` — ${htmlText(p.year)}` : ''}${p.shift ? ` — ${htmlText(p.shift)}` : ''}</p>
     <p>${p.questions ?? questions.length} solved questions with answer key and detailed explanations${subjectText ? ` — Subjects: ${htmlText(subjectText)}` : ''}${(p.negativeMarking ?? 0) > 0 ? ` — Negative marking: ${p.negativeMarking}` : ''}</p>
     ${source}
-    ${weightageTable}
-    ${seriesKeySection}
     ${sections}
     ${faqSection}
   `, crumbs)
@@ -1346,9 +1326,21 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
   const subExamLinks = subExams
     .map(x => `<li><a href="/exam/${encodeURIComponent(x.slug)}">${htmlText(x.name)}</a> <small>${x.papers ?? 0} papers${x.mocks ? ` - ${x.mocks} mocks` : ''}</small></li>`)
     .join('')
-  const paperLinks = papers
+  const paperRows = papers
     .slice(0, 150)
-    .map(p => `<li><h3><a href="${paperPath(p.slug)}">${htmlText(paperSeoOverride(p.slug)?.h1 ?? p.title)}</a></h3> <small>${p.questions ?? 0} questions${p.year ? ` · ${htmlText(p.year)}` : ''}</small></li>`)
+    .map(p => {
+      const override = paperSeoOverride(p.slug)
+      const displayTitle = override?.h1 ?? p.title
+      const heldOn = p.heldOn ?? ''
+      const shift = p.shift ?? ''
+      const subjText = (p.subjects ?? []).slice(0, 6).join(', ')
+      return `<tr>
+        <td><strong>${htmlText(p.year || '—')}</strong></td>
+        <td><h3><a href="${paperPath(p.slug)}">${htmlText(displayTitle)}</a></h3>${subjText ? `<br /><small>Subjects: ${htmlText(subjText)}</small>` : ''}</td>
+        <td>${htmlText([shift, heldOn].filter(Boolean).join(' · ') || 'Official Shift')}</td>
+        <td>${p.questions ?? 0} Solved Qs</td>
+      </tr>`
+    })
     .join('')
   const mockLinks = mocks
     // Empty series are still not linked for crawlers: the mock hub is noindex
@@ -1366,22 +1358,19 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
   const resourceLinks = guideHref
     ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`
     : ''
-  const faqs = examFaqs[e.slug] ?? []
+  const faqs = getExamFaqs({ ...e, papers: e.papers ?? papers.length })
   const faqSection = faqs.length > 0
-    ? `<section><h2>Frequently Asked Questions</h2><dl>${faqs.map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl></section>`
+    ? `<section><h2>Frequently Asked Questions — ${htmlText(e.shortName)} PYQ</h2><dl>${faqs.map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl></section>`
     : ''
-  const isBoard = subExams.length > 0
-  const heading = isBoard || e.slug === 'jkssb'
-    ? `${e.name} — Previous Year Question Papers (PYQ)`
-    : `${e.name} PYQ papers and mock tests`
+  const heading = `${e.name} — Previous Year Question Papers (PYQ)`
   return renderPageShell(heading, `
     ${paragraph(e.description)}
-    <p>${e.papers ?? papers.length} papers - ${e.totalQuestions ?? 0} questions - ${e.mocks ?? mocks.length} mocks</p>
-    ${subjects ? `<p><strong>Subjects:</strong> ${htmlText(subjects)}</p>` : ''}
-    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} exam guide</h2><ul>${resourceLinks}</ul></section>` : ''}
+    <p><strong>${e.papers ?? papers.length} Solved Official Papers</strong> · <strong>${e.totalQuestions ?? 0} Solved MCQs with Answer Keys &amp; Explanations</strong>${(e.mocks ?? mocks.length) > 0 ? ` · <strong>${e.mocks ?? mocks.length} Mock Tests</strong>` : ''}</p>
+    ${subjects ? `<p><strong>Syllabus Subjects Covered:</strong> ${htmlText(subjects)}</p>` : ''}
+    ${resourceLinks ? `<section><h2>${htmlText(e.shortName)} Syllabus &amp; Exam Guide</h2><ul>${resourceLinks}</ul></section>` : ''}
     ${subExamLinks ? `<section><h2>Exams under ${htmlText(e.shortName)}</h2><ul>${subExamLinks}</ul></section>` : ''}
-    ${paperLinks ? `<section><h2>Previous year papers</h2><ul>${paperLinks}</ul></section>` : ''}
-    ${mockLinks ? `<section><h2>Mock tests</h2><ul>${mockLinks}</ul></section>` : ''}
+    ${paperRows ? `<section><h2>${htmlText(e.shortName)} Previous Year Question Papers (Year-Wise Solved PYQ List)</h2><div class="pg-table-wrap"><table class="pg-table"><thead><tr><th>Year</th><th>Question Paper &amp; Answer Key</th><th>Shift / Exam Date</th><th>Questions</th></tr></thead><tbody>${paperRows}</tbody></table></div></section>` : ''}
+    ${mockLinks ? `<section><h2>${htmlText(e.shortName)} Free Mock Tests</h2><ul>${mockLinks}</ul></section>` : ''}
     ${faqSection}
   `, crumbs)
 }
@@ -1570,36 +1559,47 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         { name: e.shortName, item: `${BASE}/exam/${slug}` },
       ]
       const isBoard = subExams.length > 0
-      const seoTitle = isBoard || slug === 'jkssb'
-        ? examHubSeoTitle({
-            slug,
-            isBoard,
-            shortName: e.shortName,
-            name: e.name,
-            totalQuestions: e.totalQuestions,
-          })
-        : titleFit(`${e.shortName} PYQ Papers & Free Mock Tests`)
-      const seoDescription = isBoard || slug === 'jkssb'
-        ? examHubSeoDescription({
-            slug,
-            isBoard,
-            shortName: e.shortName,
-            name: e.name,
-            papers: e.papers ?? papers.length,
-            mocks: e.mocks,
-            totalQuestions: e.totalQuestions,
-            description: e.description,
-          })
-        : (e.description || `Browse solved PYQ papers and mock tests for ${e.name}.`)
-      const faqs = examFaqs[slug] ?? []
+      const seoTitle = examHubSeoTitle({
+        slug,
+        isBoard,
+        shortName: e.shortName,
+        name: e.name,
+        papers: e.papers ?? papers.length,
+        totalQuestions: e.totalQuestions,
+      })
+      const seoDescription = examHubSeoDescription({
+        slug,
+        isBoard,
+        shortName: e.shortName,
+        name: e.name,
+        papers: e.papers ?? papers.length,
+        mocks: e.mocks,
+        totalQuestions: e.totalQuestions,
+        description: e.description,
+      })
+      const faqs = getExamFaqs({ ...e, papers: e.papers ?? papers.length })
       const collectionSchema = {
         '@context': 'https://schema.org',
         '@type': 'CollectionPage',
-        name: `${e.shortName} - Mock Tests & PYQ Papers`,
+        name: `${e.name} — Previous Year Question Papers (PYQ)`,
         description: seoDescription,
         url: `${BASE}/exam/${slug}`,
         publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
         breadcrumb: breadcrumbJsonLd(examCrumbs),
+        ...(papers.length > 0
+          ? {
+              mainEntity: {
+                '@type': 'ItemList',
+                numberOfItems: papers.length,
+                itemListElement: papers.slice(0, 50).map((p, idx) => ({
+                  '@type': 'ListItem',
+                  position: idx + 1,
+                  name: paperSeoOverride(p.slug)?.h1 ?? p.title,
+                  url: `${BASE}${paperPath(p.slug)}`,
+                })),
+              },
+            }
+          : {}),
       }
       return {
         title: seoTitle,

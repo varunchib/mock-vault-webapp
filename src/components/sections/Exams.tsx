@@ -1,4 +1,4 @@
-﻿import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { examCatalog } from '../../data/catalog'
 import { Reveal } from '../ui/Reveal'
 import { SectionHeader } from '../ui/SectionHeader'

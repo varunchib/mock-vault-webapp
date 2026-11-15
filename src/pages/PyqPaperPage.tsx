@@ -1,7 +1,7 @@
 import { MathText } from '../components/common/MathText'
 import { ExplanationText } from '../components/common/ExplanationText'
 import { env } from '../lib/env'
-import { BookOpen, ChevronRight, Download, Eye, EyeOff, Play } from 'lucide-react'
+import { BookOpen, ChevronRight, Download, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { HaloLoader } from '../components/common/HaloLoader'
@@ -46,7 +46,6 @@ export function PyqPaperPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [explOpen, setExplOpen] = useState<Record<string, boolean>>({})
-  const [allSolutionsOpen, setAllSolutionsOpen] = useState(false)
   const [activeSubject, setActiveSubject] = useState<string>('ALL')
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const { isAuthenticated } = useAuth()
@@ -56,7 +55,6 @@ export function PyqPaperPage() {
     setLoading(true)
     setError(false)
     setActiveSubject('ALL')
-    setAllSolutionsOpen(false)
 
     fetchPaperBySlug(apiPaperSlug(slug))
       .then((paperData) => {
@@ -214,24 +212,6 @@ export function PyqPaperPage() {
     setExplOpen((prev) => ({ ...prev, [qSlug]: !prev[qSlug] }))
   }
 
-  const toggleAllSolutions = () => {
-    if (allSolutionsOpen) {
-      setRevealed({})
-      setExplOpen({})
-      setAllSolutionsOpen(false)
-    } else {
-      const nextRev: Record<string, boolean> = {}
-      const nextExpl: Record<string, boolean> = {}
-      for (const q of questions) {
-        nextRev[q.slug] = true
-        nextExpl[q.slug] = true
-      }
-      setRevealed(nextRev)
-      setExplOpen(nextExpl)
-      setAllSolutionsOpen(true)
-    }
-  }
-
   const content = (
     <div className="pyq-page">
       <nav className="ep-breadcrumb" aria-label="Breadcrumb">
@@ -315,7 +295,7 @@ export function PyqPaperPage() {
         </div>
       </header>
 
-      <section className="pyq-paper-seo-intro" aria-label="Exam Paper Analysis and Section Breakdown">
+      <section className="pyq-paper-seo-intro" aria-label="Exam Paper Overview and Subject Filter">
         <p className="pyq-paper-review-text">{seoOverride?.review ?? seoDesc}</p>
 
         {!comingSoon && subjectCounts.length > 0 && (
@@ -343,123 +323,6 @@ export function PyqPaperPage() {
                 </button>
               ))}
             </div>
-            <button
-              type="button"
-              className={`pyq-solution-toggle-btn${allSolutionsOpen ? ' active' : ''}`}
-              onClick={toggleAllSolutions}
-            >
-              {allSolutionsOpen ? <EyeOff size={14} /> : <Eye size={14} />}
-              {allSolutionsOpen ? 'Hide All Solutions' : 'Show All Answers & Explanations'}
-            </button>
-          </div>
-        )}
-
-        {!comingSoon && (
-          <div className="pyq-overview-panels">
-            {subjectCounts.length > 1 && (
-              <details className="pyq-overview-panel">
-                <summary>
-                  <span>Section-Wise Question &amp; Weightage Breakdown ({subjectCounts.length} Sections · {questions.length} Questions)</span>
-                </summary>
-                <div className="pyq-overview-table-wrap">
-                  <table className="pyq-overview-table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Subject / Syllabus Section</th>
-                        <th scope="col">Questions Asked</th>
-                        <th scope="col">Weightage</th>
-                        <th scope="col">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {subjectCounts.map(([subj, count]) => {
-                        const pct = Math.round((count / Math.max(questions.length, 1)) * 100)
-                        return (
-                          <tr key={subj}>
-                            <td><strong>{subj}</strong></td>
-                            <td>{count} Qs</td>
-                            <td>{pct}%</td>
-                            <td>
-                              <button
-                                type="button"
-                                className="pyq-table-filter-btn"
-                                onClick={() => setActiveSubject(subj === activeSubject ? 'ALL' : subj)}
-                              >
-                                {activeSubject === subj ? 'Showing (Reset)' : `Filter ${count} Qs →`}
-                              </button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            )}
-
-            {seoOverride?.provisionalKeyAllSeries && seoOverride.provisionalKeyAllSeries.length > 0 ? (
-              <details className="pyq-overview-panel">
-                <summary>
-                  <span>{seoOverride.provisionalKeyTitle ?? 'Official Provisional Answer Key (Series A, Series B, Series C & Series D)'}</span>
-                </summary>
-                <div className="pyq-overview-table-wrap">
-                  <p className="pyq-key-note">
-                    Official Provisional Answer Key (Annexure-A) across all four text booklet series. Click any question number to jump directly to its solved explanation below (Set C).
-                  </p>
-                  <table className="pyq-overview-table pyq-series-key-table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Q.No</th>
-                        <th scope="col">Series A</th>
-                        <th scope="col">Series B</th>
-                        <th scope="col">Series C (Solved Below)</th>
-                        <th scope="col">Series D</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {seoOverride.provisionalKeyAllSeries.map((row) => (
-                        <tr key={row.q}>
-                          <td>
-                            <a href={`#q-${row.q}`} onClick={() => setActiveSubject('ALL')}>
-                              <strong>Q{row.q}</strong>
-                            </a>
-                          </td>
-                          <td>{row.a}</td>
-                          <td>{row.b}</td>
-                          <td><strong>{row.c}</strong></td>
-                          <td>{row.d}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </details>
-            ) : (
-              questions.length > 0 && (
-                <details className="pyq-overview-panel">
-                  <summary>
-                    <span>Official Answer Key Quick-Reference Grid (Q1–Q{questions.length})</span>
-                  </summary>
-                  <div className="pyq-key-grid">
-                    {questions.map((q, idx) => {
-                      const qNo = q.questionNo || idx + 1
-                      return (
-                        <a
-                          key={q.slug}
-                          href={`#q-${qNo}`}
-                          className="pyq-key-cell"
-                          onClick={() => setActiveSubject('ALL')}
-                          title={`Jump to Question ${qNo}`}
-                        >
-                          <span className="pyq-key-q">Q{qNo}</span>
-                          <strong className="pyq-key-a">{q.answerKey}</strong>
-                        </a>
-                      )
-                    })}
-                  </div>
-                </details>
-              )
-            )}
           </div>
         )}
       </section>

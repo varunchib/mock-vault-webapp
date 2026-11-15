@@ -732,10 +732,9 @@ export const postGuides: Record<string, PostGuideData> = {
     examSlug: 'upsc-cse',
 
     papers: [
-      { slug: 'upsc-cse-prelims-2026-gs1',     title: 'UPSC CSE Prelims 2026 — GS Paper I',    year: '2026', questions: 100 },
-      { slug: 'upsc-cse-prelims-2025-gs1',     title: 'UPSC CSE Prelims 2025 — GS Paper I',    year: '2025', questions: 100 },
-      { slug: 'upsc-cse-prelims-2025-gs2',     title: 'UPSC CSE Prelims 2025 — CSAT Paper II', year: '2025', questions: 80  },
-      { slug: 'upsc-prelims-2023-gs-paper-1',  title: 'UPSC Prelims 2023 — GS Paper I',        year: '2023', questions: 100 },
+      { slug: 'upsc-cse-prelims-2026-gs1',     title: 'UPSC CSE Prelims Question Paper 2026 (GS Paper I, Set A) — Solved',    year: '2026', questions: 100 },
+      { slug: 'upsc-cse-prelims-2025-gs1',     title: 'UPSC CSE Prelims Question Paper 2025 (GS Paper I, Set A) — Solved',    year: '2025', questions: 100 },
+      { slug: 'upsc-cse-prelims-2025-gs2',     title: 'UPSC CSE Prelims Question Paper 2025 (CSAT Paper II, Set A) — Solved', year: '2025', questions: 80  },
     ],
 
     conductingBody: 'Union Public Service Commission (UPSC)',
@@ -1949,9 +1948,9 @@ export const postGuides: Record<string, PostGuideData> = {
     examSlug: 'jkssb-faa',
 
     papers: [
-      { slug: 'jkssb-accounts-assistant-finance-2026', title: 'JKSSB Accounts Assistant (Finance) — 15 Nov 2026 (Set C)', year: '2026', questions: 120 },
-      { slug: 'jkssb-finance-accounts-2024-paper', title: 'JKSSB Finance Account Assistant — Jan 2024', year: '2024', questions: 120 },
-      { slug: 'jkssb-accounts-assistant-finance-2022', title: 'JKSSB Accounts Assistant (Finance) — Mar 2022', year: '2022', questions: 120 },
+      { slug: 'jkssb-accounts-assistant-finance-2026', title: 'JKSSB Finance Accounts Assistant Question Paper 2026', year: '2026', questions: 120 },
+      { slug: 'jkssb-finance-accounts-2024-paper', title: 'JKSSB Finance Accounts Assistant Question Paper 2024', year: '2024', questions: 120 },
+      { slug: 'jkssb-accounts-assistant-finance-2022', title: 'JKSSB Finance Accounts Assistant Question Paper 2022', year: '2022', questions: 120 },
     ],
 
     conductingBody: 'J&K Services Selection Board (JKSSB)',

@@ -103,39 +103,53 @@ type ExamHubMeta = {
   description?: string
 }
 
-/** JKSSB Junior Assistant PYQ – Previous Year Papers & Mock Tests | Ministry of Papers */
+/** JKSSB Finance Accounts Assistant (FAA) Previous Year Question Papers (PYQ) – Solved */
 export function examHubSeoTitle(e: ExamHubMeta): string {
   const qCount = Number(e.totalQuestions ?? 0)
+  const pCount = Number(e.papers ?? 0)
+  const rawName = (e.name?.trim() || e.shortName).trim()
+  const short = (e.shortName ?? '').trim()
+  // Ensure the short code (e.g. "JKSSB FAA") is represented if not already in name
+  const label = short && !rawName.toLowerCase().includes(short.toLowerCase()) && rawName.length + short.length < 42
+    ? `${rawName} (${short})`
+    : rawName
+
   if ((e.isBoard || e.slug === 'jkssb') && qCount > 0) {
     const formatted = qCount.toLocaleString('en-IN')
-    return truncate(`${e.shortName} Previous Year Papers – ${formatted}+ Solved MCQs | ${BRAND}`, 72)
+    return truncate(`${short || label} Previous Year Question Papers (PYQ) – ${formatted}+ Solved MCQs`, 68)
   }
-  const label = e.name?.trim() || e.shortName
-  return `${label} PYQ – Previous Year Papers & Mock Tests | ${BRAND}`
+  if (pCount > 1 && qCount > 0) {
+    const candidate = `${label} Previous Year Question Papers (PYQ) – ${pCount} Solved Papers`
+    if (candidate.length <= 68) return candidate
+  }
+  const withFull = `${label} Previous Year Question Papers (PYQ) – Solved`
+  if (withFull.length <= 68) return withFull
+  const withShort = `${label} Previous Year Papers (PYQ) – Solved & Answer Key`
+  if (withShort.length <= 68) return withShort
+  return truncate(`${label} Previous Year Question Papers (PYQ)`, 68)
 }
 
 export function examHubSeoDescription(e: ExamHubMeta): string {
   const qCount = Number(e.totalQuestions ?? 0)
   const p = Number(e.papers ?? 0)
+  const db = e.description?.trim() ?? ''
   if ((e.isBoard || e.slug === 'jkssb') && qCount > 0) {
+    if (db.length > 50) return truncate(db, 160)
     const formatted = qCount.toLocaleString('en-IN')
-    const db = e.description?.trim() ?? ''
-    if (db.length > 40) return truncate(db, 160)
     return truncate(
-      `Practice ${formatted}+ official ${e.shortName} previous year questions across ${p} solved papers with answer keys and detailed explanations on ${BRAND}.`,
+      `Practice ${formatted}+ official ${e.shortName} previous year questions (PYQ) across ${p} solved question papers with official answer keys and detailed explanations on ${BRAND}.`,
       160,
     )
   }
-  const db = e.description?.trim() ?? ''
-  if (db.length > 40) return truncate(db, 160)
+  if (db.length > 50) return truncate(db, 160)
 
   const label = e.name?.trim() || e.shortName
   const m = Number(e.mocks ?? 0)
-  let d = `Practice ${label} with`
-  if (p > 0) d += ` ${p} solved PYQ papers`
-  if (p > 0 && m > 0) d += ' and'
-  if (m > 0) d += ` ${m} full-length mock tests`
-  d += `. Detailed answers, subject analysis, and cutoff comparison – free on ${BRAND}.`
+  let d = `Solved ${label} previous year question papers (PYQ)`
+  if (p > 0 && qCount > 0) d += ` — ${p} official paper${p > 1 ? 's' : ''} (${qCount.toLocaleString('en-IN')} solved MCQs)`
+  else if (p > 0) d += ` — ${p} solved paper${p > 1 ? 's' : ''}`
+  if (m > 0) d += ` and ${m} free mock test${m > 1 ? 's' : ''}`
+  d += ` with official answer keys and step-by-step explanations on ${BRAND}.`
   return truncate(d, 160)
 }
 
