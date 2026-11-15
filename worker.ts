@@ -125,7 +125,7 @@ type QuestionData = {
 // Results Test crawl with (NOT "Googlebot") — without it those tools see the
 // empty SPA shell and report "No items detected" even though real Googlebot
 // gets the prerendered page. GoogleOther/Storebot cover Google's other fetchers.
-const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot/i
+const BOT_UA = /Googlebot|Google-InspectionTool|GoogleOther|Storebot-Google|Google-Extended|Bingbot|bingbot|GPTBot|OAI-SearchBot|ClaudeBot|Claude-Web|anthropic-ai|PerplexityBot|FacebookBot|Applebot|Slurp|DuckDuckBot|YandexBot|Sogou|Exabot|facebot|ia_archiver|LinkedInBot|Twitterbot|WhatsApp|Slack|TelegramBot|Discordbot|AhrefsBot|SemrushBot|DotBot|MJ12bot|Screaming Frog|SiteAuditBot|PetalBot/i
 const API = 'https://api.ministryofpapers.com'
 const BASE = 'https://ministryofpapers.com'
 
@@ -546,7 +546,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // '32' refreshes the edge cache after consolidating JKSSB subjects into clean canonical names.
 // '33' refreshes edge cache with upgraded About, Contact, Disclaimer, Privacy, and Guide FAQ schema.
 // '34' refreshes edge cache with JKSSB FAA 2026 (15 Nov Set C) 120 solved explanations and sitewide quality upgrades.
-const API_CACHE_VERSION = '34'
+const API_CACHE_VERSION = '35'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -1277,13 +1277,38 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     if (!bySubject.has(s)) bySubject.set(s, [])
     bySubject.get(s)!.push(q)
   }
-  const questionLi = (q: QuestionData) => `<li>
-      <a href="${questionPath(q.urlCode ?? q.slug, q.question)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 200)}</a>
-      <br /><small><strong>Answer:</strong> ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</small>
-      ${q.explanation ? `<br /><small>${htmlText(removeRedundantAnswerLead(q.explanation)).slice(0, 240)}</small>` : ''}
+
+  const totalQs = Math.max(questions.length, 1)
+  const weightageRows = [...bySubject.entries()]
+    .sort((a, b) => b[1].length - a[1].length)
+    .map(([subj, qs]) => {
+      const pct = Math.round((qs.length / totalQs) * 100)
+      return `<tr><td><strong>${htmlText(subj)}</strong></td><td>${qs.length}</td><td>${pct}%</td></tr>`
+    })
+    .join('')
+  const weightageTable = bySubject.size > 1
+    ? `<section><h2>Section-Wise Question &amp; Weightage Breakdown</h2><table><thead><tr><th scope="col">Subject / Section</th><th scope="col">Questions Asked</th><th scope="col">Weightage</th></tr></thead><tbody>${weightageRows}</tbody></table></section>`
+    : ''
+
+  const seriesKeySection = override?.provisionalKeyAllSeries && override.provisionalKeyAllSeries.length > 0
+    ? `<section><h2>${htmlText(override.provisionalKeyTitle ?? 'Official Provisional Answer Key (Series A, Series B, Series C & Series D)')}</h2><table><thead><tr><th scope="col">Question No.</th><th scope="col">Series A</th><th scope="col">Series B</th><th scope="col">Series C</th><th scope="col">Series D</th></tr></thead><tbody>${override.provisionalKeyAllSeries
+        .map((r) => `<tr><td><strong>Q${r.q}</strong></td><td>${htmlText(r.a)}</td><td>${htmlText(r.b)}</td><td><strong>${htmlText(r.c)}</strong></td><td>${htmlText(r.d)}</td></tr>`)
+        .join('')}</tbody></table></section>`
+    : ''
+
+  const questionLi = (q: QuestionData) => {
+    const opts = (q.options ?? [])
+      .map((o) => `(${htmlText(o.key)}) ${htmlText(o.text)}`)
+      .join(' · ')
+    return `<li>
+      <a href="${questionPath(q.urlCode ?? q.slug, q.question)}">Q${htmlText(q.questionNo)}: ${htmlText(q.question).slice(0, 320)}</a>
+      ${opts ? `<br /><small><strong>Options:</strong> ${opts}</small>` : ''}
+      <br /><small><strong>Correct Answer:</strong> Option ${htmlText(q.answerKey)}${q.answer ? ` — ${htmlText(q.answer)}` : ''}</small>
+      ${q.explanation ? `<br /><small><strong>Explanation:</strong> ${htmlText(removeRedundantAnswerLead(q.explanation)).slice(0, 600)}</small>` : ''}
     </li>`
+  }
   const sections = [...bySubject.entries()]
-    .map(([subject, qs]) => `<section><h2>${htmlText(subject)} — Solved Questions</h2><ol>${qs.map(questionLi).join('')}</ol></section>`)
+    .map(([subject, qs]) => `<section><h2>${htmlText(subject)} — Solved Questions (${qs.length})</h2><ol>${qs.map(questionLi).join('')}</ol></section>`)
     .join('')
 
   const source = p.sourceUrl
@@ -1306,6 +1331,8 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` — ${htmlText(p.year)}` : ''}${p.shift ? ` — ${htmlText(p.shift)}` : ''}</p>
     <p>${p.questions ?? questions.length} solved questions with answer key and detailed explanations${subjectText ? ` — Subjects: ${htmlText(subjectText)}` : ''}${(p.negativeMarking ?? 0) > 0 ? ` — Negative marking: ${p.negativeMarking}` : ''}</p>
     ${source}
+    ${weightageTable}
+    ${seriesKeySection}
     ${sections}
     ${faqSection}
   `, crumbs)
@@ -1974,7 +2001,7 @@ export default {
         // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
         // the sitemap changes whenever a paper/question is added, and a whole
         // day of staleness (the old 3600s) held new pages back from crawlers.
-        const res = await apiFetch(`${API}/sitemap.xml?sv=19`, 600)
+        const res = await apiFetch(`${API}/sitemap.xml?sv=20`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')

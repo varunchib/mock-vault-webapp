@@ -1,7 +1,7 @@
 import { MathText } from '../components/common/MathText'
 import { ExplanationText } from '../components/common/ExplanationText'
 import { env } from '../lib/env'
-import { BookOpen, ChevronRight, Download, Play } from 'lucide-react'
+import { BookOpen, ChevronRight, Download, Eye, EyeOff, Play } from 'lucide-react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { HaloLoader } from '../components/common/HaloLoader'
@@ -19,10 +19,21 @@ import { paperSeoTitle, paperSeoDescription } from '../lib/pageTitles'
 import { getLocalizedQuestion, hasHindi, type QuestionLanguage } from '../lib/questionLanguage'
 import { paperGuideMap } from '../data/postGuides'
 import { apiPaperSlug, paperPath, paperSeoOverride } from '../lib/paperSeo'
-import { cleanPassageText } from '../lib/questionUrl'
+import { cleanPassageText, questionPath } from '../lib/questionUrl'
 import { buildPaperFaqs, formatHeldOn, paperFaqJsonLd } from '../lib/paperFaqs'
 
 const OPTION_LABELS = ['A', 'B', 'C', 'D']
+
+function cleanShiftLabel(shift?: string): string | null {
+  if (!shift) return null
+  const cleaned = shift
+    .replace(/\b\d{1,2}\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4}\b/gi, '')
+    .replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.?\s*\d{4}\b/gi, '')
+    .replace(/^[\s,–-]+|[\s,–-]+$/g, '')
+    .replace(/^\((.+)\)$/, '$1')
+    .trim()
+  return cleaned || null
+}
 
 export function PyqPaperPage() {
   const { slug } = useParams()
@@ -35,6 +46,8 @@ export function PyqPaperPage() {
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({})
   const [revealed, setRevealed] = useState<Record<string, boolean>>({})
   const [explOpen, setExplOpen] = useState<Record<string, boolean>>({})
+  const [allSolutionsOpen, setAllSolutionsOpen] = useState(false)
+  const [activeSubject, setActiveSubject] = useState<string>('ALL')
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const { isAuthenticated } = useAuth()
 
@@ -42,6 +55,8 @@ export function PyqPaperPage() {
     if (!slug) return
     setLoading(true)
     setError(false)
+    setActiveSubject('ALL')
+    setAllSolutionsOpen(false)
 
     fetchPaperBySlug(apiPaperSlug(slug))
       .then((paperData) => {
@@ -77,6 +92,7 @@ export function PyqPaperPage() {
   const faqs = useMemo(
     () => (paper
       ? buildPaperFaqs({
+          slug: paper.slug,
           title: paper.title,
           examName: paper.examName,
           year: paper.year,
@@ -84,11 +100,21 @@ export function PyqPaperPage() {
           heldOn: paper.heldOn,
           negativeMarking: paper.negativeMarking,
           sourceUrl: paper.sourceUrl,
+          subjects: paper.subjects,
           attemptable: questions.length > 0,
         })
       : []),
     [paper, questions.length],
   )
+
+  const subjectCounts = useMemo(() => {
+    const map = new Map<string, number>()
+    for (const q of questions) {
+      const s = (q.subject && q.subject.trim()) || 'General'
+      map.set(s, (map.get(s) ?? 0) + 1)
+    }
+    return [...map.entries()].sort((a, b) => b[1] - a[1])
+  }, [questions])
 
   usePageMeta({
     title: seoTitle,
@@ -117,15 +143,14 @@ export function PyqPaperPage() {
             headline: seoTitle.replace(' | Ministry of Papers', ''),
             description: seoDesc,
             url: `https://ministryofpapers.com${canonicalPath}`,
+            ...(paper.heldOn ? { datePublished: paper.heldOn, dateModified: paper.heldOn } : {}),
             author: { '@type': 'Organization', name: 'Ministry of Papers' },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
           },
           {
             '@context': 'https://schema.org',
             '@type': 'BreadcrumbList',
-            // Mirrors the trail the worker serves to crawlers. Positions 2 and 3
-            // previously shared /exam/{slug} — two steps claiming the same page,
-            // with position 3's name ("… Papers") visible nowhere.
+            // Mirrors the trail the worker serves to crawlers.
             itemListElement: [
               { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://ministryofpapers.com' },
               { '@type': 'ListItem', position: 2, name: 'Exams', item: 'https://ministryofpapers.com/exams' },
@@ -169,11 +194,13 @@ export function PyqPaperPage() {
   }
 
   const firstQuestion = questions[0]
-  const visibleQuestions = questions
+  const indexedQuestions = questions.map((q, idx) => ({ q, originalIndex: idx }))
+  const visibleQuestions = activeSubject === 'ALL'
+    ? indexedQuestions
+    : indexedQuestions.filter(({ q }) => ((q.subject && q.subject.trim()) || 'General') === activeSubject)
   const hasHindiQuestions = questions.some(hasHindi)
-  // A paper with no questions is an announced-but-not-yet-conducted exam
-  // (e.g. JKPSI 2026). Render a "coming soon" state instead of an empty list.
   const comingSoon = questions.length === 0
+  const shiftBadge = paper.heldOn ? cleanShiftLabel(paper.shift) : paper.shift
 
   const selectAnswer = (qSlug: string, key: string) => {
     setSelectedAnswers((prev) => ({ ...prev, [qSlug]: key }))
@@ -185,6 +212,24 @@ export function PyqPaperPage() {
 
   const toggleExpl = (qSlug: string) => {
     setExplOpen((prev) => ({ ...prev, [qSlug]: !prev[qSlug] }))
+  }
+
+  const toggleAllSolutions = () => {
+    if (allSolutionsOpen) {
+      setRevealed({})
+      setExplOpen({})
+      setAllSolutionsOpen(false)
+    } else {
+      const nextRev: Record<string, boolean> = {}
+      const nextExpl: Record<string, boolean> = {}
+      for (const q of questions) {
+        nextRev[q.slug] = true
+        nextExpl[q.slug] = true
+      }
+      setRevealed(nextRev)
+      setExplOpen(nextExpl)
+      setAllSolutionsOpen(true)
+    }
   }
 
   const content = (
@@ -203,7 +248,6 @@ export function PyqPaperPage() {
         <div className="pyq-paper-header-body">
           <span className="ep-category-tag">{paper.examName} · {paper.year}</span>
           <h1>{seoH1}</h1>
-          {paper.shift && <p className="pyq-paper-shift">{paper.shift}</p>}
           <div className="pyq-paper-meta-row">
             {comingSoon ? (
               <>
@@ -213,10 +257,19 @@ export function PyqPaperPage() {
               </>
             ) : (
               <>
-                <span>{paper.questions} questions</span>
+                <span>
+                  {paper.questions || questions.length} Questions
+                  {paper.maxMarks && paper.maxMarks > 0 ? ` · ${paper.maxMarks} Marks` : ''}
+                </span>
                 {paper.heldOn && <span>Held on {formatHeldOn(paper.heldOn)}</span>}
-                <span>Answer key included</span>
-                {paper.subjects.length > 0 && <span>{paper.subjects.join(' · ')}</span>}
+                {shiftBadge && <span>{shiftBadge}</span>}
+                {paper.durationMinutes && paper.durationMinutes > 0 ? (
+                  <span>Duration: {paper.durationMinutes} Mins</span>
+                ) : null}
+                {paper.negativeMarking && paper.negativeMarking > 0 ? (
+                  <span>Negative Marking: −{paper.negativeMarking}</span>
+                ) : null}
+                <span>Official Answer Key &amp; Solutions</span>
               </>
             )}
           </div>
@@ -262,12 +315,153 @@ export function PyqPaperPage() {
         </div>
       </header>
 
-      {/* Intro copy: the page's unique descriptive text for search, and the
-          same prose the worker serves bots as `override.review`. The heading and
-          fact chips that used to live here only restated the <h1> and the header
-          meta row above, so they were dropped rather than restyled. */}
-      <section className="pyq-paper-seo-intro">
-        <p>{seoOverride?.review ?? seoDesc}</p>
+      <section className="pyq-paper-seo-intro" aria-label="Exam Paper Analysis and Section Breakdown">
+        <p className="pyq-paper-review-text">{seoOverride?.review ?? seoDesc}</p>
+
+        {!comingSoon && subjectCounts.length > 0 && (
+          <div className="pyq-paper-controls">
+            <div className="pyq-subject-pills" role="tablist" aria-label="Filter questions by subject">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={activeSubject === 'ALL'}
+                className={`pyq-subj-pill${activeSubject === 'ALL' ? ' active' : ''}`}
+                onClick={() => setActiveSubject('ALL')}
+              >
+                All Sections <span>{questions.length}</span>
+              </button>
+              {subjectCounts.map(([subj, count]) => (
+                <button
+                  key={subj}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeSubject === subj}
+                  className={`pyq-subj-pill${activeSubject === subj ? ' active' : ''}`}
+                  onClick={() => setActiveSubject(subj)}
+                >
+                  {subj} <span>{count}</span>
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className={`pyq-solution-toggle-btn${allSolutionsOpen ? ' active' : ''}`}
+              onClick={toggleAllSolutions}
+            >
+              {allSolutionsOpen ? <EyeOff size={14} /> : <Eye size={14} />}
+              {allSolutionsOpen ? 'Hide All Solutions' : 'Show All Answers & Explanations'}
+            </button>
+          </div>
+        )}
+
+        {!comingSoon && (
+          <div className="pyq-overview-panels">
+            {subjectCounts.length > 1 && (
+              <details className="pyq-overview-panel">
+                <summary>
+                  <span>Section-Wise Question &amp; Weightage Breakdown ({subjectCounts.length} Sections · {questions.length} Questions)</span>
+                </summary>
+                <div className="pyq-overview-table-wrap">
+                  <table className="pyq-overview-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Subject / Syllabus Section</th>
+                        <th scope="col">Questions Asked</th>
+                        <th scope="col">Weightage</th>
+                        <th scope="col">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {subjectCounts.map(([subj, count]) => {
+                        const pct = Math.round((count / Math.max(questions.length, 1)) * 100)
+                        return (
+                          <tr key={subj}>
+                            <td><strong>{subj}</strong></td>
+                            <td>{count} Qs</td>
+                            <td>{pct}%</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="pyq-table-filter-btn"
+                                onClick={() => setActiveSubject(subj === activeSubject ? 'ALL' : subj)}
+                              >
+                                {activeSubject === subj ? 'Showing (Reset)' : `Filter ${count} Qs →`}
+                              </button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            )}
+
+            {seoOverride?.provisionalKeyAllSeries && seoOverride.provisionalKeyAllSeries.length > 0 ? (
+              <details className="pyq-overview-panel">
+                <summary>
+                  <span>{seoOverride.provisionalKeyTitle ?? 'Official Provisional Answer Key (Series A, Series B, Series C & Series D)'}</span>
+                </summary>
+                <div className="pyq-overview-table-wrap">
+                  <p className="pyq-key-note">
+                    Official Provisional Answer Key (Annexure-A) across all four text booklet series. Click any question number to jump directly to its solved explanation below (Set C).
+                  </p>
+                  <table className="pyq-overview-table pyq-series-key-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Q.No</th>
+                        <th scope="col">Series A</th>
+                        <th scope="col">Series B</th>
+                        <th scope="col">Series C (Solved Below)</th>
+                        <th scope="col">Series D</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {seoOverride.provisionalKeyAllSeries.map((row) => (
+                        <tr key={row.q}>
+                          <td>
+                            <a href={`#q-${row.q}`} onClick={() => setActiveSubject('ALL')}>
+                              <strong>Q{row.q}</strong>
+                            </a>
+                          </td>
+                          <td>{row.a}</td>
+                          <td>{row.b}</td>
+                          <td><strong>{row.c}</strong></td>
+                          <td>{row.d}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </details>
+            ) : (
+              questions.length > 0 && (
+                <details className="pyq-overview-panel">
+                  <summary>
+                    <span>Official Answer Key Quick-Reference Grid (Q1–Q{questions.length})</span>
+                  </summary>
+                  <div className="pyq-key-grid">
+                    {questions.map((q, idx) => {
+                      const qNo = q.questionNo || idx + 1
+                      return (
+                        <a
+                          key={q.slug}
+                          href={`#q-${qNo}`}
+                          className="pyq-key-cell"
+                          onClick={() => setActiveSubject('ALL')}
+                          title={`Jump to Question ${qNo}`}
+                        >
+                          <span className="pyq-key-q">Q{qNo}</span>
+                          <strong className="pyq-key-a">{q.answerKey}</strong>
+                        </a>
+                      )
+                    })}
+                  </div>
+                </details>
+              )
+            )}
+          </div>
+        )}
       </section>
 
       {comingSoon && (
@@ -292,25 +486,25 @@ export function PyqPaperPage() {
       )}
 
       <div className="pyq-question-list">
-        {visibleQuestions.map((q, index) => {
+        {visibleQuestions.map(({ q, originalIndex }, listIdx) => {
           const localized = getLocalizedQuestion(q, language)
           const cleanedPassage = cleanPassageText(localized.passage)
-          const prevPassage = index > 0
-            ? cleanPassageText(getLocalizedQuestion(visibleQuestions[index - 1], language).passage)
+          const prevPassage = listIdx > 0
+            ? cleanPassageText(getLocalizedQuestion(visibleQuestions[listIdx - 1].q, language).passage)
             : ''
           const isRepeatedPassage = Boolean(cleanedPassage && cleanedPassage === prevPassage)
-          let groupStart = index + 1
-          let groupEnd = index + 1
+          let groupStart = originalIndex + 1
+          let groupEnd = originalIndex + 1
           if (cleanedPassage) {
             while (
               groupStart > 1 &&
-              cleanPassageText(getLocalizedQuestion(visibleQuestions[groupStart - 2], language).passage) === cleanedPassage
+              cleanPassageText(getLocalizedQuestion(questions[groupStart - 2], language).passage) === cleanedPassage
             ) {
               groupStart--
             }
             while (
-              groupEnd < visibleQuestions.length &&
-              cleanPassageText(getLocalizedQuestion(visibleQuestions[groupEnd], language).passage) === cleanedPassage
+              groupEnd < questions.length &&
+              cleanPassageText(getLocalizedQuestion(questions[groupEnd], language).passage) === cleanedPassage
             ) {
               groupEnd++
             }
@@ -325,11 +519,23 @@ export function PyqPaperPage() {
           const isRevealed = revealed[q.slug]
           const isExplOpen = explOpen[q.slug]
           const isCorrect = chosen === q.answerKey
+          const qNum = q.questionNo || originalIndex + 1
+          const canonicalQPath = questionPath(q.urlCode ?? q.slug, q.question)
 
           return (
-            <article className={`pyq-question-card${isDeleted ? ' deleted' : ''}`} key={q.slug}>
+            <article
+              id={`q-${qNum}`}
+              className={`pyq-question-card${isDeleted ? ' deleted' : ''}`}
+              key={q.slug}
+            >
               <div className="pyq-q-header">
-                <span className="pyq-q-num">Q{index + 1}</span>
+                <Link
+                  to={canonicalQPath}
+                  className="pyq-q-num"
+                  title={`Open Q${qNum} standalone solution page`}
+                >
+                  Q{qNum}
+                </Link>
                 <Link
                   className="pyq-q-subject pyq-q-subject-link"
                   to={`/exam/${paper.examSlug}?tab=subjects&subject=${encodeURIComponent(q.subject)}`}
@@ -361,7 +567,7 @@ export function PyqPaperPage() {
               {q.images && q.images.length > 0 && (
                 <div className="pyq-q-images">
                   {q.images.map((src, i) => (
-                    <img key={i} src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`} alt={`Question ${index + 1} figure`} className="pyq-q-img" />
+                    <img key={i} src={src.startsWith('http') ? src : `${env.assetsBaseUrl}/${src}`} alt={`Question ${qNum} figure`} className="pyq-q-img" />
                   ))}
                 </div>
               )}
@@ -374,9 +580,6 @@ export function PyqPaperPage() {
                     {localized.options.map((opt, i) => {
                       const label = OPTION_LABELS[i] ?? opt.key
                       const isChosen = chosen === opt.key
-                      // A dropped question has no correct option, so nothing is
-                      // marked right or wrong — but it is still attemptable and
-                      // still shows its solution, which explains the drop.
                       const isCorrectOpt = !isDeleted && opt.key === q.answerKey
 
                       let cls = 'pyq-option'
@@ -429,7 +632,7 @@ export function PyqPaperPage() {
                           </div>
                         ) : (
                           <div className={`pyq-result ${isCorrect ? 'correct' : 'wrong'}`}>
-                            {isCorrect ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
+                            {chosen ? (isCorrect ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`) : `✓ Official Answer: Option ${q.answerKey}`}
                           </div>
                         )}
                         {q.explanation && (
