@@ -124,9 +124,11 @@ export function examHubSeoTitle(e: ExamHubMeta): string {
   }
   const withFull = `${label} Previous Year Question Papers (PYQ) – Solved`
   if (withFull.length <= 68) return withFull
-  const withShort = `${label} Previous Year Papers (PYQ) – Solved & Answer Key`
-  if (withShort.length <= 68) return withShort
-  return truncate(`${label} Previous Year Question Papers (PYQ)`, 68)
+  const withPyq = `${label} Previous Year Question Papers (PYQ)`
+  if (withPyq.length <= 68) return withPyq
+  const withShortPyq = `${label} Previous Year Papers (PYQ)`
+  if (withShortPyq.length <= 68) return withShortPyq
+  return truncate(`${short || label} Previous Year Question Papers (PYQ)`, 68)
 }
 
 export function examHubSeoDescription(e: ExamHubMeta): string {
