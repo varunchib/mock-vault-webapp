@@ -4331,7 +4331,54 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
-    "scoreDistributions": [],
+    "scoreDistributions": [
+      {
+        "label": "2026 Official Score Distribution (20.05.2026 · 629 Appeared)",
+        "appeared": 629,
+        "registered": 1985,
+        "topScore": "116.25 / 120",
+        "meanScore": "78.09 / 120",
+        "medianScore": "81.75 / 120",
+        "sourceNote": "Derived from Official JKSSB Result Notification No. JKSSB-COE0EXAM(UT)/14/2026-03 (7842028) dated 23.06.2026 (Annexure A — Field Assistant).",
+        "bars": [
+          {
+            "range": "85 – 120",
+            "candidates": 274,
+            "pct": 43.56
+          },
+          {
+            "range": "75 – 84.75",
+            "candidates": 107,
+            "pct": 17.01
+          },
+          {
+            "range": "65 – 74.75",
+            "candidates": 80,
+            "pct": 12.72
+          },
+          {
+            "range": "55 – 64.75",
+            "candidates": 72,
+            "pct": 11.45
+          },
+          {
+            "range": "45 – 54.75",
+            "candidates": 49,
+            "pct": 7.79
+          },
+          {
+            "range": "35 – 44.75",
+            "candidates": 23,
+            "pct": 3.66
+          },
+          {
+            "range": "Below 35",
+            "candidates": 24,
+            "pct": 3.82
+          }
+        ]
+      }
+    ],
     "paperXrays": [
       {
         "paperSlug": "jkssb-field-assistant-2026-may-20",
