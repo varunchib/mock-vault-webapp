@@ -1326,7 +1326,313 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         "whatIsAsked": "High-frequency J&K General Knowledge questions tested in official JKSSB-WILDLIFE-GUARD papers."
       }
     ],
-    "cutoffSets": [],
+    "cutoffSets": [
+      {
+        "year": "2026-DV",
+        "label": "2026 Official Document Verification (DV) Category-Wise Cutoff (Notification dated 29.10.2026)",
+        "maxMarks": 120,
+        "vacancies": "Advt. 03/2021 & 04/2022 · Item Nos. 189, 190, 605, 606",
+        "appeared": "31,486 Appeared · 605 Shortlisted for DV (after PET/PST)",
+        "topperScore": "93.00 / 120 (RBA) · 90.75 / 120 (OM)",
+        "meanScore": "23.42 / 120 (Overall Mean)",
+        "sourceNote": "Exact minimum & maximum marks per category extracted from Official JKSSB Document Verification Notification No. JKSSB-COE0EXAM(UT)/3/2026 (7909564) dated 29.10.2026 (Annexure A — Wild Life Guard).",
+        "rows": [
+          {
+            "category": "OM (Open Merit)",
+            "marks": "65.00 / 120",
+            "pct": 54,
+            "safeTarget": "167 Shortlisted",
+            "note": "Highest OM score in DV list: 90.75 / 120"
+          },
+          {
+            "category": "RBA (Resident of Backward Area)",
+            "marks": "60.00 / 120",
+            "pct": 50,
+            "safeTarget": "152 Shortlisted",
+            "note": "Highest RBA score in DV list: 93.00 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "55.75 / 120",
+            "pct": 46,
+            "safeTarget": "30 Shortlisted",
+            "note": "Highest ALC/IB score in DV list: 82.75 / 120"
+          },
+          {
+            "category": "PSP (Pahari Speaking People)",
+            "marks": "55.75 / 120",
+            "pct": 46,
+            "safeTarget": "29 Shortlisted",
+            "note": "Highest PSP score in DV list: 74.00 / 120"
+          },
+          {
+            "category": "SC (Scheduled Caste)",
+            "marks": "52.00 / 120",
+            "pct": 43,
+            "safeTarget": "72 Shortlisted",
+            "note": "Highest SC score in DV list: 79.75 / 120"
+          },
+          {
+            "category": "ST (Scheduled Tribe)",
+            "marks": "50.25 / 120",
+            "pct": 42,
+            "safeTarget": "73 Shortlisted",
+            "note": "Highest ST score in DV list: 77.75 / 120"
+          },
+          {
+            "category": "EWS (Economically Weaker Section)",
+            "marks": "47.75 / 120",
+            "pct": 40,
+            "safeTarget": "55 Shortlisted",
+            "note": "Highest EWS score in DV list: 84.75 / 120"
+          },
+          {
+            "category": "ESM (Ex-Servicemen)",
+            "marks": "18.00 / 120",
+            "pct": 15,
+            "safeTarget": "27 Shortlisted",
+            "note": "Horizontal reservation · Highest ESM: 46.75 / 120"
+          }
+        ]
+      },
+      {
+        "year": "Social Forestry",
+        "label": "Social Forestry Worker Official DV Cutoff (Annexure B · 29.10.2026)",
+        "maxMarks": 120,
+        "vacancies": "Advt. 03/2021 & 04/2022 · Item Nos. 185, 186, 592, 593",
+        "appeared": "176 Shortlisted for DV",
+        "topperScore": "71.75 / 120",
+        "meanScore": "OM Cutoff: 47.50 / 120",
+        "sourceNote": "Exact category-wise DV cutoff extracted from Official JKSSB Notification dated 29.10.2026 (Annexure B — Social Forestry Worker).",
+        "rows": [
+          {
+            "category": "OM (Open Merit)",
+            "marks": "47.50 / 120",
+            "pct": 40,
+            "safeTarget": "46 Shortlisted",
+            "note": "Highest OM: 71.75 / 120"
+          },
+          {
+            "category": "RBA",
+            "marks": "44.00 / 120",
+            "pct": 37,
+            "safeTarget": "52 Shortlisted",
+            "note": "Highest RBA: 66.25 / 120"
+          },
+          {
+            "category": "PSP",
+            "marks": "37.00 / 120",
+            "pct": 31,
+            "safeTarget": "13 Shortlisted",
+            "note": "Highest PSP: 54.75 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "36.75 / 120",
+            "pct": 31,
+            "safeTarget": "11 Shortlisted",
+            "note": "Highest ALC/IB: 51.25 / 120"
+          },
+          {
+            "category": "SC",
+            "marks": "31.50 / 120",
+            "pct": 26,
+            "safeTarget": "18 Shortlisted",
+            "note": "Highest SC: 53.75 / 120"
+          },
+          {
+            "category": "EWS",
+            "marks": "29.50 / 120",
+            "pct": 25,
+            "safeTarget": "18 Shortlisted",
+            "note": "Highest EWS: 59.25 / 120"
+          },
+          {
+            "category": "ST",
+            "marks": "28.00 / 120",
+            "pct": 23,
+            "safeTarget": "18 Shortlisted",
+            "note": "Highest ST: 52.75 / 120"
+          }
+        ]
+      },
+      {
+        "year": "FPF Guard",
+        "label": "FPF Guard Official DV Cutoff (Annexure C · 29.10.2026)",
+        "maxMarks": 120,
+        "vacancies": "Advt. 04/2022 · Item Nos. 86–92",
+        "appeared": "3,553 Appeared · 241 Shortlisted for DV",
+        "topperScore": "89.50 / 120",
+        "meanScore": "OM Cutoff: 69.50 / 120",
+        "sourceNote": "Exact category-wise DV cutoff extracted from Official JKSSB Notification dated 29.10.2026 (Annexure C — FPF Guard).",
+        "rows": [
+          {
+            "category": "OM (Open Merit)",
+            "marks": "69.50 / 120",
+            "pct": 58,
+            "safeTarget": "66 Shortlisted",
+            "note": "Highest OM: 89.50 / 120"
+          },
+          {
+            "category": "PSP",
+            "marks": "65.75 / 120",
+            "pct": 55,
+            "safeTarget": "10 Shortlisted",
+            "note": "Highest PSP: 80.00 / 120"
+          },
+          {
+            "category": "RBA",
+            "marks": "63.00 / 120",
+            "pct": 53,
+            "safeTarget": "77 Shortlisted",
+            "note": "Highest RBA: 84.75 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "61.25 / 120",
+            "pct": 51,
+            "safeTarget": "16 Shortlisted",
+            "note": "Highest ALC/IB: 80.00 / 120"
+          },
+          {
+            "category": "EWS",
+            "marks": "56.25 / 120",
+            "pct": 47,
+            "safeTarget": "7 Shortlisted",
+            "note": "Highest EWS: 80.75 / 120"
+          },
+          {
+            "category": "SC",
+            "marks": "51.50 / 120",
+            "pct": 43,
+            "safeTarget": "37 Shortlisted",
+            "note": "Highest SC: 82.25 / 120"
+          },
+          {
+            "category": "ST",
+            "marks": "47.00 / 120",
+            "pct": 39,
+            "safeTarget": "27 Shortlisted",
+            "note": "Highest ST: 72.50 / 120"
+          }
+        ]
+      },
+      {
+        "year": "Inspector FPF",
+        "label": "Inspector (Forest) Official DV Cutoff (Annexure D · 29.10.2026)",
+        "maxMarks": 120,
+        "vacancies": "Advt. 04/2022 · Item Nos. 84, 85",
+        "appeared": "8,356 Appeared · 253 Shortlisted for DV",
+        "topperScore": "98.75 / 120",
+        "meanScore": "RBA Cutoff: 71.00 · OM: 57.25*",
+        "sourceNote": "Exact category-wise DV marks extracted from Official JKSSB Notification dated 29.10.2026 (Annexure D — Inspector).",
+        "rows": [
+          {
+            "category": "RBA",
+            "marks": "71.00 / 120",
+            "pct": 59,
+            "safeTarget": "54 Shortlisted",
+            "note": "Highest RBA: 98.75 / 120"
+          },
+          {
+            "category": "PSP",
+            "marks": "68.50 / 120",
+            "pct": 57,
+            "safeTarget": "10 Shortlisted",
+            "note": "Highest PSP: 78.50 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "68.00 / 120",
+            "pct": 57,
+            "safeTarget": "13 Shortlisted",
+            "note": "Highest ALC/IB: 80.25 / 120"
+          },
+          {
+            "category": "SC",
+            "marks": "64.00 / 120",
+            "pct": 53,
+            "safeTarget": "28 Shortlisted",
+            "note": "Highest SC: 81.25 / 120"
+          },
+          {
+            "category": "ST",
+            "marks": "60.75 / 120",
+            "pct": 51,
+            "safeTarget": "31 Shortlisted",
+            "note": "Highest ST: 85.75 / 120"
+          },
+          {
+            "category": "EWS",
+            "marks": "60.00 / 120",
+            "pct": 50,
+            "safeTarget": "25 Shortlisted",
+            "note": "Highest EWS: 78.25 / 120"
+          },
+          {
+            "category": "OM (incl. horizontal/ESM)",
+            "marks": "57.25 / 120",
+            "pct": 48,
+            "safeTarget": "83 Shortlisted",
+            "note": "Highest OM: 95.25 / 120"
+          }
+        ]
+      },
+      {
+        "year": "Field Assistant",
+        "label": "Field Assistant Official DV Cutoff (Annexure E · 29.10.2026)",
+        "maxMarks": 120,
+        "vacancies": "Advt. 03/2021 · Item No. 594",
+        "appeared": "52 Shortlisted for DV",
+        "topperScore": "116.25 / 120",
+        "meanScore": "OM Cutoff: 107.50 / 120",
+        "sourceNote": "Exact category-wise DV cutoff extracted from Official JKSSB Notification dated 29.10.2026 (Annexure E — Field Assistant).",
+        "rows": [
+          {
+            "category": "OM (Open Merit)",
+            "marks": "107.50 / 120",
+            "pct": 90,
+            "safeTarget": "16 Shortlisted",
+            "note": "Highest OM: 116.25 / 120"
+          },
+          {
+            "category": "RBA",
+            "marks": "105.25 / 120",
+            "pct": 88,
+            "safeTarget": "13 Shortlisted",
+            "note": "Highest RBA: 113.75 / 120"
+          },
+          {
+            "category": "ST",
+            "marks": "85.50 / 120",
+            "pct": 71,
+            "safeTarget": "6 Shortlisted",
+            "note": "Highest ST: 92.25 / 120"
+          },
+          {
+            "category": "EWS",
+            "marks": "80.00 / 120",
+            "pct": 67,
+            "safeTarget": "6 Shortlisted",
+            "note": "Highest EWS: 115.25 / 120"
+          },
+          {
+            "category": "SC",
+            "marks": "78.75 / 120",
+            "pct": 66,
+            "safeTarget": "6 Shortlisted",
+            "note": "Highest SC: 91.25 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "67.50 / 120",
+            "pct": 56,
+            "safeTarget": "5 Shortlisted",
+            "note": "Highest ALC/IB: 95.50 / 120"
+          }
+        ]
+      }
+    ],
     "scoreDistributions": [
       {
         "label": "2026 Official Score Distribution (08.03.2026 · 31,486 Appeared)",

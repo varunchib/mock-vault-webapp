@@ -1497,15 +1497,6 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     ${cutoffsHtml}
     ${paperXrayHtml}
     ${papers ? `<section><h2>Previous year papers</h2><ul>${papers}</ul></section>` : ''}
-    <section>
-      <h2>Exam pattern</h2>
-      ${guide.examPatternNote ? paragraph(guide.examPatternNote) : ''}
-      <div class="pg-table-wrap"><table class="pg-table">
-        <thead><tr><th>Section</th><th>Questions</th><th>Marks</th><th>Negative marking / note</th></tr></thead>
-        <tbody>${patternRows}</tbody>
-      </table></div>
-    </section>
-    <section><h2>Detailed syllabus</h2>${syllabus}</section>
     <section><h2>Official source and updates</h2>
       ${sourceNote}
       <p>Check the conducting body’s official website for corrigenda or a newer notification before relying on dates or eligibility details:
