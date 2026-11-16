@@ -402,6 +402,7 @@ export function ExamPage() {
             name: `${exam.name} — Previous Year Question Papers (PYQ)`,
             description: seoDesc,
             url: `https://ministryofpapers.com/exam/${exam.slug}`,
+            dateModified: '2026-11-16',
             about: { '@type': 'Thing', name: exam.name },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
             ...(papers.length > 0
@@ -518,6 +519,9 @@ export function ExamPage() {
                   {exam.subjects.length} Subjects
                 </span>
               )}
+              <span className="ep-stat-chip">
+                <time dateTime="2026-11-16">Updated 16 Nov 2026</time>
+              </span>
             </div>
 
           </div>

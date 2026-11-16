@@ -104,13 +104,15 @@ export function QuestionPage() {
         educationalLevel: 'Competitive Exam Preparation',
         about: { '@type': 'Thing', name: question.subject || question.examName },
         author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
-        datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01`,
+        datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01T00:00:00+00:00`,
+        dateModified: '2026-11-16T00:00:00+00:00',
         acceptedAnswer: {
           '@type': 'Answer',
           text: [question.answer, removeRedundantAnswerLead(question.explanation)].filter(Boolean).join(' — ').replace(/\*\*/g, '').slice(0, 800) || `Correct answer: ${question.answerKey}.`,
           url: `https://ministryofpapers.com${questionPath(question.urlCode ?? question.slug, question.question)}`,
           author: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
-          datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01`,
+          datePublished: `${String(question.year ?? '').match(/\d{4}/)?.[0] ?? '2026'}-01-01T00:00:00+00:00`,
+          dateModified: '2026-11-16T00:00:00+00:00',
           upvoteCount: 1,
         },
       },
@@ -212,6 +214,9 @@ export function QuestionPage() {
                   {formatQuestionExamTag(question)}
                 </Link>
               )}
+              <time className="qpage-exam-tag" dateTime="2026-11-16">
+                Updated 16 Nov 2026
+              </time>
             </div>
             <div className="qpage-card-actions">
               {hasHindiVersion && (

@@ -259,6 +259,7 @@ const STATIC_META: Record<string, PageMeta> = {
       name: 'Exam Catalog - Ministry of Papers',
       description: 'Browse competitive exams - UPSC, SSC, Banking, Railways, State PSCs and more.',
       url: `${BASE}/exams`,
+      dateModified: '2026-11-16',
       breadcrumb: {
         '@type': 'BreadcrumbList',
         itemListElement: [
@@ -279,6 +280,7 @@ const STATIC_META: Record<string, PageMeta> = {
         name: 'India Physical Geography Map: Rivers, Lakes and Exam Facts',
         description: 'Study major Indian rivers, tributaries, lakes and reservoirs, their states, river connections and competitive-exam facts with an interactive map.',
         url: `${BASE}/india-physical-geography-map`,
+        dateModified: '2026-11-16',
         learningResourceType: 'Interactive map',
         educationalLevel: 'General education',
         keywords: 'rivers and lakes of India map, major lakes of India, Indian rivers and tributaries, Indian geography questions, Himalayan rivers, Peninsular rivers, reservoirs of India',
@@ -319,6 +321,7 @@ const STATIC_META: Record<string, PageMeta> = {
         name: 'Interactive Constitution of India Explorer: Preamble, Articles 1–395 & Schedules',
         description: 'Comprehensive pedagogical directory of the Constitution of India: full text of Preamble, all 395+ articles across 25 parts, student teaching notes, and Supreme Court jurisprudence.',
         url: `${BASE}/constitution-of-india`,
+        dateModified: '2026-11-16',
         educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
         learningResourceType: 'Study guide and primary legal reference',
         isAccessibleForFree: true,
@@ -358,6 +361,7 @@ const STATIC_META: Record<string, PageMeta> = {
         name: 'Modern Indian History: Chronological Timeline (1757–1947)',
         description: 'Chronological timeline of Modern Indian History from the Battle of Plassey to Independence, with verified exam takeaways for UPSC, JKPSC CCE, and State PSCs.',
         url: `${BASE}/modern-indian-history-timeline`,
+        dateModified: '2026-11-16',
         educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
         learningResourceType: 'Timeline, study guide, and historical reference',
         isAccessibleForFree: true,
@@ -397,6 +401,7 @@ const STATIC_META: Record<string, PageMeta> = {
         name: 'Ramsar Wetlands of India: Complete Chronological Timeline (1981–2026)',
         description: 'Complete pedagogical guide to India’s 103 Ramsar sites arranged chronologically by year of designation (1981–2026), with river basins, endemic fauna, tentative candidate pipelines, and Montreux Record details for UPSC and State PSC exams.',
         url: `${BASE}/ramsar-wetlands-and-national-parks`,
+        dateModified: '2026-11-16',
         educationalLevel: 'Competitive Exams (UPSC, State PSC, SSC)',
         learningResourceType: 'Timeline, study guide, and environmental directory',
         isAccessibleForFree: true,
@@ -1247,7 +1252,7 @@ function renderQuestionContent(q: QuestionData, crumbs: Crumb[] = [], related: R
   return `<article class="seo-rendered">
     ${renderBreadcrumb(crumbs)}
     <header class="qpage-card-header">
-      <p>${q.subject ? `<span class="pyq-q-subject">${htmlText(q.subject)}</span> · ` : ''}${examTagLink}</p>
+      <p>${q.subject ? `<span class="pyq-q-subject">${htmlText(q.subject)}</span> · ` : ''}${examTagLink} · <small>Last updated: <time datetime="2026-11-16">16 November 2026</time></small></p>
       ${paperLink}
     </header>
     ${images ? `<figure>${images}</figure>` : ''}
@@ -1309,6 +1314,7 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     : ''
 
   return renderPageShell(override?.h1 ?? `${p.title} — Solved PYQ with Answer Key`, `
+    <p><small>Last updated: <time datetime="2026-11-16">16 November 2026</time></small></p>
     ${override ? `<p><strong>${htmlText(override.title)}</strong></p>` : ''}
     ${override ? paragraph(override.review) : ''}
     ${paragraph(p.description)}
@@ -1366,6 +1372,7 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     : ''
   const heading = `${e.name} — Previous Year Question Papers (PYQ)`
   return renderPageShell(heading, `
+    <p><small>Last updated: <time datetime="2026-11-16">16 November 2026</time></small></p>
     ${paragraph(e.description)}
     <p><strong>${e.papers ?? papers.length} Solved Official Papers</strong> · <strong>${e.totalQuestions ?? 0} Solved MCQs with Answer Keys &amp; Explanations</strong>${(e.mocks ?? mocks.length) > 0 ? ` · <strong>${e.mocks ?? mocks.length} Mock Tests</strong>` : ''}</p>
     ${subjects ? `<p><strong>Syllabus Subjects Covered:</strong> ${htmlText(subjects)}</p>` : ''}
@@ -1586,6 +1593,7 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
         name: `${e.name} — Previous Year Question Papers (PYQ)`,
         description: seoDescription,
         url: `${BASE}/exam/${slug}`,
+        dateModified: '2026-11-16',
         publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
         breadcrumb: breadcrumbJsonLd(examCrumbs),
         ...(papers.length > 0
@@ -1687,6 +1695,8 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
             educationalUse: 'Practice',
             numberOfQuestions: p.questions ?? questions?.length,
             teaches: (p.subjects ?? []).join(', '),
+            datePublished: p.heldOn || `${p.year || '2026'}-01-01`,
+            dateModified: '2026-11-16',
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
           },
           {
@@ -1695,7 +1705,8 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
             headline: title.replace(' | Ministry of Papers', ''),
             description,
             url: canonical,
-            ...(p.heldOn ? { datePublished: p.heldOn, dateModified: p.heldOn } : {}),
+            datePublished: p.heldOn || `${p.year || '2026'}-01-01`,
+            dateModified: '2026-11-16',
             author: { '@type': 'Organization', name: 'Ministry of Papers' },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
           },
@@ -1818,6 +1829,7 @@ ${stripQuestionNumberPrefix(q.question)}` : stripQuestionNumberPrefix(q.question
               answerCount: 1,
               author: QA_AUTHOR,
               datePublished: qaDate(q.year),
+              dateModified: '2026-11-16T00:00:00+00:00',
               ...(q.subject ? { about: { '@type': 'Thing', name: q.subject } } : {}),
               acceptedAnswer: {
                 '@type': 'Answer',
@@ -1825,6 +1837,7 @@ ${stripQuestionNumberPrefix(q.question)}` : stripQuestionNumberPrefix(q.question
                 url: qUrl,
                 author: QA_AUTHOR,
                 datePublished: qaDate(q.year),
+                dateModified: '2026-11-16T00:00:00+00:00',
                 upvoteCount: 1,
               },
             },

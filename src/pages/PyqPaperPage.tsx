@@ -132,7 +132,8 @@ export function PyqPaperPage() {
             numberOfQuestions: paper.questions,
             teaches: paper.subjects?.join(', '),
             about: { '@type': 'Thing', name: paper.examName },
-            ...(paper.heldOn ? { datePublished: paper.heldOn } : {}),
+            datePublished: paper.heldOn || `${paper.year || '2026'}-01-01`,
+            dateModified: '2026-11-16',
             provider: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
           },
           {
@@ -141,7 +142,8 @@ export function PyqPaperPage() {
             headline: seoTitle.replace(' | Ministry of Papers', ''),
             description: seoDesc,
             url: `https://ministryofpapers.com${canonicalPath}`,
-            ...(paper.heldOn ? { datePublished: paper.heldOn, dateModified: paper.heldOn } : {}),
+            datePublished: paper.heldOn || `${paper.year || '2026'}-01-01`,
+            dateModified: '2026-11-16',
             author: { '@type': 'Organization', name: 'Ministry of Papers' },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: 'https://ministryofpapers.com' },
           },
@@ -250,6 +252,7 @@ export function PyqPaperPage() {
                   <span>Negative Marking: −{paper.negativeMarking}</span>
                 ) : null}
                 <span>Official Answer Key &amp; Solutions</span>
+                <span><time dateTime="2026-11-16">Updated 16 Nov 2026</time></span>
               </>
             )}
           </div>
@@ -295,10 +298,8 @@ export function PyqPaperPage() {
         </div>
       </header>
 
-      <section className="pyq-paper-seo-intro" aria-label="Exam Paper Overview and Subject Filter">
-        <p className="pyq-paper-review-text">{seoOverride?.review ?? seoDesc}</p>
-
-        {!comingSoon && subjectCounts.length > 0 && (
+      {!comingSoon && subjectCounts.length > 0 && (
+        <section className="pyq-paper-seo-intro" aria-label="Filter questions by subject">
           <div className="pyq-paper-controls">
             <div className="pyq-subject-pills" role="tablist" aria-label="Filter questions by subject">
               <button
@@ -324,8 +325,8 @@ export function PyqPaperPage() {
               ))}
             </div>
           </div>
-        )}
-      </section>
+        </section>
+      )}
 
       {comingSoon && (
         <section className="pyq-coming-soon">
