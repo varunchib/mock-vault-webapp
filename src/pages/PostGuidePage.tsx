@@ -102,8 +102,12 @@ export function PostGuidePage() {
   const activeDist = intel?.scoreDistributions?.[0]
   const activePaper = intel?.paperXrays[activePaperIdx] ?? intel?.paperXrays[0]
 
-  const seoSummaryLine = intel && (intel.masterSections.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0)
-    ? `Complete ${guide.shortName} exam guide with subject & topic-wise weightage, most repeated topics, year-wise PYQ paper X-ray (${intel.totalQuestionsAnalyzed} solved questions), ${intel.scoreDistributions?.length ? 'official score distribution, and ' : ''}${intel.cutoffSets.length > 0 ? 'category-wise cutoffs' : 'merit analysis'}.`
+  const hasIntel = Boolean(intel && (intel.masterSections.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0))
+  const pageH1 = hasIntel
+    ? `${guide.shortName} — Subject & Topic-Wise Weightage, Cutoff & Paper Analysis`
+    : guide.title
+  const seoSummaryLine = hasIntel && intel
+    ? `Complete ${guide.shortName} subject-wise weightage, topic-wise question frequency, ${intel.cutoffSets.length > 0 ? 'official category-wise cutoffs, ' : ''}${intel.scoreDistributions?.length ? 'official score distribution, ' : ''}and year-wise PYQ paper analysis across ${intel.totalQuestionsAnalyzed} solved questions.`
     : guide.tagline
 
   const content = (
@@ -124,7 +128,7 @@ export function PostGuidePage() {
           {/* Header */}
           <header className="pg-header">
             <span className="ep-category-tag">{guide.examLevel}</span>
-            <h1>{guide.title}</h1>
+            <h1>{pageH1}</h1>
             <p className="pg-tagline">{seoSummaryLine}</p>
             <div className="pg-meta-pills">
               <span className="pg-meta-pill">
@@ -153,7 +157,7 @@ export function PostGuidePage() {
                     <Flame size={17} /> Subject &amp; Topic-Wise Weightage — Most Repeated Topics
                   </h2>
                   <p className="pg-intel-sub">
-                    All topics asked across <strong>{intel.totalQuestionsAnalyzed} official questions</strong> ({intel.totalPapersAnalyzed} solved {guide.shortName} {intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}), grouped by subject and shaded by frequency (<span className="pg-legend-dot pg-tier-high">High</span> · <span className="pg-legend-dot pg-tier-mid">Medium</span> · <span className="pg-legend-dot pg-tier-low">Single</span>).
+                    All topics asked across <strong>{intel.totalQuestionsAnalyzed} official questions</strong> ({intel.totalPapersAnalyzed} solved {guide.shortName} {intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}), grouped by subject and shaded by frequency (<span className="pg-legend-dot pg-tier-high">High</span> · <span className="pg-legend-dot pg-tier-mid">Medium</span> · <span className="pg-legend-dot pg-tier-low">Low</span>).
                   </p>
                 </div>
               </div>

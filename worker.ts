@@ -1485,8 +1485,16 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
       </section>`
     : ''
 
-  return renderPageShell(guide.title, `
-    <p>${htmlText(guide.tagline)}</p>
+  const hasIntel = Boolean(intel && (intel.masterSections.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0))
+  const pageH1 = hasIntel
+    ? `${guide.shortName} — Subject & Topic-Wise Weightage, Cutoff & Paper Analysis`
+    : guide.title
+  const introDesc = hasIntel && intel
+    ? `Complete ${guide.shortName} subject-wise weightage, topic-wise question frequency, ${intel.cutoffSets.length > 0 ? 'official category-wise cutoffs, ' : ''}${intel.scoreDistributions?.length ? 'official score distribution, ' : ''}and year-wise PYQ paper analysis across ${intel.totalQuestionsAnalyzed} solved questions.`
+    : guide.tagline
+
+  return renderPageShell(pageH1, `
+    <p>${htmlText(introDesc)}</p>
     <p><small>Last updated: <time datetime="${esc(guide.lastUpdated)}">${htmlText(guide.lastUpdated)}</time></small></p>
     <p><strong>Conducting body:</strong> ${htmlText(guide.conductingBody)} · <strong>Level:</strong> ${htmlText(guide.examLevel)} · <strong>Mode:</strong> ${htmlText(guide.examMode)}</p>
     <p><a href="/exam/${encodeURIComponent(guide.examSlug)}">Browse ${htmlText(guide.shortName)} PYQ papers</a></p>
