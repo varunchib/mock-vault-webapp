@@ -27,6 +27,7 @@ import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
 import { buildGuideFaqs } from './src/lib/guideFaqs'
+import { GUIDE_INTELLIGENCE } from './src/data/guideIntelligence'
 import { getExamFaqs } from './src/data/examFaq'
 import { examHubSeoDescription, examHubSeoTitle } from './src/lib/pageTitles'
 import { MemoryRouter } from 'react-router-dom'
@@ -1434,13 +1435,50 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     ? `<p>${htmlText(guide.patternNotification)}</p>`
     : `<p>Confirm current dates, eligibility and amendments against the latest notice from the conducting body before applying.</p>`
 
+  const intel = GUIDE_INTELLIGENCE[slug]
+  const masterTopicsHtml = intel && intel.masterTopics.length > 0
+    ? `<section>
+        <h2>Master High-Yield Topics — What ${htmlText(guide.shortName)} Actually Asks</h2>
+        <p>Empirical topic frequency ranked across ${intel.totalQuestionsAnalyzed} official solved questions from ${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} papers.</p>
+        <div class="pg-table-wrap"><table class="pg-table">
+          <thead><tr><th>Topic</th><th>Subject</th><th>Priority</th><th>Questions Asked</th><th>What Is Asked</th></tr></thead>
+          <tbody>${intel.masterTopics.map(t => `<tr><td><strong>${htmlText(t.topic)}</strong></td><td>${htmlText(t.subject)}</td><td>${htmlText(t.priority)}</td><td>${t.totalQuestions} Qs (${htmlText(t.yearBreakdown)})</td><td>${htmlText(t.whatIsAsked)}</td></tr>`).join('')}</tbody>
+        </table></div>
+      </section>`
+    : ''
+  const cutoffsHtml = intel && intel.cutoffSets.length > 0
+    ? `<section>
+        <h2>${htmlText(guide.shortName)} Category-Wise Cutoffs &amp; Safe Scores</h2>
+        ${intel.cutoffSets.map(cs => `
+          <h3>${htmlText(cs.label)}</h3>
+          <p>${[cs.vacancies, cs.appeared, cs.topperScore, cs.meanScore].filter(Boolean).map(htmlText).join(' · ')}</p>
+          <div class="pg-table-wrap"><table class="pg-table">
+            <thead><tr><th>Category / Zone</th><th>Cutoff Marks</th><th>Score %</th><th>Safe Target / Seats</th><th>Remarks</th></tr></thead>
+            <tbody>${cs.rows.map(r => `<tr><td><strong>${htmlText(r.category)}</strong></td><td>${htmlText(r.marks)}</td><td>${r.pct}%</td><td>${htmlText(r.safeTarget ?? '—')}</td><td>${htmlText(r.note ?? '—')}</td></tr>`).join('')}</tbody>
+          </table></div>
+          <p><small>${htmlText(cs.sourceNote)}</small></p>
+        `).join('')}
+      </section>`
+    : ''
+  const paperXrayHtml = intel && intel.paperXrays.length > 0
+    ? `<section>
+        <h2>Year-Wise Paper X-Ray: Questions &amp; Topics Asked Per Section</h2>
+        ${intel.paperXrays.map(px => `
+          <h3><a href="${paperPath(px.paperSlug)}">${htmlText(paperSeoOverride(px.paperSlug)?.h1 ?? px.paperTitle)}</a> (${px.totalQuestions} Qs · ${px.maxMarks} Marks)</h3>
+          <ul>${px.sections.map(sec => `<li><strong>${htmlText(sec.subject)} (${sec.questionCount} Qs · ${sec.sharePct}%):</strong> ${sec.topics.map(tp => `${htmlText(tp.name)} (${tp.count} Qs)`).join(', ')}</li>`).join('')}</ul>
+        `).join('')}
+      </section>`
+    : ''
+
   return renderPageShell(guide.title, `
     <p>${htmlText(guide.tagline)}</p>
     <p><small>Last updated: <time datetime="${esc(guide.lastUpdated)}">${htmlText(guide.lastUpdated)}</time></small></p>
     <p><strong>Conducting body:</strong> ${htmlText(guide.conductingBody)} · <strong>Level:</strong> ${htmlText(guide.examLevel)} · <strong>Mode:</strong> ${htmlText(guide.examMode)}</p>
     <p><a href="/exam/${encodeURIComponent(guide.examSlug)}">Browse ${htmlText(guide.shortName)} PYQ papers</a></p>
+    ${masterTopicsHtml}
+    ${cutoffsHtml}
+    ${paperXrayHtml}
     ${facts ? `<section><h2>Quick facts</h2><ul>${facts}</ul></section>` : ''}
-    ${about ? `<section><h2>About ${htmlText(guide.shortName)}</h2>${about}</section>` : ''}
     ${papers ? `<section><h2>Previous year papers</h2><ul>${papers}</ul></section>` : ''}
     <section>
       <h2>Exam pattern</h2>
@@ -1858,19 +1896,24 @@ ${stripQuestionNumberPrefix(q.question)}` : stripQuestionNumberPrefix(q.question
         { name: guide.shortName, item: `${BASE}/guide/${slug}` },
       ]
       const faqs = buildGuideFaqs(guide)
+      const intel = GUIDE_INTELLIGENCE[slug]
+      const guideTitle = intel && (intel.masterTopics.length > 0 || intel.cutoffSets.length > 0)
+        ? titleFit(`${guide.shortName} High-Yield Topics, Cutoff & Paper Analysis`)
+        : titleFit(`${guide.shortName} Syllabus & Exam Pattern`)
       return {
-        title: titleFit(`${guide.shortName} Syllabus & Exam Pattern`),
+        title: guideTitle,
         description: stripMarkdown(guide.tagline).slice(0, 160),
         contentHtml: renderGuideContent(slug, guide, guideCrumbs),
         jsonLd: [
           {
             '@context': 'https://schema.org',
             '@type': 'Article',
-            headline: guide.title,
+            headline: guideTitle,
             description: guide.tagline,
             url: `${BASE}/guide/${slug}`,
             datePublished: guide.lastUpdated,
             dateModified: guide.lastUpdated,
+            keywords: `${guide.shortName}, ${guide.shortName} important topics, ${guide.shortName} high yield topics, ${guide.shortName} cutoff category wise, ${guide.shortName} paper analysis, ${guide.shortName} syllabus, ${guide.shortName} exam pattern`,
             author: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE },
             publisher: { '@type': 'Organization', name: 'Ministry of Papers', url: BASE, logo: `${BASE}/favicon.svg` },
             mainEntityOfPage: `${BASE}/guide/${slug}`,

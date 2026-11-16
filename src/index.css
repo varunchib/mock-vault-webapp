@@ -15902,6 +15902,342 @@ html[data-theme="dark"] {
 
 .pg-official-link:hover { color: var(--ink); }
 
+/* ── Exam Intelligence (Master Topics, Cutoffs, Paper X-Ray) ── */
+.pg-intel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pg-intel-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px !important;
+  padding-bottom: 8px !important;
+}
+
+.pg-intel-title svg { color: var(--blue); flex-shrink: 0; }
+
+.pg-intel-sub {
+  font-size: 13.5px !important;
+  line-height: 1.55 !important;
+  color: var(--ink3) !important;
+  margin: 0 !important;
+}
+
+.pg-filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin: 12px 0 16px;
+}
+
+.pg-filter-pill {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: var(--line2);
+  color: var(--ink2);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background .13s, color .13s, border-color .13s;
+}
+
+.pg-filter-pill:hover {
+  border-color: var(--ink3);
+  color: var(--ink);
+}
+
+.pg-filter-pill.active {
+  background: var(--solid);
+  color: #fff;
+  border-color: var(--solid);
+}
+
+.pg-master-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.pg-topic-card {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+
+.pg-topic-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.pg-priority-badge {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.pg-priority-muststudy {
+  background: rgba(220, 38, 38, 0.1);
+  color: #b91c1c;
+}
+
+.pg-priority-highyield {
+  background: rgba(217, 119, 6, 0.12);
+  color: #b45309;
+}
+
+.pg-priority-moderate {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--blue);
+}
+
+.pg-topic-count {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.pg-topic-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0;
+  line-height: 1.35;
+}
+
+.pg-topic-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink3);
+}
+
+.pg-topic-asked {
+  font-size: 12.5px !important;
+  line-height: 1.5 !important;
+  color: var(--ink2) !important;
+  margin: 0 !important;
+  flex: 1;
+}
+
+.pg-topic-practice-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+.pg-topic-practice-link:hover { text-decoration: underline; }
+
+/* Cutoffs */
+.pg-cutoff-label {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.pg-cutoff-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.pg-cutoff-stat {
+  background: var(--line2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: grid;
+  gap: 3px;
+}
+
+.pg-cutoff-stat span {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--ink3);
+}
+
+.pg-cutoff-stat strong {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.35;
+}
+
+.pg-cutoff-marks {
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.pg-cutoff-bar-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 110px;
+}
+
+.pg-cutoff-bar-cell span {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink2);
+  min-width: 32px;
+}
+
+.pg-cutoff-bar {
+  flex: 1;
+  height: 7px;
+  background: var(--line2);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pg-cutoff-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--blue), #16a34a);
+}
+
+.pg-safe-pill {
+  display: inline-block;
+  font-size: 11.5px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(22, 163, 74, 0.12);
+  color: #15803d;
+  white-space: nowrap;
+}
+
+.pg-cutoff-note {
+  font-size: 12.5px;
+  color: var(--ink3);
+}
+
+/* Paper X-Ray */
+.pg-xray-paper-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 12px 14px;
+  background: var(--line2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--ink2);
+}
+
+.pg-xray-open-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: var(--solid);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.pg-xray-open-btn:hover { opacity: .88; }
+
+.pg-xray-sections {
+  display: grid;
+  gap: 10px;
+}
+
+.pg-xray-sec-card {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--bg);
+}
+
+.pg-xray-sec-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pg-xray-sec-head h3 {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 2px;
+}
+
+.pg-xray-sec-share {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--ink3);
+}
+
+.pg-xray-sec-link {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--blue);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.pg-xray-topic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pg-xray-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px 10px;
+}
+
+.pg-xray-chip strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+@media (max-width: 680px) {
+  .pg-master-grid { grid-template-columns: 1fr; }
+}
+
 /* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 860px) {
   .pg-layout {
