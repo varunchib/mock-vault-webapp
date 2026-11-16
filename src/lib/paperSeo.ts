@@ -50,7 +50,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "jkssb-finance-accounts-2024-paper": {
     "apiSlug": "jkssb-finance-accounts-2024-paper",
-    "canonicalSlug": "jkssb-finance-accounts-accountancy-2024-pyq",
+    "canonicalSlug": "jkssb-finance-accounts-assistant-question-paper-2024",
     "title": "JKSSB Finance Accounts Assistant (FAA) Question Paper 2024 (28 Jan) - Solved",
     "h1": "JKSSB Finance Accounts Assistant Question Paper 2024",
     "description": "Fully solved JKSSB Finance Accounts Assistant (FAA) 28 January 2024 question paper — all 120 questions across Accountancy, GK, Maths, Statistics, Economy & Computers.",
@@ -66,7 +66,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "jkssb-junior-assistant-pyq": {
     "apiSlug": "jkssb-junior-assistant-pyq",
-    "canonicalSlug": "jkssb-junior-assistant-2026-apr-19",
+    "canonicalSlug": "jkssb-junior-assistant-question-paper-2026",
     "title": "JKSSB Junior Assistant Question Paper 2026 (19 Apr) - Solved PYQ",
     "h1": "JKSSB Junior Assistant Question Paper 2026",
     "description": "Fully solved JKSSB Junior Assistant question paper held on 19 April 2026 — all 80 questions with the official answer key and detailed explanations.",
@@ -74,7 +74,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "jkssb-lab-attendant-2026-may-10": {
     "apiSlug": "jkssb-lab-attendant-2026-may-10",
-    "canonicalSlug": "jkssb-lab-attendant-2026-may-10",
+    "canonicalSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "title": "JKSSB Laboratory Attendant Question Paper 2026 (10 May) - Solved",
     "h1": "JKSSB Laboratory Attendant Question Paper 2026",
     "description": "Fully solved JKSSB Laboratory Attendant question paper held on 10 May 2026 — all 120 questions with the official answer key and detailed explanations.",
@@ -82,7 +82,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "jkssb-wildlife-guard-2026-may-10": {
     "apiSlug": "jkssb-wildlife-guard-2026-may-10",
-    "canonicalSlug": "jkssb-wildlife-guard-2026-mar-08",
+    "canonicalSlug": "jkssb-wildlife-guard-question-paper-2026",
     "title": "JKSSB Wildlife Guard Question Paper 2026 (8 Mar) - Solved PYQ",
     "h1": "JKSSB Wildlife Guard Question Paper 2026",
     "description": "Fully solved JKSSB Wildlife Guard question paper held on 8 March 2026 — all 120 questions with the official answer key and detailed explanations.",
@@ -98,7 +98,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "jkssb-patwari-2024-sep1-set-a": {
     "apiSlug": "jkssb-patwari-2024-sep1-set-a",
-    "canonicalSlug": "jkssb-patwari-2024-sep1-set-a",
+    "canonicalSlug": "jkssb-patwari-question-paper-2024",
     "title": "JKSSB Patwari Question Paper 2024 (1 Sep, Set A) - Solved PYQ",
     "h1": "JKSSB Patwari Question Paper 2024",
     "description": "Fully solved JKSSB Patwari 2024 question paper (1 September 2024, Set A) — all 120 questions with the official answer key and detailed explanations.",
@@ -106,7 +106,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "jkssb-veterinary-pharmacist-2025": {
     "apiSlug": "jkssb-veterinary-pharmacist-2025",
-    "canonicalSlug": "jkssb-veterinary-pharmacist-2025-mar-02",
+    "canonicalSlug": "jkssb-veterinary-pharmacist-question-paper-2025",
     "title": "JKSSB Veterinary Pharmacist Question Paper 2025 (2 Mar) - Solved",
     "h1": "JKSSB Veterinary Pharmacist Question Paper 2025",
     "description": "Fully solved JKSSB Veterinary Pharmacist question paper held on 2 March 2025 — all 120 questions with the official answer key and detailed explanations.",
@@ -346,7 +346,7 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   },
   "hp-patwari-2019": {
     "apiSlug": "hp-patwari-2019",
-    "canonicalSlug": "hp-patwari-2019-nov-17",
+    "canonicalSlug": "hp-patwari-question-paper-2019",
     "title": "HP Patwari Question Paper 2019 (17 Nov) - Solved & Answer Key",
     "h1": "HP Patwari Question Paper 2019",
     "description": "Fully solved HP Revenue Department Patwari question paper held on 17 November 2019 — all 100 questions across Hindi, English, Maths & HP GK with explanations.",
@@ -354,9 +354,14 @@ export const PAPER_SEO_OVERRIDES: Record<string, PaperSeoOverride> = {
   }
 }
 
-const API_SLUG_BY_CANONICAL = Object.fromEntries(
-  Object.values(PAPER_SEO_OVERRIDES).map((entry) => [entry.canonicalSlug, entry.apiSlug]),
-)
+const API_SLUG_BY_CANONICAL: Record<string, string> = {
+  ...Object.fromEntries(Object.values(PAPER_SEO_OVERRIDES).map((entry) => [entry.canonicalSlug, entry.apiSlug])),
+  'jkssb-finance-accounts-accountancy-2024-pyq': 'jkssb-finance-accounts-2024-paper',
+  'jkssb-junior-assistant-2026-apr-19': 'jkssb-junior-assistant-pyq',
+  'jkssb-wildlife-guard-2026-mar-08': 'jkssb-wildlife-guard-2026-may-10',
+  'jkssb-veterinary-pharmacist-2025-mar-02': 'jkssb-veterinary-pharmacist-2025',
+  'hp-patwari-2019-nov-17': 'hp-patwari-2019',
+}
 
 export function apiPaperSlug(slug: string | undefined): string {
   if (!slug) return ''
