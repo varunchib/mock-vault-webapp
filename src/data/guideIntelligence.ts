@@ -47,12 +47,30 @@ export type PaperXray = {
   sections: PaperSectionXray[]
 }
 
+export type ScoreDistBar = {
+  range: string
+  candidates: number
+  pct: number
+}
+
+export type ScoreDistribution = {
+  label: string
+  appeared: number
+  registered: number
+  topScore: string
+  meanScore: string
+  medianScore: string
+  sourceNote: string
+  bars: ScoreDistBar[]
+}
+
 export type GuideIntelligence = {
   examSlug: string
   totalPapersAnalyzed: number
   totalQuestionsAnalyzed: number
   masterTopics: MasterTopicRow[]
   cutoffSets: GuideCutoffSet[]
+  scoreDistributions: ScoreDistribution[]
   paperXrays: PaperXray[]
 }
 
@@ -392,6 +410,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkssb-accounts-assistant-finance-2026",
@@ -1307,138 +1326,51 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         "whatIsAsked": "High-frequency J&K General Knowledge questions tested in official JKSSB-WILDLIFE-GUARD papers."
       }
     ],
-    "cutoffSets": [
+    "cutoffSets": [],
+    "scoreDistributions": [
       {
-        "year": "2026",
-        "label": "2026 Official Scoresheet & Rank Distribution (Notification dated 28.04.2026)",
-        "maxMarks": 120,
-        "vacancies": "108 Posts (Advt. 03/2021 & 04/2022 · Item Nos. 605, 606, 189, 190)",
-        "appeared": "31,486 Appeared (out of 1,08,083 Registered)",
-        "topperScore": "93.00 / 120 (Rank #1: Tawfeeq Ahmad Wani)",
-        "meanScore": "23.42 / 120 (Median: 20.25 · Std Dev: 14.71)",
-        "sourceNote": "Verified directly from Official JKSSB Result Notification No. JKSSB-COE0EXAM(UT)/14/2026-03 (7842028) dated 28.04.2026 (Annexure A — Wild Life Guard, exam held 08.03.2026).",
-        "rows": [
+        "label": "2026 Official Score Distribution (08.03.2026 · 31,486 Appeared)",
+        "appeared": 31486,
+        "registered": 108083,
+        "topScore": "93.00 / 120",
+        "meanScore": "23.42 / 120",
+        "medianScore": "20.25 / 120",
+        "sourceNote": "Derived from Official JKSSB Result Notification No. JKSSB-COE0EXAM(UT)/14/2026-03 (7842028) dated 28.04.2026 (Annexure A — Wild Life Guard).",
+        "bars": [
           {
-            "category": "Rank #1 (UT Topper)",
-            "marks": "93.00 / 120",
-            "pct": 78,
-            "safeTarget": "Rank 1",
-            "note": "Tawfeeq Ahmad Wani (Roll No. 90090076) · Rank #2: 90.75 · Rank #3: 85.50"
+            "range": "85 – 120",
+            "candidates": 3,
+            "pct": 0.01
           },
           {
-            "category": "Top 25 Merit Zone",
-            "marks": "81.25 / 120",
-            "pct": 68,
-            "safeTarget": "Rank 1–25",
-            "note": "Rank #10 scored 83.00 / 120; Rank #25 scored 81.25 / 120"
+            "range": "75 – 84.75",
+            "candidates": 86,
+            "pct": 0.3
           },
           {
-            "category": "OM Final Selection Zone (Top 100)",
-            "marks": "74.25 / 120",
-            "pct": 62,
-            "safeTarget": "Rank 1–100",
-            "note": "Rank #50 scored 77.50 / 120; Rank #100 scored 74.25 / 120"
+            "range": "65 – 74.75",
+            "candidates": 338,
+            "pct": 1.1
           },
           {
-            "category": "RBA / EWS / OBC Consideration Zone (Top 200)",
-            "marks": "70.50 / 120",
-            "pct": 59,
-            "safeTarget": "Rank 101–200",
-            "note": "Rank #150 scored 72.00 / 120; Rank #200 scored 70.50 / 120"
+            "range": "55 – 64.75",
+            "candidates": 862,
+            "pct": 2.7
           },
           {
-            "category": "PET Shortlist / Reserved Zone (Top 500)",
-            "marks": "63.50 / 120",
-            "pct": 53,
-            "safeTarget": "Rank 201–500",
-            "note": "Rank #300 scored 67.25 / 120; Rank #500 scored 63.50 / 120"
+            "range": "45 – 54.75",
+            "candidates": 1770,
+            "pct": 5.6
           },
           {
-            "category": "Extended PET / SC / ST Zone (Top 1,000)",
-            "marks": "57.50 / 120",
-            "pct": 48,
-            "safeTarget": "Rank 501–1000",
-            "note": "Top 3.1% of all 31,486 appeared candidates"
-          }
-        ]
-      },
-      {
-        "year": "2026-Inspector",
-        "label": "2026 Inspector (Forest) Official Scoresheet (Annexure B · 28.04.2026)",
-        "maxMarks": 120,
-        "vacancies": "Inspector (Forest, Ecology & Environment) · Advt. 04/2022 (Item Nos. 84, 85)",
-        "appeared": "8,356 Appeared (out of 25,167 Registered)",
-        "topperScore": "98.75 / 120 (Rank #1: Rahul Singh Shan)",
-        "meanScore": "44.04 / 120 (Median: 44.25 · Std Dev: 16.23)",
-        "sourceNote": "Verified from Official JKSSB Notification dated 28.04.2026 (Annexure B — Inspector, exam held 15.03.2026).",
-        "rows": [
-          {
-            "category": "Rank #1 (Topper)",
-            "marks": "98.75 / 120",
-            "pct": 82,
-            "safeTarget": "Rank 1",
-            "note": "Rank #2: 95.25 · Rank #3: 92.00 · Rank #10: 89.50"
+            "range": "35 – 44.75",
+            "candidates": 3154,
+            "pct": 10.0
           },
           {
-            "category": "Top 50 Merit Zone",
-            "marks": "82.50 / 120",
-            "pct": 69,
-            "safeTarget": "Rank 1–50",
-            "note": "Rank #25: 85.75 · Rank #50: 82.50"
-          },
-          {
-            "category": "Top 100 Merit Zone",
-            "marks": "79.25 / 120",
-            "pct": 66,
-            "safeTarget": "Rank 51–100",
-            "note": "Rank #150: 77.25 · Rank #200: 75.50"
-          },
-          {
-            "category": "Top 500 Consideration Zone",
-            "marks": "69.00 / 120",
-            "pct": 58,
-            "safeTarget": "Rank 101–500",
-            "note": "Rank #300: 73.00 · Rank #1,000: 63.75"
-          }
-        ]
-      },
-      {
-        "year": "2026-FPF",
-        "label": "2026 FPF Guard Official Scoresheet (Annexure C · 28.04.2026)",
-        "maxMarks": 120,
-        "vacancies": "FPF Guard (Forest Protection Force) · Advt. 04/2022 (Item Nos. 86–92)",
-        "appeared": "3,553 Appeared (out of 13,807 Registered)",
-        "topperScore": "89.50 / 120 (Rank #1: Muneesh Sharma)",
-        "meanScore": "32.22 / 120 (Median: 28.50 · Std Dev: 20.29)",
-        "sourceNote": "Verified from Official JKSSB Notification dated 28.04.2026 (Annexure C — FPF Guard, exam held 29.03.2026).",
-        "rows": [
-          {
-            "category": "Rank #1 (Topper)",
-            "marks": "89.50 / 120",
-            "pct": 75,
-            "safeTarget": "Rank 1",
-            "note": "Rank #2: 87.50 · Rank #3: 87.50 · Rank #10: 84.50"
-          },
-          {
-            "category": "Top 50 Merit Zone",
-            "marks": "78.75 / 120",
-            "pct": 66,
-            "safeTarget": "Rank 1–50",
-            "note": "Rank #25: 82.50 · Rank #50: 78.75"
-          },
-          {
-            "category": "Top 100 Merit Zone",
-            "marks": "73.50 / 120",
-            "pct": 61,
-            "safeTarget": "Rank 51–100",
-            "note": "Rank #150: 71.00 · Rank #200: 68.25"
-          },
-          {
-            "category": "Top 500 Consideration Zone",
-            "marks": "57.75 / 120",
-            "pct": 48,
-            "safeTarget": "Rank 101–500",
-            "note": "Rank #300: 64.75 · Rank #1,000: 44.25"
+            "range": "Below 35",
+            "candidates": 25273,
+            "pct": 80.3
           }
         ]
       }
@@ -1835,6 +1767,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkssb-veterinary-pharmacist-2025",
@@ -2255,6 +2188,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkssb-patwari-2024-sep1-set-a",
@@ -2640,6 +2574,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkssb-junior-assistant-pyq",
@@ -3033,6 +2968,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkssb-constable-2024-set-a",
@@ -3794,6 +3730,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkssb-constable-telecom-2024-set-a",
@@ -4193,6 +4130,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkpsi-2022",
@@ -4680,6 +4618,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": []
   },
   "upsc-cse": {
@@ -4881,6 +4820,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "upsc-cse-prelims-2026-gs1",
@@ -5556,6 +5496,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "ssc-cgl-2026-sep30-shift2",
@@ -7259,6 +7200,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "bpsc-71st-cce-prelims-2025-gs",
@@ -7810,6 +7752,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "jkcce-prelims-2025-gs2-set-b",
@@ -8496,6 +8439,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "ibps-po-pre-2025-aug-23-shift-1",
@@ -8810,6 +8754,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
+    "scoreDistributions": [],
     "paperXrays": [
       {
         "paperSlug": "rsmssb-patwari-2025-aug17-shift1-spz8",

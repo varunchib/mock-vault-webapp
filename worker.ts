@@ -1460,12 +1460,28 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
         `).join('')}
       </section>`
     : ''
+  const scoreDistHtml = intel && intel.scoreDistributions?.length > 0
+    ? `<section>
+        <h2>${htmlText(guide.shortName)} Official Score Distribution Graph</h2>
+        ${intel.scoreDistributions.map(sd => `
+          <p>${htmlText(sd.label)} — Appeared: ${sd.appeared.toLocaleString('en-IN')} · Top Score: ${htmlText(sd.topScore)} · Mean: ${htmlText(sd.meanScore)} · Median: ${htmlText(sd.medianScore)}</p>
+          <div class="pg-table-wrap"><table class="pg-table">
+            <thead><tr><th>Marks Bracket</th><th>Candidates</th><th>% of Appeared</th></tr></thead>
+            <tbody>${sd.bars.map(b => `<tr><td><strong>${htmlText(b.range)}</strong></td><td>${b.candidates.toLocaleString('en-IN')}</td><td>${b.pct}%</td></tr>`).join('')}</tbody>
+          </table></div>
+          <p><small>${htmlText(sd.sourceNote)}</small></p>
+        `).join('')}
+      </section>`
+    : ''
   const paperXrayHtml = intel && intel.paperXrays.length > 0
     ? `<section>
         <h2>Year-Wise Paper X-Ray: Questions &amp; Topics Asked Per Section</h2>
         ${intel.paperXrays.map(px => `
           <h3><a href="${paperPath(px.paperSlug)}">${htmlText(paperSeoOverride(px.paperSlug)?.h1 ?? px.paperTitle)}</a> (${px.totalQuestions} Qs · ${px.maxMarks} Marks)</h3>
-          <ul>${px.sections.map(sec => `<li><strong>${htmlText(sec.subject)} (${sec.questionCount} Qs · ${sec.sharePct}%):</strong> ${sec.topics.map(tp => `${htmlText(tp.name)} (${tp.count} Qs)`).join(', ')}</li>`).join('')}</ul>
+          <div class="pg-table-wrap"><table class="pg-table">
+            <thead><tr><th>Section</th><th>Questions</th><th>Weightage</th><th>Exact Topics Asked</th></tr></thead>
+            <tbody>${px.sections.map(sec => `<tr><td><strong>${htmlText(sec.subject)}</strong></td><td>${sec.questionCount}</td><td>${sec.sharePct}%</td><td>${sec.topics.map(tp => `${htmlText(tp.name)} (${tp.count})`).join(' · ')}</td></tr>`).join('')}</tbody>
+          </table></div>
         `).join('')}
       </section>`
     : ''
@@ -1476,9 +1492,9 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     <p><strong>Conducting body:</strong> ${htmlText(guide.conductingBody)} · <strong>Level:</strong> ${htmlText(guide.examLevel)} · <strong>Mode:</strong> ${htmlText(guide.examMode)}</p>
     <p><a href="/exam/${encodeURIComponent(guide.examSlug)}">Browse ${htmlText(guide.shortName)} PYQ papers</a></p>
     ${masterTopicsHtml}
+    ${scoreDistHtml}
     ${cutoffsHtml}
     ${paperXrayHtml}
-    ${facts ? `<section><h2>Quick facts</h2><ul>${facts}</ul></section>` : ''}
     ${papers ? `<section><h2>Previous year papers</h2><ul>${papers}</ul></section>` : ''}
     <section>
       <h2>Exam pattern</h2>
@@ -1488,23 +1504,7 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
         <tbody>${patternRows}</tbody>
       </table></div>
     </section>
-    ${weightage ? `<section><h2>Exam analysis: marks distribution</h2>
-      ${guide.analysis?.intro ? paragraph(guide.analysis.intro) : ''}
-      <p>Shares below are calculated from the numeric section marks listed in this guide. They describe the published pattern, not a prediction of the next paper.</p>
-      <ul>${weightage}</ul>
-      ${topTopics}
-      ${guide.analysis?.difficulty ? `<p>${htmlText(guide.analysis.difficulty)}</p>` : ''}
-    </section>` : ''}
     <section><h2>Detailed syllabus</h2>${syllabus}</section>
-    <section><h2>Eligibility</h2><dl>${eligibility}</dl></section>
-    <section><h2>Selection process</h2><ol>${selectionProcess}</ol></section>
-    ${salaries ? `<section><h2>Salary and pay scale</h2>
-      <div class="pg-table-wrap"><table class="pg-table">
-        <thead><tr><th>Post</th><th>Pay level</th><th>Pay scale</th></tr></thead>
-        <tbody>${salaries}</tbody>
-      </table></div>
-    </section>` : ''}
-    ${tips ? `<section><h2>Preparation tips</h2><ol>${tips}</ol></section>` : ''}
     <section><h2>Official source and updates</h2>
       ${sourceNote}
       <p>Check the conducting body’s official website for corrigenda or a newer notification before relying on dates or eligibility details:

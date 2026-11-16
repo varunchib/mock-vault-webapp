@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, ExternalLink, Flame, Award, Layers } from 'lucide-react'
+import { ChevronRight, FileText, ExternalLink, Flame, Award, Layers, BarChart3 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -91,19 +91,6 @@ export function PostGuidePage() {
 
   const examHref = `/exam/${guide.examSlug}${guide.paperSearchTerm ? `?s=${encodeURIComponent(guide.paperSearchTerm)}` : ''}`
 
-  // Section weightage, derived straight from the exam pattern's marks so it can
-  // never contradict the table. Only numeric, non-total rows count.
-  const weightage = (() => {
-    const rows = guide.examPattern
-      .filter(r => !r.isTotal && typeof r.marks === 'number' && (r.marks as number) > 0)
-      .map(r => ({ section: r.section, marks: r.marks as number }))
-    const total = rows.reduce((s, r) => s + r.marks, 0)
-    if (total <= 0) return []
-    return rows
-      .map(r => ({ ...r, share: Math.round((r.marks / total) * 100) }))
-      .sort((a, b) => b.marks - a.marks)
-  })()
-
   const topicSubjects = intel
     ? [...new Set(intel.masterTopics.map(t => t.subject))]
     : []
@@ -113,6 +100,7 @@ export function PostGuidePage() {
         : intel.masterTopics.filter(t => t.subject === topicSubjectFilter))
     : []
   const activeCutoff = intel?.cutoffSets[activeCutoffIdx] ?? intel?.cutoffSets[0]
+  const activeDist = intel?.scoreDistributions?.[0]
   const activePaper = intel?.paperXrays[activePaperIdx] ?? intel?.paperXrays[0]
 
   const content = (
@@ -147,7 +135,7 @@ export function PostGuidePage() {
                 <>
                   <span className="pg-meta-sep" aria-hidden="true">·</span>
                   <span className="pg-meta-item">
-                    <strong>Analyzed:</strong> {intel.totalPapersAnalyzed} Papers ({intel.totalQuestionsAnalyzed} Real PYQs)
+                    <strong>Analyzed:</strong> {intel.totalPapersAnalyzed} {intel.totalPapersAnalyzed === 1 ? 'Paper' : 'Papers'} ({intel.totalQuestionsAnalyzed} Real PYQs)
                   </span>
                 </>
               )}
@@ -199,36 +187,88 @@ export function PostGuidePage() {
                 </div>
               )}
 
-              <div className="pg-master-grid">
-                {visibleTopics.map((item, idx) => (
-                  <div className="pg-topic-card" key={`${item.subject}-${item.topic}`}>
-                    <div className="pg-topic-card-top">
-                      <span className={`pg-priority-badge pg-priority-${item.priority.toLowerCase().replace('-', '')}`}>
-                        #{idx + 1} · {item.priority}
-                      </span>
-                      <span className="pg-topic-count">{item.totalQuestions} Qs</span>
-                    </div>
-                    <h3 className="pg-topic-name">{item.topic}</h3>
-                    <div className="pg-topic-meta">
-                      <span>{item.subject}</span>
-                      <span>{item.yearBreakdown}</span>
-                    </div>
-                    <p className="pg-topic-asked">
-                      <MathText text={item.whatIsAsked} />
-                    </p>
-                    <Link
-                      className="pg-topic-practice-link"
-                      to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(item.subject)}`}
-                    >
-                      Practise {item.subject} PYQs →
-                    </Link>
-                  </div>
-                ))}
+              <div className="pg-table-wrap">
+                <table className="pg-table pg-compact-table">
+                  <thead>
+                    <tr>
+                      <th>Topic</th>
+                      <th>Subject</th>
+                      <th>Priority</th>
+                      <th>Qs</th>
+                      <th>What Is Asked</th>
+                      <th>Practice</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {visibleTopics.map((item, idx) => (
+                      <tr key={`${item.subject}-${item.topic}`}>
+                        <td><strong>#{idx + 1} {item.topic}</strong></td>
+                        <td>{item.subject}</td>
+                        <td>
+                          <span className={`pg-priority-badge pg-priority-${item.priority.toLowerCase().replace('-', '')}`}>
+                            {item.priority}
+                          </span>
+                        </td>
+                        <td className="pg-num-cell">
+                          <strong>{item.totalQuestions}</strong>
+                          <small>{item.yearBreakdown}</small>
+                        </td>
+                        <td className="pg-asked-cell"><MathText text={item.whatIsAsked} /></td>
+                        <td>
+                          <Link
+                            className="pg-topic-practice-link"
+                            to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(item.subject)}`}
+                          >
+                            Practise →
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </section>
           )}
 
-          {/* ── 2. CATEGORY-WISE CUTOFFS & OFFICIAL SCORESHEET BENCHMARKS ── */}
+          {/* ── 2. OFFICIAL SCORE DISTRIBUTION GRAPH (When Scoresheet Exists) ── */}
+          {activeDist && (
+            <section className="pg-section pg-intel-section" aria-labelledby="dist-heading">
+              <div className="pg-intel-head">
+                <div>
+                  <h2 id="dist-heading" className="pg-intel-title">
+                    <BarChart3 size={17} /> {guide.shortName} Official Score Distribution Graph
+                  </h2>
+                  <p className="pg-intel-sub">
+                    {activeDist.label} — Appeared: <strong>{activeDist.appeared.toLocaleString('en-IN')}</strong> (Registered: {activeDist.registered.toLocaleString('en-IN')}) · Top Score: <strong>{activeDist.topScore}</strong> · Mean: <strong>{activeDist.meanScore}</strong> · Median: <strong>{activeDist.medianScore}</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="pg-dist-chart" role="img" aria-label={`Score distribution bar chart for ${guide.shortName}`}>
+                {activeDist.bars.map((b) => {
+                  const maxCand = Math.max(...activeDist.bars.map(x => x.candidates), 1)
+                  const widthPct = Math.max(2, Math.round((b.candidates / maxCand) * 100))
+                  return (
+                    <div className="pg-dist-row" key={b.range}>
+                      <span className="pg-dist-range">{b.range}</span>
+                      <div className="pg-dist-track">
+                        <div className="pg-dist-fill" style={{ width: `${widthPct}%` }} />
+                      </div>
+                      <span className="pg-dist-val">
+                        <strong>{b.candidates.toLocaleString('en-IN')}</strong> ({b.pct}%)
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+
+              <p className="pg-note" style={{ marginTop: '12px', marginBottom: 0 }}>
+                {activeDist.sourceNote} Category-wise cutoffs will be added here once the official category-wise selection list is published.
+              </p>
+            </section>
+          )}
+
+          {/* ── 3. CATEGORY-WISE CUTOFFS ── */}
           {intel && intel.cutoffSets.length > 0 && activeCutoff && (
             <section className="pg-section pg-intel-section" aria-labelledby="cutoffs-heading">
               <div className="pg-intel-head">
@@ -364,30 +404,38 @@ export function PostGuidePage() {
                 </Link>
               </div>
 
-              <div className="pg-xray-sections">
-                {activePaper.sections.map(sec => (
-                  <div className="pg-xray-sec-card" key={sec.subject}>
-                    <div className="pg-xray-sec-head">
-                      <div>
-                        <h3>{sec.subject}</h3>
-                        <span className="pg-xray-sec-share">{sec.questionCount} Questions · {sec.sharePct}% of Paper</span>
-                      </div>
-                      <Link
-                        className="pg-xray-sec-link"
-                        to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(sec.subject)}`}
-                      >
-                        Practise →
-                      </Link>
-                    </div>
-                    <div className="pg-xray-topic-chips">
-                      {sec.topics.map(tp => (
-                        <span className="pg-xray-chip" key={tp.name}>
-                          {tp.name} <strong>{tp.count} Qs</strong>
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                ))}
+              <div className="pg-table-wrap">
+                <table className="pg-table pg-compact-table">
+                  <thead>
+                    <tr>
+                      <th>Section</th>
+                      <th>Questions</th>
+                      <th>Weightage</th>
+                      <th>Exact Topics Asked</th>
+                      <th>Practice</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activePaper.sections.map(sec => (
+                      <tr key={sec.subject}>
+                        <td><strong>{sec.subject}</strong></td>
+                        <td className="pg-num-cell"><strong>{sec.questionCount}</strong></td>
+                        <td>{sec.sharePct}%</td>
+                        <td>
+                          {sec.topics.map(tp => `${tp.name} (${tp.count})`).join(' · ')}
+                        </td>
+                        <td>
+                          <Link
+                            className="pg-topic-practice-link"
+                            to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(sec.subject)}`}
+                          >
+                            Practise →
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </section>
           )}
@@ -424,46 +472,6 @@ export function PostGuidePage() {
               </table>
             </div>
           </section>
-
-          {/* Exam Analysis — section weightage derived from the pattern above,
-              so "which section carries the most marks" is always accurate. This
-              is the guide's unique hook. */}
-          {weightage.length > 0 && (
-            <section className="pg-section" aria-labelledby="analysis-heading">
-              <h2 id="analysis-heading">Exam Analysis: Section Weightage</h2>
-              {guide.analysis?.intro && <p>{guide.analysis.intro}</p>}
-              <p className="pg-note">
-                Shares are calculated from the numeric section marks listed in this guide. They
-                describe the published pattern, not a prediction of the next paper.
-              </p>
-              <div className="pg-weightage">
-                {weightage.map(w => (
-                  <div className="pg-weightage-row" key={w.section}>
-                    <div className="pg-weightage-head">
-                      <span className="pg-weightage-section">{w.section}</span>
-                      <span className="pg-weightage-share">{w.share}% · {w.marks} marks</span>
-                    </div>
-                    <div className="pg-weightage-bar">
-                      <div className="pg-weightage-fill" style={{ width: `${w.share}%` }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {guide.analysis?.topTopics && guide.analysis.topTopics.length > 0 && (
-                <div className="pg-analysis-topics">
-                  <h3>Where the questions come from</h3>
-                  <ul>
-                    {guide.analysis.topTopics.map((t, i) => (
-                      <li key={i}><strong>{t.section}:</strong> {t.topics}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              {guide.analysis?.difficulty && (
-                <p className="pg-note pg-note-warning">{guide.analysis.difficulty}</p>
-              )}
-            </section>
-          )}
 
           {/* Syllabus */}
           <section className="pg-section" aria-labelledby="syllabus-heading">
@@ -502,83 +510,6 @@ export function PostGuidePage() {
               ))}
             </div>
           </section>
-
-          {/* Eligibility */}
-          <section className="pg-section" aria-labelledby="eligibility-heading">
-            <h2 id="eligibility-heading">Eligibility Criteria</h2>
-            <dl className="pg-dl">
-              <div className="pg-dl-row">
-                <dt>Age Limit</dt>
-                <dd>{guide.eligibility.age}</dd>
-              </div>
-              <div className="pg-dl-row">
-                <dt>Education</dt>
-                <dd>{guide.eligibility.education}</dd>
-              </div>
-              <div className="pg-dl-row">
-                <dt>Domicile</dt>
-                <dd>{guide.eligibility.domicile}</dd>
-              </div>
-              {guide.eligibility.attempts && (
-                <div className="pg-dl-row">
-                  <dt>Attempts</dt>
-                  <dd>{guide.eligibility.attempts}</dd>
-                </div>
-              )}
-            </dl>
-          </section>
-
-          {/* Selection Process */}
-          <section className="pg-section" aria-labelledby="selection-heading">
-            <h2 id="selection-heading">Selection Process</h2>
-            <ol className="pg-steps">
-              {guide.selectionProcess.map((step, i) => (
-                <li key={i}>
-                  <span className="pg-step-num">{i + 1}</span>
-                  <span>{step}</span>
-                </li>
-              ))}
-            </ol>
-          </section>
-
-          {/* Salary */}
-          {guide.salary.length > 0 && (
-            <section className="pg-section" aria-labelledby="salary-heading">
-              <h2 id="salary-heading">Salary & Pay Scale</h2>
-              <div className="pg-table-wrap">
-                <table className="pg-table">
-                  <thead>
-                    <tr>
-                      <th>Post</th>
-                      <th>Pay Level</th>
-                      <th>Pay Scale</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {guide.salary.map((row, i) => (
-                      <tr key={i}>
-                        <td>{row.post}</td>
-                        <td>{row.level}</td>
-                        <td>{row.payScale}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* Preparation Tips */}
-          {guide.preparationTips.length > 0 && (
-            <section className="pg-section" aria-labelledby="tips-heading">
-              <h2 id="tips-heading">Preparation Tips</h2>
-              <ol className="pg-tips">
-                {guide.preparationTips.map((tip, i) => (
-                  <li key={i}>{tip}</li>
-                ))}
-              </ol>
-            </section>
-          )}
 
           {/* Frequently Asked Questions */}
           {faqs.length > 0 && (
@@ -634,33 +565,6 @@ export function PostGuidePage() {
               View all {guide.examSlug.toUpperCase()} papers
               <ChevronRight size={13} />
             </Link>
-          </div>
-
-          {/* Quick facts card */}
-          <div className="pg-sidebar-card">
-            <div className="pg-sidebar-card-head">
-              <strong>Quick Facts</strong>
-            </div>
-            <dl className="pg-quick-facts">
-              <div>
-                <dt>Board</dt>
-                <dd>{guide.conductingBody}</dd>
-              </div>
-              <div>
-                <dt>Level</dt>
-                <dd>{guide.examLevel}</dd>
-              </div>
-              <div>
-                <dt>Mode</dt>
-                <dd>{guide.examMode}</dd>
-              </div>
-              {guide.quickFacts?.map((fact, i) => (
-                <div key={i}>
-                  <dt>{fact.label}</dt>
-                  <dd>{fact.value}</dd>
-                </div>
-              ))}
-            </dl>
             <a
               className="pg-official-link"
               href={guide.officialWebsite}

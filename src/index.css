@@ -16234,8 +16234,74 @@ html[data-theme="dark"] {
   font-weight: 700;
 }
 
+.pg-compact-table th,
+.pg-compact-table td {
+  padding: 9px 11px;
+  font-size: 12.5px;
+  vertical-align: top;
+}
+
+.pg-num-cell {
+  white-space: nowrap;
+}
+
+.pg-num-cell small {
+  display: block;
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 2px;
+}
+
+.pg-asked-cell {
+  min-width: 240px;
+  line-height: 1.45 !important;
+  color: var(--ink2) !important;
+}
+
+/* Score Distribution Graph */
+.pg-dist-chart {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.pg-dist-row {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr) 115px;
+  align-items: center;
+  gap: 10px;
+  font-size: 12.5px;
+}
+
+.pg-dist-range {
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.pg-dist-track {
+  height: 12px;
+  background: var(--line2);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.pg-dist-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--blue), #22b8e6);
+  border-radius: 6px;
+}
+
+.pg-dist-val {
+  text-align: right;
+  font-size: 12px;
+  color: var(--ink2);
+  white-space: nowrap;
+}
+
 @media (max-width: 680px) {
   .pg-master-grid { grid-template-columns: 1fr; }
+  .pg-dist-row { grid-template-columns: 74px minmax(0, 1fr) 98px; gap: 6px; }
 }
 
 /* ── Responsive ─────────────────────────────────────── */

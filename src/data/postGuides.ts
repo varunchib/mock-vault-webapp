@@ -118,7 +118,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Constable Syllabus & Exam Pattern 2026 (Executive/Armed/IRP/SDRF)',
     shortName: 'JKSSB Constable',
     tagline: 'One syllabus covers Constable (Executive Police), Constable (Armed/IRP) and Constable (SDRF) — 100 questions, 100 marks, 2 hours. Written exams scheduled for 13 and 20 December 2026.',
-    lastUpdated: '2026-08-03',
+    lastUpdated: '2026-11-16',
     patternNotification: 'Syllabus notified by JKSSB vide Notice No. JKSSB/COE0EXAM(UT)/47/2023-03 (7202110) dated 03.10.2024, Annexure A, issued against Advertisement Notification No. 01 of 2024 dated 16.07.2024. Written examinations per the JKSSB exam-date annexure: Constable (Executive) 13 December 2026 under Notification 12 of 2025; Constable (Armed/IRP/SDRF) 20 December 2026 under Notification 14 of 2025.',
     quickFacts: [
       { label: 'Exam Date (Executive)', value: '13 December 2026' },
@@ -224,7 +224,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Constable Telecommunication Syllabus & Exam Pattern 2026',
     shortName: 'JKSSB Constable Telecom',
     tagline: '60 marks of aptitude plus 40 marks of technical questions — radio communication, television transmission, antennas, mobile communication and electricity. Written exam scheduled for 27 December 2026.',
-    lastUpdated: '2026-08-03',
+    lastUpdated: '2026-11-16',
     patternNotification: 'Syllabus notified by JKSSB vide Notice No. JKSSB/COE0EXAM(UT)/47/2023-03 (7202110) dated 03.10.2024, Annexure B, issued against Advertisement Notification No. 01 of 2024 dated 16.07.2024. Written examination scheduled for 27 December 2026 under Notification 15 of 2025 (Item No. 325) per the JKSSB exam-date annexure.',
     quickFacts: [
       { label: 'Exam Date', value: '27 December 2026' },
@@ -360,7 +360,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector (Executive) 2026 Syllabus & Exam Pattern (Advt. 02/2024)',
     shortName: 'JKSSB SI (Executive)',
     tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Executive) — J&K Police, Home Department — exam under Advertisement 02/2024. 100 questions, 200 marks, 6 sections, exam expected in 2026. Solved 2017 & 2022 previous year papers included.',
-    lastUpdated: '2026-08-03',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkpsi',
 
@@ -514,7 +514,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Sub Inspector (Telecommunication) 2026 Syllabus & Exam Pattern (Advt. 11/2025)',
     shortName: 'JKSSB SI (Telecom)',
     tagline: 'Complete syllabus and exam pattern for the upcoming JKSSB Sub Inspector (Telecommunication) — J&K Police, Home Department — exam under Advertisement 11/2025. 100 questions, 200 marks, two parts (60 General + 140 Technical), exam expected in 2026.',
-    lastUpdated: '2026-08-03',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkpsi-telecom',
 
@@ -727,7 +727,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'UPSC Civil Services Examination (CSE) — Complete Syllabus & Exam Pattern',
     shortName: 'UPSC CSE',
     tagline: 'UPSC IAS/IPS/IFS exam — Prelims syllabus, GS Paper I & CSAT pattern, Mains overview, and previous year solved papers.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'upsc-cse',
 
@@ -874,7 +874,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'SSC CGL — Complete Syllabus, Exam Pattern & Previous Year Papers',
     shortName: 'SSC CGL',
     tagline: 'SSC Combined Graduate Level — Tier I & II syllabus, section-wise exam pattern, previous year papers with solutions.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'ssc-cgl',
 
@@ -1007,7 +1007,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'BPSC Combined Competitive Examination (CCE) — Syllabus & Exam Pattern',
     shortName: 'BPSC CCE',
     tagline: 'Bihar Public Service Commission CCE — Prelims syllabus, 150 GS questions, no negative marking. Previous year papers with solutions.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'bpsc-cce',
 
@@ -1134,7 +1134,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'IBPS PO Syllabus, Exam Pattern & Section Weightage Analysis 2025',
     shortName: 'IBPS PO',
     tagline: 'IBPS Probationary Officer exam — Prelims & Mains syllabus, section-wise pattern, Banking Awareness topics, previous year papers.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'ibps-po',
 
@@ -1273,7 +1273,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKPSC JKCCE — Official Syllabus, Exam Pattern & Previous Year Papers',
     shortName: 'JKPSC',
     tagline: 'JKPSC Combined Competitive Examination (JKCCE) — GS Paper I & CSAT syllabus, Prelims pattern, and solved papers for J&K Gazetted Officer recruitment.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkcce',
 
@@ -1406,7 +1406,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'RSSB Patwari — Official Syllabus & Exam Pattern 2025',
     shortName: 'RSSB Patwari',
     tagline: 'Rajasthan Staff Selection Board Patwari exam — 150 questions, 300 marks, −0.67 negative marking. Official syllabus, Rajasthan GK topics, and solved 2025 paper.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'rssb-patwari',
 
@@ -1540,7 +1540,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'NEET UG — Complete Syllabus & Exam Pattern 2025',
     shortName: 'NEET UG',
     tagline: 'NEET UG medical entrance — official syllabus for Physics, Chemistry, Biology. 180 questions, 720 marks, −1 negative marking. NTA-conducted.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'neet-ug',
     papers: [],
@@ -1676,7 +1676,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Patwari — Syllabus, Revenue Laws & Exam Pattern',
     shortName: 'JKSSB Patwari',
     tagline: 'JKSSB Patwari exam — Revenue Laws syllabus, J&K Land Records, 120 MCQs, −0.25 negative marking. 2024 solved paper included.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkssb-patwari',
 
@@ -1809,7 +1809,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Junior Assistant — Syllabus, Computer Knowledge & Exam Pattern',
     shortName: 'JKSSB Junior Assistant',
     tagline: 'JKSSB Junior Assistant exam — Computer Knowledge syllabus, GK, Reasoning, English. 80 questions, −0.25 negative marking. 2026 solved paper.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkssb-junior-assistant',
 
@@ -2159,7 +2159,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Wildlife Guard — Official Syllabus & Exam Pattern (Forest Dept.)',
     shortName: 'JKSSB Wildlife Guard',
     tagline: 'Official syllabus for JKSSB Wildlife Guard (Forest, Ecology & Environment) — 4 sections, 120 marks. Mathematics, Reasoning, English, General Awareness + Forest & Wildlife. 2026 solved paper.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkssb-wildlife-guard',
 
@@ -2306,7 +2306,7 @@ export const postGuides: Record<string, PostGuideData> = {
     title: 'JKSSB Veterinary Pharmacist — Official Syllabus & Exam Pattern 2025',
     shortName: 'JKSSB Veterinary Pharmacist',
     tagline: 'Official syllabus for JKSSB Veterinary Pharmacist — 120 questions, 120 marks, 2 hours. English, GK, Reasoning, Computer + 60 marks of Zoology, Physiology, Evolution & Immunology. Solved 2025 paper with answer key.',
-    lastUpdated: '2026-07-16',
+    lastUpdated: '2026-11-16',
 
     examSlug: 'jkssb-veterinary-pharmacist',
 
