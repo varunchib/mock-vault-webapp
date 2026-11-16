@@ -56,8 +56,10 @@ const rowKey = (line: string) => line.split('|').map(c => c.trim()).join(' ')
  */
 const GENERIC_STEM: RegExp[] = [
   /\babove\b/i,
+  /\bpassage\b/i,
   /^(passage|match list|directions?)\b/i,
-  /^(select|choose|identify|pick)\b/i,
+  /^(select|choose|identify|pick|consider|read|study|examine|match)\b/i,
+  /^(with reference to|in the context of)\b/i,
   /^in the (passage|sentence|following)\b/i,
   /^a sentence is provided\b/i,
   /^(which|how many)\b.*\b(statements?|pairs?|assumptions?|conclusions?)\b/i,

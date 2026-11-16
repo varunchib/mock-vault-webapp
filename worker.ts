@@ -546,7 +546,7 @@ const STATIC_META: Record<string, PageMeta> = {
 // '32' refreshes the edge cache after consolidating JKSSB subjects into clean canonical names.
 // '33' refreshes edge cache with upgraded About, Contact, Disclaimer, Privacy, and Guide FAQ schema.
 // '34' refreshes edge cache with JKSSB FAA 2026 (15 Nov Set C) 120 solved explanations and sitewide quality upgrades.
-const API_CACHE_VERSION = '38'
+const API_CACHE_VERSION = '39'
 
 // Every SSR subrequest leaves the Worker from the same Cloudflare egress
 // address, so the API's per-IP rate limiter (120/min on the public endpoints)
@@ -976,7 +976,7 @@ function richText(s: string | undefined | null): string {
 // or, when that is bare boilerplate ("Consider the following statements:"),
 // the first numbered statement. Strip the lead-in and keep the noun phrase.
 const TOPIC_LEAD_IN =
-  /^(consider the following statements?(?:\s+(?:regarding|about|concerning|on))?(?:\s+the)?|with reference to(?:\s+the)?|in the context of(?:\s+the)?)\s*/i
+  /^(?:(?:consider|read|study|examine|select|choose|identify)\s+the\s+(?:following|correct|incorrect)(?:\s+(?:statements?|pairs?|items?|options?))?(?:\s+(?:regarding|about|concerning|on|related to|with reference to))?(?:\s+the)?|with reference to(?:\s+the)?|in the context of(?:\s+the)?)\s*/i
 
 function topicFromQuestion(lines: string[]): string {
   for (const raw of lines) {
@@ -1042,10 +1042,12 @@ function isGenericStem(line: string, multiline: boolean): boolean {
   if (!t) return true
   // "above" always points at statements/pairs that live outside the title.
   if (/\babove\b/i.test(t)) return true
+  if (/\bpassage\b/i.test(t)) return true
   if (/^(passage|match list|directions?)\b/i.test(t)) return true
-  // Instruction-style stems shared verbatim across whole English/reasoning
-  // sections ("Select the letter-cluster…", "In the passage below…").
-  if (/^(select|choose|identify|pick)\b/i.test(t)) return true
+  // Instruction-style stems shared verbatim across whole English/reasoning/GS
+  // sections ("Select the letter-cluster…", "Consider the following statements…").
+  if (/^(select|choose|identify|pick|consider|read|study|examine|match)\b/i.test(t)) return true
+  if (/^(with reference to|in the context of)\b/i.test(t)) return true
   if (/^in the (passage|sentence|following)\b/i.test(t)) return true
   if (/^a sentence is provided\b/i.test(t)) return true
   // "Which of the following statements/pairs/conclusions is/are correct?" —
@@ -1770,11 +1772,9 @@ async function fetchMeta(pathname: string, clientIp?: string): Promise<PageMeta 
       // The brand suffix is deliberately gone: 21 chars of " | Ministry of
       // Papers" pushed the topic keywords past what Google renders, and Search
       // now appends the site name itself.
-      const pageTitle = isGenericStem(expandedHeading, multiline)
+      const pageTitle = isGenericStem(expandedHeading, multiline) || isGenericStem(actualQuestion, multiline)
         ? questionTitle(examLabel, q.year, q.subject ?? '', q.questionNo, topic)
-        : expandedHeading.length > 65
-          ? expandedHeading.slice(0, 64).trimEnd() + '…'
-          : expandedHeading
+        : fitHeadingCap(expandedHeading, 70)
       // Descriptions lead with the FULL question text — the same source the URL
       // keywords come from — not the trailing stem, which is identical across
       // papers and gave every statement-list page one shared snippet.
