@@ -456,6 +456,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Double Entry, Journal & Accounting Equation",
                 "count": 1
+              },
+              {
+                "name": "Public Financial Management (PFMS)",
+                "count": 1
               }
             ]
           },
@@ -698,6 +702,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Public Financial Management (PFMS)",
                 "count": 2
+              },
+              {
+                "name": "Final Accounts & Balance Sheet",
+                "count": 1
               }
             ]
           },
@@ -951,6 +959,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Partnership Accounts",
+                "count": 1
+              },
+              {
+                "name": "Public Financial Management (PFMS)",
                 "count": 1
               }
             ]
@@ -1394,243 +1406,6 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "note": "Horizontal reservation · Highest ESM: 46.75 / 120"
           }
         ]
-      },
-      {
-        "year": "Social Forestry",
-        "label": "Social Forestry Worker Official DV Cutoff (Annexure B · 29.10.2026)",
-        "maxMarks": 120,
-        "vacancies": "Advt. 03/2021 & 04/2022 · Item Nos. 185, 186, 592, 593",
-        "appeared": "176 Shortlisted for DV",
-        "topperScore": "71.75 / 120",
-        "meanScore": "OM Cutoff: 47.50 / 120",
-        "sourceNote": "Exact category-wise DV cutoff extracted from Official JKSSB Notification dated 29.10.2026 (Annexure B — Social Forestry Worker).",
-        "rows": [
-          {
-            "category": "OM (Open Merit)",
-            "marks": "47.50 / 120",
-            "pct": 40,
-            "safeTarget": "46 Shortlisted",
-            "note": "Highest OM: 71.75 / 120"
-          },
-          {
-            "category": "RBA",
-            "marks": "44.00 / 120",
-            "pct": 37,
-            "safeTarget": "52 Shortlisted",
-            "note": "Highest RBA: 66.25 / 120"
-          },
-          {
-            "category": "PSP",
-            "marks": "37.00 / 120",
-            "pct": 31,
-            "safeTarget": "13 Shortlisted",
-            "note": "Highest PSP: 54.75 / 120"
-          },
-          {
-            "category": "ALC / IB",
-            "marks": "36.75 / 120",
-            "pct": 31,
-            "safeTarget": "11 Shortlisted",
-            "note": "Highest ALC/IB: 51.25 / 120"
-          },
-          {
-            "category": "SC",
-            "marks": "31.50 / 120",
-            "pct": 26,
-            "safeTarget": "18 Shortlisted",
-            "note": "Highest SC: 53.75 / 120"
-          },
-          {
-            "category": "EWS",
-            "marks": "29.50 / 120",
-            "pct": 25,
-            "safeTarget": "18 Shortlisted",
-            "note": "Highest EWS: 59.25 / 120"
-          },
-          {
-            "category": "ST",
-            "marks": "28.00 / 120",
-            "pct": 23,
-            "safeTarget": "18 Shortlisted",
-            "note": "Highest ST: 52.75 / 120"
-          }
-        ]
-      },
-      {
-        "year": "FPF Guard",
-        "label": "FPF Guard Official DV Cutoff (Annexure C · 29.10.2026)",
-        "maxMarks": 120,
-        "vacancies": "Advt. 04/2022 · Item Nos. 86–92",
-        "appeared": "3,553 Appeared · 241 Shortlisted for DV",
-        "topperScore": "89.50 / 120",
-        "meanScore": "OM Cutoff: 69.50 / 120",
-        "sourceNote": "Exact category-wise DV cutoff extracted from Official JKSSB Notification dated 29.10.2026 (Annexure C — FPF Guard).",
-        "rows": [
-          {
-            "category": "OM (Open Merit)",
-            "marks": "69.50 / 120",
-            "pct": 58,
-            "safeTarget": "66 Shortlisted",
-            "note": "Highest OM: 89.50 / 120"
-          },
-          {
-            "category": "PSP",
-            "marks": "65.75 / 120",
-            "pct": 55,
-            "safeTarget": "10 Shortlisted",
-            "note": "Highest PSP: 80.00 / 120"
-          },
-          {
-            "category": "RBA",
-            "marks": "63.00 / 120",
-            "pct": 53,
-            "safeTarget": "77 Shortlisted",
-            "note": "Highest RBA: 84.75 / 120"
-          },
-          {
-            "category": "ALC / IB",
-            "marks": "61.25 / 120",
-            "pct": 51,
-            "safeTarget": "16 Shortlisted",
-            "note": "Highest ALC/IB: 80.00 / 120"
-          },
-          {
-            "category": "EWS",
-            "marks": "56.25 / 120",
-            "pct": 47,
-            "safeTarget": "7 Shortlisted",
-            "note": "Highest EWS: 80.75 / 120"
-          },
-          {
-            "category": "SC",
-            "marks": "51.50 / 120",
-            "pct": 43,
-            "safeTarget": "37 Shortlisted",
-            "note": "Highest SC: 82.25 / 120"
-          },
-          {
-            "category": "ST",
-            "marks": "47.00 / 120",
-            "pct": 39,
-            "safeTarget": "27 Shortlisted",
-            "note": "Highest ST: 72.50 / 120"
-          }
-        ]
-      },
-      {
-        "year": "Inspector FPF",
-        "label": "Inspector (Forest) Official DV Cutoff (Annexure D · 29.10.2026)",
-        "maxMarks": 120,
-        "vacancies": "Advt. 04/2022 · Item Nos. 84, 85",
-        "appeared": "8,356 Appeared · 253 Shortlisted for DV",
-        "topperScore": "98.75 / 120",
-        "meanScore": "RBA Cutoff: 71.00 · OM: 57.25*",
-        "sourceNote": "Exact category-wise DV marks extracted from Official JKSSB Notification dated 29.10.2026 (Annexure D — Inspector).",
-        "rows": [
-          {
-            "category": "RBA",
-            "marks": "71.00 / 120",
-            "pct": 59,
-            "safeTarget": "54 Shortlisted",
-            "note": "Highest RBA: 98.75 / 120"
-          },
-          {
-            "category": "PSP",
-            "marks": "68.50 / 120",
-            "pct": 57,
-            "safeTarget": "10 Shortlisted",
-            "note": "Highest PSP: 78.50 / 120"
-          },
-          {
-            "category": "ALC / IB",
-            "marks": "68.00 / 120",
-            "pct": 57,
-            "safeTarget": "13 Shortlisted",
-            "note": "Highest ALC/IB: 80.25 / 120"
-          },
-          {
-            "category": "SC",
-            "marks": "64.00 / 120",
-            "pct": 53,
-            "safeTarget": "28 Shortlisted",
-            "note": "Highest SC: 81.25 / 120"
-          },
-          {
-            "category": "ST",
-            "marks": "60.75 / 120",
-            "pct": 51,
-            "safeTarget": "31 Shortlisted",
-            "note": "Highest ST: 85.75 / 120"
-          },
-          {
-            "category": "EWS",
-            "marks": "60.00 / 120",
-            "pct": 50,
-            "safeTarget": "25 Shortlisted",
-            "note": "Highest EWS: 78.25 / 120"
-          },
-          {
-            "category": "OM (incl. horizontal/ESM)",
-            "marks": "57.25 / 120",
-            "pct": 48,
-            "safeTarget": "83 Shortlisted",
-            "note": "Highest OM: 95.25 / 120"
-          }
-        ]
-      },
-      {
-        "year": "Field Assistant",
-        "label": "Field Assistant Official DV Cutoff (Annexure E · 29.10.2026)",
-        "maxMarks": 120,
-        "vacancies": "Advt. 03/2021 · Item No. 594",
-        "appeared": "52 Shortlisted for DV",
-        "topperScore": "116.25 / 120",
-        "meanScore": "OM Cutoff: 107.50 / 120",
-        "sourceNote": "Exact category-wise DV cutoff extracted from Official JKSSB Notification dated 29.10.2026 (Annexure E — Field Assistant).",
-        "rows": [
-          {
-            "category": "OM (Open Merit)",
-            "marks": "107.50 / 120",
-            "pct": 90,
-            "safeTarget": "16 Shortlisted",
-            "note": "Highest OM: 116.25 / 120"
-          },
-          {
-            "category": "RBA",
-            "marks": "105.25 / 120",
-            "pct": 88,
-            "safeTarget": "13 Shortlisted",
-            "note": "Highest RBA: 113.75 / 120"
-          },
-          {
-            "category": "ST",
-            "marks": "85.50 / 120",
-            "pct": 71,
-            "safeTarget": "6 Shortlisted",
-            "note": "Highest ST: 92.25 / 120"
-          },
-          {
-            "category": "EWS",
-            "marks": "80.00 / 120",
-            "pct": 67,
-            "safeTarget": "6 Shortlisted",
-            "note": "Highest EWS: 115.25 / 120"
-          },
-          {
-            "category": "SC",
-            "marks": "78.75 / 120",
-            "pct": 66,
-            "safeTarget": "6 Shortlisted",
-            "note": "Highest SC: 91.25 / 120"
-          },
-          {
-            "category": "ALC / IB",
-            "marks": "67.50 / 120",
-            "pct": 56,
-            "safeTarget": "5 Shortlisted",
-            "note": "Highest ALC/IB: 95.50 / 120"
-          }
-        ]
       }
     ],
     "scoreDistributions": [
@@ -1726,6 +1501,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Verbs",
                 "count": 2
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "Para Jumbles",
+                "count": 1
+              },
+              {
+                "name": "Tenses",
+                "count": 1
               }
             ]
           },
@@ -1764,6 +1555,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Arithmetic",
+                "count": 1
+              },
+              {
+                "name": "Mensuration",
+                "count": 1
+              },
+              {
+                "name": "Quadratic Equations",
                 "count": 1
               }
             ]
@@ -1861,6 +1660,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Indian Polity",
+                "count": 1
+              },
+              {
+                "name": "Physics",
+                "count": 1
+              },
+              {
+                "name": "Static GK",
                 "count": 1
               }
             ]
@@ -2138,6 +1945,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Government Schemes",
                 "count": 1
+              },
+              {
+                "name": "Indian History",
+                "count": 1
               }
             ]
           },
@@ -2177,6 +1988,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Homophones",
                 "count": 1
+              },
+              {
+                "name": "Prepositions",
+                "count": 1
+              },
+              {
+                "name": "Punctuation",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
+              },
+              {
+                "name": "Tenses",
+                "count": 1
               }
             ]
           },
@@ -2215,6 +2042,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Number Series",
+                "count": 1
+              },
+              {
+                "name": "Probability",
+                "count": 1
+              },
+              {
+                "name": "Statement & Assumption",
+                "count": 1
+              },
+              {
+                "name": "Statement & Conclusion",
+                "count": 1
+              },
+              {
+                "name": "Trains",
                 "count": 1
               }
             ]
@@ -2540,6 +2383,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Chemistry",
                 "count": 1
+              },
+              {
+                "name": "Economy",
+                "count": 1
+              },
+              {
+                "name": "Indian Polity",
+                "count": 1
+              },
+              {
+                "name": "International Organisations",
+                "count": 1
+              },
+              {
+                "name": "J&K Geography",
+                "count": 1
+              },
+              {
+                "name": "Space & Defense",
+                "count": 1
               }
             ]
           },
@@ -2578,6 +2441,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "International Organisations",
+                "count": 1
+              },
+              {
+                "name": "J&K Polity",
                 "count": 1
               }
             ]
@@ -2618,6 +2485,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Prepositions",
                 "count": 2
+              },
+              {
+                "name": "Reading Comprehension",
+                "count": 2
+              },
+              {
+                "name": "Active & Passive Voice",
+                "count": 1
+              },
+              {
+                "name": "Antonyms",
+                "count": 1
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Homophones",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
               }
             ]
           },
@@ -2656,6 +2547,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "MS Excel",
+                "count": 1
+              },
+              {
+                "name": "MS Office",
+                "count": 1
+              },
+              {
+                "name": "Operating Systems",
                 "count": 1
               }
             ]
@@ -2926,6 +2825,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Internet & Email",
                 "count": 1
+              },
+              {
+                "name": "MS PowerPoint",
+                "count": 1
               }
             ]
           },
@@ -2964,6 +2867,34 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Clauses",
+                "count": 1
+              },
+              {
+                "name": "Direct & Indirect Speech",
+                "count": 1
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "Homophones",
+                "count": 1
+              },
+              {
+                "name": "Modals",
+                "count": 1
+              },
+              {
+                "name": "Prepositions",
+                "count": 1
+              },
+              {
+                "name": "Punctuation",
                 "count": 1
               }
             ]
@@ -3320,6 +3251,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Phrasal Verbs",
                 "count": 2
+              },
+              {
+                "name": "Prepositions",
+                "count": 2
+              },
+              {
+                "name": "Pronouns",
+                "count": 2
+              },
+              {
+                "name": "Punctuation",
+                "count": 2
+              },
+              {
+                "name": "Synonyms",
+                "count": 2
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
               }
             ]
           },
@@ -3359,6 +3310,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Economy",
                 "count": 1
+              },
+              {
+                "name": "Government Schemes",
+                "count": 1
+              },
+              {
+                "name": "J&K General Knowledge",
+                "count": 1
+              },
+              {
+                "name": "Modern History",
+                "count": 1
               }
             ]
           },
@@ -3397,6 +3360,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Profit & Loss",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
                 "count": 1
               }
             ]
@@ -3536,6 +3503,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "International Organisations",
                 "count": 1
+              },
+              {
+                "name": "Medieval History",
+                "count": 1
+              },
+              {
+                "name": "Sports",
+                "count": 1
               }
             ]
           },
@@ -3597,6 +3572,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Nouns",
+                "count": 1
+              },
+              {
+                "name": "Phrasal Verbs",
+                "count": 1
+              },
+              {
+                "name": "Prepositions",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
+              },
+              {
+                "name": "Vocabulary",
                 "count": 1
               }
             ]
@@ -3701,6 +3692,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Current Affairs",
                 "count": 3
+              },
+              {
+                "name": "Economy",
+                "count": 3
+              },
+              {
+                "name": "Physics",
+                "count": 3
+              },
+              {
+                "name": "Awards & Honours",
+                "count": 2
+              },
+              {
+                "name": "World Geography",
+                "count": 2
+              },
+              {
+                "name": "Art & Culture",
+                "count": 1
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 1
+              },
+              {
+                "name": "International Organisations",
+                "count": 1
+              },
+              {
+                "name": "Judiciary",
+                "count": 1
               }
             ]
           },
@@ -3739,6 +3762,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Simple & Compound Interest",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Trigonometry",
                 "count": 1
               }
             ]
@@ -3779,6 +3814,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Coding-Decoding",
                 "count": 1
+              },
+              {
+                "name": "Logical Deduction",
+                "count": 1
               }
             ]
           },
@@ -3817,6 +3856,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Synonyms",
+                "count": 1
+              },
+              {
+                "name": "Tenses",
+                "count": 1
+              },
+              {
+                "name": "Vocabulary",
                 "count": 1
               }
             ]
@@ -4093,6 +4140,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Indian Polity",
                 "count": 1
+              },
+              {
+                "name": "Rivers & Lakes",
+                "count": 1
+              },
+              {
+                "name": "World Geography",
+                "count": 1
               }
             ]
           },
@@ -4131,6 +4186,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Sentence Improvement",
+                "count": 1
+              },
+              {
+                "name": "Spelling",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
                 "count": 1
               }
             ]
@@ -4509,6 +4572,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Logical Deduction",
                 "count": 1
+              },
+              {
+                "name": "Number Series",
+                "count": 1
+              },
+              {
+                "name": "Odd One Out",
+                "count": 1
+              },
+              {
+                "name": "Seating Arrangement",
+                "count": 1
               }
             ]
           },
@@ -4720,6 +4795,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "World Geography",
                 "count": 2
+              },
+              {
+                "name": "Art & Culture",
+                "count": 1
+              },
+              {
+                "name": "Climate Change",
+                "count": 1
+              },
+              {
+                "name": "Current Affairs",
+                "count": 1
+              },
+              {
+                "name": "Operating Systems",
+                "count": 1
               }
             ]
           },
@@ -4785,6 +4876,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Number Series",
+                "count": 1
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
                 "count": 1
               }
             ]
@@ -5336,6 +5439,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Algebra",
                 "count": 1
+              },
+              {
+                "name": "Data Interpretation",
+                "count": 1
+              },
+              {
+                "name": "Profit & Loss",
+                "count": 1
+              },
+              {
+                "name": "Trigonometry",
+                "count": 1
               }
             ]
           },
@@ -5596,6 +5711,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Geometry",
                 "count": 1
+              },
+              {
+                "name": "Letter Series",
+                "count": 1
               }
             ]
           }
@@ -5848,6 +5967,46 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Art, Culture & Sports",
                 "count": 1
+              },
+              {
+                "name": "Economy",
+                "count": 1
+              },
+              {
+                "name": "Environmental Science",
+                "count": 1
+              },
+              {
+                "name": "Festivals & Culture",
+                "count": 1
+              },
+              {
+                "name": "Freedom Struggle",
+                "count": 1
+              },
+              {
+                "name": "Human Physiology",
+                "count": 1
+              },
+              {
+                "name": "Indian Geography",
+                "count": 1
+              },
+              {
+                "name": "International Relations",
+                "count": 1
+              },
+              {
+                "name": "Physics",
+                "count": 1
+              },
+              {
+                "name": "Science & Technology",
+                "count": 1
+              },
+              {
+                "name": "Sports",
+                "count": 1
               }
             ]
           },
@@ -5886,6 +6045,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Fill in the Blanks",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Prepositions",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
                 "count": 1
               }
             ]
@@ -5926,6 +6105,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Partnership",
                 "count": 1
+              },
+              {
+                "name": "Percentage",
+                "count": 1
+              },
+              {
+                "name": "Profit & Loss",
+                "count": 1
+              },
+              {
+                "name": "Simple & Compound Interest",
+                "count": 1
+              },
+              {
+                "name": "Simplification",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
               }
             ]
           },
@@ -5964,6 +6163,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Calendar & Clock",
+                "count": 1
+              },
+              {
+                "name": "Course of Action",
+                "count": 1
+              },
+              {
+                "name": "Data Interpretation",
+                "count": 1
+              },
+              {
+                "name": "Decision Making",
+                "count": 1
+              },
+              {
+                "name": "Missing Number",
+                "count": 1
+              },
+              {
+                "name": "Puzzles",
+                "count": 1
+              },
+              {
+                "name": "Statement & Assumption",
+                "count": 1
+              },
+              {
+                "name": "Statement & Conclusion",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
                 "count": 1
               }
             ]
@@ -6014,6 +6245,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Sentence Improvement",
                 "count": 2
+              },
+              {
+                "name": "Spelling",
+                "count": 2
+              },
+              {
+                "name": "Antonyms",
+                "count": 1
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Fill in the Blanks",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Phrasal Verbs",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
               }
             ]
           },
@@ -6052,6 +6315,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Number System",
+                "count": 1
+              },
+              {
+                "name": "Partnership",
+                "count": 1
+              },
+              {
+                "name": "Probability",
+                "count": 1
+              },
+              {
+                "name": "Simple & Compound Interest",
+                "count": 1
+              },
+              {
+                "name": "Simplification",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
                 "count": 1
               }
             ]
@@ -6092,6 +6375,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Dice & Cube",
                 "count": 1
+              },
+              {
+                "name": "Direction Sense",
+                "count": 1
+              },
+              {
+                "name": "Mirror & Water Image",
+                "count": 1
+              },
+              {
+                "name": "Missing Number",
+                "count": 1
+              },
+              {
+                "name": "Venn Diagrams",
+                "count": 1
+              },
+              {
+                "name": "Word Formation",
+                "count": 1
               }
             ]
           },
@@ -6131,6 +6434,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Environment & Ecology",
                 "count": 1
+              },
+              {
+                "name": "Human Physiology",
+                "count": 1
+              },
+              {
+                "name": "International Organisations",
+                "count": 1
+              },
+              {
+                "name": "Science & Technology",
+                "count": 1
               }
             ]
           },
@@ -6169,6 +6484,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Cyber Security",
+                "count": 1
+              },
+              {
+                "name": "MS PowerPoint",
                 "count": 1
               }
             ]
@@ -6246,6 +6565,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Active & Passive Voice",
                 "count": 1
+              },
+              {
+                "name": "Antonyms",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "Spelling",
+                "count": 1
               }
             ]
           },
@@ -6285,6 +6620,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Simple & Compound Interest",
                 "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
               }
             ]
           },
@@ -6323,6 +6662,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Number Series",
+                "count": 1
+              },
+              {
+                "name": "Syllogism",
                 "count": 1
               }
             ]
@@ -6373,6 +6716,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Biology",
                 "count": 1
+              },
+              {
+                "name": "Current Affairs",
+                "count": 1
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 1
+              },
+              {
+                "name": "Geography",
+                "count": 1
+              },
+              {
+                "name": "Government Schemes",
+                "count": 1
+              },
+              {
+                "name": "Physics",
+                "count": 1
               }
             ]
           },
@@ -6412,6 +6775,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Spelling",
                 "count": 2
+              },
+              {
+                "name": "Antonyms",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
+              },
+              {
+                "name": "Vocabulary",
+                "count": 1
               }
             ]
           },
@@ -6451,6 +6838,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Algebra",
                 "count": 1
+              },
+              {
+                "name": "Coordinate Geometry",
+                "count": 1
+              },
+              {
+                "name": "Data Interpretation",
+                "count": 1
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Simplification",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
               }
             ]
           },
@@ -6489,6 +6900,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Statement & Assumption",
+                "count": 1
+              },
+              {
+                "name": "Statement & Conclusion",
+                "count": 1
+              },
+              {
+                "name": "Word Formation",
                 "count": 1
               }
             ]
@@ -6539,6 +6962,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Current Affairs",
                 "count": 1
+              },
+              {
+                "name": "Economy",
+                "count": 1
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 1
+              },
+              {
+                "name": "International Organisations",
+                "count": 1
+              },
+              {
+                "name": "Physics",
+                "count": 1
+              },
+              {
+                "name": "Static GK",
+                "count": 1
               }
             ]
           },
@@ -6578,6 +7021,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Spelling",
                 "count": 2
+              },
+              {
+                "name": "Antonyms",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
+              },
+              {
+                "name": "Vocabulary",
+                "count": 1
               }
             ]
           },
@@ -6617,6 +7084,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Time & Work",
                 "count": 2
+              },
+              {
+                "name": "Algebra",
+                "count": 1
+              },
+              {
+                "name": "Coordinate Geometry",
+                "count": 1
+              },
+              {
+                "name": "Data Interpretation",
+                "count": 1
+              },
+              {
+                "name": "Linear Equations",
+                "count": 1
+              },
+              {
+                "name": "Percentage",
+                "count": 1
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 1
               }
             ]
           },
@@ -6701,6 +7192,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Assertion & Reason",
                 "count": 1
+              },
+              {
+                "name": "Biology",
+                "count": 1
+              },
+              {
+                "name": "Chemistry",
+                "count": 1
+              },
+              {
+                "name": "Current Affairs",
+                "count": 1
+              },
+              {
+                "name": "Physics",
+                "count": 1
+              },
+              {
+                "name": "Space & Defense",
+                "count": 1
               }
             ]
           },
@@ -6739,6 +7250,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Active & Passive Voice",
+                "count": 1
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Prepositions",
                 "count": 1
               }
             ]
@@ -6779,6 +7310,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Time & Work",
                 "count": 2
+              },
+              {
+                "name": "Algebra",
+                "count": 1
+              },
+              {
+                "name": "Arithmetic",
+                "count": 1
+              },
+              {
+                "name": "Data Interpretation",
+                "count": 1
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
               }
             ]
           },
@@ -6890,6 +7441,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Homonyms",
                 "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
               }
             ]
           },
@@ -6929,6 +7492,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Mensuration",
                 "count": 1
+              },
+              {
+                "name": "Profit & Loss",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
               }
             ]
           },
@@ -6967,6 +7542,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Odd One Out",
+                "count": 1
+              },
+              {
+                "name": "Statement & Conclusion",
+                "count": 1
+              },
+              {
+                "name": "Syllogism",
                 "count": 1
               }
             ]
@@ -7017,6 +7600,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Current Affairs",
                 "count": 1
+              },
+              {
+                "name": "Economy",
+                "count": 1
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 1
+              },
+              {
+                "name": "International Organisations",
+                "count": 1
               }
             ]
           },
@@ -7056,6 +7651,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Sentence Improvement",
                 "count": 2
+              },
+              {
+                "name": "Homonyms",
+                "count": 1
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 1
+              },
+              {
+                "name": "One Word Substitution",
+                "count": 1
+              },
+              {
+                "name": "Spelling",
+                "count": 1
+              },
+              {
+                "name": "Synonyms",
+                "count": 1
+              },
+              {
+                "name": "Vocabulary",
+                "count": 1
               }
             ]
           },
@@ -7095,6 +7714,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Simple & Compound Interest",
                 "count": 1
+              },
+              {
+                "name": "Simplification",
+                "count": 1
               }
             ]
           },
@@ -7133,6 +7756,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Seating Arrangement",
+                "count": 1
+              },
+              {
+                "name": "Statement & Assumption",
+                "count": 1
+              },
+              {
+                "name": "Word Formation",
                 "count": 1
               }
             ]
@@ -7183,6 +7818,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Physics",
                 "count": 2
+              },
+              {
+                "name": "Sports",
+                "count": 2
+              },
+              {
+                "name": "Static GK",
+                "count": 2
+              },
+              {
+                "name": "Ancient History",
+                "count": 1
+              },
+              {
+                "name": "Government Schemes",
+                "count": 1
+              },
+              {
+                "name": "Medieval History",
+                "count": 1
               }
             ]
           },
@@ -7222,6 +7877,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Spelling",
                 "count": 2
+              },
+              {
+                "name": "Tenses",
+                "count": 2
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1
+              },
+              {
+                "name": "Homophones",
+                "count": 1
               }
             ]
           },
@@ -7261,6 +7928,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Ratio & Proportion",
                 "count": 1
+              },
+              {
+                "name": "Simple & Compound Interest",
+                "count": 1
+              },
+              {
+                "name": "Simplification",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
               }
             ]
           },
@@ -7299,6 +7982,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Analogy",
+                "count": 1
+              },
+              {
+                "name": "Blood Relations",
+                "count": 1
+              },
+              {
+                "name": "Direction Sense",
+                "count": 1
+              },
+              {
+                "name": "Syllogism",
                 "count": 1
               }
             ]
@@ -8104,6 +8799,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Missing Number",
                 "count": 1
+              },
+              {
+                "name": "Odd One Out",
+                "count": 1
+              },
+              {
+                "name": "Seating Arrangement",
+                "count": 1
+              },
+              {
+                "name": "Syllogism",
+                "count": 1
               }
             ]
           },
@@ -8157,6 +8864,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Boats & Streams",
+                "count": 1
+              },
+              {
+                "name": "HCF & LCM",
+                "count": 1
+              },
+              {
+                "name": "Permutations & Combinations",
+                "count": 1
+              },
+              {
+                "name": "Probability",
+                "count": 1
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
+              },
+              {
+                "name": "Trigonometry",
                 "count": 1
               }
             ]
@@ -8791,6 +9522,30 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Partnership",
                 "count": 1
+              },
+              {
+                "name": "Percentage",
+                "count": 1
+              },
+              {
+                "name": "Profit & Loss",
+                "count": 1
+              },
+              {
+                "name": "Simple & Compound Interest",
+                "count": 1
+              },
+              {
+                "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Time & Work",
+                "count": 1
+              },
+              {
+                "name": "Trains",
+                "count": 1
               }
             ]
           },
@@ -8829,6 +9584,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Analogy",
+                "count": 1
+              },
+              {
+                "name": "Calendar & Clock",
+                "count": 1
+              },
+              {
+                "name": "Number Series",
+                "count": 1
+              },
+              {
+                "name": "Seating Arrangement",
+                "count": 1
+              },
+              {
+                "name": "Word Formation",
                 "count": 1
               }
             ]
@@ -9106,6 +9877,22 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               {
                 "name": "Blood Relations",
                 "count": 1
+              },
+              {
+                "name": "Computer Architecture",
+                "count": 1
+              },
+              {
+                "name": "Odd One Out",
+                "count": 1
+              },
+              {
+                "name": "Statement & Conclusion",
+                "count": 1
+              },
+              {
+                "name": "Syllogism",
+                "count": 1
               }
             ]
           },
@@ -9159,6 +9946,10 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "MS Word",
+                "count": 1
+              },
+              {
+                "name": "Storage Devices",
                 "count": 1
               }
             ]
@@ -9217,6 +10008,14 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
               },
               {
                 "name": "Speed, Time & Distance",
+                "count": 1
+              },
+              {
+                "name": "Syllogism",
+                "count": 1
+              },
+              {
+                "name": "Venn Diagrams",
                 "count": 1
               }
             ]

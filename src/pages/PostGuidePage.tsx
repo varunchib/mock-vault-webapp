@@ -103,13 +103,13 @@ export function PostGuidePage() {
   const activePaper = intel?.paperXrays[activePaperIdx] ?? intel?.paperXrays[0]
 
   const priorityStars = (p: string) => {
-    if (p === 'Must-Study') return '★★★ Must-Study'
-    if (p === 'High-Yield') return '★★☆ High-Yield'
-    return '★☆☆ Moderate'
+    if (p === 'Must-Study') return '★★★'
+    if (p === 'High-Yield') return '★★☆'
+    return '★☆☆'
   }
 
   const seoSummaryLine = intel && (intel.masterTopics.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0)
-    ? `Complete ${guide.shortName} exam guide covering high-yield important topics, ${intel.cutoffSets.length > 0 ? 'category-wise cutoffs, ' : intel.scoreDistributions?.length ? 'official score distribution, ' : ''}section-wise PYQ paper analysis (${intel.totalQuestionsAnalyzed} solved questions), exam pattern, and syllabus.`
+    ? `Complete ${guide.shortName} exam guide with subject & topic-wise weightage, most repeated topics, year-wise PYQ paper X-ray (${intel.totalQuestionsAnalyzed} solved questions), ${intel.scoreDistributions?.length ? 'official score distribution, and ' : ''}${intel.cutoffSets.length > 0 ? 'category-wise cutoffs' : 'merit analysis'}.`
     : guide.tagline
 
   const content = (
@@ -150,22 +150,22 @@ export function PostGuidePage() {
             </div>
           </header>
 
-          {/* ── 1. MASTER HIGH-YIELD TOPICS (Top Section) ─────────────── */}
+          {/* ── 1. SUBJECT & TOPIC-WISE WEIGHTAGE (Master Frequency Table) ── */}
           {intel && intel.masterTopics.length > 0 && (
             <section className="pg-section pg-intel-section" aria-labelledby="master-topics-heading">
               <div className="pg-intel-head">
                 <div>
                   <h2 id="master-topics-heading" className="pg-intel-title">
-                    <Flame size={17} /> Master High-Yield Topics — What {guide.shortName} Actually Asks
+                    <Flame size={17} /> Subject &amp; Topic-Wise Weightage — Most Repeated Topics
                   </h2>
                   <p className="pg-intel-sub">
-                    Empirical topic frequency ranked across <strong>{intel.totalQuestionsAnalyzed} official questions</strong> from {intel.totalPapersAnalyzed} solved {guide.shortName} paper{intel.totalPapersAnalyzed > 1 ? 's' : ''}. Focus on <strong>Must-Study</strong> topics first.
+                    Master frequency table of the most repeated topics across <strong>{intel.totalQuestionsAnalyzed} official questions</strong> ({intel.totalPapersAnalyzed} solved {guide.shortName} {intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}).
                   </p>
                 </div>
               </div>
 
               {topicSubjects.length > 1 && (
-                <div className="pg-filter-pills" role="tablist" aria-label="Filter high-yield topics by subject">
+                <div className="pg-filter-pills" role="tablist" aria-label="Filter topics by subject">
                   <button
                     type="button"
                     role="tab"
@@ -173,7 +173,7 @@ export function PostGuidePage() {
                     className={`pg-filter-pill${topicSubjectFilter === 'ALL' ? ' active' : ''}`}
                     onClick={() => setTopicSubjectFilter('ALL')}
                   >
-                    All Top Topics ({intel.masterTopics.length})
+                    All Topics ({intel.masterTopics.length})
                   </button>
                   {topicSubjects.map(subj => (
                     <button
@@ -207,7 +207,12 @@ export function PostGuidePage() {
                         <td><strong>#{idx + 1} {item.topic}</strong></td>
                         <td>{item.subject}</td>
                         <td>
-                          <span className={`pg-priority-badge pg-priority-${item.priority.toLowerCase().replace('-', '')}`}>
+                          <span
+                            className={`pg-priority-badge pg-priority-${item.priority.toLowerCase().replace('-', '')}`}
+                            title={item.priority}
+                            aria-label={item.priority}
+                          >
+                            <span className="pg-light-dot" aria-hidden="true" />
                             {priorityStars(item.priority)}
                           </span>
                         </td>
@@ -231,7 +236,89 @@ export function PostGuidePage() {
             </section>
           )}
 
-          {/* ── 2. OFFICIAL SCORE DISTRIBUTION GRAPH (When Scoresheet Exists) ── */}
+          {/* ── 2. YEAR-WISE PAPER X-RAY (Detailed Subject & Topic Breakdown) ── */}
+          {intel && intel.paperXrays.length > 0 && activePaper && (
+            <section className="pg-section pg-intel-section" aria-labelledby="xray-heading">
+              <div className="pg-intel-head">
+                <div>
+                  <h2 id="xray-heading" className="pg-intel-title">
+                    <Layers size={17} /> Year-Wise Paper X-Ray: Subject &amp; Topic-Wise Breakdown
+                  </h2>
+                  <p className="pg-intel-sub">
+                    Comprehensive section-by-section and topic-by-topic breakdown of every solved {guide.shortName} question paper.
+                  </p>
+                </div>
+              </div>
+
+              {intel.paperXrays.length > 1 && (
+                <div className="pg-filter-pills" role="tablist" aria-label="Select question paper year">
+                  {intel.paperXrays.map((px, idx) => (
+                    <button
+                      key={px.paperSlug}
+                      type="button"
+                      role="tab"
+                      aria-selected={activePaperIdx === idx}
+                      className={`pg-filter-pill${activePaperIdx === idx ? ' active' : ''}`}
+                      onClick={() => setActivePaperIdx(idx)}
+                    >
+                      {px.year || px.paperTitle} ({px.totalQuestions} Qs)
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <div className="pg-xray-paper-bar">
+                <div>
+                  <strong>{paperSeoOverride(activePaper.paperSlug)?.h1 ?? activePaper.paperTitle}</strong>
+                  <span> · {activePaper.totalQuestions} Questions · {activePaper.maxMarks} Marks</span>
+                </div>
+                <Link className="pg-xray-open-btn" to={paperPath(activePaper.paperSlug)}>
+                  Open Solved Paper →
+                </Link>
+              </div>
+
+              <div className="pg-table-wrap">
+                <table className="pg-table pg-compact-table">
+                  <thead>
+                    <tr>
+                      <th>Subject / Section</th>
+                      <th>Qs</th>
+                      <th>Exact Topics Asked (with Question Count)</th>
+                      <th>Practice</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {activePaper.sections.map(sec => (
+                      <tr key={sec.subject}>
+                        <td><strong>{sec.subject}</strong></td>
+                        <td className="pg-num-cell"><strong>{sec.questionCount} Qs</strong></td>
+                        <td>
+                          <ul className="pg-xray-topic-list">
+                            {sec.topics.map(tp => (
+                              <li key={tp.name}>
+                                <span>{tp.name}</span>
+                                <strong>{tp.count}</strong>
+                              </li>
+                            ))}
+                          </ul>
+                        </td>
+                        <td>
+                          <Link
+                            className="pg-topic-practice-link"
+                            to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(sec.subject)}`}
+                          >
+                            Practise →
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
+
+          {/* ── 3. OFFICIAL SCORE DISTRIBUTION GRAPH ── */}
           {activeDist && (
             <section className="pg-section pg-intel-section" aria-labelledby="dist-heading">
               <div className="pg-intel-head">
@@ -240,7 +327,7 @@ export function PostGuidePage() {
                     <BarChart3 size={17} /> {guide.shortName} Official Score Distribution Graph
                   </h2>
                   <p className="pg-intel-sub">
-                    {activeDist.label} — Appeared: <strong>{activeDist.appeared.toLocaleString('en-IN')}</strong> (Registered: {activeDist.registered.toLocaleString('en-IN')}) · Top Score: <strong>{activeDist.topScore}</strong> · Mean: <strong>{activeDist.meanScore}</strong> · Median: <strong>{activeDist.medianScore}</strong>
+                    {activeDist.label} — Appeared: <strong>{activeDist.appeared.toLocaleString('en-IN')}</strong> · Top Score: <strong>{activeDist.topScore}</strong> · Mean: <strong>{activeDist.meanScore}</strong> · Median: <strong>{activeDist.medianScore}</strong>
                   </p>
                 </div>
               </div>
@@ -264,21 +351,21 @@ export function PostGuidePage() {
               </div>
 
               <p className="pg-note" style={{ marginTop: '12px', marginBottom: 0 }}>
-                {activeDist.sourceNote} Category-wise cutoffs will be added here once the official category-wise selection list is published.
+                {activeDist.sourceNote}
               </p>
             </section>
           )}
 
-          {/* ── 3. CATEGORY-WISE CUTOFFS ── */}
+          {/* ── 4. CATEGORY-WISE CUTOFFS ── */}
           {intel && intel.cutoffSets.length > 0 && activeCutoff && (
             <section className="pg-section pg-intel-section" aria-labelledby="cutoffs-heading">
               <div className="pg-intel-head">
                 <div>
                   <h2 id="cutoffs-heading" className="pg-intel-title">
-                    <Award size={17} /> {guide.shortName} Category-Wise Cutoffs &amp; Safe Scores
+                    <Award size={17} /> {guide.shortName} Category-Wise Cutoffs
                   </h2>
                   <p className="pg-intel-sub">
-                    Official category-wise selection cutoffs, merit zones, and scoresheet statistics. Switch year/post below to compare.
+                    Official category-wise cutoff marks for {guide.shortName}.
                   </p>
                 </div>
               </div>
@@ -302,41 +389,14 @@ export function PostGuidePage() {
 
               <div className="pg-cutoff-label">{activeCutoff.label}</div>
 
-              <div className="pg-cutoff-stats">
-                {activeCutoff.vacancies && (
-                  <div className="pg-cutoff-stat">
-                    <span>Vacancies / Post</span>
-                    <strong>{activeCutoff.vacancies}</strong>
-                  </div>
-                )}
-                {activeCutoff.appeared && (
-                  <div className="pg-cutoff-stat">
-                    <span>Candidates Appeared</span>
-                    <strong>{activeCutoff.appeared}</strong>
-                  </div>
-                )}
-                {activeCutoff.topperScore && (
-                  <div className="pg-cutoff-stat">
-                    <span>Topper / Benchmark</span>
-                    <strong>{activeCutoff.topperScore}</strong>
-                  </div>
-                )}
-                {activeCutoff.meanScore && (
-                  <div className="pg-cutoff-stat">
-                    <span>Average / Pattern</span>
-                    <strong>{activeCutoff.meanScore}</strong>
-                  </div>
-                )}
-              </div>
-
               <div className="pg-table-wrap">
                 <table className="pg-table pg-cutoff-table">
                   <thead>
                     <tr>
-                      <th>Category / Zone</th>
+                      <th>Category</th>
                       <th>Cutoff Marks</th>
                       <th>Score %</th>
-                      <th>Safe Target / Seats</th>
+                      <th>Shortlisted / Seats</th>
                       <th>Remarks</th>
                     </tr>
                   </thead>
@@ -363,81 +423,6 @@ export function PostGuidePage() {
               <p className="pg-note" style={{ marginTop: '12px', marginBottom: 0 }}>
                 {activeCutoff.sourceNote}
               </p>
-            </section>
-          )}
-
-          {/* ── 3. YEAR-WISE PAPER X-RAY (Sections + Exact Topics Asked) ── */}
-          {intel && intel.paperXrays.length > 0 && activePaper && (
-            <section className="pg-section pg-intel-section" aria-labelledby="xray-heading">
-              <div className="pg-intel-head">
-                <div>
-                  <h2 id="xray-heading" className="pg-intel-title">
-                    <Layers size={17} /> Year-Wise Paper X-Ray: Questions &amp; Topics Asked Per Section
-                  </h2>
-                  <p className="pg-intel-sub">
-                    Exact section-by-section and topic-by-topic breakdown of every solved {guide.shortName} question paper.
-                  </p>
-                </div>
-              </div>
-
-              <div className="pg-filter-pills" role="tablist" aria-label="Select question paper year">
-                {intel.paperXrays.map((px, idx) => (
-                  <button
-                    key={px.paperSlug}
-                    type="button"
-                    role="tab"
-                    aria-selected={activePaperIdx === idx}
-                    className={`pg-filter-pill${activePaperIdx === idx ? ' active' : ''}`}
-                    onClick={() => setActivePaperIdx(idx)}
-                  >
-                    {px.year || px.paperTitle} ({px.totalQuestions} Qs)
-                  </button>
-                ))}
-              </div>
-
-              <div className="pg-xray-paper-bar">
-                <div>
-                  <strong>{paperSeoOverride(activePaper.paperSlug)?.h1 ?? activePaper.paperTitle}</strong>
-                  <span> · {activePaper.totalQuestions} Questions · {activePaper.maxMarks} Marks</span>
-                </div>
-                <Link className="pg-xray-open-btn" to={paperPath(activePaper.paperSlug)}>
-                  Open Solved Paper →
-                </Link>
-              </div>
-
-              <div className="pg-table-wrap">
-                <table className="pg-table pg-compact-table">
-                  <thead>
-                    <tr>
-                      <th>Section</th>
-                      <th>Questions</th>
-                      <th>Weightage</th>
-                      <th>Exact Topics Asked</th>
-                      <th>Practice</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activePaper.sections.map(sec => (
-                      <tr key={sec.subject}>
-                        <td><strong>{sec.subject}</strong></td>
-                        <td className="pg-num-cell"><strong>{sec.questionCount}</strong></td>
-                        <td>{sec.sharePct}%</td>
-                        <td>
-                          {sec.topics.map(tp => `${tp.name} (${tp.count})`).join(' · ')}
-                        </td>
-                        <td>
-                          <Link
-                            className="pg-topic-practice-link"
-                            to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(sec.subject)}`}
-                          >
-                            Practise →
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             </section>
           )}
 

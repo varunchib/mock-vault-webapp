@@ -1436,11 +1436,11 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     : `<p>Confirm current dates, eligibility and amendments against the latest notice from the conducting body before applying.</p>`
 
   const intel = GUIDE_INTELLIGENCE[slug]
-  const priorityStars = (p: string) => p === 'Must-Study' ? '★★★ Must-Study' : p === 'High-Yield' ? '★★☆ High-Yield' : '★☆☆ Moderate'
+  const priorityStars = (p: string) => p === 'Must-Study' ? '★★★' : p === 'High-Yield' ? '★★☆' : '★☆☆'
   const masterTopicsHtml = intel && intel.masterTopics.length > 0
     ? `<section>
-        <h2>Master High-Yield Topics — What ${htmlText(guide.shortName)} Actually Asks</h2>
-        <p>Empirical topic frequency ranked across ${intel.totalQuestionsAnalyzed} official solved questions from ${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} ${intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}.</p>
+        <h2>Subject &amp; Topic-Wise Weightage — Most Repeated Topics</h2>
+        <p>Master frequency table of the most repeated topics across ${intel.totalQuestionsAnalyzed} official solved questions (${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} ${intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}).</p>
         <div class="pg-table-wrap"><table class="pg-table">
           <thead><tr><th>Topic</th><th>Subject</th><th>Priority</th><th>Questions Asked</th></tr></thead>
           <tbody>${intel.masterTopics.map(t => `<tr><td><strong>${htmlText(t.topic)}</strong></td><td>${htmlText(t.subject)}</td><td>${htmlText(priorityStars(t.priority))}</td><td>${t.totalQuestions} Qs (${htmlText(t.yearBreakdown)})</td></tr>`).join('')}</tbody>
@@ -1449,12 +1449,11 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     : ''
   const cutoffsHtml = intel && intel.cutoffSets.length > 0
     ? `<section>
-        <h2>${htmlText(guide.shortName)} Category-Wise Cutoffs &amp; Safe Scores</h2>
+        <h2>${htmlText(guide.shortName)} Category-Wise Cutoffs</h2>
         ${intel.cutoffSets.map(cs => `
           <h3>${htmlText(cs.label)}</h3>
-          <p>${[cs.vacancies, cs.appeared, cs.topperScore, cs.meanScore].filter(Boolean).map(htmlText).join(' · ')}</p>
           <div class="pg-table-wrap"><table class="pg-table">
-            <thead><tr><th>Category / Zone</th><th>Cutoff Marks</th><th>Score %</th><th>Safe Target / Seats</th><th>Remarks</th></tr></thead>
+            <thead><tr><th>Category</th><th>Cutoff Marks</th><th>Score %</th><th>Shortlisted / Seats</th><th>Remarks</th></tr></thead>
             <tbody>${cs.rows.map(r => `<tr><td><strong>${htmlText(r.category)}</strong></td><td>${htmlText(r.marks)}</td><td>${r.pct}%</td><td>${htmlText(r.safeTarget ?? '—')}</td><td>${htmlText(r.note ?? '—')}</td></tr>`).join('')}</tbody>
           </table></div>
           <p><small>${htmlText(cs.sourceNote)}</small></p>
@@ -1476,12 +1475,12 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     : ''
   const paperXrayHtml = intel && intel.paperXrays.length > 0
     ? `<section>
-        <h2>Year-Wise Paper X-Ray: Questions &amp; Topics Asked Per Section</h2>
+        <h2>Year-Wise Paper X-Ray: Subject &amp; Topic-Wise Breakdown</h2>
         ${intel.paperXrays.map(px => `
           <h3><a href="${paperPath(px.paperSlug)}">${htmlText(paperSeoOverride(px.paperSlug)?.h1 ?? px.paperTitle)}</a> (${px.totalQuestions} Qs · ${px.maxMarks} Marks)</h3>
           <div class="pg-table-wrap"><table class="pg-table">
-            <thead><tr><th>Section</th><th>Questions</th><th>Weightage</th><th>Exact Topics Asked</th></tr></thead>
-            <tbody>${px.sections.map(sec => `<tr><td><strong>${htmlText(sec.subject)}</strong></td><td>${sec.questionCount}</td><td>${sec.sharePct}%</td><td>${sec.topics.map(tp => `${htmlText(tp.name)} (${tp.count})`).join(' · ')}</td></tr>`).join('')}</tbody>
+            <thead><tr><th>Subject / Section</th><th>Qs</th><th>Exact Topics Asked</th></tr></thead>
+            <tbody>${px.sections.map(sec => `<tr><td><strong>${htmlText(sec.subject)}</strong></td><td>${sec.questionCount} Qs</td><td>${sec.topics.map(tp => `${htmlText(tp.name)} (${tp.count})`).join(' · ')}</td></tr>`).join('')}</tbody>
           </table></div>
         `).join('')}
       </section>`
@@ -1493,9 +1492,9 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     <p><strong>Conducting body:</strong> ${htmlText(guide.conductingBody)} · <strong>Level:</strong> ${htmlText(guide.examLevel)} · <strong>Mode:</strong> ${htmlText(guide.examMode)}</p>
     <p><a href="/exam/${encodeURIComponent(guide.examSlug)}">Browse ${htmlText(guide.shortName)} PYQ papers</a></p>
     ${masterTopicsHtml}
+    ${paperXrayHtml}
     ${scoreDistHtml}
     ${cutoffsHtml}
-    ${paperXrayHtml}
     ${papers ? `<section><h2>Previous year papers</h2><ul>${papers}</ul></section>` : ''}
     <section><h2>Official source and updates</h2>
       ${sourceNote}
