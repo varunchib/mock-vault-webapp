@@ -35,8 +35,8 @@ export function buildPaperFaqs(p: PaperFaqInput): PaperFaq[] {
         a: 'The JKSSB Accounts Assistant (Finance Department) written examination was conducted on 15 November 2026 in offline OMR mode. The paper carried 120 objective multiple-choice questions for 120 marks with a duration of 2 hours (120 minutes) and 0.25 negative marking per wrong answer.',
       },
       {
-        q: 'Where can I check the official JKSSB FAA 2026 Provisional Answer Key (Annexure-A) for Series A, Series B, Series C, and Series D?',
-        a: 'The complete 120-question official JKSSB Annexure-A Provisional Answer Key (for Booklet Series A, Series B, Series C, and Series D) is published in the Official Answer Key table on this page, along with the fully solved Set C question paper and step-by-step explanations.',
+        q: 'Are the answers in this JKSSB FAA 2026 solved paper verified against the official JKSSB Provisional Answer Key?',
+        a: 'Yes. All 120 questions from Set C of the JKSSB Finance Accounts Assistant (FAA) 15 November 2026 paper are verified against the official JKSSB Annexure-A Provisional Answer Key and accompanied by step-by-step conceptual and mathematical explanations.',
       },
       {
         q: 'What is the subject-wise marks distribution in the JKSSB Finance Accounts Assistant (FAA) 2026 question paper?',
