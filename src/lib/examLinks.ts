@@ -6,6 +6,7 @@ const GUIDE_SLUGS = new Set<string>([
   'jkpsi', 'jkpsi-telecom', 'upsc-cse', 'ssc-cgl', 'bpsc-cce', 'ibps-po', 'jkcce', 'rssb-patwari', // 'neet-ug',
   'jkssb-patwari', 'jkssb-junior-assistant', 'jkssb-faa', 'jkssb-wildlife-guard', 'jkssb-veterinary-pharmacist',
   'jkssb-constable', 'jkssb-constable-telecom',
+  'jkssb-social-forestry-worker', 'jkssb-inspector-forest', 'jkssb-field-assistant',
 ])
 
 /** /guide/:slug for an exam hub, or null when no guide exists. */

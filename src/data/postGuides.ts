@@ -97,6 +97,9 @@ export const paperGuideMap: Record<string, string> = {
   'jkssb-finance-accounts-2024-paper': 'jkssb-faa',
   'jkssb-accounts-assistant-finance-2022': 'jkssb-faa',
   'jkssb-wildlife-guard-2026-may-10':  'jkssb-wildlife-guard',
+  'jkssb-social-forestry-worker-2026': 'jkssb-social-forestry-worker',
+  'jkssb-inspector-forest-2026-mar-15': 'jkssb-inspector-forest',
+  'jkssb-field-assistant-2026-may-20': 'jkssb-field-assistant',
   'jkssb-veterinary-pharmacist-2025':  'jkssb-veterinary-pharmacist',
   'rsmssb-patwari-2025-aug17-shift1-spz8': 'rssb-patwari',
   'ssc-cgl-2026-sep30-shift2':         'ssc-cgl',
@@ -2515,6 +2518,130 @@ export const postGuides: Record<string, PostGuideData> = {
       'Computer Knowledge (10 marks) is entirely from Class 10–12 level IT concepts — HTML, ASCII, OS types, input/output devices, memory types, MS Office features. Do not skip this section; it is the easiest 10 marks available.',
       'Reasoning (15 marks) is moderate difficulty — Number Series, Letter Series, Coding-Decoding, Blood Relations, Direction Sense. Practise these daily for 2–3 weeks to secure 12+/15.',
     ],
+  },
+
+  // ─── JKSSB Social Forestry Worker ────────────────────────────────────────────
+  'jkssb-social-forestry-worker': {
+    title: 'JKSSB Social Forestry Worker — Subject & Topic-Wise Weightage, Cutoff & Paper Analysis',
+    shortName: 'JKSSB Social Forestry Worker',
+    tagline: 'Complete JKSSB Social Forestry Worker (Forest Dept.) exam guide — official 29.10.2026 DV category-wise cutoffs, subject & topic-wise weightage, and 2026 solved paper X-ray.',
+    lastUpdated: '2026-11-16',
+    examSlug: 'jkssb-social-forestry-worker',
+    papers: [
+      { slug: 'jkssb-social-forestry-worker-2026', title: 'JKSSB Social Forestry Worker Question Paper 2026', year: '2026', questions: 120 },
+    ],
+    conductingBody: 'J&K Services Selection Board (JKSSB)',
+    officialWebsite: 'https://jkssb.nic.in',
+    examLevel: 'UT Level (J&K) — Forest, Ecology & Environment Department',
+    examMode: 'OMR-based Written Test + Physical Efficiency Test',
+    about: [
+      'JKSSB Social Forestry Worker is a field post under the Department of Forest, Ecology & Environment, J&K UT (Advt. 03/2021 & 04/2022).',
+    ],
+    syllabus: [],
+    examPattern: [
+      { section: 'General English', questions: 32, marks: 32 },
+      { section: 'Reasoning', questions: 32, marks: 32 },
+      { section: 'Mathematics', questions: 32, marks: 32 },
+      { section: 'General Knowledge & Current Affairs', questions: 18, marks: 18 },
+      { section: 'General Science', questions: 6, marks: 6 },
+      { section: 'Total', questions: 120, marks: 120, isTotal: true },
+    ],
+    eligibility: {
+      age: '18–40 years (General); category relaxations as per J&K UT rules.',
+      education: 'Matriculation (10th pass) from a recognised Board.',
+      domicile: 'Valid J&K UT Domicile Certificate mandatory.',
+    },
+    selectionProcess: [
+      'Written Examination — 120 MCQs, 120 marks, −0.25 negative marking',
+      'Physical Standard & Endurance Test (PST/PET)',
+      'Document Verification (DV)',
+    ],
+    salary: [],
+    preparationTips: [],
+  },
+
+  // ─── JKSSB Inspector (Forest, Ecology & Environment) ─────────────────────────
+  'jkssb-inspector-forest': {
+    title: 'JKSSB Inspector (Forest) — Subject & Topic-Wise Weightage, Cutoff & Paper Analysis',
+    shortName: 'JKSSB Inspector (Forest)',
+    tagline: 'Complete JKSSB Inspector (Forest, Ecology & Environment) exam guide — official 29.10.2026 DV category-wise cutoffs, 8,356-candidate score distribution, and 2026 solved paper X-ray.',
+    lastUpdated: '2026-11-16',
+    examSlug: 'jkssb-inspector-forest',
+    papers: [
+      { slug: 'jkssb-inspector-forest-2026-mar-15', title: 'JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026', year: '2026', questions: 120 },
+    ],
+    conductingBody: 'J&K Services Selection Board (JKSSB)',
+    officialWebsite: 'https://jkssb.nic.in',
+    examLevel: 'UT Level (J&K) — Forest, Ecology & Environment Department',
+    examMode: 'OMR-based Written Test + Physical Efficiency Test',
+    about: [
+      'JKSSB Inspector (Forest Protection Force / Forest, Ecology & Environment Department) is recruited under Advt. 04 of 2022 (Item Nos. 84, 85).',
+    ],
+    syllabus: [],
+    examPattern: [
+      { section: 'Mathematics', questions: 20, marks: 20 },
+      { section: 'General Science', questions: 20, marks: 20 },
+      { section: 'Environment & Ecology', questions: 12, marks: 12 },
+      { section: 'Indian Polity', questions: 10, marks: 10 },
+      { section: 'Computer Knowledge', questions: 10, marks: 10 },
+      { section: 'History', questions: 10, marks: 10 },
+      { section: 'General English', questions: 10, marks: 10 },
+      { section: 'Reasoning', questions: 10, marks: 10 },
+      { section: 'General Knowledge & Current Affairs', questions: 10, marks: 10 },
+      { section: 'Geography', questions: 8, marks: 8 },
+      { section: 'Total', questions: 120, marks: 120, isTotal: true },
+    ],
+    eligibility: {
+      age: '18–40 years (General); category relaxations as per J&K UT rules.',
+      education: 'Graduation from a recognised university.',
+      domicile: 'Valid J&K UT Domicile Certificate mandatory.',
+    },
+    selectionProcess: [
+      'Written Examination — 120 MCQs, 120 marks, −0.25 negative marking',
+      'Physical Standard & Endurance Test (PST/PET)',
+      'Document Verification (DV)',
+    ],
+    salary: [],
+    preparationTips: [],
+  },
+
+  // ─── JKSSB Field Assistant (Forest / Pollution Control) ──────────────────────
+  'jkssb-field-assistant': {
+    title: 'JKSSB Field Assistant — Subject & Topic-Wise Weightage, Cutoff & Paper Analysis',
+    shortName: 'JKSSB Field Assistant',
+    tagline: 'Complete JKSSB Field Assistant (Forest, Ecology & Environment) exam guide — official 29.10.2026 DV category-wise cutoffs, subject & topic-wise weightage, and 2026 solved paper X-ray.',
+    lastUpdated: '2026-11-16',
+    examSlug: 'jkssb-field-assistant',
+    papers: [
+      { slug: 'jkssb-field-assistant-2026-may-20', title: 'JKSSB Field Assistant Question Paper 2026', year: '2026', questions: 120 },
+    ],
+    conductingBody: 'J&K Services Selection Board (JKSSB)',
+    officialWebsite: 'https://jkssb.nic.in',
+    examLevel: 'UT Level (J&K) — Forest, Ecology & Environment Department',
+    examMode: 'OMR-based Written Test',
+    about: [
+      'JKSSB Field Assistant is a technical environmental post under the Forest, Ecology & Environment Department (Advt. 03/2021, Item No. 594).',
+    ],
+    syllabus: [],
+    examPattern: [
+      { section: 'Water & Waste Water Engineering', questions: 43, marks: 43 },
+      { section: 'Environmental Impact Assessment', questions: 21, marks: 21 },
+      { section: 'Environment & Ecology', questions: 20, marks: 20 },
+      { section: 'Environmental Audit & Safety Audit', questions: 20, marks: 20 },
+      { section: 'Environmental Legislation in India', questions: 16, marks: 16 },
+      { section: 'Total', questions: 120, marks: 120, isTotal: true },
+    ],
+    eligibility: {
+      age: '18–40 years (General); category relaxations as per J&K UT rules.',
+      education: 'B.Sc / Diploma / Degree in Environmental Science or relevant technical discipline.',
+      domicile: 'Valid J&K UT Domicile Certificate mandatory.',
+    },
+    selectionProcess: [
+      'Written Examination — 120 MCQs, 120 marks, −0.25 negative marking',
+      'Document Verification (DV)',
+    ],
+    salary: [],
+    preparationTips: [],
   },
 
 }

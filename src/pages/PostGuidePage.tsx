@@ -91,24 +91,18 @@ export function PostGuidePage() {
   const examHref = `/exam/${guide.examSlug}${guide.paperSearchTerm ? `?s=${encodeURIComponent(guide.paperSearchTerm)}` : ''}`
 
   const topicSubjects = intel
-    ? [...new Set(intel.masterTopics.map(t => t.subject))]
+    ? intel.masterSections.map(s => s.subject)
     : []
-  const visibleTopics = intel
+  const visibleSections = intel
     ? (topicSubjectFilter === 'ALL'
-        ? intel.masterTopics
-        : intel.masterTopics.filter(t => t.subject === topicSubjectFilter))
+        ? intel.masterSections
+        : intel.masterSections.filter(s => s.subject === topicSubjectFilter))
     : []
   const activeCutoff = intel?.cutoffSets[activeCutoffIdx] ?? intel?.cutoffSets[0]
   const activeDist = intel?.scoreDistributions?.[0]
   const activePaper = intel?.paperXrays[activePaperIdx] ?? intel?.paperXrays[0]
 
-  const priorityStars = (p: string) => {
-    if (p === 'Must-Study') return '★★★'
-    if (p === 'High-Yield') return '★★☆'
-    return '★☆☆'
-  }
-
-  const seoSummaryLine = intel && (intel.masterTopics.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0)
+  const seoSummaryLine = intel && (intel.masterSections.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0)
     ? `Complete ${guide.shortName} exam guide with subject & topic-wise weightage, most repeated topics, year-wise PYQ paper X-ray (${intel.totalQuestionsAnalyzed} solved questions), ${intel.scoreDistributions?.length ? 'official score distribution, and ' : ''}${intel.cutoffSets.length > 0 ? 'category-wise cutoffs' : 'merit analysis'}.`
     : guide.tagline
 
@@ -151,7 +145,7 @@ export function PostGuidePage() {
           </header>
 
           {/* ── 1. SUBJECT & TOPIC-WISE WEIGHTAGE (Master Frequency Table) ── */}
-          {intel && intel.masterTopics.length > 0 && (
+          {intel && intel.masterSections.length > 0 && (
             <section className="pg-section pg-intel-section" aria-labelledby="master-topics-heading">
               <div className="pg-intel-head">
                 <div>
@@ -159,7 +153,7 @@ export function PostGuidePage() {
                     <Flame size={17} /> Subject &amp; Topic-Wise Weightage — Most Repeated Topics
                   </h2>
                   <p className="pg-intel-sub">
-                    Master frequency table of the most repeated topics across <strong>{intel.totalQuestionsAnalyzed} official questions</strong> ({intel.totalPapersAnalyzed} solved {guide.shortName} {intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}).
+                    All topics asked across <strong>{intel.totalQuestionsAnalyzed} official questions</strong> ({intel.totalPapersAnalyzed} solved {guide.shortName} {intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}), grouped by subject and shaded by frequency (<span className="pg-legend-dot pg-tier-high">High</span> · <span className="pg-legend-dot pg-tier-mid">Medium</span> · <span className="pg-legend-dot pg-tier-low">Single</span>).
                   </p>
                 </div>
               </div>
@@ -173,7 +167,7 @@ export function PostGuidePage() {
                     className={`pg-filter-pill${topicSubjectFilter === 'ALL' ? ' active' : ''}`}
                     onClick={() => setTopicSubjectFilter('ALL')}
                   >
-                    All Topics ({intel.masterTopics.length})
+                    All Subjects ({intel.masterSections.length})
                   </button>
                   {topicSubjects.map(subj => (
                     <button
@@ -194,36 +188,31 @@ export function PostGuidePage() {
                 <table className="pg-table pg-compact-table">
                   <thead>
                     <tr>
-                      <th>Topic</th>
-                      <th>Subject</th>
-                      <th>Priority</th>
+                      <th>Subject / Section</th>
                       <th>Qs</th>
+                      <th>All Topics Asked (Sorted by Frequency)</th>
                       <th>Practice</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {visibleTopics.map((item, idx) => (
-                      <tr key={`${item.subject}-${item.topic}`}>
-                        <td><strong>#{idx + 1} {item.topic}</strong></td>
-                        <td>{item.subject}</td>
+                    {visibleSections.map((sec) => (
+                      <tr key={sec.subject}>
+                        <td><strong>{sec.subject}</strong></td>
+                        <td className="pg-num-cell"><strong>{sec.totalQuestions} Qs</strong></td>
                         <td>
-                          <span
-                            className={`pg-priority-badge pg-priority-${item.priority.toLowerCase().replace('-', '')}`}
-                            title={item.priority}
-                            aria-label={item.priority}
-                          >
-                            <span className="pg-light-dot" aria-hidden="true" />
-                            {priorityStars(item.priority)}
-                          </span>
-                        </td>
-                        <td className="pg-num-cell">
-                          <strong>{item.totalQuestions}</strong>
-                          <small>{item.yearBreakdown}</small>
+                          <ul className="pg-xray-topic-list">
+                            {sec.topics.map(tp => (
+                              <li key={tp.name} className={`pg-topic-pill pg-tier-${tp.tier ?? 'low'}`}>
+                                <span>{tp.name}</span>
+                                <strong>{tp.count}</strong>
+                              </li>
+                            ))}
+                          </ul>
                         </td>
                         <td>
                           <Link
                             className="pg-topic-practice-link"
-                            to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(item.subject)}`}
+                            to={`/exam/${guide.examSlug}?tab=subjects&subject=${encodeURIComponent(sec.subject)}`}
                           >
                             Practise →
                           </Link>
@@ -295,7 +284,7 @@ export function PostGuidePage() {
                         <td>
                           <ul className="pg-xray-topic-list">
                             {sec.topics.map(tp => (
-                              <li key={tp.name}>
+                              <li key={tp.name} className={`pg-topic-pill pg-tier-${tp.tier ?? 'low'}`}>
                                 <span>{tp.name}</span>
                                 <strong>{tp.count}</strong>
                               </li>

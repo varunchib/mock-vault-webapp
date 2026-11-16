@@ -30,11 +30,23 @@ export type GuideCutoffSet = {
   rows: GuideCutoffRow[]
 }
 
+export type ShadedTopic = {
+  name: string
+  count: number
+  tier?: 'high' | 'mid' | 'low'
+}
+
+export type MasterSectionRow = {
+  subject: string
+  totalQuestions: number
+  topics: ShadedTopic[]
+}
+
 export type PaperSectionXray = {
   subject: string
   questionCount: number
   sharePct: number
-  topics: { name: string; count: number }[]
+  topics: ShadedTopic[]
 }
 
 export type PaperXray = {
@@ -68,6 +80,7 @@ export type GuideIntelligence = {
   examSlug: string
   totalPapersAnalyzed: number
   totalQuestionsAnalyzed: number
+  masterSections: MasterSectionRow[]
   masterTopics: MasterTopicRow[]
   cutoffSets: GuideCutoffSet[]
   scoreDistributions: ScoreDistribution[]
@@ -79,6 +92,331 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-faa",
     "totalPapersAnalyzed": 3,
     "totalQuestionsAnalyzed": 360,
+    "masterSections": [
+      {
+        "subject": "Accountancy and Book Keeping",
+        "totalQuestions": 90,
+        "topics": [
+          {
+            "name": "Accounting Concepts & Standards (GAAP/IFRS)",
+            "count": 36,
+            "tier": "high"
+          },
+          {
+            "name": "Financial & Social Audit / Vouchers",
+            "count": 10,
+            "tier": "mid"
+          },
+          {
+            "name": "Taxation & GST Laws",
+            "count": 9,
+            "tier": "mid"
+          },
+          {
+            "name": "Cost Accounting & Budgetary Control",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Ledger & Trial Balance",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Final Accounts & Balance Sheet",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Bank Reconciliation Statement (BRS)",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Partnership Accounts",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Public Financial Management (PFMS)",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Double Entry, Journal & Accounting Equation",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 79,
+        "topics": [
+          {
+            "name": "J&K History, Heritage, Culture & Tourism",
+            "count": 22,
+            "tier": "high"
+          },
+          {
+            "name": "National & International Current Affairs",
+            "count": 21,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Geography, Rivers, Lakes & Transport",
+            "count": 13,
+            "tier": "high"
+          },
+          {
+            "name": "J&K Geography, Rivers, Lakes & Flora/Fauna",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Environment, Ecology & Biodiversity",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Census & Demography of India",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian Culture, Heritage & Freedom Struggle",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "J&K Reorganisation Act, 2019",
+            "count": 3,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "General Science",
+        "totalQuestions": 40,
+        "topics": [
+          {
+            "name": "Biology (Nutrition, Respiration & Plant Transport)",
+            "count": 18,
+            "tier": "high"
+          },
+          {
+            "name": "Physics (Newton's Laws, Motion & Electricity)",
+            "count": 9,
+            "tier": "mid"
+          },
+          {
+            "name": "Chemistry (Chemical Equations, Metals & Non-Metals)",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Vitamins, Deficiency & Communicable Diseases",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Ecosystem, Ozone/Greenhouse & Energy Sources",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Statistics",
+        "totalQuestions": 31,
+        "topics": [
+          {
+            "name": "Primary/Secondary Data, Questionnaires & Tabulation",
+            "count": 13,
+            "tier": "high"
+          },
+          {
+            "name": "Vital Statistics, Fertility & Demography",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Probability & Theory of Attributes",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Measures of Central Tendency",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Index Numbers (WPI, CPI & Fisher)",
+            "count": 3,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Computer Hardware, CPU, Memory & Storage",
+            "count": 10,
+            "tier": "high"
+          },
+          {
+            "name": "Input & Output Devices",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "MS Office (Word, Excel, PowerPoint & Access)",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Virus, Anti-Virus & Security",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Internet, E-Mail Protocols & IT in Governance",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Operating Systems & Open Source Technologies",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Economy",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Economic Reforms, Planning & Developing Economy",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "Consumer Demand & Indifference Curve Analysis",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Fiscal & Monetary Policy & Role of RBI",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Pricing Under Various Forms of Market",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "National Income (GDP/GNP) & Economic Growth",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Factors of Production, Laws & Factor Pricing",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Tenses & Subject-Verb Agreement",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "Articles, Prepositions & Modals",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Synonyms, Antonyms & Homophones",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Active & Passive Voice",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Clauses & Sentence Structure",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Direct & Indirect Narration",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Linear Equations in Two Variables",
+            "count": 12,
+            "tier": "high"
+          },
+          {
+            "name": "Set Theory, Relations & Functions",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Permutations, Combinations & Binomial Theorem",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Vectors, Coordinate & 3D Geometry",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Limits & Derivatives (Calculus)",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Matrices & Determinants",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Probability",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Accountancy and Book Keeping",
@@ -427,39 +765,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Accounting Concepts & Standards (GAAP/IFRS)",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "Cost Accounting & Budgetary Control",
-                "count": 5
+                "count": 5,
+                "tier": "mid"
               },
               {
                 "name": "Financial & Social Audit / Vouchers",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Final Accounts & Balance Sheet",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Ledger & Trial Balance",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Taxation & GST Laws",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Bank Reconciliation Statement (BRS)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Double Entry, Journal & Accounting Equation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Public Financial Management (PFMS)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -470,31 +817,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "National & International Current Affairs",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               },
               {
                 "name": "Indian Geography, Rivers, Lakes & Transport",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "J&K History, Heritage, Culture & Tourism",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Census & Demography of India",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Environment, Ecology & Biodiversity",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K Geography, Rivers, Lakes & Flora/Fauna",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Culture, Heritage & Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -505,23 +859,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Primary/Secondary Data, Questionnaires & Tabulation",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Vital Statistics, Fertility & Demography",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Probability & Theory of Attributes",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Index Numbers (WPI, CPI & Fisher)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Measures of Central Tendency",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -532,23 +891,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Hardware, CPU, Memory & Storage",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Internet, E-Mail Protocols & IT in Governance",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "MS Office (Word, Excel, PowerPoint & Access)",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Virus, Anti-Virus & Security",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Operating Systems & Open Source Technologies",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -559,23 +923,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Consumer Demand & Indifference Curve Analysis",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Economic Reforms, Planning & Developing Economy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fiscal & Monetary Policy & Role of RBI",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Pricing Under Various Forms of Market",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "National Income (GDP/GNP) & Economic Growth",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -586,23 +955,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Tenses & Subject-Verb Agreement",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Synonyms, Antonyms & Homophones",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Clauses & Sentence Structure",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -613,19 +987,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Biology (Nutrition, Respiration & Plant Transport)",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Chemistry (Chemical Equations, Metals & Non-Metals)",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Physics (Newton's Laws, Motion & Electricity)",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Vitamins, Deficiency & Communicable Diseases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -636,23 +1014,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Linear Equations in Two Variables",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Permutations, Combinations & Binomial Theorem",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Set Theory, Relations & Functions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vectors, Coordinate & 3D Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -673,39 +1056,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Accounting Concepts & Standards (GAAP/IFRS)",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "Taxation & GST Laws",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Cost Accounting & Budgetary Control",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Partnership Accounts",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Bank Reconciliation Statement (BRS)",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Financial & Social Audit / Vouchers",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ledger & Trial Balance",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Public Financial Management (PFMS)",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Final Accounts & Balance Sheet",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -716,31 +1108,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "National & International Current Affairs",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "J&K History, Heritage, Culture & Tourism",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "J&K Geography, Rivers, Lakes & Flora/Fauna",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Environment, Ecology & Biodiversity",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Geography, Rivers, Lakes & Transport",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Culture, Heritage & Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K Reorganisation Act, 2019",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -751,23 +1150,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Biology (Nutrition, Respiration & Plant Transport)",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               },
               {
                 "name": "Physics (Newton's Laws, Motion & Electricity)",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Vitamins, Deficiency & Communicable Diseases",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Chemistry (Chemical Equations, Metals & Non-Metals)",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ecosystem, Ozone/Greenhouse & Energy Sources",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -778,23 +1182,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Hardware, CPU, Memory & Storage",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Computer Virus, Anti-Virus & Security",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Input & Output Devices",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Internet, E-Mail Protocols & IT in Governance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS Office (Word, Excel, PowerPoint & Access)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -805,23 +1214,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economic Reforms, Planning & Developing Economy",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Consumer Demand & Indifference Curve Analysis",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Factors of Production, Laws & Factor Pricing",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Fiscal & Monetary Policy & Role of RBI",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Pricing Under Various Forms of Market",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -832,27 +1246,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Tenses & Subject-Verb Agreement",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Articles, Prepositions & Modals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Synonyms, Antonyms & Homophones",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Clauses & Sentence Structure",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direct & Indirect Narration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -863,27 +1283,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Linear Equations in Two Variables",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Permutations, Combinations & Binomial Theorem",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Set Theory, Relations & Functions",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Limits & Derivatives (Calculus)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Matrices & Determinants",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vectors, Coordinate & 3D Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -894,23 +1320,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Primary/Secondary Data, Questionnaires & Tabulation",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Vital Statistics, Fertility & Demography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Index Numbers (WPI, CPI & Fisher)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Measures of Central Tendency",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Probability & Theory of Attributes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -931,39 +1362,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Accounting Concepts & Standards (GAAP/IFRS)",
-                "count": 14
+                "count": 14,
+                "tier": "high"
               },
               {
                 "name": "Financial & Social Audit / Vouchers",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Ledger & Trial Balance",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Taxation & GST Laws",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Bank Reconciliation Statement (BRS)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Double Entry, Journal & Accounting Equation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Final Accounts & Balance Sheet",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Partnership Accounts",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Public Financial Management (PFMS)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -974,35 +1414,43 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K History, Heritage, Culture & Tourism",
-                "count": 13
+                "count": 13,
+                "tier": "high"
               },
               {
                 "name": "National & International Current Affairs",
-                "count": 5
+                "count": 5,
+                "tier": "mid"
               },
               {
                 "name": "Indian Geography, Rivers, Lakes & Transport",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "J&K Geography, Rivers, Lakes & Flora/Fauna",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Census & Demography of India",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K Reorganisation Act, 2019",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Environment, Ecology & Biodiversity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Culture, Heritage & Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1013,27 +1461,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Input & Output Devices",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Computer Hardware, CPU, Memory & Storage",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "MS Office (Word, Excel, PowerPoint & Access)",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Virus, Anti-Virus & Security",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Internet, E-Mail Protocols & IT in Governance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Operating Systems & Open Source Technologies",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1044,27 +1498,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economic Reforms, Planning & Developing Economy",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Fiscal & Monetary Policy & Role of RBI",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "National Income (GDP/GNP) & Economic Growth",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Consumer Demand & Indifference Curve Analysis",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Factors of Production, Laws & Factor Pricing",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Pricing Under Various Forms of Market",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1075,27 +1535,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Articles, Prepositions & Modals",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Tenses & Subject-Verb Agreement",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direct & Indirect Narration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms, Antonyms & Homophones",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1106,23 +1572,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Biology (Nutrition, Respiration & Plant Transport)",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Physics (Newton's Laws, Motion & Electricity)",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Chemistry (Chemical Equations, Metals & Non-Metals)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ecosystem, Ozone/Greenhouse & Energy Sources",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vitamins, Deficiency & Communicable Diseases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1133,27 +1604,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Linear Equations in Two Variables",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Limits & Derivatives (Calculus)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Probability",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Set Theory, Relations & Functions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vectors, Coordinate & 3D Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1164,23 +1641,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Primary/Secondary Data, Questionnaires & Tabulation",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Measures of Central Tendency",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Probability & Theory of Attributes",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Index Numbers (WPI, CPI & Fisher)",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vital Statistics, Fertility & Demography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -1192,6 +1674,274 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-wildlife-guard",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 120,
+    "masterSections": [
+      {
+        "subject": "General English",
+        "totalQuestions": 25,
+        "topics": [
+          {
+            "name": "Articles",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Determiners",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Prepositions",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Reading Comprehension",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Synonyms",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Antonyms",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Spelling",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Verbs",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Para Jumbles",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Tenses",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 25,
+        "topics": [
+          {
+            "name": "Ratio & Proportion",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Averages",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Probability",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Percentage",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Number System",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Time & Work",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Arithmetic",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Mensuration",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Quadratic Equations",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 25,
+        "topics": [
+          {
+            "name": "Number Series",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Analogy",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Syllogism",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Forest & Wildlife",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Forest & Wildlife Core Concepts",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Biodiversity & Conservation",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 16,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Modern History",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Ancient History",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Sports",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Biology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Chemistry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Physics",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Static GK",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "J&K General Knowledge",
+        "totalQuestions": 9,
+        "topics": [
+          {
+            "name": "J&K History",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "J&K Geography",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "J&K General Knowledge Core Concepts",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Forest & Wildlife",
@@ -1472,51 +2222,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Articles",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Determiners",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Prepositions",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Reading Comprehension",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Synonyms",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Verbs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Para Jumbles",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Tenses",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1527,43 +2289,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Ratio & Proportion",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Probability",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Linear Equations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number System",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Time & Work",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Arithmetic",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mensuration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Quadratic Equations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1574,27 +2346,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Number Series",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Direction Sense",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Analogy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Syllogism",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           },
@@ -1605,23 +2383,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Forest & Wildlife Core Concepts",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Biodiversity & Conservation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1632,43 +2415,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Modern History",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Ancient History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sports",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Chemistry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Physics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Static GK",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1679,15 +2472,1895 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K History",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "J&K Geography",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "jkssb-social-forestry-worker": {
+    "examSlug": "jkssb-social-forestry-worker",
+    "totalPapersAnalyzed": 1,
+    "totalQuestionsAnalyzed": 120,
+    "masterSections": [
+      {
+        "subject": "General English",
+        "totalQuestions": 32,
+        "topics": [
+          {
+            "name": "Antonyms",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Articles",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Prepositions",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Reading Comprehension",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Clauses",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Determiners",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Spelling",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Synonyms",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Modals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Verbs",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 32,
+        "topics": [
+          {
+            "name": "Averages",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Mensuration",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Number System",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Probability",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Percentage",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Time & Work",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Algebra",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Arithmetic",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Discount",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Quadratic Equations",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 32,
+        "topics": [
+          {
+            "name": "Direction Sense",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Number Series",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Venn Diagrams",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Analogy",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogies",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Seating Arrangement",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 18,
+        "topics": [
+          {
+            "name": "J&K General Knowledge",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Static GK",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Economy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Modern History",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Science",
+        "totalQuestions": 6,
+        "topics": [
+          {
+            "name": "Biology",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "General Science Core Concepts",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Chemistry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Light & Optics",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
+    "masterTopics": [
+      {
+        "subject": "Reasoning",
+        "topic": "Direction Sense",
+        "totalQuestions": 7,
+        "yearBreakdown": "2026: 7 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Reasoning questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "topic": "J&K General Knowledge",
+        "totalQuestions": 6,
+        "yearBreakdown": "2026: 6 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency General Knowledge & Current Affairs questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Averages",
+        "totalQuestions": 5,
+        "yearBreakdown": "2026: 5 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Antonyms",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency General English questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Articles",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency General English questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Prepositions",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency General English questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Reading Comprehension",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency General English questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "topic": "Indian Geography",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency General Knowledge & Current Affairs questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Mensuration",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Number System",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Probability",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Ratio & Proportion",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Reasoning",
+        "topic": "Blood Relations",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Reasoning questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Reasoning",
+        "topic": "Coding-Decoding",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Reasoning questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Reasoning",
+        "topic": "Number Series",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Reasoning questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Reasoning",
+        "topic": "Odd One Out",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Reasoning questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "Reasoning",
+        "topic": "Venn Diagrams",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Reasoning questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Clauses",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "High-frequency General English questions tested in official JKSSB-SOCIAL-FORESTRY-WORKER papers."
+      }
+    ],
+    "cutoffSets": [
+      {
+        "year": "2026-DV",
+        "label": "2026 Official Document Verification (DV) Category-Wise Cutoff (Notification dated 29.10.2026)",
+        "maxMarks": 120,
+        "sourceNote": "Exact minimum & maximum marks per category extracted from Official JKSSB Document Verification Notification No. JKSSB-COE0EXAM(UT)/3/2026 (7909564) dated 29.10.2026 (Annexure B — Social Forestry Worker).",
+        "rows": [
+          {
+            "category": "OM (Open Merit)",
+            "marks": "47.50 / 120",
+            "pct": 40,
+            "safeTarget": "46 Shortlisted",
+            "note": "Highest OM score in DV list: 71.75 / 120"
+          },
+          {
+            "category": "RBA (Resident of Backward Area)",
+            "marks": "44.00 / 120",
+            "pct": 37,
+            "safeTarget": "52 Shortlisted",
+            "note": "Highest RBA score in DV list: 66.25 / 120"
+          },
+          {
+            "category": "PSP (Pahari Speaking People)",
+            "marks": "37.00 / 120",
+            "pct": 31,
+            "safeTarget": "13 Shortlisted",
+            "note": "Highest PSP score in DV list: 54.75 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "36.75 / 120",
+            "pct": 31,
+            "safeTarget": "11 Shortlisted",
+            "note": "Highest ALC/IB score in DV list: 51.25 / 120"
+          },
+          {
+            "category": "SC (Scheduled Caste)",
+            "marks": "31.50 / 120",
+            "pct": 26,
+            "safeTarget": "18 Shortlisted",
+            "note": "Highest SC score in DV list: 53.75 / 120"
+          },
+          {
+            "category": "EWS (Economically Weaker Section)",
+            "marks": "29.50 / 120",
+            "pct": 25,
+            "safeTarget": "18 Shortlisted",
+            "note": "Highest EWS score in DV list: 59.25 / 120"
+          },
+          {
+            "category": "ST (Scheduled Tribe)",
+            "marks": "28.00 / 120",
+            "pct": 23,
+            "safeTarget": "18 Shortlisted",
+            "note": "Highest ST score in DV list: 52.75 / 120"
+          }
+        ]
+      }
+    ],
+    "scoreDistributions": [],
+    "paperXrays": [
+      {
+        "paperSlug": "jkssb-social-forestry-worker-2026",
+        "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
+        "year": "2026",
+        "heldOn": "2026-03-15",
+        "totalQuestions": 120,
+        "maxMarks": 120,
+        "sections": [
+          {
+            "subject": "General English",
+            "questionCount": 32,
+            "sharePct": 27,
+            "topics": [
+              {
+                "name": "Antonyms",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Articles",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Prepositions",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Reading Comprehension",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Clauses",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "Determiners",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "Spelling",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "Synonyms",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "Modals",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Error Spotting",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Verbs",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "Mathematics",
+            "questionCount": 32,
+            "sharePct": 27,
+            "topics": [
+              {
+                "name": "Averages",
+                "count": 5,
+                "tier": "high"
+              },
+              {
+                "name": "Mensuration",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Number System",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Probability",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Linear Equations",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Percentage",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Time & Work",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Algebra",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Arithmetic",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Discount",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Profit & Loss",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Quadratic Equations",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "Reasoning",
+            "questionCount": 32,
+            "sharePct": 27,
+            "topics": [
+              {
+                "name": "Direction Sense",
+                "count": 7,
+                "tier": "high"
+              },
+              {
+                "name": "Blood Relations",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Coding-Decoding",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Number Series",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Odd One Out",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Venn Diagrams",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Analogy",
+                "count": 3,
+                "tier": "mid"
+              },
+              {
+                "name": "Analogies",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Seating Arrangement",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "General Knowledge & Current Affairs",
+            "questionCount": 18,
+            "sharePct": 15,
+            "topics": [
+              {
+                "name": "J&K General Knowledge",
+                "count": 6,
+                "tier": "high"
+              },
+              {
+                "name": "Indian Geography",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Indian Polity",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Static GK",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Art & Culture",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Economy",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Government Schemes",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Modern History",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "General Science",
+            "questionCount": 6,
+            "sharePct": 5,
+            "topics": [
+              {
+                "name": "Biology",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "General Science Core Concepts",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Chemistry",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Light & Optics",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "jkssb-inspector-forest": {
+    "examSlug": "jkssb-inspector-forest",
+    "totalPapersAnalyzed": 1,
+    "totalQuestionsAnalyzed": 120,
+    "masterSections": [
+      {
+        "subject": "General Science",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Biology",
+            "count": 9,
+            "tier": "high"
+          },
+          {
+            "name": "Chemistry",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Physics",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "General Science Core Concepts",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Mensuration",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Probability",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Simplification",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Coordinate Geometry",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Percentage",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Environment & Ecology",
+        "totalQuestions": 12,
+        "topics": [
+          {
+            "name": "Environment & Ecology Core Concepts",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Climate Change",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "MS Office",
+            "count": 10,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Articles",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Para Jumbles",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Prepositions",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Synonyms",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "J&K General Knowledge",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Economy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Organisations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Science & Technology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Static GK",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "History",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Modern History",
+            "count": 10,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Indian Polity",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Indian Polity Core Concepts",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Constitutional Amendments",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Directive Principles",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Fundamental Rights",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Organisations",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Coding-Decoding",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Boats & Streams",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Letter Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Syllogism",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Time & Work",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Geography",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
+    "masterTopics": [
+      {
+        "subject": "Computer Knowledge",
+        "topic": "MS Office",
+        "totalQuestions": 10,
+        "yearBreakdown": "2026: 10 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Computer Knowledge questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "History",
+        "topic": "Modern History",
+        "totalQuestions": 10,
+        "yearBreakdown": "2026: 10 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency History questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General Science",
+        "topic": "Biology",
+        "totalQuestions": 9,
+        "yearBreakdown": "2026: 9 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency General Science questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Environment & Ecology",
+        "topic": "Environment & Ecology Core Concepts",
+        "totalQuestions": 8,
+        "yearBreakdown": "2026: 8 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Environment & Ecology questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Indian Polity",
+        "topic": "Indian Polity Core Concepts",
+        "totalQuestions": 6,
+        "yearBreakdown": "2026: 6 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Indian Polity questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "topic": "J&K General Knowledge",
+        "totalQuestions": 5,
+        "yearBreakdown": "2026: 5 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency General Knowledge & Current Affairs questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Geography",
+        "topic": "Indian Geography",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Geography questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Mensuration",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Profit & Loss",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General Science",
+        "topic": "Chemistry",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency General Science questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General Science",
+        "topic": "Environment & Ecology",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency General Science questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General Science",
+        "topic": "Physics",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency General Science questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Geography",
+        "topic": "Environment & Ecology",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "High-frequency Geography questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Probability",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Mathematics",
+        "topic": "Simplification",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "High-frequency Mathematics questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "Environment & Ecology",
+        "topic": "J&K General Knowledge",
+        "totalQuestions": 2,
+        "yearBreakdown": "2026: 2 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "High-frequency Environment & Ecology questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Articles",
+        "totalQuestions": 2,
+        "yearBreakdown": "2026: 2 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "High-frequency General English questions tested in official JKSSB-INSPECTOR-FOREST papers."
+      },
+      {
+        "subject": "General English",
+        "topic": "Idioms & Phrases",
+        "totalQuestions": 2,
+        "yearBreakdown": "2026: 2 Qs",
+        "priority": "Moderate",
+        "whatIsAsked": "Contextual meaning of classic English idioms and phrasal verbs tested in JKSSB & SSC exams."
+      }
+    ],
+    "cutoffSets": [
+      {
+        "year": "2026-DV",
+        "label": "2026 Official Document Verification (DV) Category-Wise Cutoff (Notification dated 29.10.2026)",
+        "maxMarks": 120,
+        "sourceNote": "Exact minimum & maximum marks per category extracted from Official JKSSB Document Verification Notification No. JKSSB-COE0EXAM(UT)/3/2026 (7909564) dated 29.10.2026 (Annexure D — Inspector).",
+        "rows": [
+          {
+            "category": "RBA (Resident of Backward Area)",
+            "marks": "71.00 / 120",
+            "pct": 59,
+            "safeTarget": "54 Shortlisted",
+            "note": "Highest RBA score in DV list: 98.75 / 120"
+          },
+          {
+            "category": "PSP (Pahari Speaking People)",
+            "marks": "68.50 / 120",
+            "pct": 57,
+            "safeTarget": "10 Shortlisted",
+            "note": "Highest PSP score in DV list: 78.50 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "68.00 / 120",
+            "pct": 57,
+            "safeTarget": "13 Shortlisted",
+            "note": "Highest ALC/IB score in DV list: 80.25 / 120"
+          },
+          {
+            "category": "SC (Scheduled Caste)",
+            "marks": "64.00 / 120",
+            "pct": 53,
+            "safeTarget": "28 Shortlisted",
+            "note": "Highest SC score in DV list: 81.25 / 120"
+          },
+          {
+            "category": "ST (Scheduled Tribe)",
+            "marks": "60.75 / 120",
+            "pct": 51,
+            "safeTarget": "31 Shortlisted",
+            "note": "Highest ST score in DV list: 85.75 / 120"
+          },
+          {
+            "category": "EWS (Economically Weaker Section)",
+            "marks": "60.00 / 120",
+            "pct": 50,
+            "safeTarget": "25 Shortlisted",
+            "note": "Highest EWS score in DV list: 78.25 / 120"
+          },
+          {
+            "category": "OM (incl. ESM horizontal)",
+            "marks": "57.25 / 120",
+            "pct": 48,
+            "safeTarget": "83 Shortlisted",
+            "note": "Highest OM score in DV list: 95.25 / 120"
+          }
+        ]
+      }
+    ],
+    "scoreDistributions": [
+      {
+        "label": "2026 Official Score Distribution (15.03.2026 · 8,356 Appeared)",
+        "appeared": 8356,
+        "registered": 25167,
+        "topScore": "98.75 / 120",
+        "meanScore": "44.04 / 120",
+        "medianScore": "44.25 / 120",
+        "sourceNote": "Derived from Official JKSSB Result Notification No. JKSSB-COE0EXAM(UT)/14/2026-03 (7842028) dated 28.04.2026 (Annexure B — Inspector).",
+        "bars": [
+          {
+            "range": "85 – 120",
+            "candidates": 28,
+            "pct": 0.3
+          },
+          {
+            "range": "75 – 84.75",
+            "candidates": 192,
+            "pct": 2.3
+          },
+          {
+            "range": "65 – 74.75",
+            "candidates": 642,
+            "pct": 7.7
+          },
+          {
+            "range": "55 – 64.75",
+            "candidates": 1396,
+            "pct": 16.7
+          },
+          {
+            "range": "45 – 54.75",
+            "candidates": 1774,
+            "pct": 21.2
+          },
+          {
+            "range": "35 – 44.75",
+            "candidates": 1793,
+            "pct": 21.5
+          },
+          {
+            "range": "Below 35",
+            "candidates": 2531,
+            "pct": 30.3
+          }
+        ]
+      }
+    ],
+    "paperXrays": [
+      {
+        "paperSlug": "jkssb-inspector-forest-2026-mar-15",
+        "paperTitle": "JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
+        "year": "2026",
+        "heldOn": "2026-03-15",
+        "totalQuestions": 120,
+        "maxMarks": 120,
+        "sections": [
+          {
+            "subject": "General Science",
+            "questionCount": 20,
+            "sharePct": 17,
+            "topics": [
+              {
+                "name": "Biology",
+                "count": 9,
+                "tier": "high"
+              },
+              {
+                "name": "Chemistry",
+                "count": 3,
+                "tier": "mid"
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 3,
+                "tier": "mid"
+              },
+              {
+                "name": "Physics",
+                "count": 3,
+                "tier": "mid"
+              },
+              {
+                "name": "General Science Core Concepts",
+                "count": 2,
+                "tier": "mid"
+              }
+            ]
+          },
+          {
+            "subject": "Mathematics",
+            "questionCount": 20,
+            "sharePct": 17,
+            "topics": [
+              {
+                "name": "Mensuration",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Profit & Loss",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Probability",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "Simplification",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "Coordinate Geometry",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Simple & Compound Interest",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Linear Equations",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Percentage",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "Environment & Ecology",
+            "questionCount": 12,
+            "sharePct": 10,
+            "topics": [
+              {
+                "name": "Environment & Ecology Core Concepts",
+                "count": 8,
+                "tier": "high"
+              },
+              {
+                "name": "J&K General Knowledge",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Climate Change",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Government Schemes",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "Computer Knowledge",
+            "questionCount": 10,
+            "sharePct": 8,
+            "topics": [
+              {
+                "name": "MS Office",
+                "count": 10,
+                "tier": "high"
+              }
+            ]
+          },
+          {
+            "subject": "General English",
+            "questionCount": 10,
+            "sharePct": 8,
+            "topics": [
+              {
+                "name": "Articles",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Idioms & Phrases",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Para Jumbles",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Prepositions",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Synonyms",
+                "count": 2,
+                "tier": "mid"
+              }
+            ]
+          },
+          {
+            "subject": "General Knowledge & Current Affairs",
+            "questionCount": 10,
+            "sharePct": 8,
+            "topics": [
+              {
+                "name": "J&K General Knowledge",
+                "count": 5,
+                "tier": "high"
+              },
+              {
+                "name": "Economy",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "International Organisations",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Science & Technology",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Static GK",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "History",
+            "questionCount": 10,
+            "sharePct": 8,
+            "topics": [
+              {
+                "name": "Modern History",
+                "count": 10,
+                "tier": "high"
+              }
+            ]
+          },
+          {
+            "subject": "Indian Polity",
+            "questionCount": 10,
+            "sharePct": 8,
+            "topics": [
+              {
+                "name": "Indian Polity Core Concepts",
+                "count": 6,
+                "tier": "high"
+              },
+              {
+                "name": "Constitutional Amendments",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Directive Principles",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Fundamental Rights",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "International Organisations",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "Reasoning",
+            "questionCount": 10,
+            "sharePct": 8,
+            "topics": [
+              {
+                "name": "Coding-Decoding",
+                "count": 2,
+                "tier": "mid"
+              },
+              {
+                "name": "Blood Relations",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Boats & Streams",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Direction Sense",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Letter Series",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Number Series",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Ratio & Proportion",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Syllogism",
+                "count": 1,
+                "tier": "low"
+              },
+              {
+                "name": "Time & Work",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          },
+          {
+            "subject": "Geography",
+            "questionCount": 8,
+            "sharePct": 7,
+            "topics": [
+              {
+                "name": "Indian Geography",
+                "count": 4,
+                "tier": "high"
+              },
+              {
+                "name": "Environment & Ecology",
+                "count": 3,
+                "tier": "high"
+              },
+              {
+                "name": "J&K General Knowledge",
+                "count": 1,
+                "tier": "low"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "jkssb-field-assistant": {
+    "examSlug": "jkssb-field-assistant",
+    "totalPapersAnalyzed": 1,
+    "totalQuestionsAnalyzed": 120,
+    "masterSections": [
+      {
+        "subject": "Water & Waste Water Engineering",
+        "totalQuestions": 43,
+        "topics": [
+          {
+            "name": "Water Engineering",
+            "count": 43,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Environmental Impact Assessment",
+        "totalQuestions": 21,
+        "topics": [
+          {
+            "name": "Environmental Impact Assessment Core Concepts",
+            "count": 17,
+            "tier": "high"
+          },
+          {
+            "name": "Environmental Legislation",
+            "count": 4,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Environment & Ecology",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Environment & Ecology Core Concepts",
+            "count": 17,
+            "tier": "high"
+          },
+          {
+            "name": "Environmental Legislation",
+            "count": 3,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Environmental Audit & Safety Audit",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Environmental Audit",
+            "count": 20,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Environmental Legislation in India",
+        "totalQuestions": 16,
+        "topics": [
+          {
+            "name": "Environmental Legislation",
+            "count": 16,
+            "tier": "high"
+          }
+        ]
+      }
+    ],
+    "masterTopics": [
+      {
+        "subject": "Water & Waste Water Engineering",
+        "topic": "Water Engineering",
+        "totalQuestions": 43,
+        "yearBreakdown": "2026: 43 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Water & Waste Water Engineering questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      },
+      {
+        "subject": "Environmental Audit & Safety Audit",
+        "topic": "Environmental Audit",
+        "totalQuestions": 20,
+        "yearBreakdown": "2026: 20 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Environmental Audit & Safety Audit questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      },
+      {
+        "subject": "Environment & Ecology",
+        "topic": "Environment & Ecology Core Concepts",
+        "totalQuestions": 17,
+        "yearBreakdown": "2026: 17 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Environment & Ecology questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      },
+      {
+        "subject": "Environmental Impact Assessment",
+        "topic": "Environmental Impact Assessment Core Concepts",
+        "totalQuestions": 17,
+        "yearBreakdown": "2026: 17 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Environmental Impact Assessment questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      },
+      {
+        "subject": "Environmental Legislation in India",
+        "topic": "Environmental Legislation",
+        "totalQuestions": 16,
+        "yearBreakdown": "2026: 16 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Environmental Legislation in India questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      },
+      {
+        "subject": "Environmental Impact Assessment",
+        "topic": "Environmental Legislation",
+        "totalQuestions": 4,
+        "yearBreakdown": "2026: 4 Qs",
+        "priority": "Must-Study",
+        "whatIsAsked": "High-frequency Environmental Impact Assessment questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      },
+      {
+        "subject": "Environment & Ecology",
+        "topic": "Environmental Legislation",
+        "totalQuestions": 3,
+        "yearBreakdown": "2026: 3 Qs",
+        "priority": "High-Yield",
+        "whatIsAsked": "High-frequency Environment & Ecology questions tested in official JKSSB-FIELD-ASSISTANT papers."
+      }
+    ],
+    "cutoffSets": [
+      {
+        "year": "2026-DV",
+        "label": "2026 Official Document Verification (DV) Category-Wise Cutoff (Notification dated 29.10.2026)",
+        "maxMarks": 120,
+        "sourceNote": "Exact minimum & maximum marks per category extracted from Official JKSSB Document Verification Notification No. JKSSB-COE0EXAM(UT)/3/2026 (7909564) dated 29.10.2026 (Annexure E — Field Assistant).",
+        "rows": [
+          {
+            "category": "OM (Open Merit)",
+            "marks": "107.50 / 120",
+            "pct": 90,
+            "safeTarget": "16 Shortlisted",
+            "note": "Highest OM score in DV list: 116.25 / 120"
+          },
+          {
+            "category": "RBA (Resident of Backward Area)",
+            "marks": "105.25 / 120",
+            "pct": 88,
+            "safeTarget": "13 Shortlisted",
+            "note": "Highest RBA score in DV list: 113.75 / 120"
+          },
+          {
+            "category": "ST (Scheduled Tribe)",
+            "marks": "85.50 / 120",
+            "pct": 71,
+            "safeTarget": "6 Shortlisted",
+            "note": "Highest ST score in DV list: 92.25 / 120"
+          },
+          {
+            "category": "EWS (Economically Weaker Section)",
+            "marks": "80.00 / 120",
+            "pct": 67,
+            "safeTarget": "6 Shortlisted",
+            "note": "Highest EWS score in DV list: 115.25 / 120"
+          },
+          {
+            "category": "SC (Scheduled Caste)",
+            "marks": "78.75 / 120",
+            "pct": 66,
+            "safeTarget": "6 Shortlisted",
+            "note": "Highest SC score in DV list: 91.25 / 120"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "67.50 / 120",
+            "pct": 56,
+            "safeTarget": "5 Shortlisted",
+            "note": "Highest ALC/IB score in DV list: 95.50 / 120"
+          }
+        ]
+      }
+    ],
+    "scoreDistributions": [],
+    "paperXrays": [
+      {
+        "paperSlug": "jkssb-field-assistant-2026-may-20",
+        "paperTitle": "JKSSB Field Assistant Question Paper 2026",
+        "year": "2026",
+        "heldOn": "2026-05-20",
+        "totalQuestions": 120,
+        "maxMarks": 120,
+        "sections": [
+          {
+            "subject": "Water & Waste Water Engineering",
+            "questionCount": 43,
+            "sharePct": 36,
+            "topics": [
+              {
+                "name": "Water Engineering",
+                "count": 43,
+                "tier": "high"
+              }
+            ]
+          },
+          {
+            "subject": "Environmental Impact Assessment",
+            "questionCount": 21,
+            "sharePct": 18,
+            "topics": [
+              {
+                "name": "Environmental Impact Assessment Core Concepts",
+                "count": 17,
+                "tier": "high"
+              },
+              {
+                "name": "Environmental Legislation",
+                "count": 4,
+                "tier": "mid"
+              }
+            ]
+          },
+          {
+            "subject": "Environment & Ecology",
+            "questionCount": 20,
+            "sharePct": 17,
+            "topics": [
+              {
+                "name": "Environment & Ecology Core Concepts",
+                "count": 17,
+                "tier": "high"
+              },
+              {
+                "name": "Environmental Legislation",
+                "count": 3,
+                "tier": "mid"
+              }
+            ]
+          },
+          {
+            "subject": "Environmental Audit & Safety Audit",
+            "questionCount": 20,
+            "sharePct": 17,
+            "topics": [
+              {
+                "name": "Environmental Audit",
+                "count": 20,
+                "tier": "high"
+              }
+            ]
+          },
+          {
+            "subject": "Environmental Legislation in India",
+            "questionCount": 16,
+            "sharePct": 13,
+            "topics": [
+              {
+                "name": "Environmental Legislation",
+                "count": 16,
+                "tier": "high"
               }
             ]
           }
@@ -1699,6 +4372,291 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-veterinary-pharmacist",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 120,
+    "masterSections": [
+      {
+        "subject": "Zoology & Animal Kingdom",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Zoology",
+            "count": 26,
+            "tier": "high"
+          },
+          {
+            "name": "Match the Following",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Indian Polity",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Static GK",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Freedom Struggle",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian History",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Idioms & Phrases",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Antonyms",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogies",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Articles",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Clauses",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Determiners",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homophones",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Prepositions",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Punctuation",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Synonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Tenses",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Percentage",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Match the Following",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Probability",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Statement & Assumption",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Trains",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Computer Fundamentals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Hardware",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Input & Output Devices",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Computer Networks",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Evolution",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Evolution Core Concepts",
+            "count": 9,
+            "tier": "high"
+          },
+          {
+            "name": "Match the Following",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Human Physiology",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Human Physiology Core Concepts",
+            "count": 10,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Immunology",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Immunology Core Concepts",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Match the Following",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Zoology & Animal Kingdom",
@@ -1897,15 +4855,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Zoology",
-                "count": 26
+                "count": 26,
+                "tier": "high"
               },
               {
                 "name": "Match the Following",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1916,39 +4877,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Indian Geography",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Static GK",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian History",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -1959,51 +4929,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Idioms & Phrases",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogies",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Articles",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Clauses",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Determiners",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homophones",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Punctuation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Tenses",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2014,51 +4996,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Match the Following",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Probability",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Assumption",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Trains",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2069,27 +5063,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Fundamentals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Hardware",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Input & Output Devices",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Operating Systems",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Memory",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Computer Networks",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2100,11 +5100,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Evolution Core Concepts",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               },
               {
                 "name": "Match the Following",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2115,7 +5117,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Human Physiology Core Concepts",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               }
             ]
           },
@@ -2126,11 +5129,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Immunology Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Match the Following",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           }
@@ -2142,6 +5147,298 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-patwari",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 120,
+    "masterSections": [
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Modern History",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Static GK",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Biology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Chemistry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Economy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Organisations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K Geography",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Space & Defense",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "J&K General Knowledge",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "J&K General Knowledge Core Concepts",
+            "count": 10,
+            "tier": "high"
+          },
+          {
+            "name": "J&K Geography",
+            "count": 9,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "J&K History",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Botany",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Organisations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K Polity",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 24,
+        "topics": [
+          {
+            "name": "Direct & Indirect Speech",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Articles",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Clauses",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Fill in the Blanks",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Modals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Para Jumbles",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Prepositions",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Reading Comprehension",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Active & Passive Voice",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Antonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homophones",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Synonyms",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 18,
+        "topics": [
+          {
+            "name": "MS PowerPoint",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "MS Word",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Fundamentals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Networks",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Input & Output Devices",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Cyber Security",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "MS Excel",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "MS Office",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 18,
+        "topics": [
+          {
+            "name": "Analogy",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Letter Series",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Number Series",
+            "count": 3,
+            "tier": "high"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "J&K General Knowledge",
@@ -2354,55 +5651,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Modern History",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Art & Culture",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Chemistry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Space & Defense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2413,39 +5723,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               },
               {
                 "name": "J&K Geography",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               },
               {
                 "name": "Indian Geography",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Botany",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2456,59 +5775,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Direct & Indirect Speech",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Articles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Clauses",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Modals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Prepositions",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Reading Comprehension",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homophones",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2519,43 +5852,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "MS PowerPoint",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "MS Word",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Computer Fundamentals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Networks",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Input & Output Devices",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Memory",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Cyber Security",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS Excel",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS Office",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Operating Systems",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2566,27 +5909,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Analogy",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Direction Sense",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Letter Series",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               }
             ]
           }
@@ -2598,6 +5947,243 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-junior-assistant",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 80,
+    "masterSections": [
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Computer Networks",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "MS Office",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Fundamentals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Hardware",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "MS Excel",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "MS Word",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Internet & Email",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "MS PowerPoint",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Antonyms",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Para Jumbles",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Pronouns",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Synonyms",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Active & Passive Voice",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Articles",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Clauses",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Direct & Indirect Speech",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homophones",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Modals",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Prepositions",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Punctuation",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "J&K Geography",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Static GK",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "World Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 11,
+        "topics": [
+          {
+            "name": "Averages",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Time & Work",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 9,
+        "topics": [
+          {
+            "name": "Blood Relations",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Syllogism",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "General Knowledge & Current Affairs",
@@ -2796,39 +6382,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Networks",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "MS Office",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Computer Fundamentals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Hardware",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "MS Excel",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "MS Word",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Operating Systems",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Internet & Email",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS PowerPoint",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2839,63 +6434,78 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Pronouns",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Synonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Articles",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Clauses",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homophones",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Modals",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Punctuation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2906,31 +6516,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "J&K Geography",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "World Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2941,23 +6558,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Averages",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Profit & Loss",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Time & Work",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -2968,23 +6590,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Blood Relations",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -2996,6 +6623,449 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-constable",
     "totalPapersAnalyzed": 3,
     "totalQuestionsAnalyzed": 300,
+    "masterSections": [
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 115,
+        "topics": [
+          {
+            "name": "Static GK",
+            "count": 18,
+            "tier": "high"
+          },
+          {
+            "name": "Biology",
+            "count": 13,
+            "tier": "high"
+          },
+          {
+            "name": "Modern History",
+            "count": 13,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "Physics",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Chemistry",
+            "count": 7,
+            "tier": "mid"
+          },
+          {
+            "name": "Sports",
+            "count": 7,
+            "tier": "mid"
+          },
+          {
+            "name": "Economy",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "International Organisations",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Awards & Honours",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "World Geography",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Judiciary",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Medieval History",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 55,
+        "topics": [
+          {
+            "name": "Antonyms",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Spelling",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Articles",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Phrasal Verbs",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Prepositions",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Synonyms",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Homophones",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "One Word Substitution",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogies",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Clauses",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Nouns",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Pronouns",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Punctuation",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Vocabulary",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Active & Passive Voice",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Tenses",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "J&K General Knowledge",
+        "totalQuestions": 45,
+        "topics": [
+          {
+            "name": "J&K General Knowledge Core Concepts",
+            "count": 31,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "J&K History",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K Geography",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Sports",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 43,
+        "topics": [
+          {
+            "name": "Averages",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Geometry",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Mensuration",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Arithmetic",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Number System",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Percentage",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Algebra",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "HCF & LCM",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Probability",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Trigonometry",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Partnership",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Quadratic Equations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Time & Work",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 27,
+        "topics": [
+          {
+            "name": "Number Series",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Logical Deduction",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Letter Series",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Order & Ranking",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogies",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Calendar & Clock",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Internet & Email",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Fundamentals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Hardware",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Cyber Security",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "MS Excel",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "J&K General Knowledge",
@@ -3222,55 +7292,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Analogies",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Articles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Clauses",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Homophones",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Phrasal Verbs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Prepositions",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Pronouns",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Punctuation",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Synonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3281,47 +7364,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Static GK",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "International Organisations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sports",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Awards & Honours",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Modern History",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3332,39 +7426,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Averages",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "HCF & LCM",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Linear Equations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mensuration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Partnership",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Profit & Loss",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3375,31 +7478,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Internet & Email",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Computer Fundamentals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Hardware",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Computer Memory",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Cyber Security",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS Excel",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Operating Systems",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3410,19 +7520,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3433,27 +7547,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Odd One Out",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogies",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -3474,43 +7594,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Static GK",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               },
               {
                 "name": "Biology",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Physics",
-                "count": 5
+                "count": 5,
+                "tier": "mid"
               },
               {
                 "name": "Chemistry",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Modern History",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Economy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Medieval History",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3521,19 +7651,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 22
+                "count": 22,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Indian Polity",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3544,51 +7678,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Antonyms",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Spelling",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "One Word Substitution",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Articles",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homophones",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Nouns",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Phrasal Verbs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vocabulary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3599,35 +7745,43 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Geometry",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Arithmetic",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Linear Equations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mensuration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Trigonometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3638,11 +7792,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Odd One Out",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           }
@@ -3663,67 +7819,83 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Biology",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Indian Geography",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Chemistry",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Economy",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Physics",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Awards & Honours",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "World Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Judiciary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3734,47 +7906,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Number System",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Arithmetic",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Geometry",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Mensuration",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Probability",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Quadratic Equations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Trigonometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3785,39 +7968,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Direction Sense",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Letter Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Order & Ranking",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Calendar & Clock",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Logical Deduction",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3828,43 +8020,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Articles",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Nouns",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Phrasal Verbs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Tenses",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vocabulary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -3875,15 +8077,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -3895,6 +8100,260 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkssb-constable-telecom",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 100,
+    "masterSections": [
+      {
+        "subject": "Telecommunication Engineering",
+        "totalQuestions": 40,
+        "topics": [
+          {
+            "name": "Telecommunication Engineering Core Concepts",
+            "count": 40,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 16,
+        "topics": [
+          {
+            "name": "Current Affairs",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "International Organisations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Modern History",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Sports",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Static GK",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Awards & Honours",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Rivers & Lakes",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "World Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Idioms & Phrases",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "One Word Substitution",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Antonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Fill in the Blanks",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Modals",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Prepositions",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Sentence Improvement",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Spelling",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Synonyms",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Computer Fundamentals",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Input & Output Devices",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Internet & Email",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "MS Office",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Storage Devices",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "Odd One Out",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Assertion & Reason",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Letter Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Syllogism",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 7,
+        "topics": [
+          {
+            "name": "Arithmetic",
+            "count": 1,
+            "tier": "mid"
+          },
+          {
+            "name": "Averages",
+            "count": 1,
+            "tier": "mid"
+          },
+          {
+            "name": "Geometry",
+            "count": 1,
+            "tier": "mid"
+          },
+          {
+            "name": "Percentage",
+            "count": 1,
+            "tier": "mid"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 1,
+            "tier": "mid"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 1,
+            "tier": "mid"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 1,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "J&K General Knowledge",
+        "totalQuestions": 4,
+        "topics": [
+          {
+            "name": "J&K General Knowledge Core Concepts",
+            "count": 4,
+            "tier": "high"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Telecommunication Engineering",
@@ -4100,7 +8559,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Telecommunication Engineering Core Concepts",
-                "count": 40
+                "count": 40,
+                "tier": "high"
               }
             ]
           },
@@ -4111,43 +8571,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "International Organisations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Modern History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sports",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Awards & Honours",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Rivers & Lakes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "World Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4158,43 +8628,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Idioms & Phrases",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "One Word Substitution",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Modals",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Sentence Improvement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Spelling",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4205,27 +8685,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Fundamentals",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Input & Output Devices",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Internet & Email",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "MS Office",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Operating Systems",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Storage Devices",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4236,31 +8722,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Odd One Out",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Assertion & Reason",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Letter Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4271,31 +8764,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Arithmetic",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               },
               {
                 "name": "Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               },
               {
                 "name": "Percentage",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               }
             ]
           },
@@ -4306,7 +8806,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               }
             ]
           }
@@ -4318,6 +8819,405 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkpsi",
     "totalPapersAnalyzed": 2,
     "totalQuestionsAnalyzed": 240,
+    "masterSections": [
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 40,
+        "topics": [
+          {
+            "name": "Static GK",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Sports",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Economy",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian History",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "International Organisations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "World Geography",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Climate Change",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Science",
+        "totalQuestions": 28,
+        "topics": [
+          {
+            "name": "Physics",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Biology",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "General Science Core Concepts",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Chemistry",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Mathematics",
+        "totalQuestions": 25,
+        "topics": [
+          {
+            "name": "Percentage",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Arithmetic",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Averages",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Time & Work",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Geometry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Mensuration",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "History",
+        "totalQuestions": 24,
+        "topics": [
+          {
+            "name": "Modern History",
+            "count": 18,
+            "tier": "high"
+          },
+          {
+            "name": "Ancient History",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Medieval History",
+            "count": 3,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Indian Polity",
+        "totalQuestions": 24,
+        "topics": [
+          {
+            "name": "Indian Polity Core Concepts",
+            "count": 20,
+            "tier": "high"
+          },
+          {
+            "name": "Parliament",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Fundamental Rights",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 19,
+        "topics": [
+          {
+            "name": "Vocabulary",
+            "count": 10,
+            "tier": "high"
+          },
+          {
+            "name": "Fill in the Blanks",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Antonyms",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Synonyms",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Geography",
+        "totalQuestions": 18,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 17,
+            "tier": "high"
+          },
+          {
+            "name": "World Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "J&K General Knowledge",
+        "totalQuestions": 16,
+        "topics": [
+          {
+            "name": "J&K General Knowledge Core Concepts",
+            "count": 12,
+            "tier": "high"
+          },
+          {
+            "name": "J&K History",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "J&K Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 16,
+        "topics": [
+          {
+            "name": "Direction Sense",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Syllogism",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Arithmetic Reasoning",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Logical Deduction",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Seating Arrangement",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 11,
+        "topics": [
+          {
+            "name": "Computer Networks",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Fundamentals",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Economy",
+        "totalQuestions": 11,
+        "topics": [
+          {
+            "name": "Economy Core Concepts",
+            "count": 10,
+            "tier": "high"
+          },
+          {
+            "name": "Budget & Fiscal Policy",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Environment & Ecology",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "Environment & Ecology Core Concepts",
+            "count": 8,
+            "tier": "high"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Indian Polity",
@@ -4516,23 +9416,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Vocabulary",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Synonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           },
@@ -4543,47 +9448,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Direction Sense",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Syllogism",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Arithmetic Reasoning",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Logical Deduction",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Seating Arrangement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4594,15 +9510,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Networks",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Computer Fundamentals",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Computer Memory",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           },
@@ -4613,7 +9532,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               }
             ]
           },
@@ -4624,31 +9544,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Static GK",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4659,7 +9586,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               }
             ]
           },
@@ -4670,7 +9598,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               }
             ]
           },
@@ -4681,7 +9610,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               }
             ]
           },
@@ -4692,7 +9622,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               }
             ]
           },
@@ -4703,19 +9634,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Percentage",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4726,15 +9661,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "General Science Core Concepts",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Chemistry",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4745,7 +9683,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               }
             ]
           }
@@ -4766,51 +9705,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Static GK",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Government Schemes",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Economy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "International Organisations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "World Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Climate Change",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Operating Systems",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4821,23 +9772,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Physics",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Biology",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Chemistry",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "General Science Core Concepts",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4848,47 +9804,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Arithmetic",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Linear Equations",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mensuration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4899,19 +9866,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 12
+                "count": 12,
+                "tier": "high"
               },
               {
                 "name": "Parliament",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fundamental Rights",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4922,15 +9893,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               },
               {
                 "name": "Ancient History",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Medieval History",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               }
             ]
           },
@@ -4941,11 +9915,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "World Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4956,15 +9932,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K History",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -4975,11 +9954,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Budget & Fiscal Policy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -4991,6 +9972,7 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkpsi-telecom",
     "totalPapersAnalyzed": 0,
     "totalQuestionsAnalyzed": 0,
+    "masterSections": [],
     "masterTopics": [],
     "cutoffSets": [
       {
@@ -5034,6 +10016,346 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "upsc-cse",
     "totalPapersAnalyzed": 4,
     "totalQuestionsAnalyzed": 360,
+    "masterSections": [
+      {
+        "subject": "Quantitative Aptitude",
+        "totalQuestions": 61,
+        "topics": [
+          {
+            "name": "Number System",
+            "count": 24,
+            "tier": "high"
+          },
+          {
+            "name": "Arithmetic",
+            "count": 7,
+            "tier": "mid"
+          },
+          {
+            "name": "Averages",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Percentage",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Mensuration",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Algebra",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Time & Work",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Data Interpretation",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Trigonometry",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reading Comprehension",
+        "totalQuestions": 52,
+        "topics": [
+          {
+            "name": "Reading Comprehension Core Concepts",
+            "count": 48,
+            "tier": "high"
+          },
+          {
+            "name": "Climate Change",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Economy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Inflation & Indices",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 47,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 14,
+            "tier": "high"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 9,
+            "tier": "high"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 7,
+            "tier": "mid"
+          },
+          {
+            "name": "Data Sufficiency",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Number Series",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Geometry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Letter Series",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Economy",
+        "totalQuestions": 34,
+        "topics": [
+          {
+            "name": "Economy Core Concepts",
+            "count": 33,
+            "tier": "high"
+          },
+          {
+            "name": "Budget & Fiscal Policy",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Science & Technology",
+        "totalQuestions": 33,
+        "topics": [
+          {
+            "name": "Science & Technology Core Concepts",
+            "count": 31,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Space & Defense",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "History",
+        "totalQuestions": 29,
+        "topics": [
+          {
+            "name": "Modern History",
+            "count": 25,
+            "tier": "high"
+          },
+          {
+            "name": "Freedom Struggle",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Indian Polity",
+        "totalQuestions": 27,
+        "topics": [
+          {
+            "name": "Indian Polity Core Concepts",
+            "count": 24,
+            "tier": "high"
+          },
+          {
+            "name": "Fundamental Rights",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Panchayati Raj",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Environment & Ecology",
+        "totalQuestions": 23,
+        "topics": [
+          {
+            "name": "Environment & Ecology Core Concepts",
+            "count": 22,
+            "tier": "high"
+          },
+          {
+            "name": "Climate Change",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Geography",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "World Geography",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Physical Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Current Affairs",
+        "totalQuestions": 12,
+        "topics": [
+          {
+            "name": "Current Affairs Core Concepts",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "International Relations",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "International Relations",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "International Relations Core Concepts",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "World Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Art & Culture",
+        "totalQuestions": 9,
+        "topics": [
+          {
+            "name": "Art & Culture Core Concepts",
+            "count": 9,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Decision Making & Ethics",
+        "totalQuestions": 3,
+        "topics": [
+          {
+            "name": "Decision Making",
+            "count": 3,
+            "tier": "high"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Reading Comprehension",
@@ -5246,11 +10568,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 17
+                "count": 17,
+                "tier": "high"
               },
               {
                 "name": "Budget & Fiscal Policy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5261,11 +10585,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Science & Technology Core Concepts",
-                "count": 16
+                "count": 16,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5276,11 +10602,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 12
+                "count": 12,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5291,15 +10619,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "International Relations Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "World Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5310,7 +10641,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Art & Culture Core Concepts",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               }
             ]
           },
@@ -5321,11 +10653,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Climate Change",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5336,15 +10670,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Fundamental Rights",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Panchayati Raj",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5355,19 +10692,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "World Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5378,7 +10719,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs Core Concepts",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               }
             ]
           },
@@ -5389,7 +10731,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Decision Making",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               }
             ]
           }
@@ -5410,47 +10753,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Arithmetic",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Number System",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Mensuration",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Percentage",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Data Interpretation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Profit & Loss",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Trigonometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5461,23 +10815,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               },
               {
                 "name": "Direction Sense",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5488,7 +10847,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension Core Concepts",
-                "count": 23
+                "count": 23,
+                "tier": "high"
               }
             ]
           }
@@ -5509,11 +10869,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 17
+                "count": 17,
+                "tier": "high"
               },
               {
                 "name": "Fundamental Rights",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5524,7 +10886,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 16
+                "count": 16,
+                "tier": "high"
               }
             ]
           },
@@ -5535,11 +10898,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 13
+                "count": 13,
+                "tier": "high"
               },
               {
                 "name": "Freedom Struggle",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               }
             ]
           },
@@ -5550,11 +10915,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Science & Technology Core Concepts",
-                "count": 15
+                "count": 15,
+                "tier": "high"
               },
               {
                 "name": "Space & Defense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5565,7 +10932,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology Core Concepts",
-                "count": 14
+                "count": 14,
+                "tier": "high"
               }
             ]
           },
@@ -5576,15 +10944,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "World Geography",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Physical Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5595,11 +10966,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs Core Concepts",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "International Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -5620,31 +10993,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Number System",
-                "count": 18
+                "count": 18,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Percentage",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Time & Work",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Arithmetic",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5655,23 +11035,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension Core Concepts",
-                "count": 25
+                "count": 25,
+                "tier": "high"
               },
               {
                 "name": "Climate Change",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Inflation & Indices",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -5682,39 +11067,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Data Sufficiency",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Logical Deduction",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Letter Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -5726,6 +11120,588 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "ssc-cgl",
     "totalPapersAnalyzed": 9,
     "totalQuestionsAnalyzed": 950,
+    "masterSections": [
+      {
+        "subject": "General English",
+        "totalQuestions": 245,
+        "topics": [
+          {
+            "name": "Reading Comprehension",
+            "count": 47,
+            "tier": "high"
+          },
+          {
+            "name": "Vocabulary",
+            "count": 27,
+            "tier": "mid"
+          },
+          {
+            "name": "Para Jumbles",
+            "count": 22,
+            "tier": "mid"
+          },
+          {
+            "name": "Direct & Indirect Speech",
+            "count": 17,
+            "tier": "mid"
+          },
+          {
+            "name": "Spelling",
+            "count": 17,
+            "tier": "mid"
+          },
+          {
+            "name": "Active & Passive Voice",
+            "count": 14,
+            "tier": "mid"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 14,
+            "tier": "mid"
+          },
+          {
+            "name": "Antonyms",
+            "count": 12,
+            "tier": "mid"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 12,
+            "tier": "mid"
+          },
+          {
+            "name": "Fill in the Blanks",
+            "count": 11,
+            "tier": "mid"
+          },
+          {
+            "name": "One Word Substitution",
+            "count": 11,
+            "tier": "mid"
+          },
+          {
+            "name": "Synonyms",
+            "count": 11,
+            "tier": "mid"
+          },
+          {
+            "name": "Sentence Improvement",
+            "count": 10,
+            "tier": "mid"
+          },
+          {
+            "name": "Homonyms",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Prepositions",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Active and Passive Voice",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Tenses",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Direct and Indirect Speech",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Homophones",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Phrasal Verbs",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Quantitative Aptitude",
+        "totalQuestions": 230,
+        "topics": [
+          {
+            "name": "Mensuration",
+            "count": 33,
+            "tier": "high"
+          },
+          {
+            "name": "Percentage",
+            "count": 21,
+            "tier": "high"
+          },
+          {
+            "name": "Geometry",
+            "count": 19,
+            "tier": "high"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 19,
+            "tier": "high"
+          },
+          {
+            "name": "Trigonometry",
+            "count": 19,
+            "tier": "high"
+          },
+          {
+            "name": "Arithmetic",
+            "count": 17,
+            "tier": "mid"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 17,
+            "tier": "mid"
+          },
+          {
+            "name": "Algebra",
+            "count": 12,
+            "tier": "mid"
+          },
+          {
+            "name": "Averages",
+            "count": 11,
+            "tier": "mid"
+          },
+          {
+            "name": "Partnership",
+            "count": 11,
+            "tier": "mid"
+          },
+          {
+            "name": "Simplification",
+            "count": 10,
+            "tier": "mid"
+          },
+          {
+            "name": "Time & Work",
+            "count": 10,
+            "tier": "mid"
+          },
+          {
+            "name": "Data Interpretation",
+            "count": 9,
+            "tier": "mid"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 9,
+            "tier": "mid"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Coordinate Geometry",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Number System",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Discount",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Probability",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 230,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 51,
+            "tier": "high"
+          },
+          {
+            "name": "Number Series",
+            "count": 40,
+            "tier": "high"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 23,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 22,
+            "tier": "mid"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 21,
+            "tier": "mid"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 18,
+            "tier": "mid"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Syllogism",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Word Formation",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Arithmetic Reasoning",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Letter Series",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Seating Arrangement",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Simplification",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Statement & Assumption",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Missing Number",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Algebra",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Alphanumeric Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Averages",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Calendar & Clock",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Course of Action",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Data Interpretation",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Decision Making",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Dice & Cube",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Linear Equations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Mirror & Water Image",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Puzzles",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Time & Work",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Venn Diagrams",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Awareness",
+        "totalQuestions": 225,
+        "topics": [
+          {
+            "name": "Static GK",
+            "count": 53,
+            "tier": "high"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 32,
+            "tier": "high"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 20,
+            "tier": "mid"
+          },
+          {
+            "name": "Economy",
+            "count": 19,
+            "tier": "mid"
+          },
+          {
+            "name": "Sports",
+            "count": 18,
+            "tier": "mid"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 9,
+            "tier": "mid"
+          },
+          {
+            "name": "Science & Technology",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Physics",
+            "count": 6,
+            "tier": "mid"
+          },
+          {
+            "name": "Assertion & Reason",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Biology",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Art, Culture & Sports",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian History",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Geography",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Indian Geography",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "International Organisations",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Space & Defense",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Awards & Honours",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Books & Authors",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Human Physiology",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Modern History",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Physical Geography",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Planning & Reforms",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Ancient History",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Chemistry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Environmental Science",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Festivals & Culture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Freedom Struggle",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Medieval History",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Computer Networks",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Fundamentals",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "MS Excel",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "MS Word",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Architecture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Cyber Security",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "MS PowerPoint",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "General Awareness",
@@ -5938,75 +11914,93 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Static GK",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Books & Authors",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Polity",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Physical Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Planning & Reforms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Space & Defense",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Art, Culture & Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environmental Science",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Festivals & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Human Physiology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Physics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Science & Technology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6017,55 +12011,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Active and Passive Voice",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Para Jumbles",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Spelling",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Direct and Indirect Speech",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6076,55 +12083,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Mensuration",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Geometry",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Algebra",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Trigonometry",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Coordinate Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Discount",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Partnership",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Percentage",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Profit & Loss",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simplification",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6135,67 +12155,83 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Analogy",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Odd One Out",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Word Formation",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Calendar & Clock",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Course of Action",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Data Interpretation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Decision Making",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Missing Number",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Puzzles",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Assumption",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -6216,67 +12252,83 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 15
+                "count": 15,
+                "tier": "high"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Vocabulary",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Prepositions",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sentence Improvement",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Phrasal Verbs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6287,55 +12339,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Mensuration",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Geometry",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Trigonometry",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Data Interpretation",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number System",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Partnership",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Probability",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simplification",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6346,55 +12411,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Blood Relations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Letter Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Syllogism",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Dice & Cube",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mirror & Water Image",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Missing Number",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Venn Diagrams",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Word Formation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6405,47 +12483,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Static GK",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Human Physiology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Science & Technology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6456,39 +12545,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Networks",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Computer Fundamentals",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Computer Memory",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "MS Excel",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "MS Word",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Operating Systems",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Architecture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Cyber Security",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS PowerPoint",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -6509,23 +12607,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Static GK",
-                "count": 17
+                "count": 17,
+                "tier": "high"
               },
               {
                 "name": "Economy",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Art, Culture & Sports",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6536,51 +12639,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Vocabulary",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Reading Comprehension",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "One Word Substitution",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Synonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Spelling",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6591,39 +12706,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Arithmetic",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Geometry",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Trigonometry",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Mensuration",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6634,39 +12758,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 13
+                "count": 13,
+                "tier": "high"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Blood Relations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Odd One Out",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Arithmetic Reasoning",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -6687,55 +12820,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Static GK",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Economy",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Science & Technology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Awards & Honours",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Physics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6746,59 +12892,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sentence Improvement",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vocabulary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6809,59 +12969,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Trigonometry",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Profit & Loss",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Arithmetic",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Geometry",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Mensuration",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Partnership",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coordinate Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Data Interpretation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simplification",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6872,47 +13046,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Number Series",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Logical Deduction",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Odd One Out",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Analogy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Simplification",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Assumption",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Word Formation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -6933,55 +13118,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Assertion & Reason",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Science & Technology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Awards & Honours",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Physics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Static GK",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -6992,59 +13190,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sentence Improvement",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vocabulary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7055,59 +13267,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Profit & Loss",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Mensuration",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Arithmetic",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Averages",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Partnership",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Simplification",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Time & Work",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coordinate Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Data Interpretation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Linear Equations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Percentage",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7118,31 +13344,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Number Series",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Analogy",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Logical Deduction",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Odd One Out",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Seating Arrangement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -7163,55 +13396,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Economy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Art, Culture & Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Assertion & Reason",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Chemistry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Physics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Space & Defense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7222,55 +13468,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Vocabulary",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sentence Improvement",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Prepositions",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7281,55 +13540,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Profit & Loss",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Mensuration",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Simplification",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Partnership",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Percentage",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Time & Work",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Arithmetic",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Data Interpretation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7340,35 +13612,43 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Number Series",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Analogy",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Odd One Out",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Logical Deduction",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Seating Arrangement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simplification",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -7389,19 +13669,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Static GK",
-                "count": 18
+                "count": 18,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Economy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           },
@@ -7412,47 +13696,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Vocabulary",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7463,47 +13758,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Ratio & Proportion",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Arithmetic",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Trigonometry",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Geometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mensuration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Profit & Loss",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7514,43 +13820,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Analogy",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Blood Relations",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Direction Sense",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Arithmetic Reasoning",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -7571,47 +13887,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Art & Culture",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Government Schemes",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Sports",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Assertion & Reason",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Science & Technology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Economy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7622,59 +13949,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Direct & Indirect Speech",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Para Jumbles",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sentence Improvement",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Homonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Spelling",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Synonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Vocabulary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7685,39 +14026,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Mensuration",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Profit & Loss",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Partnership",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Arithmetic",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simplification",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7728,47 +14078,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Blood Relations",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Algebra",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Linear Equations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Seating Arrangement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Assumption",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Word Formation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -7789,55 +14150,68 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Art & Culture",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Indian Polity",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Biology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Economy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Indian Geography",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Modern History",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Physics",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Sports",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Static GK",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ancient History",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Medieval History",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7848,47 +14222,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Antonyms",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Para Jumbles",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Synonyms",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Active & Passive Voice",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "One Word Substitution",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Spelling",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Tenses",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Homophones",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7899,51 +14284,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Data Interpretation",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Geometry",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Trigonometry",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Algebra",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Mensuration",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number System",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simplification",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -7954,47 +14351,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Number Series",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Arithmetic Reasoning",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Letter Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Odd One Out",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Alphanumeric Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -8006,6 +14414,277 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "bpsc-cce",
     "totalPapersAnalyzed": 2,
     "totalQuestionsAnalyzed": 300,
+    "masterSections": [
+      {
+        "subject": "History",
+        "totalQuestions": 58,
+        "topics": [
+          {
+            "name": "Modern History",
+            "count": 52,
+            "tier": "high"
+          },
+          {
+            "name": "Match the Following",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Freedom Struggle",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General Science",
+        "totalQuestions": 57,
+        "topics": [
+          {
+            "name": "General Science Core Concepts",
+            "count": 27,
+            "tier": "high"
+          },
+          {
+            "name": "Chemistry",
+            "count": 10,
+            "tier": "mid"
+          },
+          {
+            "name": "Physics",
+            "count": 8,
+            "tier": "mid"
+          },
+          {
+            "name": "Biology",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Electricity & Magnetism",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Botany",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Human Physiology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Light & Optics",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Current Affairs",
+        "totalQuestions": 54,
+        "topics": [
+          {
+            "name": "Current Affairs Core Concepts",
+            "count": 43,
+            "tier": "high"
+          },
+          {
+            "name": "Awards & Honours",
+            "count": 5,
+            "tier": "mid"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Environment & Ecology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Indian Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Space & Defense",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Sports",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Bihar Studies",
+        "totalQuestions": 35,
+        "topics": [
+          {
+            "name": "Bihar GK",
+            "count": 34,
+            "tier": "high"
+          },
+          {
+            "name": "Rivers & Lakes",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Indian Polity",
+        "totalQuestions": 26,
+        "topics": [
+          {
+            "name": "Indian Polity Core Concepts",
+            "count": 19,
+            "tier": "high"
+          },
+          {
+            "name": "Parliament",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Panchayati Raj",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Fundamental Rights",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Judiciary",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Geography",
+        "totalQuestions": 22,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 16,
+            "tier": "high"
+          },
+          {
+            "name": "Rivers & Lakes",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "World Geography",
+            "count": 3,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 20,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 9,
+            "tier": "high"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Arithmetic Reasoning",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Calendar & Clock",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Missing Number",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Order & Ranking",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Economy",
+        "totalQuestions": 19,
+        "topics": [
+          {
+            "name": "Economy Core Concepts",
+            "count": 17,
+            "tier": "high"
+          },
+          {
+            "name": "Banking & Monetary Policy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Environment & Ecology",
+        "totalQuestions": 9,
+        "topics": [
+          {
+            "name": "Environment & Ecology Core Concepts",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "History",
@@ -8218,15 +14897,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 25
+                "count": 25,
+                "tier": "high"
               },
               {
                 "name": "Match the Following",
-                "count": 5
+                "count": 5,
+                "tier": "mid"
               },
               {
                 "name": "Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8237,35 +14919,43 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "General Science Core Concepts",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               },
               {
                 "name": "Physics",
-                "count": 5
+                "count": 5,
+                "tier": "mid"
               },
               {
                 "name": "Biology",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Electricity & Magnetism",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Botany",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Chemistry",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Human Physiology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Light & Optics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8276,35 +14966,43 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs Core Concepts",
-                "count": 14
+                "count": 14,
+                "tier": "high"
               },
               {
                 "name": "Awards & Honours",
-                "count": 5
+                "count": 5,
+                "tier": "mid"
               },
               {
                 "name": "Art & Culture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Environment & Ecology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Indian Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Space & Defense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8315,23 +15013,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Parliament",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Panchayati Raj",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Fundamental Rights",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Judiciary",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8342,11 +15045,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Bihar GK",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "Rivers & Lakes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8357,15 +15062,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Rivers & Lakes",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "World Geography",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               }
             ]
           },
@@ -8376,15 +15084,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Banking & Monetary Policy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8395,35 +15106,43 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Logical Deduction",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Arithmetic Reasoning",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Missing Number",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Order & Ranking",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8434,11 +15153,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology Core Concepts",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -8459,19 +15180,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "General Science Core Concepts",
-                "count": 17
+                "count": 17,
+                "tier": "high"
               },
               {
                 "name": "Chemistry",
-                "count": 8
+                "count": 8,
+                "tier": "mid"
               },
               {
                 "name": "Physics",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Biology",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           },
@@ -8482,7 +15207,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs Core Concepts",
-                "count": 29
+                "count": 29,
+                "tier": "high"
               }
             ]
           },
@@ -8493,7 +15219,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 27
+                "count": 27,
+                "tier": "high"
               }
             ]
           },
@@ -8504,7 +15231,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Bihar GK",
-                "count": 23
+                "count": 23,
+                "tier": "high"
               }
             ]
           },
@@ -8515,7 +15243,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 12
+                "count": 12,
+                "tier": "high"
               }
             ]
           },
@@ -8526,7 +15255,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 10
+                "count": 10,
+                "tier": "high"
               }
             ]
           },
@@ -8537,19 +15267,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 7
+                "count": 7,
+                "tier": "high"
               },
               {
                 "name": "Calendar & Clock",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8560,7 +15294,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               }
             ]
           }
@@ -8572,6 +15307,489 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "jkcce",
     "totalPapersAnalyzed": 3,
     "totalQuestionsAnalyzed": 300,
+    "masterSections": [
+      {
+        "subject": "Indian Polity",
+        "totalQuestions": 45,
+        "topics": [
+          {
+            "name": "Indian Polity Core Concepts",
+            "count": 35,
+            "tier": "high"
+          },
+          {
+            "name": "Parliament",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Budget & Fiscal Policy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Constitutional Amendments",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Fundamental Rights",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K Polity",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Panchayati Raj",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 33,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 17,
+            "tier": "high"
+          },
+          {
+            "name": "Analogy",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Number Series",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Data Sufficiency",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Mirror & Water Image",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Missing Number",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Seating Arrangement",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Syllogism",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "History",
+        "totalQuestions": 32,
+        "topics": [
+          {
+            "name": "Modern History",
+            "count": 28,
+            "tier": "high"
+          },
+          {
+            "name": "Art & Culture",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Freedom Struggle",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reading Comprehension",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Reading Comprehension Core Concepts",
+            "count": 28,
+            "tier": "high"
+          },
+          {
+            "name": "Assertion & Reason",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Environment & Ecology",
+        "totalQuestions": 28,
+        "topics": [
+          {
+            "name": "Environment & Ecology Core Concepts",
+            "count": 21,
+            "tier": "high"
+          },
+          {
+            "name": "Biodiversity & Conservation",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Climate Change",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Environmental Legislation",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Protected Areas & Ramsar",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Science & Technology",
+        "totalQuestions": 28,
+        "topics": [
+          {
+            "name": "Science & Technology Core Concepts",
+            "count": 23,
+            "tier": "high"
+          },
+          {
+            "name": "Biology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Chemistry",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Internet & Email",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Light & Optics",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Space & Defense",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Quantitative Aptitude",
+        "totalQuestions": 25,
+        "topics": [
+          {
+            "name": "Arithmetic",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Averages",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Mensuration",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Number System",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Data Interpretation",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Boats & Streams",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "HCF & LCM",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Permutations & Combinations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Probability",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Time & Work",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Trigonometry",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Economy",
+        "totalQuestions": 17,
+        "topics": [
+          {
+            "name": "Economy Core Concepts",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "Banking & Monetary Policy",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Budget & Fiscal Policy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Government Schemes",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Organisations",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Geography",
+        "totalQuestions": 16,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 12,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "World Geography",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Current Affairs",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Current Affairs Core Concepts",
+            "count": 7,
+            "tier": "high"
+          },
+          {
+            "name": "Awards & Honours",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Budget & Fiscal Policy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Climate Change",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Organisations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "International Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Science & Technology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Sports",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Decision Making & Ethics",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "Decision Making",
+            "count": 8,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Social Issues & Schemes",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "Government Schemes",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Census & Demographics",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "J&K General Knowledge",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "J&K General Knowledge",
+        "totalQuestions": 6,
+        "topics": [
+          {
+            "name": "J&K General Knowledge Core Concepts",
+            "count": 6,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "Communication & Interpersonal Skills",
+        "totalQuestions": 4,
+        "topics": [
+          {
+            "name": "Communication Skills",
+            "count": 4,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "International Relations",
+        "totalQuestions": 4,
+        "topics": [
+          {
+            "name": "Current Affairs",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "International Relations Core Concepts",
+            "count": 2,
+            "tier": "mid"
+          }
+        ]
+      },
+      {
+        "subject": "Agriculture",
+        "totalQuestions": 1,
+        "topics": [
+          {
+            "name": "Indian Agriculture",
+            "count": 1,
+            "tier": "mid"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Indian Polity",
@@ -8770,47 +15988,58 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 17
+                "count": 17,
+                "tier": "high"
               },
               {
                 "name": "Analogy",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Blood Relations",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Number Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Data Sufficiency",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Direction Sense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mirror & Water Image",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Missing Number",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Seating Arrangement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8821,11 +16050,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension Core Concepts",
-                "count": 28
+                "count": 28,
+                "tier": "high"
               },
               {
                 "name": "Assertion & Reason",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           },
@@ -8836,59 +16067,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Arithmetic",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Averages",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Mensuration",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Number System",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Data Interpretation",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Boats & Streams",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "HCF & LCM",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Permutations & Combinations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Probability",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Trigonometry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8899,7 +16144,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Decision Making",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               }
             ]
           },
@@ -8910,7 +16156,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Communication Skills",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               }
             ]
           }
@@ -8931,11 +16178,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 24
+                "count": 24,
+                "tier": "high"
               },
               {
                 "name": "J&K Polity",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8946,11 +16195,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Science & Technology Core Concepts",
-                "count": 17
+                "count": 17,
+                "tier": "high"
               },
               {
                 "name": "Light & Optics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -8961,7 +16212,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 16
+                "count": 16,
+                "tier": "high"
               }
             ]
           },
@@ -8972,7 +16224,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology Core Concepts",
-                "count": 15
+                "count": 15,
+                "tier": "high"
               }
             ]
           },
@@ -8983,7 +16236,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Economy Core Concepts",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               }
             ]
           },
@@ -8994,11 +16248,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs Core Concepts",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9009,7 +16265,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "J&K General Knowledge Core Concepts",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               }
             ]
           },
@@ -9020,11 +16277,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "World Geography",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9035,7 +16294,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Agriculture",
-                "count": 1
+                "count": 1,
+                "tier": "mid"
               }
             ]
           }
@@ -9056,31 +16316,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "Parliament",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Budget & Fiscal Policy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Constitutional Amendments",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Fundamental Rights",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Panchayati Raj",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9091,19 +16358,23 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 12
+                "count": 12,
+                "tier": "high"
               },
               {
                 "name": "Art & Culture",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Freedom Struggle",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9114,23 +16385,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Environment & Ecology Core Concepts",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Biodiversity & Conservation",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Climate Change",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Environmental Legislation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Protected Areas & Ramsar",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9141,15 +16417,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9160,23 +16439,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Science & Technology Core Concepts",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Chemistry",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Internet & Email",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Space & Defense",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9187,31 +16471,38 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Awards & Honours",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Current Affairs Core Concepts",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Budget & Fiscal Policy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Climate Change",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Science & Technology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Sports",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9222,27 +16513,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Banking & Monetary Policy",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Economy Core Concepts",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Budget & Fiscal Policy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Government Schemes",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "International Organisations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9253,15 +16550,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Government Schemes",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Census & Demographics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "J&K General Knowledge",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9272,11 +16572,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "International Relations Core Concepts",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               }
             ]
           }
@@ -9288,6 +16590,186 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "ibps-po",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 100,
+    "masterSections": [
+      {
+        "subject": "Quantitative Aptitude",
+        "totalQuestions": 35,
+        "topics": [
+          {
+            "name": "Data Interpretation",
+            "count": 13,
+            "tier": "high"
+          },
+          {
+            "name": "Quadratic Equations",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Simplification",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Averages",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Mensuration",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number System",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Partnership",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Percentage",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Time & Work",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Trains",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 35,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 14,
+            "tier": "high"
+          },
+          {
+            "name": "Syllogism",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Arithmetic Reasoning",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Calendar & Clock",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Number Series",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Seating Arrangement",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Word Formation",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 30,
+        "topics": [
+          {
+            "name": "Vocabulary",
+            "count": 8,
+            "tier": "high"
+          },
+          {
+            "name": "Reading Comprehension",
+            "count": 6,
+            "tier": "high"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Fill in the Blanks",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Para Jumbles",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Reasoning",
@@ -9493,59 +16975,73 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Data Interpretation",
-                "count": 13
+                "count": 13,
+                "tier": "high"
               },
               {
                 "name": "Quadratic Equations",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Simplification",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Averages",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Mensuration",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number System",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Partnership",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Percentage",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Profit & Loss",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Time & Work",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Trains",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9556,51 +17052,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 14
+                "count": 14,
+                "tier": "high"
               },
               {
                 "name": "Syllogism",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Blood Relations",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Direction Sense",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Arithmetic Reasoning",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Odd One Out",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Calendar & Clock",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Number Series",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Seating Arrangement",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Word Formation",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9611,27 +17119,33 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Vocabulary",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               },
               {
                 "name": "Reading Comprehension",
-                "count": 6
+                "count": 6,
+                "tier": "high"
               },
               {
                 "name": "Error Spotting",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Fill in the Blanks",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Para Jumbles",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           }
@@ -9643,6 +17157,329 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "examSlug": "rssb-patwari",
     "totalPapersAnalyzed": 1,
     "totalQuestionsAnalyzed": 150,
+    "masterSections": [
+      {
+        "subject": "Reasoning",
+        "totalQuestions": 31,
+        "topics": [
+          {
+            "name": "Logical Deduction",
+            "count": 12,
+            "tier": "high"
+          },
+          {
+            "name": "Missing Number",
+            "count": 4,
+            "tier": "mid"
+          },
+          {
+            "name": "Critical Reasoning",
+            "count": 3,
+            "tier": "mid"
+          },
+          {
+            "name": "Coding-Decoding",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Direction Sense",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Number Series",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Blood Relations",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Computer Architecture",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Odd One Out",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Statement & Conclusion",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Syllogism",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Rajasthan GK",
+        "totalQuestions": 25,
+        "topics": [
+          {
+            "name": "Rajasthan GK Core Concepts",
+            "count": 24,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Computer Knowledge",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Computer Fundamentals",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Operating Systems",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "MS Excel",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "MS PowerPoint",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Computer Hardware",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Computer Networks",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "MS Word",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Storage Devices",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Indian Polity",
+        "totalQuestions": 15,
+        "topics": [
+          {
+            "name": "Indian Polity Core Concepts",
+            "count": 13,
+            "tier": "high"
+          },
+          {
+            "name": "Current Affairs",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Fundamental Rights",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Quantitative Aptitude",
+        "totalQuestions": 14,
+        "topics": [
+          {
+            "name": "Mensuration",
+            "count": 3,
+            "tier": "high"
+          },
+          {
+            "name": "Percentage",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Profit & Loss",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Analogy",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Computer Memory",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Ratio & Proportion",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Simple & Compound Interest",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Speed, Time & Distance",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Syllogism",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Venn Diagrams",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Hindi Language",
+        "totalQuestions": 12,
+        "topics": [
+          {
+            "name": "Hindi Grammar",
+            "count": 11,
+            "tier": "high"
+          },
+          {
+            "name": "One Word Substitution",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "General English",
+        "totalQuestions": 10,
+        "topics": [
+          {
+            "name": "Reading Comprehension",
+            "count": 5,
+            "tier": "high"
+          },
+          {
+            "name": "Vocabulary",
+            "count": 2,
+            "tier": "mid"
+          },
+          {
+            "name": "Antonyms",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Error Spotting",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Idioms & Phrases",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "History",
+        "totalQuestions": 9,
+        "topics": [
+          {
+            "name": "Modern History",
+            "count": 9,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "General Science",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "General Science Core Concepts",
+            "count": 4,
+            "tier": "high"
+          },
+          {
+            "name": "Biology",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Diseases & Health",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Light & Optics",
+            "count": 1,
+            "tier": "low"
+          },
+          {
+            "name": "Physics",
+            "count": 1,
+            "tier": "low"
+          }
+        ]
+      },
+      {
+        "subject": "Geography",
+        "totalQuestions": 8,
+        "topics": [
+          {
+            "name": "Indian Geography",
+            "count": 8,
+            "tier": "high"
+          }
+        ]
+      },
+      {
+        "subject": "General Knowledge & Current Affairs",
+        "totalQuestions": 3,
+        "topics": [
+          {
+            "name": "Current Affairs",
+            "count": 3,
+            "tier": "high"
+          }
+        ]
+      }
+    ],
     "masterTopics": [
       {
         "subject": "Rajasthan GK",
@@ -9848,51 +17685,63 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Logical Deduction",
-                "count": 12
+                "count": 12,
+                "tier": "high"
               },
               {
                 "name": "Missing Number",
-                "count": 4
+                "count": 4,
+                "tier": "mid"
               },
               {
                 "name": "Critical Reasoning",
-                "count": 3
+                "count": 3,
+                "tier": "mid"
               },
               {
                 "name": "Coding-Decoding",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Direction Sense",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Number Series",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Blood Relations",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Computer Architecture",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Odd One Out",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Statement & Conclusion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9903,11 +17752,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Rajasthan GK Core Concepts",
-                "count": 24
+                "count": 24,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9918,39 +17769,48 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Computer Fundamentals",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Operating Systems",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "MS Excel",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "MS PowerPoint",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Computer Hardware",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Computer Memory",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Computer Networks",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "MS Word",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Storage Devices",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9961,15 +17821,18 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Polity Core Concepts",
-                "count": 13
+                "count": 13,
+                "tier": "high"
               },
               {
                 "name": "Current Affairs",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Fundamental Rights",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -9980,43 +17843,53 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Mensuration",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               },
               {
                 "name": "Percentage",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Profit & Loss",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Analogy",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Computer Memory",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Ratio & Proportion",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Simple & Compound Interest",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Speed, Time & Distance",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Syllogism",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Venn Diagrams",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -10027,11 +17900,13 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Hindi Grammar",
-                "count": 11
+                "count": 11,
+                "tier": "high"
               },
               {
                 "name": "One Word Substitution",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -10042,23 +17917,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Reading Comprehension",
-                "count": 5
+                "count": 5,
+                "tier": "high"
               },
               {
                 "name": "Vocabulary",
-                "count": 2
+                "count": 2,
+                "tier": "mid"
               },
               {
                 "name": "Antonyms",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Error Spotting",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Idioms & Phrases",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -10069,7 +17949,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Modern History",
-                "count": 9
+                "count": 9,
+                "tier": "high"
               }
             ]
           },
@@ -10080,23 +17961,28 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "General Science Core Concepts",
-                "count": 4
+                "count": 4,
+                "tier": "high"
               },
               {
                 "name": "Biology",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Diseases & Health",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Light & Optics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               },
               {
                 "name": "Physics",
-                "count": 1
+                "count": 1,
+                "tier": "low"
               }
             ]
           },
@@ -10107,7 +17993,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Indian Geography",
-                "count": 8
+                "count": 8,
+                "tier": "high"
               }
             ]
           },
@@ -10118,7 +18005,8 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
             "topics": [
               {
                 "name": "Current Affairs",
-                "count": 3
+                "count": 3,
+                "tier": "high"
               }
             ]
           }

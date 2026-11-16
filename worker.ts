@@ -1436,14 +1436,13 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     : `<p>Confirm current dates, eligibility and amendments against the latest notice from the conducting body before applying.</p>`
 
   const intel = GUIDE_INTELLIGENCE[slug]
-  const priorityStars = (p: string) => p === 'Must-Study' ? '★★★' : p === 'High-Yield' ? '★★☆' : '★☆☆'
-  const masterTopicsHtml = intel && intel.masterTopics.length > 0
+  const masterTopicsHtml = intel && intel.masterSections.length > 0
     ? `<section>
         <h2>Subject &amp; Topic-Wise Weightage — Most Repeated Topics</h2>
-        <p>Master frequency table of the most repeated topics across ${intel.totalQuestionsAnalyzed} official solved questions (${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} ${intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}).</p>
+        <p>All topics asked across ${intel.totalQuestionsAnalyzed} official solved questions (${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} ${intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}), grouped by subject.</p>
         <div class="pg-table-wrap"><table class="pg-table">
-          <thead><tr><th>Topic</th><th>Subject</th><th>Priority</th><th>Questions Asked</th></tr></thead>
-          <tbody>${intel.masterTopics.map(t => `<tr><td><strong>${htmlText(t.topic)}</strong></td><td>${htmlText(t.subject)}</td><td>${htmlText(priorityStars(t.priority))}</td><td>${t.totalQuestions} Qs (${htmlText(t.yearBreakdown)})</td></tr>`).join('')}</tbody>
+          <thead><tr><th>Subject / Section</th><th>Qs</th><th>All Topics Asked (Sorted by Frequency)</th></tr></thead>
+          <tbody>${intel.masterSections.map(s => `<tr><td><strong>${htmlText(s.subject)}</strong></td><td>${s.totalQuestions} Qs</td><td>${s.topics.map(tp => `${htmlText(tp.name)} (${tp.count})`).join(' · ')}</td></tr>`).join('')}</tbody>
         </table></div>
       </section>`
     : ''
@@ -2065,7 +2064,10 @@ export default {
           const historyUrl = `${BASE}/modern-indian-history-timeline`
           const ramsarUrl = `${BASE}/ramsar-wetlands-and-national-parks`
           const studyMaterialUrl = `${BASE}/study-material`
-          for (const extraUrl of [articleUrl, blogUrl, contactUrl, disclaimerUrl, constitutionUrl, historyUrl, ramsarUrl, studyMaterialUrl]) {
+          const sfGuideUrl = `${BASE}/guide/jkssb-social-forestry-worker`
+          const ifGuideUrl = `${BASE}/guide/jkssb-inspector-forest`
+          const faGuideUrl = `${BASE}/guide/jkssb-field-assistant`
+          for (const extraUrl of [articleUrl, blogUrl, contactUrl, disclaimerUrl, constitutionUrl, historyUrl, ramsarUrl, studyMaterialUrl, sfGuideUrl, ifGuideUrl, faGuideUrl]) {
             if (!sitemap.includes(`<loc>${extraUrl}</loc>`)) {
               if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
               sitemap = sitemap.replace(
