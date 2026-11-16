@@ -1,4 +1,4 @@
-import { ChevronRight, FileText, ExternalLink, Flame, Award, Layers, BarChart3 } from 'lucide-react'
+import { ChevronRight, FileText, Flame, Award, Layers, BarChart3 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { Link, useParams, Navigate } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
@@ -7,7 +7,6 @@ import { postGuides } from '../data/postGuides'
 import { GUIDE_INTELLIGENCE } from '../data/guideIntelligence'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { buildGuideFaqs } from '../lib/guideFaqs'
-import { MathText } from '../components/common/MathText'
 
 function formatUpdated(iso: string): string {
   const d = new Date(iso)
@@ -103,6 +102,16 @@ export function PostGuidePage() {
   const activeDist = intel?.scoreDistributions?.[0]
   const activePaper = intel?.paperXrays[activePaperIdx] ?? intel?.paperXrays[0]
 
+  const priorityStars = (p: string) => {
+    if (p === 'Must-Study') return '★★★ Must-Study'
+    if (p === 'High-Yield') return '★★☆ High-Yield'
+    return '★☆☆ Moderate'
+  }
+
+  const seoSummaryLine = intel && (intel.masterTopics.length > 0 || intel.cutoffSets.length > 0 || intel.scoreDistributions?.length > 0)
+    ? `Complete ${guide.shortName} exam guide covering high-yield important topics, ${intel.cutoffSets.length > 0 ? 'category-wise cutoffs, ' : intel.scoreDistributions?.length ? 'official score distribution, ' : ''}section-wise PYQ paper analysis (${intel.totalQuestionsAnalyzed} solved questions), exam pattern, and syllabus.`
+    : guide.tagline
+
   const content = (
     <div className="pg-page">
       {/* Breadcrumb */}
@@ -122,27 +131,21 @@ export function PostGuidePage() {
           <header className="pg-header">
             <span className="ep-category-tag">{guide.examLevel}</span>
             <h1>{guide.title}</h1>
-            <p className="pg-tagline">{guide.tagline}</p>
-            <div className="pg-meta-strip">
-              <span className="pg-meta-item">
-                <strong>Conducting Body:</strong> {guide.conductingBody}
+            <p className="pg-tagline">{seoSummaryLine}</p>
+            <div className="pg-meta-pills">
+              <span className="pg-meta-pill">
+                <strong>Board:</strong> {guide.conductingBody}
               </span>
-              <span className="pg-meta-sep" aria-hidden="true">·</span>
-              <span className="pg-meta-item">
+              <span className="pg-meta-pill">
                 <strong>Mode:</strong> {guide.examMode}
               </span>
               {intel && intel.totalQuestionsAnalyzed > 0 && (
-                <>
-                  <span className="pg-meta-sep" aria-hidden="true">·</span>
-                  <span className="pg-meta-item">
-                    <strong>Analyzed:</strong> {intel.totalPapersAnalyzed} {intel.totalPapersAnalyzed === 1 ? 'Paper' : 'Papers'} ({intel.totalQuestionsAnalyzed} Real PYQs)
-                  </span>
-                </>
+                <span className="pg-meta-pill">
+                  <strong>Analyzed:</strong> {intel.totalPapersAnalyzed} {intel.totalPapersAnalyzed === 1 ? 'Paper' : 'Papers'} ({intel.totalQuestionsAnalyzed} PYQs)
+                </span>
               )}
-              <span className="pg-meta-sep" aria-hidden="true">·</span>
-              <span className="pg-meta-item pg-updated">
-                <strong>Last updated:</strong>{' '}
-                <time dateTime={guide.lastUpdated}>{formatUpdated(guide.lastUpdated)}</time>
+              <span className="pg-meta-pill pg-meta-pill-updated">
+                <strong>Updated:</strong> <time dateTime={guide.lastUpdated}>{formatUpdated(guide.lastUpdated)}</time>
               </span>
             </div>
           </header>
@@ -195,7 +198,6 @@ export function PostGuidePage() {
                       <th>Subject</th>
                       <th>Priority</th>
                       <th>Qs</th>
-                      <th>What Is Asked</th>
                       <th>Practice</th>
                     </tr>
                   </thead>
@@ -206,14 +208,13 @@ export function PostGuidePage() {
                         <td>{item.subject}</td>
                         <td>
                           <span className={`pg-priority-badge pg-priority-${item.priority.toLowerCase().replace('-', '')}`}>
-                            {item.priority}
+                            {priorityStars(item.priority)}
                           </span>
                         </td>
                         <td className="pg-num-cell">
                           <strong>{item.totalQuestions}</strong>
                           <small>{item.yearBreakdown}</small>
                         </td>
-                        <td className="pg-asked-cell"><MathText text={item.whatIsAsked} /></td>
                         <td>
                           <Link
                             className="pg-topic-practice-link"
@@ -562,17 +563,9 @@ export function PostGuidePage() {
               ))}
             </div>
             <Link className="pg-all-papers-btn" to={examHref}>
-              View all {guide.examSlug.toUpperCase()} papers
-              <ChevronRight size={13} />
+              <span>View all {guide.shortName} papers</span>
+              <ChevronRight size={14} />
             </Link>
-            <a
-              className="pg-official-link"
-              href={guide.officialWebsite}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Official Website <ExternalLink size={11} />
-            </a>
           </div>
         </aside>
       </div>

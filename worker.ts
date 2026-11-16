@@ -1436,13 +1436,14 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
     : `<p>Confirm current dates, eligibility and amendments against the latest notice from the conducting body before applying.</p>`
 
   const intel = GUIDE_INTELLIGENCE[slug]
+  const priorityStars = (p: string) => p === 'Must-Study' ? '★★★ Must-Study' : p === 'High-Yield' ? '★★☆ High-Yield' : '★☆☆ Moderate'
   const masterTopicsHtml = intel && intel.masterTopics.length > 0
     ? `<section>
         <h2>Master High-Yield Topics — What ${htmlText(guide.shortName)} Actually Asks</h2>
-        <p>Empirical topic frequency ranked across ${intel.totalQuestionsAnalyzed} official solved questions from ${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} papers.</p>
+        <p>Empirical topic frequency ranked across ${intel.totalQuestionsAnalyzed} official solved questions from ${intel.totalPapersAnalyzed} ${htmlText(guide.shortName)} ${intel.totalPapersAnalyzed === 1 ? 'paper' : 'papers'}.</p>
         <div class="pg-table-wrap"><table class="pg-table">
-          <thead><tr><th>Topic</th><th>Subject</th><th>Priority</th><th>Questions Asked</th><th>What Is Asked</th></tr></thead>
-          <tbody>${intel.masterTopics.map(t => `<tr><td><strong>${htmlText(t.topic)}</strong></td><td>${htmlText(t.subject)}</td><td>${htmlText(t.priority)}</td><td>${t.totalQuestions} Qs (${htmlText(t.yearBreakdown)})</td><td>${htmlText(t.whatIsAsked)}</td></tr>`).join('')}</tbody>
+          <thead><tr><th>Topic</th><th>Subject</th><th>Priority</th><th>Questions Asked</th></tr></thead>
+          <tbody>${intel.masterTopics.map(t => `<tr><td><strong>${htmlText(t.topic)}</strong></td><td>${htmlText(t.subject)}</td><td>${htmlText(priorityStars(t.priority))}</td><td>${t.totalQuestions} Qs (${htmlText(t.yearBreakdown)})</td></tr>`).join('')}</tbody>
         </table></div>
       </section>`
     : ''
