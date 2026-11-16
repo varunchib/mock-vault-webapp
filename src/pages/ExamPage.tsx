@@ -1,4 +1,5 @@
 import {
+  BarChart3,
   BookOpen,
   ChevronDown,
   ChevronRight,
@@ -473,6 +474,8 @@ export function ExamPage() {
   const homeHref = isAuthenticated ? '/dashboard' : '/'
   const totalQuestions = exam.totalQuestions || examQuestions.length
 
+  const guideHref = slug ? guidePathForExam(slug) : null
+
   const hub = (
     <div className="ep-page">
 
@@ -532,40 +535,41 @@ export function ExamPage() {
             keeps it visible for anyone already enrolled in a board from before
             this rule, otherwise their enrolment would be impossible to undo.
             Logged-out visitors see the button too; clicking it opens login. */}
-        {(!isBoard || isEnrolled) && (
+        {(!isBoard || isEnrolled || guideHref) && (
           <div className="ep-hero-actions">
-            <button
-              className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
-              type="button"
-              disabled={enrollBusy}
-              onClick={() => void handleEnrollToggle()}
-            >
-              {enrollBusy ? '…' : isEnrolled ? '✓ Enrolled' : '+ Enroll'}
-            </button>
+            {(!isBoard || isEnrolled) && (
+              <button
+                className={`ep-enroll-btn${isEnrolled ? ' enrolled' : ''}`}
+                type="button"
+                disabled={enrollBusy}
+                onClick={() => void handleEnrollToggle()}
+              >
+                {enrollBusy ? '…' : isEnrolled ? '✓ Enrolled' : '+ Enroll'}
+              </button>
+            )}
+            {guideHref && (
+              <Link to={guideHref} className="ep-analytics-btn">
+                <BarChart3 size={15} />
+                Analysis &amp; Cutoff
+              </Link>
+            )}
           </div>
         )}
       </header>
 
-      {/* ── Guide cross-link ───────────────────────────
-          The exam hub should hand crawlers (and readers) off to the editorial
-          guide (syllabus, pattern, weightage) for this exam — strengthening
-          internal linking and the hub's own indexing. */}
-      {(() => {
-        const guideHref = slug ? guidePathForExam(slug) : null
-        if (!guideHref) return null
-        return (
-          <section className="ep-resources" aria-label={`${exam.shortName} exam guide`}>
-            <Link to={guideHref} className="ep-resource-card">
-              <span className="ep-resource-icon"><BookOpen size={18} /></span>
-              <span className="ep-resource-copy">
-                <strong>{exam.shortName} Exam Guide</strong>
-                <small>Syllabus, exam pattern &amp; weightage analysis</small>
-              </span>
-              <ChevronRight size={15} className="ep-resource-chev" />
-            </Link>
-          </section>
-        )
-      })()}
+      {/* ── Guide / Analysis cross-link ─────────────────────────── */}
+      {guideHref && (
+        <section className="ep-resources" aria-label={`${exam.shortName} analysis and cutoff`}>
+          <Link to={guideHref} className="ep-resource-card">
+            <span className="ep-resource-icon"><BarChart3 size={18} /></span>
+            <span className="ep-resource-copy">
+              <strong>{exam.shortName} Paper Analysis &amp; Cutoff</strong>
+              <small>Subject &amp; topic-wise weightage, cutoffs &amp; score distribution</small>
+            </span>
+            <ChevronRight size={15} className="ep-resource-chev" />
+          </Link>
+        </section>
+      )}
 
       {/* ── Exams under this board ─────────────────────
           Without this, sub-exams (JKSSB Patwari, Junior Assistant, …) are

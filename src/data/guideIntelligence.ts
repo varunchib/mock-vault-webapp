@@ -2957,7 +2957,54 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
-    "scoreDistributions": [],
+    "scoreDistributions": [
+      {
+        "label": "2026 Official Score Distribution (17.05.2026 · 2,648 Appeared)",
+        "appeared": 2648,
+        "registered": 16820,
+        "topScore": "71.75 / 120",
+        "meanScore": "21.61 / 120",
+        "medianScore": "20.00 / 120",
+        "sourceNote": "Derived from Official JKSSB Result Notification No. JKSSB-COE0EXAM(UT)/14/2026-03 (7842028) dated 19.06.2026 (Annexure A — Social Forestry Worker).",
+        "bars": [
+          {
+            "range": "65 – 120",
+            "candidates": 3,
+            "pct": 0.11
+          },
+          {
+            "range": "55 – 64.75",
+            "candidates": 23,
+            "pct": 0.87
+          },
+          {
+            "range": "45 – 54.75",
+            "candidates": 137,
+            "pct": 5.17
+          },
+          {
+            "range": "35 – 44.75",
+            "candidates": 343,
+            "pct": 12.95
+          },
+          {
+            "range": "25 – 34.75",
+            "candidates": 513,
+            "pct": 19.37
+          },
+          {
+            "range": "15 – 24.75",
+            "candidates": 638,
+            "pct": 24.09
+          },
+          {
+            "range": "Below 15",
+            "candidates": 991,
+            "pct": 37.42
+          }
+        ]
+      }
+    ],
     "paperXrays": [
       {
         "paperSlug": "jkssb-social-forestry-worker-2026",
