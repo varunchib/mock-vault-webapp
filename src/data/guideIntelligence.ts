@@ -6427,39 +6427,181 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "cutoffSets": [
       {
         "year": "2026",
-        "label": "2026 Junior Assistant Written Cutoff Benchmark (19 Apr 2026 · 80 Marks)",
-        "maxMarks": 80,
-        "vacancies": "Multiple UT & Divisional Cadre Posts",
-        "appeared": "~65,000+ Appeared",
-        "topperScore": "74.50 / 80",
-        "meanScore": "41.20 / 80",
-        "sourceNote": "Written exam carries 80 marks (scaled with 20-mark Type Test of min 35 WPM speed).",
+        "label": "2026 Official DV Cutoff — OMR (80) + Typing Test (20) (12.11.2026)",
+        "maxMarks": 100,
+        "vacancies": "Advt. 08/2025 · Items 163–251",
+        "appeared": "58,423 Appeared · 5,555 Type-Test Qualified · 1,044 DV Shortlisted",
+        "topperScore": "70.81 / 100 (OMR 54.25/80 + Typing 16.56/20)",
+        "meanScore": "OM Cutoff: 53.35 / 100",
+        "sourceNote": "Verified from Official JKSSB DV Notification No. JKSSB-COE0EXAM(UT)/1/2026 (7827645) dated 12.11.2026 & Combined Result dated 15.10.2026. Combined score = OMR (80) + Type Test (20, scaled to max net speed 93 WPM).",
         "rows": [
           {
             "category": "OM (Open Merit)",
-            "marks": "61.50 – 65.00 / 80",
-            "pct": 79,
-            "safeTarget": "66+ / 80",
-            "note": "Combined with 35+ WPM typing score"
+            "marks": "53.35 / 100",
+            "pct": 53,
+            "safeTarget": "502 Shortlisted (291 OM + 211 */OM)",
+            "note": "Top combined score: 70.81 / 100 (pure OM lowest: 53.39)"
           },
           {
-            "category": "RBA / EWS",
-            "marks": "57.00 – 60.50 / 80",
-            "pct": 73,
-            "safeTarget": "61+ / 80",
-            "note": "Reserved categories"
+            "category": "RBA (Resident of Backward Area)",
+            "marks": "50.93 / 100",
+            "pct": 51,
+            "safeTarget": "63 Shortlisted (+ 69 RBA/OM)",
+            "note": "Highest RBA score in DV list: 65.26 / 100"
           },
           {
-            "category": "SC / ST / OBC",
-            "marks": "51.50 – 56.00 / 80",
-            "pct": 67,
-            "safeTarget": "57+ / 80",
-            "note": "SC, ST-1/ST-2 & OBC"
+            "category": "ALC / IB",
+            "marks": "50.86 / 100",
+            "pct": 51,
+            "safeTarget": "15 Shortlisted (+ 19 ALC/IB/OM)",
+            "note": "Highest ALC/IB score in DV list: 68.72 / 100"
+          },
+          {
+            "category": "OBC (Other Backward Class)",
+            "marks": "49.33 / 100",
+            "pct": 49,
+            "safeTarget": "51 Shortlisted (+ 36 OBC/OM)",
+            "note": "Highest OBC score in DV list: 63.73 / 100"
+          },
+          {
+            "category": "ST-2 (Scheduled Tribe 2)",
+            "marks": "47.82 / 100",
+            "pct": 48,
+            "safeTarget": "90 Shortlisted (+ 31 ST2/OM)",
+            "note": "Highest ST-2 score in DV list: 60.90 / 100"
+          },
+          {
+            "category": "EWS (Economically Weaker Section)",
+            "marks": "47.17 / 100",
+            "pct": 47,
+            "safeTarget": "45 Shortlisted (+ 13 EWS/OM)",
+            "note": "Highest EWS score in DV list: 64.58 / 100"
+          },
+          {
+            "category": "SC (Scheduled Caste)",
+            "marks": "46.25 / 100",
+            "pct": 46,
+            "safeTarget": "147 Shortlisted (+ 32 SC/OM)",
+            "note": "Highest SC score in DV list: 66.08 / 100"
+          },
+          {
+            "category": "ST-1 (Scheduled Tribe 1)",
+            "marks": "43.46 / 100",
+            "pct": 43,
+            "safeTarget": "97 Shortlisted (+ 11 ST1/OM)",
+            "note": "Highest ST-1 score in DV list: 68.71 / 100"
+          },
+          {
+            "category": "ESM (Ex-Servicemen)",
+            "marks": "38.03 / 100",
+            "pct": 38,
+            "safeTarget": "14 Shortlisted",
+            "note": "Highest ESM score in DV list: 46.49 / 100"
+          },
+          {
+            "category": "PwD (Benchmark Disabilities)",
+            "marks": "34.18 – 43.67 / 100",
+            "pct": 34,
+            "safeTarget": "20 Shortlisted",
+            "note": "Visual 43.67 · Locomotor 42.60 · Multiple 37.39 · Hearing 34.18"
           }
         ]
       }
     ],
-    "scoreDistributions": [],
+    "scoreDistributions": [
+      {
+        "label": "2026 Combined Score Distribution — OMR (80) + Typing Test (20) (5,555 Qualified)",
+        "appeared": 5555,
+        "registered": 58423,
+        "topScore": "70.81 / 100",
+        "meanScore": "44.66 / 100 (Typing avg: 9.63 / 20)",
+        "medianScore": "44.85 / 100",
+        "sourceNote": "Derived from Official JKSSB Combined Result Notification dated 15.10.2026 (5,555 Type-Test qualified candidates). Type Test formula: (Net WPM / 93 WPM) × 20 (min 35 WPM = 7.53/20, max 93 WPM = 20.00/20, mean ≈ 44.8 WPM).",
+        "bars": [
+          {
+            "range": "65 – 100",
+            "candidates": 10,
+            "pct": 0.18
+          },
+          {
+            "range": "60 – 64.99",
+            "candidates": 45,
+            "pct": 0.81
+          },
+          {
+            "range": "55 – 59.99",
+            "candidates": 253,
+            "pct": 4.55
+          },
+          {
+            "range": "50 – 54.99",
+            "candidates": 803,
+            "pct": 14.46
+          },
+          {
+            "range": "45 – 49.99",
+            "candidates": 1612,
+            "pct": 29.02
+          },
+          {
+            "range": "40 – 44.99",
+            "candidates": 1475,
+            "pct": 26.55
+          },
+          {
+            "range": "Below 40",
+            "candidates": 1357,
+            "pct": 24.43
+          }
+        ]
+      },
+      {
+        "label": "2026 Official OMR Written Score Distribution (19.04.2026 · 58,423 Appeared · Out of 80)",
+        "appeared": 58423,
+        "registered": 82630,
+        "topScore": "59.25 / 80",
+        "meanScore": "22.31 / 80",
+        "medianScore": "22.00 / 80",
+        "sourceNote": "Derived from Official JKSSB OMR Result Notification No. JKSSB-COE0EXAM(UT)/1/2026-03 (7827645) dated 15.10.2026 (Exam held 19.04.2026, Advt. 08 of 2025; 24,207 Absent).",
+        "bars": [
+          {
+            "range": "50 – 80",
+            "candidates": 58,
+            "pct": 0.1
+          },
+          {
+            "range": "45 – 49.75",
+            "candidates": 334,
+            "pct": 0.57
+          },
+          {
+            "range": "40 – 44.75",
+            "candidates": 1434,
+            "pct": 2.45
+          },
+          {
+            "range": "35 – 39.75",
+            "candidates": 3721,
+            "pct": 6.37
+          },
+          {
+            "range": "30 – 34.75",
+            "candidates": 7057,
+            "pct": 12.08
+          },
+          {
+            "range": "20 – 29.75",
+            "candidates": 21851,
+            "pct": 37.4
+          },
+          {
+            "range": "Below 20",
+            "candidates": 23968,
+            "pct": 41.02
+          }
+        ]
+      }
+    ],
     "paperXrays": [
       {
         "paperSlug": "jkssb-junior-assistant-pyq",
