@@ -21,11 +21,36 @@ export function PostGuidePage() {
   const faqs = guide ? buildGuideFaqs(guide) : []
   const [topicSubjectFilter, setTopicSubjectFilter] = useState<string>('ALL')
   const [activePaperIdx, setActivePaperIdx] = useState<number>(0)
+  const [activeCutoffYear, setActiveCutoffYear] = useState<string>('')
 
   useEffect(() => {
     setTopicSubjectFilter('ALL')
     setActivePaperIdx(0)
-  }, [postSlug])
+    setActiveCutoffYear(intel?.cutoffSets?.[0]?.year ?? '')
+  }, [postSlug, intel])
+
+  useEffect(() => {
+    const years = Array.from(new Set((intel?.cutoffSets ?? []).map((c) => c.year)))
+    if (years.length <= 1) return
+    const els = years
+      .map((y) => document.getElementById(`cutoff-${y.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`))
+      .filter((el): el is HTMLElement => Boolean(el))
+    if (els.length === 0) return
+    const io = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+        if (visible[0]?.target) {
+          const y = visible[0].target.getAttribute('data-cutoff-year')
+          if (y) setActiveCutoffYear(y)
+        }
+      },
+      { rootMargin: '-80px 0px -65% 0px', threshold: 0 },
+    )
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [intel])
 
   const seoTitle = guide
     ? intel && (intel.masterTopics.length > 0 || intel.cutoffSets.length > 0)
@@ -347,86 +372,106 @@ export function PostGuidePage() {
           )}
 
           {/* ── 4. CATEGORY-WISE CUTOFFS ── */}
-          {intel && intel.cutoffSets.length > 0 && (
-            <section className="pg-section pg-intel-section" aria-labelledby="cutoffs-heading">
-              <div className="pg-intel-head">
-                <div>
-                  <h2 id="cutoffs-heading" className="pg-intel-title">
-                    <Award size={17} /> {guide.shortName} Category-Wise Cutoffs
-                  </h2>
-                  <p className="pg-intel-sub">
-                    Official category-wise cutoff marks for {guide.shortName}.
-                  </p>
+          {intel && intel.cutoffSets.length > 0 && (() => {
+            const uniqueYears = Array.from(new Set(intel.cutoffSets.map((cs) => cs.year)))
+            const hasMultiYear = uniqueYears.length > 1
+            const seenYears = new Set<string>()
+            return (
+              <section className="pg-section pg-intel-section" aria-labelledby="cutoffs-heading">
+                <div className="pg-intel-head">
+                  <div>
+                    <h2 id="cutoffs-heading" className="pg-intel-title">
+                      <Award size={17} /> {guide.shortName} Category-Wise Cutoffs
+                    </h2>
+                    <p className="pg-intel-sub">
+                      Official category-wise cutoff marks for {guide.shortName}.
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              {intel.cutoffSets.length > 1 && (
-                <nav className="pg-filter-pills" aria-label="Jump to cutoff year">
-                  {intel.cutoffSets.map((cs, idx) => (
-                    <a
-                      key={cs.year}
-                      href={`#cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`}
-                      className={`pg-filter-pill${idx === 0 ? ' active' : ''}`}
-                      onClick={(e) => {
-                        e.preventDefault()
-                        document
-                          .getElementById(`cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
-                          ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                      }}
-                    >
-                      {cs.year}
-                    </a>
-                  ))}
-                </nav>
-              )}
+                <div className={hasMultiYear ? 'pg-cutoff-layout' : undefined}>
+                  <div className="pg-cutoff-stack">
+                    {intel.cutoffSets.map((cs, sIdx) => {
+                      const isFirstForYear = !seenYears.has(cs.year)
+                      seenYears.add(cs.year)
+                      const anchorId = `cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
+                      return (
+                        <div
+                          key={`${cs.year}-${sIdx}`}
+                          id={isFirstForYear ? anchorId : undefined}
+                          data-cutoff-year={isFirstForYear ? cs.year : undefined}
+                          className="pg-cutoff-block"
+                        >
+                          <div className="pg-cutoff-label">{cs.label}</div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                {intel.cutoffSets.map((cs) => {
-                  const anchorId = `cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
-                  return (
-                    <div key={cs.year} id={anchorId} style={{ scrollMarginTop: '76px' }}>
-                      <div className="pg-cutoff-label">{cs.label}</div>
+                          <div className="pg-table-wrap">
+                            <table className="pg-table pg-cutoff-table">
+                              <thead>
+                                <tr>
+                                  <th>Category</th>
+                                  <th>Cutoff Marks</th>
+                                  <th>Score %</th>
+                                  <th>Stage / Seats</th>
+                                  <th>Remarks</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {cs.rows.map((row, idx) => (
+                                  <tr key={idx}>
+                                    <td><strong>{row.category}</strong></td>
+                                    <td className="pg-cutoff-marks">{row.marks}</td>
+                                    <td>
+                                      <div className="pg-cutoff-bar-cell">
+                                        <span>{row.pct}%</span>
+                                        <div className="pg-cutoff-bar">
+                                          <div className="pg-cutoff-bar-fill" style={{ width: `${Math.min(100, row.pct)}%` }} />
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td><span className="pg-safe-pill">{row.safeTarget ?? '—'}</span></td>
+                                    <td className="pg-cutoff-note">{row.note ?? '—'}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                          <p className="pg-note" style={{ marginTop: '8px', marginBottom: 0 }}>
+                            {cs.sourceNote}
+                          </p>
+                        </div>
+                      )
+                    })}
+                  </div>
 
-                      <div className="pg-table-wrap">
-                        <table className="pg-table pg-cutoff-table">
-                          <thead>
-                            <tr>
-                              <th>Category</th>
-                              <th>Cutoff Marks</th>
-                              <th>Score %</th>
-                              <th>Shortlisted / Seats</th>
-                              <th>Remarks</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {cs.rows.map((row, idx) => (
-                              <tr key={idx}>
-                                <td><strong>{row.category}</strong></td>
-                                <td className="pg-cutoff-marks">{row.marks}</td>
-                                <td>
-                                  <div className="pg-cutoff-bar-cell">
-                                    <span>{row.pct}%</span>
-                                    <div className="pg-cutoff-bar">
-                                      <div className="pg-cutoff-bar-fill" style={{ width: `${Math.min(100, row.pct)}%` }} />
-                                    </div>
-                                  </div>
-                                </td>
-                                <td><span className="pg-safe-pill">{row.safeTarget ?? '—'}</span></td>
-                                <td className="pg-cutoff-note">{row.note ?? '—'}</td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
-                      <p className="pg-note" style={{ marginTop: '10px', marginBottom: 0 }}>
-                        {cs.sourceNote}
-                      </p>
-                    </div>
-                  )
-                })}
-              </div>
-            </section>
-          )}
+                  {hasMultiYear && (
+                    <aside className="pg-cutoff-rail" aria-label="Jump to cutoff year">
+                      <span className="pg-cutoff-rail-title">Year</span>
+                      <nav className="pg-cutoff-rail-list">
+                        {uniqueYears.map((yr) => {
+                          const anchorId = `cutoff-${yr.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
+                          const isActive = (activeCutoffYear || uniqueYears[0]) === yr
+                          return (
+                            <a
+                              key={yr}
+                              href={`#${anchorId}`}
+                              className={`pg-cutoff-rail-btn${isActive ? ' active' : ''}`}
+                              onClick={(e) => {
+                                e.preventDefault()
+                                setActiveCutoffYear(yr)
+                                document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                              }}
+                            >
+                              {yr}
+                            </a>
+                          )
+                        })}
+                      </nav>
+                    </aside>
+                  )}
+                </div>
+              </section>
+            )
+          })()}
 
           {/* Frequently Asked Questions */}
           {faqs.length > 0 && (
