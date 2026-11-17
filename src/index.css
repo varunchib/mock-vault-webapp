@@ -7091,8 +7091,8 @@ footer {
 
 .pyq-option {
   display: grid;
-  grid-template-columns: 34px 1fr;
-  align-items: center;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: start;
   gap: 12px;
   padding: 12px;
   border: 1.5px solid var(--line);
@@ -7135,13 +7135,14 @@ footer {
 
 /* ── Solved (read-only) question page: answer shown up-front ─────────── */
 .pyq-options--solved .pyq-option {
-  grid-template-columns: 34px 1fr auto;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
   cursor: default;
 }
 .pyq-options--solved .pyq-option:hover { border-color: var(--line); background: var(--surface); }
 .pyq-options--solved .pyq-option.correct:hover { border-color: var(--green); background: var(--green-bg); }
 
-.pyq-opt-text { line-height: 1.6; }
+.pyq-opt-text { line-height: 1.6; min-width: 0; overflow-wrap: anywhere; }
 
 .pyq-opt-badge {
   font-size: 11px;
@@ -7338,8 +7339,28 @@ footer {
 @media (max-width: 640px) {
   .pyq-solution-body p { font-size: 14.5px; line-height: 1.75; }
   .pyq-answer-value { font-size: 14px; }
-  .pyq-options--solved .pyq-option { grid-template-columns: 30px 1fr; }
-  .pyq-opt-badge { grid-column: 2; justify-self: start; margin-top: 4px; }
+  .pyq-option {
+    grid-template-columns: 30px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    padding: 11px 12px;
+    font-size: 14.5px;
+    line-height: 1.55;
+  }
+  .pyq-opt-key {
+    width: 30px;
+    height: 30px;
+    margin-top: 1px;
+  }
+  .pyq-options--solved .pyq-option {
+    grid-template-columns: 30px minmax(0, 1fr);
+    align-items: start;
+  }
+  .pyq-opt-badge {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: 2px;
+  }
 }
 
 /* ── Tags ───────────────────────────────────────────── */
@@ -12422,7 +12443,7 @@ footer {
 }
 .sq-option.correct .sq-opt-key { background: var(--green); color: #fff; }
 .sq-option.wrong .sq-opt-key { background: var(--red); color: #fff; }
-.sq-opt-text { flex: 1; line-height: 1.45; }
+.sq-opt-text { flex: 1; min-width: 0; overflow-wrap: anywhere; line-height: 1.45; }
 
 /* Structured explanation on the subject-practice card. Renders via
    ExplanationText (same as paper/question pages); the .pyq-solution-body class
