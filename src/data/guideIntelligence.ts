@@ -10740,50 +10740,56 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     ],
     "cutoffSets": [
       {
-        "year": "2025-2024",
-        "label": "UPSC CSE Prelims Official GS Paper-I Cutoffs (Out of 200 Marks)",
+        "year": "2025",
+        "label": "UPSC CSE 2025 Official Cutoff — Prelims (GS-I / 200), Mains (/ 1750) & Final (/ 2025)",
         "maxMarks": 200,
-        "vacancies": "1,056 Posts (CSE 2024) · 979 Posts (CSE 2025)",
-        "appeared": "~5.8 Lakh Appeared",
-        "topperScore": "CSAT Qualifying: 66.00 / 200 (33%)",
-        "meanScore": "GS-I Cutoff Range: 75.41 – 87.98 / 200",
-        "sourceNote": "Official UPSC CSE Preliminary Examination category-wise cutoffs (GS Paper-I out of 200; CSAT Paper-II qualifying at 33%).",
+        "vacancies": "CSE 2025",
+        "appeared": "CSAT Qualifying: 66.67 / 200 (33%)",
+        "topperScore": "General Final: 963 / 2025",
+        "meanScore": "General Prelims: 92.66 / 200",
+        "sourceNote": "Official UPSC CSE 2025 cutoffs. Prelims cutoff is based solely on GS Paper-I (200 marks); CSAT is qualifying at 33% (66.67/200). Mains = 1750 marks; Final = Mains (1750) + Interview (275) = 2025 marks.",
         "rows": [
-          {
-            "category": "General (UR)",
-            "marks": "87.98 / 200 (2024: 87.98 · 2023: 75.41)",
-            "pct": 44,
-            "safeTarget": "95+ / 200",
-            "note": "45–48 net correct questions after 1/3rd negative marking"
-          },
-          {
-            "category": "OBC",
-            "marks": "87.28 / 200 (2023: 74.75)",
-            "pct": 44,
-            "safeTarget": "92+ / 200",
-            "note": "Virtually par with General category"
-          },
-          {
-            "category": "EWS",
-            "marks": "85.92 / 200 (2023: 68.02)",
-            "pct": 43,
-            "safeTarget": "90+ / 200",
-            "note": "10% EWS reservation"
-          },
-          {
-            "category": "SC",
-            "marks": "79.03 / 200 (2023: 59.25)",
-            "pct": 40,
-            "safeTarget": "84+ / 200",
-            "note": "Scheduled Caste"
-          },
-          {
-            "category": "ST",
-            "marks": "74.23 / 200 (2023: 47.82)",
-            "pct": 37,
-            "safeTarget": "80+ / 200",
-            "note": "Scheduled Tribe"
-          }
+          { "category": "General (UR)", "marks": "92.66 / 200", "pct": 46, "safeTarget": "Mains: 739 / 1750", "note": "Final Cutoff: 963 / 2025" },
+          { "category": "OBC", "marks": "92.00 / 200", "pct": 46, "safeTarget": "Mains: 717 / 1750", "note": "Final Cutoff: 931 / 2025" },
+          { "category": "EWS", "marks": "89.34 / 200", "pct": 45, "safeTarget": "Mains: 706 / 1750", "note": "Final Cutoff: 926 / 2025" },
+          { "category": "SC", "marks": "84.00 / 200", "pct": 42, "safeTarget": "Mains: 700 / 1750", "note": "Final Cutoff: 905 / 2025" },
+          { "category": "ST", "marks": "82.66 / 200", "pct": 41, "safeTarget": "Mains: 694 / 1750", "note": "Final Cutoff: 902 / 2025" },
+          { "category": "PwBD-1", "marks": "76.66 / 200", "pct": 38, "safeTarget": "Mains: 703 / 1750", "note": "Final Cutoff: 917 / 2025" },
+          { "category": "PwBD-2", "marks": "54.66 / 200", "pct": 27, "safeTarget": "Mains: 708 / 1750", "note": "Final Cutoff: 944 / 2025" },
+          { "category": "PwBD-3", "marks": "40.66 / 200", "pct": 20, "safeTarget": "Mains: 536 / 1750", "note": "Final Cutoff: 804 / 2025" },
+          { "category": "PwBD-5", "marks": "40.66 / 200", "pct": 20, "safeTarget": "Mains: 451 / 1750", "note": "Final Cutoff: 631 / 2025" }
+        ]
+      },
+      {
+        "year": "2024",
+        "label": "UPSC CSE 2024 Official Cutoff — Prelims (GS-I / 200), Mains (/ 1750) & Final (/ 2025)",
+        "maxMarks": 200,
+        "sourceNote": "Official UPSC CSE 2024 category-wise cutoffs released at upsc.gov.in.",
+        "rows": [
+          { "category": "General (UR)", "marks": "87.98 / 200", "pct": 44, "safeTarget": "Mains: 729 / 1750", "note": "Final Cutoff: 947 / 2025" },
+          { "category": "OBC", "marks": "87.28 / 200", "pct": 44, "safeTarget": "Mains: 702 / 1750", "note": "Final Cutoff: 910 / 2025" },
+          { "category": "EWS", "marks": "85.92 / 200", "pct": 43, "safeTarget": "Mains: 696 / 1750", "note": "Final Cutoff: 917 / 2025" },
+          { "category": "SC", "marks": "79.03 / 200", "pct": 40, "safeTarget": "Mains: 685 / 1750", "note": "Final Cutoff: 880 / 2025" },
+          { "category": "ST", "marks": "74.23 / 200", "pct": 37, "safeTarget": "Mains: 684 / 1750", "note": "Final Cutoff: 884 / 2025" },
+          { "category": "PwBD-1", "marks": "69.42 / 200", "pct": 35, "safeTarget": "Mains: 663 / 1750", "note": "Final Cutoff: 876 / 2025" },
+          { "category": "PwBD-2", "marks": "65.30 / 200", "pct": 33, "safeTarget": "Mains: 696 / 1750", "note": "Final Cutoff: 913 / 2025" },
+          { "category": "PwBD-3", "marks": "40.56 / 200", "pct": 20, "safeTarget": "Mains: 307 / 1750", "note": "Final Cutoff: 701 / 2025" },
+          { "category": "PwBD-5", "marks": "40.56 / 200", "pct": 20, "safeTarget": "Mains: 361 / 1750", "note": "Final Cutoff: 461 / 2025" }
+        ]
+      },
+      {
+        "year": "2017–2023",
+        "label": "UPSC CSE Historical Official Cutoffs (2017–2023 · Prelims, Mains & Final)",
+        "maxMarks": 200,
+        "sourceNote": "Official UPSC CSE historical cutoffs across Prelims (GS-I / 200), Mains (/ 1750), and Final (/ 2025).",
+        "rows": [
+          { "category": "2023-24 (Gen)", "marks": "75.41 / 200", "pct": 38, "safeTarget": "Mains: 741 · Final: 953", "note": "EWS 68.02 · OBC 74.75 · SC 59.25 · ST 47.82 · PwBD 33.68–47.13" },
+          { "category": "2022-23 (Gen)", "marks": "88.22 / 200", "pct": 44, "safeTarget": "Mains: 748 · Final: 960", "note": "EWS 82.83 · OBC 87.54 · SC 74.08 · ST 69.35 · PwBD 40.40–58.59" },
+          { "category": "2021 (Gen)", "marks": "87.54 / 200", "pct": 44, "safeTarget": "Mains: 745 · Final: 953", "note": "EWS 80.14 · OBC 84.85 · SC 75.41 · ST 70.71 · PwBD 43.09–68.02" },
+          { "category": "2020 (Gen)", "marks": "92.51 / 200", "pct": 46, "safeTarget": "Mains: 736 · Final: 944", "note": "EWS 77.55 · OBC 89.12 · SC 74.84 · ST 68.71 · PwBD 40.82–70.06" },
+          { "category": "2019 (Gen)", "marks": "98.00 / 200", "pct": 49, "safeTarget": "Mains: 751 · Final: 961", "note": "EWS 90.00 · OBC 95.34 · SC 82.00 · ST 77.34 · PwBD 44.66–61.34" },
+          { "category": "2018 (Gen)", "marks": "98.00 / 200", "pct": 49, "safeTarget": "Mains: 774 · Final: 982", "note": "OBC 96.66 · SC 84.00 · ST 83.34 · PwBD 40.00–73.34" },
+          { "category": "2017 (Gen)", "marks": "105.34 / 200", "pct": 53, "safeTarget": "Mains: 809 · Final: 1006", "note": "OBC 102.66 · SC 88.66 · ST 88.66 · PH 40.00–85.34" }
         ]
       }
     ],
