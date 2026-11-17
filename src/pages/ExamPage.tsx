@@ -35,12 +35,11 @@ import { examHubSeoTitle, examHubSeoDescription } from '../lib/pageTitles'
 import { paperPath, paperSeoOverride } from '../lib/paperSeo'
 import { recordExamView } from '../lib/examActivity'
 import { subExamsOf } from '../lib/examTree'
-import { normalizeExamCategory } from './DashboardPage'
+import { normalizeExamCategory } from '../lib/examCategories'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
 import { ExplanationText } from '../components/common/ExplanationText'
 import { getExamFaqs } from '../data/examFaq'
 import { FaqAccordion } from '../components/common/FaqAccordion'
-import { postGuides } from '../data/postGuides'
 
 type Tab = 'papers' | 'mocks' | 'subjects'
 
@@ -754,25 +753,16 @@ export function ExamPage() {
 
           {faqs && <FaqAccordion items={faqs} />}
 
-          {/* Exam Guides — links to post-specific guide pages.
-              Skipped on a board: you sit JKSSB Patwari, not "JKSSB", and every
-              sub-exam now carries its own guide on its own page. */}
-          {(() => {
-            if (isBoard) return null
-            const guides = Object.entries(postGuides).filter(([, g]) => g.examSlug === exam.slug)
-            if (guides.length === 0) return null
-            return (
-              <div className="ep-guides-strip">
-                <span className="ep-guides-label">Exam Guides</span>
-                {guides.map(([slug, g]) => (
-                  <Link key={slug} className="ep-guide-chip" to={`/guide/${slug}`}>
-                    {g.shortName} — Syllabus &amp; Pattern
-                    <ChevronRight size={12} />
-                  </Link>
-                ))}
-              </div>
-            )
-          })()}
+          {/* Exam Guide — links to post-specific guide page via lightweight examLinks lookup */}
+          {!isBoard && guideHref && (
+            <div className="ep-guides-strip">
+              <span className="ep-guides-label">Exam Guide</span>
+              <Link className="ep-guide-chip" to={guideHref}>
+                {exam.shortName} — Analysis &amp; Cutoff
+                <ChevronRight size={12} />
+              </Link>
+            </div>
+          )}
         </div>
       )}
 

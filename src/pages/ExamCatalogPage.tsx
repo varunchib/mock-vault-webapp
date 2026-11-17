@@ -15,7 +15,7 @@ import {
   categoryIcons,
   categoryOrder,
   normalizeExamCategory,
-} from './DashboardPage'
+} from '../lib/examCategories'
 
 const ALL = 'All'
 

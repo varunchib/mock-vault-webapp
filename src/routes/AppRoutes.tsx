@@ -7,21 +7,24 @@ import { hasSessionHint } from '../lib/sessionHint'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { RouteErrorBoundary } from '../components/common/RouteErrorBoundary'
 
-// Eager — public SEO pages must render fast on any cold URL
+// Eager — only the landing page stays in the initial entry bundle for instant LCP
 import { LandingPage }       from '../pages/LandingPage'
-import { ExamCatalogPage }   from '../pages/ExamCatalogPage'
-import { ExamPage }          from '../pages/ExamPage'
-import { QuestionPage }      from '../pages/QuestionPage'
-import { PyqPaperPage }      from '../pages/PyqPaperPage'
-import { PrivacyPolicyPage } from '../pages/PrivacyPolicyPage'
-import { TermsPage }         from '../pages/TermsPage'
-import { AboutPage }         from '../pages/AboutPage'
-import { ContactPage }       from '../pages/ContactPage'
-import { DisclaimerPage }    from '../pages/DisclaimerPage'
-import { PostGuidePage }     from '../pages/PostGuidePage'
-import { RiversOfIndiaPage } from '../pages/RiversOfIndiaPage'
-import { IndianRiversBlogPage } from '../pages/IndianRiversBlogPage'
-import { BlogIndexPage } from '../pages/BlogIndexPage'
+
+// Lazy — split every secondary route into its own chunk so visitors on /
+// don't download guideIntelligence.ts, postGuides.ts, Rivers map, or paper pages.
+const ExamCatalogPage   = lazy(() => import('../pages/ExamCatalogPage').then(m => ({ default: m.ExamCatalogPage })))
+const ExamPage          = lazy(() => import('../pages/ExamPage').then(m => ({ default: m.ExamPage })))
+const QuestionPage      = lazy(() => import('../pages/QuestionPage').then(m => ({ default: m.QuestionPage })))
+const PyqPaperPage      = lazy(() => import('../pages/PyqPaperPage').then(m => ({ default: m.PyqPaperPage })))
+const PrivacyPolicyPage = lazy(() => import('../pages/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })))
+const TermsPage         = lazy(() => import('../pages/TermsPage').then(m => ({ default: m.TermsPage })))
+const AboutPage         = lazy(() => import('../pages/AboutPage').then(m => ({ default: m.AboutPage })))
+const ContactPage       = lazy(() => import('../pages/ContactPage').then(m => ({ default: m.ContactPage })))
+const DisclaimerPage    = lazy(() => import('../pages/DisclaimerPage').then(m => ({ default: m.DisclaimerPage })))
+const PostGuidePage     = lazy(() => import('../pages/PostGuidePage').then(m => ({ default: m.PostGuidePage })))
+const RiversOfIndiaPage = lazy(() => import('../pages/RiversOfIndiaPage').then(m => ({ default: m.RiversOfIndiaPage })))
+const IndianRiversBlogPage = lazy(() => import('../pages/IndianRiversBlogPage').then(m => ({ default: m.IndianRiversBlogPage })))
+const BlogIndexPage     = lazy(() => import('../pages/BlogIndexPage').then(m => ({ default: m.BlogIndexPage })))
 
 // Lazy — auth-gated or heavy pages not needed on initial load
 const ConstitutionExplorerPage = lazy(() => import('../pages/ConstitutionExplorerPage').then(m => ({ default: m.ConstitutionExplorerPage })))
@@ -110,14 +113,14 @@ export function AppRoutes() {
       <Route path="/admin"              element={<ProtectedAdmin />} />
       <Route path="/admin/users/:id/analytics"           element={<ProtectedAdminPage><Lazy><AdminUserAnalyticsOverview /></Lazy></ProtectedAdminPage>} />
       <Route path="/admin/users/:id/analytics/:examSlug" element={<ProtectedAdminPage><Lazy><AdminUserExamAnalytics /></Lazy></ProtectedAdminPage>} />
-      <Route path="/exams"              element={<ExamCatalogPage />} />
-      <Route path="/exam/:slug"          element={<ExamPage />} />
+      <Route path="/exams"              element={<Lazy><ExamCatalogPage /></Lazy>} />
+      <Route path="/exam/:slug"          element={<Lazy><ExamPage /></Lazy>} />
       {/* /exam/:slug/overview retired — the Worker 301s it to /guide/:slug */}
       <Route path="/analytics"              element={<ProtectedPage><Lazy><AnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/analytics/:examSlug"  element={<ProtectedPage><Lazy><ExamAnalyticsPage /></Lazy></ProtectedPage>} />
       <Route path="/study-material"       element={<Lazy><StudyMaterialPage /></Lazy>} />
-      <Route path="/question/:slug"     element={<QuestionPage />} />
-      <Route path="/pyq/:slug"          element={<PyqPaperPage />} />
+      <Route path="/question/:slug"     element={<Lazy><QuestionPage /></Lazy>} />
+      <Route path="/pyq/:slug"          element={<Lazy><PyqPaperPage /></Lazy>} />
       {/* The test series moved into the exam page's Mock Tests tab; this
           route stays so existing links and bookmarks still land somewhere. */}
       <Route path="/mock-test/:slug"    element={<MockTestRedirect />} />      {/* Mocks run in the same exam environment as previous year papers —
@@ -125,18 +128,18 @@ export function AppRoutes() {
           not a second implementation that drifts from it. */}
       <Route path="/mock-attempt/:slug"  element={<ProtectedPage><Lazy><PaperAttemptPage /></Lazy></ProtectedPage>} />
       <Route path="/paper-attempt/:slug" element={<ProtectedPage><Lazy><PaperAttemptPage /></Lazy></ProtectedPage>} />
-      <Route path="/guide/:postSlug" element={<PostGuidePage />} />
-      <Route path="/privacy"      element={<PrivacyPolicyPage />} />
-      <Route path="/terms"        element={<TermsPage />} />
-      <Route path="/about"        element={<AboutPage />} />
-      <Route path="/contact"      element={<ContactPage />} />
-      <Route path="/disclaimer"   element={<DisclaimerPage />} />
-      <Route path="/india-physical-geography-map" element={<RiversOfIndiaPage />} />
+      <Route path="/guide/:postSlug" element={<Lazy><PostGuidePage /></Lazy>} />
+      <Route path="/privacy"      element={<Lazy><PrivacyPolicyPage /></Lazy>} />
+      <Route path="/terms"        element={<Lazy><TermsPage /></Lazy>} />
+      <Route path="/about"        element={<Lazy><AboutPage /></Lazy>} />
+      <Route path="/contact"      element={<Lazy><ContactPage /></Lazy>} />
+      <Route path="/disclaimer"   element={<Lazy><DisclaimerPage /></Lazy>} />
+      <Route path="/india-physical-geography-map" element={<Lazy><RiversOfIndiaPage /></Lazy>} />
       <Route path="/constitution-of-india" element={<Lazy><ConstitutionExplorerPage /></Lazy>} />
       <Route path="/modern-indian-history-timeline" element={<Lazy><HistoryTimelinePage /></Lazy>} />
       <Route path="/ramsar-wetlands-and-national-parks" element={<Lazy><RamsarWetlandsPage /></Lazy>} />
-      <Route path="/blog" element={<BlogIndexPage />} />
-      <Route path="/blog/indian-rivers-and-tributaries" element={<IndianRiversBlogPage />} />
+      <Route path="/blog" element={<Lazy><BlogIndexPage /></Lazy>} />
+      <Route path="/blog/indian-rivers-and-tributaries" element={<Lazy><IndianRiversBlogPage /></Lazy>} />
       <Route path="/rivers-of-india" element={<Navigate to="/india-physical-geography-map" replace />} />
       {/* Legacy redirects */}
       <Route path="/exam"        element={<Navigate to="/exams" replace />} />
