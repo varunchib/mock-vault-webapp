@@ -59,7 +59,6 @@ import {
   saveAdminMock,
   saveAdminPaper,
   updateAdminQuestion,
-  updateAdminUserStatus,
   refreshAuthSession,
   APIError,
   type AdminActiveUser,
@@ -613,7 +612,7 @@ export function AdminDashboardPage() {
   const [usersLoading, setUsersLoading] = useState(false)
   const [userSearch, setUserSearch] = useState('')
   const [userSearchInput, setUserSearchInput] = useState('')
-  const [togglingUserId, setTogglingUserId] = useState<string | null>(null)
+  const [lastLoginSort, setLastLoginSort] = useState<'none' | 'desc' | 'asc'>('none')
   const [userDetail, setUserDetail] = useState<AdminUserDetail | null>(null)
   const [userDetailLoading, setUserDetailLoading] = useState(false)
   const [userDetailOpen, setUserDetailOpen] = useState(false)
@@ -1133,18 +1132,32 @@ export function AdminDashboardPage() {
     void loadUsers(0, '')
   }
 
-  const toggleUserStatus = async (user: AdminUser) => {
-    setTogglingUserId(user.id)
-    try {
-      await updateAdminUserStatus(user.id, !user.isActive)
-      setUsers((cur) => cur.map((u) => u.id === user.id ? { ...u, isActive: !u.isActive } : u))
-      toast('success', `${user.name} ${!user.isActive ? 'activated' : 'deactivated'}.`)
-    } catch {
-      toast('error', 'Failed to update user status.')
-    } finally {
-      setTogglingUserId(null)
+  const handleToggleLastLoginSort = async () => {
+    const nextSort: 'desc' | 'asc' = lastLoginSort === 'desc' ? 'asc' : 'desc'
+    setLastLoginSort(nextSort)
+    if (users.length < usersTotal) {
+      setUsersLoading(true)
+      try {
+        const res = await fetchAdminUsers({ limit: Math.max(usersTotal, 250), offset: 0, q: userSearch })
+        setUsers(res.users)
+        setUsersTotal(res.total)
+        setUsersOffset(0)
+      } catch {
+        toast('error', 'Unable to load all users for sorting.')
+      } finally {
+        setUsersLoading(false)
+      }
     }
   }
+
+  const sortedUsers = useMemo(() => {
+    if (lastLoginSort === 'none') return users
+    return [...users].sort((a, b) => {
+      const ta = a.lastLogin ? new Date(a.lastLogin).getTime() : 0
+      const tb = b.lastLogin ? new Date(b.lastLogin).getTime() : 0
+      return lastLoginSort === 'desc' ? tb - ta : ta - tb
+    })
+  }, [users, lastLoginSort])
 
   // ── Tab labels ─────────────────────────────────────────────────
 
@@ -1702,12 +1715,18 @@ export function AdminDashboardPage() {
                     <span>Name</span>
                     <span>Email</span>
                     <span>Role</span>
-                    <span>Status</span>
-                    <span>Last login</span>
+                    <button
+                      type="button"
+                      className={`ov-sort-header-btn${lastLoginSort !== 'none' ? ' active' : ''}`}
+                      onClick={() => void handleToggleLastLoginSort()}
+                      title="Sort by last login"
+                    >
+                      Last login {lastLoginSort === 'desc' ? '↓' : lastLoginSort === 'asc' ? '↑' : '↕'}
+                    </button>
                     <span></span>
                   </div>
                   <div className="ov-user-list">
-                    {users.map((user) => (
+                    {sortedUsers.map((user) => (
                       <div className="ov-user-row" key={user.id}>
                         <button
                           type="button"
@@ -1730,9 +1749,6 @@ export function AdminDashboardPage() {
                         </button>
                         <span className="ov-user-email-text">{user.email}</span>
                         <span className="ov-user-role-tag">{user.role}</span>
-                        <span className={`ov-user-dot ${user.isActive ? 'active' : 'banned'}`}>
-                          {user.isActive ? 'Active' : 'Banned'}
-                        </span>
                         <span className="ov-user-login-text">
                           {fmtLastLogin(user.lastLogin)}
                         </span>
@@ -1743,14 +1759,6 @@ export function AdminDashboardPage() {
                             onClick={() => void openUserDetail(user.id)}
                           >
                             View
-                          </button>
-                          <button
-                            type="button"
-                            className={`ov-user-action-btn ${user.isActive ? 'ban' : 'activate'}`}
-                            onClick={() => void toggleUserStatus(user)}
-                            disabled={togglingUserId === user.id}
-                          >
-                            {togglingUserId === user.id ? '…' : user.isActive ? 'Ban' : 'Activate'}
                           </button>
                         </div>
                       </div>

@@ -233,6 +233,13 @@ const STATIC_META: Record<string, PageMeta> = {
         <a href="/exam/ssc-cgl">SSC CGL</a>
         <a href="/exam/bpsc">BPSC</a>
         <a href="/exam/jkssb">JKSSB</a>
+        <a href="/exam/kashmir-university">Kashmir University</a>
+        <a href="/pyq/upsc-cse-prelims-2026-gs1">UPSC CSE Prelims 2026 GS1</a>
+        <a href="/pyq/kashmir-university-jaa-2026-set-a">Kashmir University JAA 2026</a>
+        <a href="/pyq/jkssb-accounts-assistant-finance-2026">JKSSB FAA 2026</a>
+        <a href="/pyq/jkssb-wildlife-guard-2026-may-10">JKSSB Wildlife Guard 2026</a>
+        <a href="/pyq/jkssb-junior-assistant-pyq">JKSSB Junior Assistant 2026</a>
+        <a href="/pyq/jkssb-field-assistant-2026-may-20">JKSSB Field Assistant 2026</a>
         <a href="/india-physical-geography-map">Explore India’s physical geography map</a>
       </nav>
     </article>`,
@@ -1315,12 +1322,9 @@ function renderPaperContent(p: PaperData, questions: QuestionData[], crumbs: Cru
     : ''
 
   return renderPageShell(override?.h1 ?? `${p.title} — Solved PYQ with Answer Key`, `
-    <p><small>Last updated: <time datetime="2026-11-16">16 November 2026</time></small></p>
-    ${override ? `<p><strong>${htmlText(override.title)}</strong></p>` : ''}
-    ${override ? paragraph(override.review) : ''}
-    ${paragraph(p.description)}
-    <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` — ${htmlText(p.year)}` : ''}${p.shift ? ` — ${htmlText(p.shift)}` : ''}</p>
-    <p>${p.questions ?? questions.length} solved questions with answer key and detailed explanations${subjectText ? ` — Subjects: ${htmlText(subjectText)}` : ''}${(p.negativeMarking ?? 0) > 0 ? ` — Negative marking: ${p.negativeMarking}` : ''}</p>
+    <p><small>Last updated: <time datetime="2026-11-17">17 November 2026</time></small></p>
+    ${override ? paragraph(override.review) : paragraph(p.description)}
+    <p><a href="/exam/${encodeURIComponent(p.examSlug)}">${htmlText(p.examName)}</a>${p.year ? ` — ${htmlText(p.year)}` : ''}${p.shift ? ` — ${htmlText(p.shift)}` : ''} · ${p.questions ?? questions.length} solved questions${subjectText ? ` · Subjects: ${htmlText(subjectText)}` : ''}${(p.negativeMarking ?? 0) > 0 ? ` · Negative marking: ${p.negativeMarking}` : ''}</p>
     ${source}
     ${sections}
     ${faqSection}
