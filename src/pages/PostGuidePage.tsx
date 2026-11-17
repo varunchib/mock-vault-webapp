@@ -32,24 +32,24 @@ export function PostGuidePage() {
   useEffect(() => {
     const years = Array.from(new Set((intel?.cutoffSets ?? []).map((c) => c.year)))
     if (years.length <= 1) return
-    const els = years
-      .map((y) => document.getElementById(`cutoff-${y.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`))
-      .filter((el): el is HTMLElement => Boolean(el))
-    if (els.length === 0) return
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
-        if (visible[0]?.target) {
-          const y = visible[0].target.getAttribute('data-cutoff-year')
-          if (y) setActiveCutoffYear(y)
+
+    const updateActiveYear = () => {
+      const blocks = Array.from(document.querySelectorAll<HTMLElement>('.pg-cutoff-block[data-cutoff-year]'))
+      if (blocks.length === 0) return
+      let current = blocks[0].getAttribute('data-cutoff-year') || years[0]
+      for (const el of blocks) {
+        if (el.getBoundingClientRect().top <= 160) {
+          current = el.getAttribute('data-cutoff-year') || current
+        } else {
+          break
         }
-      },
-      { rootMargin: '-80px 0px -65% 0px', threshold: 0 },
-    )
-    els.forEach((el) => io.observe(el))
-    return () => io.disconnect()
+      }
+      setActiveCutoffYear((prev) => (prev === current ? prev : current))
+    }
+
+    updateActiveYear()
+    window.addEventListener('scroll', updateActiveYear, { passive: true })
+    return () => window.removeEventListener('scroll', updateActiveYear)
   }, [intel])
 
   const seoTitle = guide
@@ -445,7 +445,6 @@ export function PostGuidePage() {
 
                   {hasMultiYear && (
                     <aside className="pg-cutoff-rail" aria-label="Jump to cutoff year">
-                      <span className="pg-cutoff-rail-title">Year</span>
                       <nav className="pg-cutoff-rail-list">
                         {uniqueYears.map((yr) => {
                           const anchorId = `cutoff-${yr.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
@@ -461,7 +460,8 @@ export function PostGuidePage() {
                                 document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
                               }}
                             >
-                              {yr}
+                              <span className="pg-cutoff-rail-dot" aria-hidden="true" />
+                              <span>{yr}</span>
                             </a>
                           )
                         })}

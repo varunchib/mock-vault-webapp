@@ -24114,11 +24114,11 @@ html[data-theme="dark"] .study-banner-amber {
   margin-bottom: 4px;
 }
 
-/* ── Multi-year cutoff layout with right-side vertical sticky year scroller ── */
+/* ── Multi-year cutoff layout with right-side vertical timeline year scroller ── */
 .pg-cutoff-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 82px;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) 86px;
+  gap: 18px;
   align-items: start;
 }
 .pg-cutoff-stack {
@@ -24132,48 +24132,60 @@ html[data-theme="dark"] .study-banner-amber {
 }
 .pg-cutoff-rail {
   position: sticky;
-  top: 80px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 10px 8px;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-}
-.pg-cutoff-rail-title {
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-  color: var(--ink4);
-  text-align: center;
-  padding-bottom: 4px;
-  border-bottom: 1px solid var(--line);
+  top: 90px;
+  padding: 6px 0;
 }
 .pg-cutoff-rail-list {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 18px;
+  padding-left: 6px;
+}
+.pg-cutoff-rail-list::before {
+  content: '';
+  position: absolute;
+  left: 10px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--line, #e2e8f0);
 }
 .pg-cutoff-rail-btn {
-  display: block;
-  padding: 5px 6px;
-  border-radius: 6px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
-  font-weight: 700;
-  color: var(--ink3);
-  text-align: center;
+  font-weight: 600;
+  color: var(--ink4);
   text-decoration: none;
-  transition: background .12s, color .12s;
+  line-height: 1.2;
+  transition: color .15s;
+}
+.pg-cutoff-rail-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--surface, #fff);
+  border: 2px solid var(--line, #cbd5e1);
+  flex-shrink: 0;
+  transition: border-color .15s, background .15s, transform .15s;
 }
 .pg-cutoff-rail-btn:hover {
-  background: var(--line2);
   color: var(--ink);
 }
+.pg-cutoff-rail-btn:hover .pg-cutoff-rail-dot {
+  border-color: var(--ink3);
+}
 .pg-cutoff-rail-btn.active {
-  background: var(--ink);
-  color: var(--surface);
+  color: var(--ink);
+  font-weight: 800;
+}
+.pg-cutoff-rail-btn.active .pg-cutoff-rail-dot {
+  background: var(--blue, #2563eb);
+  border-color: var(--blue, #2563eb);
+  transform: scale(1.2);
 }
 @media (max-width: 720px) {
   .pg-cutoff-layout {
@@ -24184,24 +24196,31 @@ html[data-theme="dark"] .study-banner-amber {
     order: -1;
     top: 58px;
     z-index: 5;
-    flex-direction: row;
-    align-items: center;
-    padding: 8px 10px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--line);
+    padding: 8px 4px;
     overflow-x: auto;
-  }
-  .pg-cutoff-rail-title {
-    border-bottom: none;
-    border-right: 1px solid var(--line);
-    padding: 0 8px 0 0;
-    flex-shrink: 0;
   }
   .pg-cutoff-rail-list {
     flex-direction: row;
-    gap: 6px;
+    align-items: center;
+    gap: 16px;
+    padding-left: 4px;
+    width: max-content;
+  }
+  .pg-cutoff-rail-list::before {
+    left: 6px;
+    right: 6px;
+    top: 50%;
+    bottom: auto;
+    width: auto;
+    height: 2px;
+    transform: translateY(-50%);
   }
   .pg-cutoff-rail-btn {
     white-space: nowrap;
-    padding: 4px 10px;
+    background: var(--surface);
+    padding: 2px 4px;
   }
 }
 
