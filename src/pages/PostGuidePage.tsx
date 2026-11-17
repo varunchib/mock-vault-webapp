@@ -20,12 +20,10 @@ export function PostGuidePage() {
   const intel = postSlug ? GUIDE_INTELLIGENCE[postSlug] : undefined
   const faqs = guide ? buildGuideFaqs(guide) : []
   const [topicSubjectFilter, setTopicSubjectFilter] = useState<string>('ALL')
-  const [activeCutoffIdx, setActiveCutoffIdx] = useState<number>(0)
   const [activePaperIdx, setActivePaperIdx] = useState<number>(0)
 
   useEffect(() => {
     setTopicSubjectFilter('ALL')
-    setActiveCutoffIdx(0)
     setActivePaperIdx(0)
   }, [postSlug])
 
@@ -98,7 +96,6 @@ export function PostGuidePage() {
         ? intel.masterSections
         : intel.masterSections.filter(s => s.subject === topicSubjectFilter))
     : []
-  const activeCutoff = intel?.cutoffSets[activeCutoffIdx] ?? intel?.cutoffSets[0]
   const activeDist = intel?.scoreDistributions?.[0]
   const activePaper = intel?.paperXrays[activePaperIdx] ?? intel?.paperXrays[0]
 
@@ -350,7 +347,7 @@ export function PostGuidePage() {
           )}
 
           {/* ── 4. CATEGORY-WISE CUTOFFS ── */}
-          {intel && intel.cutoffSets.length > 0 && activeCutoff && (
+          {intel && intel.cutoffSets.length > 0 && (
             <section className="pg-section pg-intel-section" aria-labelledby="cutoffs-heading">
               <div className="pg-intel-head">
                 <div>
@@ -364,58 +361,70 @@ export function PostGuidePage() {
               </div>
 
               {intel.cutoffSets.length > 1 && (
-                <div className="pg-filter-pills" role="tablist" aria-label="Select cutoff year">
+                <nav className="pg-filter-pills" aria-label="Jump to cutoff year">
                   {intel.cutoffSets.map((cs, idx) => (
-                    <button
+                    <a
                       key={cs.year}
-                      type="button"
-                      role="tab"
-                      aria-selected={activeCutoffIdx === idx}
-                      className={`pg-filter-pill${activeCutoffIdx === idx ? ' active' : ''}`}
-                      onClick={() => setActiveCutoffIdx(idx)}
+                      href={`#cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`}
+                      className={`pg-filter-pill${idx === 0 ? ' active' : ''}`}
+                      onClick={(e) => {
+                        e.preventDefault()
+                        document
+                          .getElementById(`cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`)
+                          ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                      }}
                     >
                       {cs.year}
-                    </button>
+                    </a>
                   ))}
-                </div>
+                </nav>
               )}
 
-              <div className="pg-cutoff-label">{activeCutoff.label}</div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {intel.cutoffSets.map((cs) => {
+                  const anchorId = `cutoff-${cs.year.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}`
+                  return (
+                    <div key={cs.year} id={anchorId} style={{ scrollMarginTop: '76px' }}>
+                      <div className="pg-cutoff-label">{cs.label}</div>
 
-              <div className="pg-table-wrap">
-                <table className="pg-table pg-cutoff-table">
-                  <thead>
-                    <tr>
-                      <th>Category</th>
-                      <th>Cutoff Marks</th>
-                      <th>Score %</th>
-                      <th>Shortlisted / Seats</th>
-                      <th>Remarks</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {activeCutoff.rows.map((row, idx) => (
-                      <tr key={idx}>
-                        <td><strong>{row.category}</strong></td>
-                        <td className="pg-cutoff-marks">{row.marks}</td>
-                        <td>
-                          <div className="pg-cutoff-bar-cell">
-                            <span>{row.pct}%</span>
-                            <div className="pg-cutoff-bar">
-                              <div className="pg-cutoff-bar-fill" style={{ width: `${Math.min(100, row.pct)}%` }} />
-                            </div>
-                          </div>
-                        </td>
-                        <td><span className="pg-safe-pill">{row.safeTarget ?? '—'}</span></td>
-                        <td className="pg-cutoff-note">{row.note ?? '—'}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                      <div className="pg-table-wrap">
+                        <table className="pg-table pg-cutoff-table">
+                          <thead>
+                            <tr>
+                              <th>Category</th>
+                              <th>Cutoff Marks</th>
+                              <th>Score %</th>
+                              <th>Shortlisted / Seats</th>
+                              <th>Remarks</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {cs.rows.map((row, idx) => (
+                              <tr key={idx}>
+                                <td><strong>{row.category}</strong></td>
+                                <td className="pg-cutoff-marks">{row.marks}</td>
+                                <td>
+                                  <div className="pg-cutoff-bar-cell">
+                                    <span>{row.pct}%</span>
+                                    <div className="pg-cutoff-bar">
+                                      <div className="pg-cutoff-bar-fill" style={{ width: `${Math.min(100, row.pct)}%` }} />
+                                    </div>
+                                  </div>
+                                </td>
+                                <td><span className="pg-safe-pill">{row.safeTarget ?? '—'}</span></td>
+                                <td className="pg-cutoff-note">{row.note ?? '—'}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                      <p className="pg-note" style={{ marginTop: '10px', marginBottom: 0 }}>
+                        {cs.sourceNote}
+                      </p>
+                    </div>
+                  )
+                })}
               </div>
-              <p className="pg-note" style={{ marginTop: '12px', marginBottom: 0 }}>
-                {activeCutoff.sourceNote}
-              </p>
             </section>
           )}
 
