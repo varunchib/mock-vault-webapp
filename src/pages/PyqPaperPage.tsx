@@ -463,7 +463,7 @@ export function PyqPaperPage() {
                           disabled={isRevealed}
                         >
                           <span className="pyq-opt-key">{label}</span>
-                          <MathText text={opt.text} />
+                          <MathText className="pyq-opt-text" text={opt.text} />
                         </button>
                       )
                     })}

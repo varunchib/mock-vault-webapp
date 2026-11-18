@@ -6662,11 +6662,12 @@ footer {
    instead of forcing the track wider. */
 .pyq-page > *,
 .pyq-question-list,
-.pyq-question-card { min-width: 0; }
+.pyq-question-card { min-width: 0; max-width: 100%; }
+.pyq-question-card { overflow-x: clip; }
 .pyq-q-text,
 .pyq-passage,
 .qr-text,
-.pyq-option { overflow-wrap: break-word; }
+.pyq-option { min-width: 0; max-width: 100%; overflow-wrap: anywhere; }
 
 /* ── Paper header card ──────────────────────────────── */
 .pyq-paper-header {
@@ -18472,6 +18473,8 @@ html[data-theme="dark"] {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* Instruction line: "Find the part...", "Select the sentence..." */
@@ -18481,11 +18484,14 @@ html[data-theme="dark"] {
   color: var(--ink2);
   font-style: italic;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .qr-text {
   white-space: pre-wrap;
   line-height: 1.6;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 /* The opening line IS the question — it carries the most weight on the card. */
@@ -18493,6 +18499,7 @@ html[data-theme="dark"] {
   font-weight: 600;
   line-height: 1.55;
   color: var(--ink);
+  overflow-wrap: anywhere;
 }
 
 /* Column header for a list block: "List-I (Coal Field)", "(Pass) — (State)" */
@@ -18538,6 +18545,8 @@ html[data-theme="dark"] {
 
 .qr-claim-body {
   white-space: pre-wrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Numbered / lettered statement list: the marker sits in its own column so the
@@ -18549,6 +18558,7 @@ html[data-theme="dark"] {
   margin: 2px 0;
   padding: 0;
   list-style: none;
+  min-width: 0;
 }
 
 .qr-item {
@@ -18556,6 +18566,8 @@ html[data-theme="dark"] {
   gap: 10px;
   align-items: baseline;
   line-height: 1.55;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .qr-item-marker {
@@ -18567,7 +18579,10 @@ html[data-theme="dark"] {
 }
 
 .qr-item-body {
+  flex: 1;
+  min-width: 0;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 /* Closing rubric or question line ("Which of the statements given above is/are correct?") */
@@ -18578,6 +18593,7 @@ html[data-theme="dark"] {
   font-style: normal;
   color: var(--ink);
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 /* Match-the-following: the two headed lists side by side, so the reader can
@@ -18735,7 +18751,8 @@ html[data-theme="dark"] {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
+  max-width: 100%;
   padding: 3px 10px;
   background: var(--line2);
   border: 1px solid var(--line);
@@ -18915,6 +18932,7 @@ html[data-theme="dark"] {
 .qr-match-col {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .qr-match-col + .qr-match-col {
@@ -18938,6 +18956,8 @@ html[data-theme="dark"] {
   padding: 6px 10px;
   line-height: 1.45;
   color: var(--ink);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .qr-match-row + .qr-match-row {
@@ -18953,7 +18973,7 @@ html[data-theme="dark"] {
   padding-top: 1px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 640px) {
   .qr-match-grid {
     grid-template-columns: 1fr;
   }
