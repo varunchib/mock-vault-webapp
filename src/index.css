@@ -22737,6 +22737,22 @@ html[data-theme="dark"] {
 .pa-attempt-page .pa-subject-tab.active .pa-subject-tab-count {
   background: rgba(255, 255, 255, 0.25);
 }
+.pa-attempt-page .pa-subject-tab.locked {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.pa-section-notice {
+  background: #1e3a5f;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-align: center;
+  padding: 6px 12px;
+}
+.pa-attempt-page .pa-submit-palette-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 /* Question header tools */
 .pa-q-tools {

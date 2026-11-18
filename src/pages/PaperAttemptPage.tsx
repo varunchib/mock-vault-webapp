@@ -2,6 +2,7 @@ import {
   AlertTriangle,
   ChevronLeft,
   ChevronRight,
+  Lock,
   Maximize2,
   UserRound,
   Play,
@@ -125,6 +126,15 @@ function computeResults(questions: Question[], answers: Record<string, string>) 
 
 const DEFAULT_DURATION = 120 * 60
 
+function shuffleStrings(arr: string[]): string[] {
+  const copy = [...arr]
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy
+}
+
 export function PaperAttemptPage() {
   const navigate = useNavigate()
   const { slug } = useParams()
@@ -171,6 +181,11 @@ export function PaperAttemptPage() {
   const [confirmSubmit, setConfirmSubmit] = useState(false)
   const [language, setLanguage] = useState<QuestionLanguage>('en')
   const [activeSubject, setActiveSubject] = useState<string | null>(null)
+  const [sectionOrder, setSectionOrder] = useState<string[]>([])
+  const [sectionIdx, setSectionIdx] = useState(0)
+  const [sectionPerDuration, setSectionPerDuration] = useState(0)
+  const [sectionSecondsLeft, setSectionSecondsLeft] = useState(0)
+  const [sectionNotice, setSectionNotice] = useState<string | null>(null)
   // True when review has no answer sheet to show — better to say so than to
   // render a palette of blank chips that reads as "you skipped everything".
   const [answersUnavailable, setAnswersUnavailable] = useState(false)
@@ -302,12 +317,54 @@ export function PaperAttemptPage() {
     }
   }, [])
 
+  const initSectionState = useCallback((effectiveRemaining: number, durationSeconds: number, startIdx: number) => {
+    if (!paper) return
+    const distinctList = Array.from(new Set(questions.map((q) => q.subject)))
+    if (paper.examSlug === 'ssc-cgl' && distinctList.length > 1) {
+      const storageKey = `cgl-sec-${paper.slug}`
+      let order: string[] = []
+      let perSec = Math.floor(durationSeconds / distinctList.length)
+      try {
+        const saved = localStorage.getItem(storageKey)
+        if (saved) {
+          const parsed = JSON.parse(saved) as { order?: string[]; perSec?: number }
+          if (Array.isArray(parsed.order) && parsed.order.length === distinctList.length) {
+            order = parsed.order
+          }
+          if (typeof parsed.perSec === 'number' && parsed.perSec > 0) perSec = parsed.perSec
+        }
+      } catch { /* ignore */ }
+      if (order.length === 0) {
+        order = shuffleStrings(distinctList)
+        try { localStorage.setItem(storageKey, JSON.stringify({ order, perSec })) } catch { /* ignore */ }
+      }
+      const elapsed = Math.max(0, durationSeconds - effectiveRemaining)
+      const idx = Math.min(order.length - 1, Math.floor(elapsed / perSec))
+      const secLeft = idx === order.length - 1
+        ? Math.max(1, effectiveRemaining)
+        : Math.max(1, perSec - (elapsed % perSec))
+      const targetSubj = order[idx]
+      setSectionOrder(order)
+      setSectionIdx(idx)
+      setSectionPerDuration(perSec)
+      setSectionSecondsLeft(secLeft)
+      setActiveSubject(targetSubj)
+      if (questions[startIdx]?.subject !== targetSubj) {
+        const firstIdx = questions.findIndex((q) => q.subject === targetSubj)
+        if (firstIdx !== -1) setCurrentIndex(firstIdx)
+      }
+    } else if (distinctList.length > 1) {
+      setActiveSubject(questions[startIdx]?.subject ?? null)
+    }
+  }, [paper, questions])
+
   // ── Start exam handler ────────────────────────────────────────
   const handleStartExam = useCallback(async () => {
     if (!paper || !questions.length || startingExam) return
     setStartingExam(true)
     const durationSeconds = (paper.durationMinutes > 0 ? paper.durationMinutes : 120) * 60
     let startIdx = 0
+    let effectiveRemaining = durationSeconds
     try {
       const liveState = await startLiveAttempt({
         paperSlug: paper.slug,
@@ -331,26 +388,26 @@ export function PaperAttemptPage() {
           setStartingExam(false)
           return
         }
+        effectiveRemaining = liveState.remainingSeconds
         setRemainingSeconds(liveState.remainingSeconds)
       } else {
         setRemainingSeconds(durationSeconds)
+        if (paper.examSlug === 'ssc-cgl') {
+          try { localStorage.removeItem(`cgl-sec-${paper.slug}`) } catch { /* ignore */ }
+        }
       }
       if (liveState?.attemptId) setAttemptId(liveState.attemptId)
     } catch {
       setRemainingSeconds(durationSeconds)
     }
-    // Auto-select the subject of the starting question for multi-subject exams
-    const distinctSubjects = new Set(questions.map((q) => q.subject))
-    if (distinctSubjects.size > 1) {
-      setActiveSubject(questions[startIdx]?.subject ?? null)
-    }
+    initSectionState(effectiveRemaining, durationSeconds, startIdx)
     startTimeRef.current = Date.now()
     document.documentElement.requestFullscreen?.()
       .then(() => setIsFullscreen(true))
       .catch(() => {})
     setExamStarted(true)
     setStartingExam(false)
-  }, [paper, questions, startingExam])
+  }, [paper, questions, startingExam, initSectionState])
 
   // ── Resume handler — calls startLiveAttempt to restore full state ──
   const handleResumeExam = useCallback(async () => {
@@ -358,6 +415,7 @@ export function PaperAttemptPage() {
     setStartingExam(true)
     const durationSeconds = (paper.durationMinutes > 0 ? paper.durationMinutes : 120) * 60
     let startIdx = 0
+    let effectiveRemaining = durationSeconds
     try {
       const liveState = await startLiveAttempt({
         paperSlug: paper.slug,
@@ -380,6 +438,7 @@ export function PaperAttemptPage() {
           setStartingExam(false)
           return
         }
+        effectiveRemaining = liveState.remainingSeconds
         setRemainingSeconds(liveState.remainingSeconds)
       } else {
         setRemainingSeconds(durationSeconds)
@@ -388,17 +447,14 @@ export function PaperAttemptPage() {
     } catch {
       setRemainingSeconds(durationSeconds)
     }
-    const distinctSubjects = new Set(questions.map((q) => q.subject))
-    if (distinctSubjects.size > 1) {
-      setActiveSubject(questions[startIdx]?.subject ?? null)
-    }
+    initSectionState(effectiveRemaining, durationSeconds, startIdx)
     startTimeRef.current = Date.now()
     document.documentElement.requestFullscreen?.()
       .then(() => setIsFullscreen(true))
       .catch(() => {})
     setExamStarted(true)
     setStartingExam(false)
-  }, [paper, questions, startingExam])
+  }, [paper, questions, startingExam, initSectionState])
 
   // ── Redis sync helpers ─────────────────────────────────────────
   const syncFnRef = useRef<() => void>(() => {})
@@ -453,6 +509,9 @@ export function PaperAttemptPage() {
     navigate(paperPath(paper.slug))
   }, [paper, attemptId, answers, marked, currentIndex, remainingSeconds, navigate])
 
+  const isSectionalTimed = !isReview && paper?.examSlug === 'ssc-cgl' && sectionOrder.length > 1
+  const isLastSection = !isSectionalTimed || sectionIdx >= sectionOrder.length - 1
+
   // ── Timer countdown ────────────────────────────────────────────
   useEffect(() => {
     if (submitted || loading || !examStarted || remainingSeconds <= 0) return
@@ -461,14 +520,47 @@ export function PaperAttemptPage() {
         if (s <= 1) {
           window.clearInterval(id)
           if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+          if (paper?.examSlug === 'ssc-cgl') {
+            try { localStorage.removeItem(`cgl-sec-${paper.slug}`) } catch { /* ignore */ }
+          }
           setSubmitted(true)
           return 0
         }
         return s - 1
       })
+
+      if (isSectionalTimed) {
+        setSectionSecondsLeft((sec) => {
+          if (sec <= 1) {
+            if (sectionIdx < sectionOrder.length - 1) {
+              const nextIdx = sectionIdx + 1
+              const nextSubj = sectionOrder[nextIdx]
+              setSectionIdx(nextIdx)
+              setActiveSubject(nextSubj)
+              const firstQ = questions.findIndex((q) => q.subject === nextSubj)
+              if (firstQ !== -1) setCurrentIndex(firstQ)
+              setSectionNotice(`Section time finished — moved to ${nextSubj}`)
+              return sectionPerDuration
+            }
+            if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {})
+            if (paper) {
+              try { localStorage.removeItem(`cgl-sec-${paper.slug}`) } catch { /* ignore */ }
+            }
+            setSubmitted(true)
+            return 0
+          }
+          return sec - 1
+        })
+      }
     }, 1000)
     return () => window.clearInterval(id)
-  }, [loading, examStarted, remainingSeconds, submitted])
+  }, [loading, examStarted, remainingSeconds, submitted, isSectionalTimed, sectionIdx, sectionOrder, sectionPerDuration, questions, paper])
+
+  useEffect(() => {
+    if (!sectionNotice) return
+    const t = window.setTimeout(() => setSectionNotice(null), 4500)
+    return () => window.clearTimeout(t)
+  }, [sectionNotice])
 
   // ── Sync on unmount + browser close (catches "Exit Paper" navigation) ──
   useEffect(() => {
@@ -575,16 +667,23 @@ export function PaperAttemptPage() {
     return [...map.entries()].map(([name, { count, answered }]) => ({ name, count, answered }))
   }, [questions, answers])
 
+  const orderedSubjectList = useMemo(() => {
+    if (!sectionOrder.length) return subjectList
+    const orderMap = new Map(sectionOrder.map((name, idx) => [name, idx]))
+    return [...subjectList].sort((a, b) => (orderMap.get(a.name) ?? 99) - (orderMap.get(b.name) ?? 99))
+  }, [subjectList, sectionOrder])
+
   const filteredQuestions = useMemo(
     () => activeSubject ? questions.filter((q) => q.subject === activeSubject) : questions,
     [questions, activeSubject],
   )
 
   const switchSubject = useCallback((subject: string) => {
+    if (isSectionalTimed) return
     setActiveSubject(subject)
     const first = questions.findIndex((q) => q.subject === subject)
     if (first !== -1) setCurrentIndex(first)
-  }, [questions])
+  }, [questions, isSectionalTimed])
 
   const currentQuestion = questions[currentIndex]
   const localizedCurrent = currentQuestion ? getLocalizedQuestion(currentQuestion, language) : null
@@ -1125,9 +1224,9 @@ export function PaperAttemptPage() {
             <span className="pa-review-flag">Reviewing your attempt</span>
           ) : (
           /* Boxed digits, as the delivery software renders the clock. */
-          <div className={`pa-clock${timerWarning ? ' warning' : ''}`}>
-            <span className="pa-clock-label">Time Left</span>
-            {formatTime(remainingSeconds).split(':').map((part, i, all) => (
+          <div className={`pa-clock${(isSectionalTimed ? sectionSecondsLeft <= 120 : timerWarning) ? ' warning' : ''}`}>
+            <span className="pa-clock-label">{isSectionalTimed ? 'Section Time' : 'Time Left'}</span>
+            {formatTime(isSectionalTimed ? sectionSecondsLeft : remainingSeconds).split(':').map((part, i, all) => (
               <span key={i} className="pa-clock-part">
                 <b>{part}</b>
                 {i < all.length - 1 && <i>:</i>}
@@ -1153,18 +1252,31 @@ export function PaperAttemptPage() {
       {hasSubjectTabs && (
         <nav className="pa-subject-tabs" aria-label="Question subjects">
           <span className="pa-sections-label">Sections</span>
-          {subjectList.map((s) => (
-            <button
-              key={s.name}
-              type="button"
-              className={`pa-subject-tab${activeSubject === s.name ? ' active' : ''}`}
-              onClick={() => switchSubject(s.name)}
-            >
-              {s.name}
-              <span className="pa-subject-tab-count">{s.answered}/{s.count}</span>
-            </button>
-          ))}
+          {orderedSubjectList.map((s) => {
+            const isActive = activeSubject === s.name
+            const isLocked = isSectionalTimed && !isActive
+            return (
+              <button
+                key={s.name}
+                type="button"
+                disabled={isLocked}
+                title={isLocked ? 'Section locked — auto-advances when current section timer ends' : undefined}
+                className={`pa-subject-tab${isActive ? ' active' : ''}${isLocked ? ' locked' : ''}`}
+                onClick={() => switchSubject(s.name)}
+              >
+                {isLocked && <Lock size={11} style={{ marginRight: 4, opacity: 0.7 }} />}
+                {s.name}
+                <span className="pa-subject-tab-count">{s.answered}/{s.count}</span>
+              </button>
+            )
+          })}
         </nav>
+      )}
+
+      {sectionNotice && (
+        <div className="pa-section-notice" role="status">
+          {sectionNotice}
+        </div>
       )}
 
       {/* Body: question + palette */}
@@ -1429,8 +1541,14 @@ export function PaperAttemptPage() {
 
           {/* Nothing to submit in review — the attempt is already finished. */}
           {!isReview && (
-            <button type="button" className="pa-submit-palette-btn" onClick={() => setConfirmSubmit(true)}>
-              Submit Test
+            <button
+              type="button"
+              className="pa-submit-palette-btn"
+              disabled={!isLastSection}
+              title={!isLastSection ? 'Submit unlocks on the final section' : undefined}
+              onClick={() => setConfirmSubmit(true)}
+            >
+              {isLastSection ? 'Submit Test' : `Submit (Section ${sectionIdx + 1}/${sectionOrder.length})`}
             </button>
           )}
 
