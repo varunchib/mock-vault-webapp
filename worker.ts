@@ -2054,45 +2054,94 @@ export default {
     const indexRequest = new Request(`${url.origin}/`, request)
 
     if (path === '/sitemap.xml') {
+      const today = new Date().toISOString().slice(0, 10)
+      const indexXml = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>${BASE}/sitemap-core.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>${BASE}/sitemap-questions.xml</loc>
+    <lastmod>${today}</lastmod>
+  </sitemap>
+</sitemapindex>`
+      return new Response(indexXml, {
+        status: 200,
+        headers: {
+          'content-type': 'application/xml; charset=UTF-8',
+          'cache-control': 'public, max-age=600',
+        },
+      })
+    }
+
+    if (path === '/sitemap-core.xml' || path === '/sitemap-questions.xml') {
+      const isQuestions = path === '/sitemap-questions.xml'
+      const filterSitemap = (rawXml: string): string => {
+        let sitemap = rawXml
+          .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
+          .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/)|\/pyq\/upsc-prelims-2023-gs-paper-1)[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
+        const studyLastMod = '2026-11-16'
+        const extraUrls = [
+          `${BASE}/blog/indian-rivers-and-tributaries`,
+          `${BASE}/blog`,
+          `${BASE}/contact`,
+          `${BASE}/disclaimer`,
+          `${BASE}/constitution-of-india`,
+          `${BASE}/modern-indian-history-timeline`,
+          `${BASE}/ramsar-wetlands-and-national-parks`,
+          `${BASE}/study-material`,
+          `${BASE}/guide/jkssb-social-forestry-worker`,
+          `${BASE}/guide/jkssb-inspector-forest`,
+          `${BASE}/guide/jkssb-field-assistant`,
+        ]
+        for (const extraUrl of extraUrls) {
+          if (!sitemap.includes(`<loc>${extraUrl}</loc>`)) {
+            if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
+            sitemap = sitemap.replace(
+              '</urlset>',
+              `  <url>\n    <loc>${extraUrl}</loc>\n    <lastmod>${studyLastMod}</lastmod>\n  </url>\n</urlset>`,
+            )
+          }
+        }
+        const urlBlocks = sitemap.match(/<url>[\s\S]*?<\/url>/g) ?? []
+        const filtered = urlBlocks.filter((block) => {
+          const isQ = /<loc>[^<]*\/question\//.test(block)
+          return isQuestions ? isQ : !isQ
+        })
+        return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n  ${filtered.join('\n  ')}\n</urlset>`
+      }
+
       try {
         // ?sv bumps the edge cache key so a sitemap with stale question slugs
-        // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB —
-        // the sitemap changes whenever a paper/question is added, and a whole
-        // day of staleness (the old 3600s) held new pages back from crawlers.
+        // is dropped immediately on deploy. Short 10-min TTL keeps it close to the DB.
         const res = await apiFetch(`${API}/sitemap.xml?sv=20`, 600)
         if (res.ok) {
           const headers = new Headers(res.headers)
           headers.set('content-type', 'application/xml; charset=UTF-8')
           headers.set('cache-control', 'public, max-age=600')
-          let sitemap = (await res.text())
-            .replaceAll(`${BASE}/rivers-of-india`, `${BASE}/india-physical-geography-map`)
-            .replace(/<url>\s*<loc>[^<]*(?:neet-ug|\/exam\/nta(?=<|\/)|\/pyq\/upsc-prelims-2023-gs-paper-1)[^<]*<\/loc>[\s\S]*?<\/url>\s*/gi, '')
-          const studyLastMod = '2026-11-16'
-          const articleUrl = `${BASE}/blog/indian-rivers-and-tributaries`
-          const blogUrl = `${BASE}/blog`
-          const contactUrl = `${BASE}/contact`
-          const disclaimerUrl = `${BASE}/disclaimer`
-          const constitutionUrl = `${BASE}/constitution-of-india`
-          const historyUrl = `${BASE}/modern-indian-history-timeline`
-          const ramsarUrl = `${BASE}/ramsar-wetlands-and-national-parks`
-          const studyMaterialUrl = `${BASE}/study-material`
-          const sfGuideUrl = `${BASE}/guide/jkssb-social-forestry-worker`
-          const ifGuideUrl = `${BASE}/guide/jkssb-inspector-forest`
-          const faGuideUrl = `${BASE}/guide/jkssb-field-assistant`
-          for (const extraUrl of [articleUrl, blogUrl, contactUrl, disclaimerUrl, constitutionUrl, historyUrl, ramsarUrl, studyMaterialUrl, sfGuideUrl, ifGuideUrl, faGuideUrl]) {
-            if (!sitemap.includes(`<loc>${extraUrl}</loc>`)) {
-              if (!sitemap.includes('</urlset>')) throw new Error('Backend sitemap has no closing urlset')
-              sitemap = sitemap.replace(
-                '</urlset>',
-                `  <url>\n    <loc>${extraUrl}</loc>\n    <lastmod>${studyLastMod}</lastmod>\n  </url>\n</urlset>`,
-              )
-            }
-          }
           headers.delete('content-length')
-          return new Response(sitemap, { status: 200, headers })
+          const body = filterSitemap(await res.text())
+          return new Response(body, { status: 200, headers })
         }
       } catch {
         // Fall through to the static sitemap bundled with the app.
+      }
+
+      try {
+        const assetRes = await env.ASSETS.fetch(new Request(`${url.origin}/sitemap.xml`, request))
+        if (assetRes.ok) {
+          const body = filterSitemap(await assetRes.text())
+          return new Response(body, {
+            status: 200,
+            headers: {
+              'content-type': 'application/xml; charset=UTF-8',
+              'cache-control': 'public, max-age=600',
+            },
+          })
+        }
+      } catch {
+        // Fall through.
       }
     }
 
