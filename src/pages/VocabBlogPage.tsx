@@ -2,6 +2,11 @@ import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
 import {
+  JKSSB_VOCAB_PYQS,
+  SSC_CGL_VOCAB_PYQS,
+  type VocabPyqItem,
+} from '../data/vocabPyqData'
+import {
   JKSSB_VOCAB_CONFIG,
   SSC_CGL_VOCAB_CONFIG,
   VOCAB_BLOG_MODIFIED,
@@ -9,14 +14,27 @@ import {
   type VocabArticleConfig,
 } from './vocabBlogArticleMeta'
 
-type VocabTab = 'all' | 'antonyms' | 'synonyms' | 'idioms' | 'one-word'
+type VocabCat = 'all' | 'synonym' | 'antonym' | 'idiom' | 'one-word'
 
 const fmtDate = (iso: string) =>
   new Date(`${iso}T00:00:00+05:30`).toLocaleDateString('en-IN', {
     day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata',
   })
 
-function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
+const CAT_META: Record<VocabPyqItem['category'], { label: string; bg: string; fg: string; border: string }> = {
+  synonym: { label: 'Synonym', bg: 'var(--blue-bg)', fg: 'var(--blue)', border: 'var(--blue-border)' },
+  antonym: { label: 'Antonym', bg: 'var(--hl-bg)', fg: 'var(--hl-dark)', border: 'var(--hl-border)' },
+  idiom: { label: 'Idiom & Phrase', bg: 'var(--green-bg)', fg: 'var(--green)', border: 'var(--green-border)' },
+  'one-word': { label: 'One-Word', bg: 'var(--card-bg)', fg: 'var(--ink)', border: 'var(--line)' },
+}
+
+function VocabBlogArticle({
+  config,
+  pyqItems,
+}: {
+  config: VocabArticleConfig
+  pyqItems: VocabPyqItem[]
+}) {
   usePageMeta({
     title: config.title,
     description: config.description,
@@ -25,73 +43,75 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
     jsonLd: config.jsonLd,
   })
 
-  const [activeTab, setActiveTab] = useState<VocabTab>('all')
+  const [selectedYear, setSelectedYear] = useState<string>('all')
+  const [selectedCat, setSelectedCat] = useState<VocabCat>('all')
+  const [onlyRepeated, setOnlyRepeated] = useState(false)
   const [query, setQuery] = useState('')
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null)
+
+  const years = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const item of pyqItems) {
+      counts.set(item.year, (counts.get(item.year) ?? 0) + 1)
+    }
+    return Array.from(counts.entries()).sort((a, b) => Number(b[0]) - Number(a[0]))
+  }, [pyqItems])
+
+  const catCounts = useMemo(() => {
+    const counts: Record<VocabCat, number> = {
+      all: pyqItems.length,
+      synonym: 0,
+      antonym: 0,
+      idiom: 0,
+      'one-word': 0,
+    }
+    for (const item of pyqItems) {
+      counts[item.category] += 1
+    }
+    return counts
+  }, [pyqItems])
+
+  const repeatedTotal = useMemo(
+    () => pyqItems.filter((x) => x.repeatCount > 1).length,
+    [pyqItems],
+  )
+
   const q = query.trim().toLowerCase()
 
-  const filteredAntonyms = useMemo(
+  const filteredItems = useMemo(
     () =>
-      config.antonyms.filter(
-        (w) =>
-          !q ||
-          w.word.toLowerCase().includes(q) ||
-          w.meaning.toLowerCase().includes(q) ||
-          w.primaryAnswer.toLowerCase().includes(q) ||
-          w.alsoPair.toLowerCase().includes(q),
-      ),
-    [config.antonyms, q],
+      pyqItems.filter((item) => {
+        if (selectedYear !== 'all' && item.year !== selectedYear) return false
+        if (selectedCat !== 'all' && item.category !== selectedCat) return false
+        if (onlyRepeated && item.repeatCount <= 1) return false
+        if (!q) return true
+        return (
+          item.term.toLowerCase().includes(q) ||
+          item.question.toLowerCase().includes(q) ||
+          item.answer.toLowerCase().includes(q) ||
+          item.paperTitle.toLowerCase().includes(q)
+        )
+      }),
+    [pyqItems, selectedYear, selectedCat, onlyRepeated, q],
   )
 
-  const filteredSynonyms = useMemo(
-    () =>
-      config.synonyms.filter(
-        (w) =>
-          !q ||
-          w.word.toLowerCase().includes(q) ||
-          w.meaning.toLowerCase().includes(q) ||
-          w.primaryAnswer.toLowerCase().includes(q) ||
-          w.alsoPair.toLowerCase().includes(q),
-      ),
-    [config.synonyms, q],
-  )
-
-  const filteredIdioms = useMemo(
-    () =>
-      config.idioms.filter(
-        (i) =>
-          !q ||
-          i.idiom.toLowerCase().includes(q) ||
-          i.meaning.toLowerCase().includes(q) ||
-          i.example.toLowerCase().includes(q),
-      ),
-    [config.idioms, q],
-  )
-
-  const filteredOneWords = useMemo(
-    () =>
-      config.oneWords.filter(
-        (o) =>
-          !q ||
-          o.phrase.toLowerCase().includes(q) ||
-          o.substitute.toLowerCase().includes(q) ||
-          o.rootNote.toLowerCase().includes(q),
-      ),
-    [config.oneWords, q],
-  )
-
-  const totalCount =
-    config.antonyms.length + config.synonyms.length + config.idioms.length + config.oneWords.length
-
-  const showAntonyms = activeTab === 'all' || activeTab === 'antonyms'
-  const showSynonyms = activeTab === 'all' || activeTab === 'synonyms'
-  const showIdioms = activeTab === 'all' || activeTab === 'idioms'
-  const showOneWords = activeTab === 'all' || activeTab === 'one-word'
+  const groupedByYear = useMemo(() => {
+    const map = new Map<string, VocabPyqItem[]>()
+    for (const item of filteredItems) {
+      const list = map.get(item.year) ?? []
+      list.push(item)
+      map.set(item.year, list)
+    }
+    return Array.from(map.entries()).sort((a, b) => Number(b[0]) - Number(a[0]))
+  }, [filteredItems])
 
   const siblingHref = config.id === 'jkssb' ? SSC_CGL_VOCAB_CONFIG.path : JKSSB_VOCAB_CONFIG.path
   const siblingLabel =
     config.id === 'jkssb'
       ? 'SSC CGL Most Repeated Synonyms & Antonyms →'
       : 'JKSSB Most Repeated Synonyms & Antonyms →'
+
+  const examShort = config.id === 'jkssb' ? 'JKSSB' : 'SSC CGL'
 
   return (
     <section className="public-page river-article-page">
@@ -105,10 +125,10 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
         </nav>
 
         <article className="river-guide-article">
-          <header className="river-guide-header" style={{ marginBottom: '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', flexWrap: 'wrap' }}>
+          <header className="river-guide-header" style={{ marginBottom: '22px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '10px', flexWrap: 'wrap' }}>
               <span className="public-kicker" style={{ margin: 0 }}>{config.kicker}</span>
-              <span style={{ fontSize: '11px', fontWeight: 700, padding: '2px 8px', borderRadius: '12px', background: 'var(--blue-bg)', color: 'var(--blue)', border: '1px solid var(--blue-border)' }}>
+              <span style={{ fontSize: '11.5px', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: 'var(--blue-bg)', color: 'var(--blue)', border: '1px solid var(--blue-border)' }}>
                 {config.badge}
               </span>
             </div>
@@ -123,47 +143,33 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
               <time dateTime={VOCAB_BLOG_PUBLISHED}>{fmtDate(VOCAB_BLOG_PUBLISHED)}</time>{' '}
               <span aria-hidden="true">·</span> Updated{' '}
               <time dateTime={VOCAB_BLOG_MODIFIED}>{fmtDate(VOCAB_BLOG_MODIFIED)}</time>{' '}
-              <span aria-hidden="true">·</span> 12 min read
+              <span aria-hidden="true">·</span> {pyqItems.length} Official PYQs
             </p>
 
+            {/* Summary KPI Strip */}
             <div
               style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                gap: '12px',
-                marginBottom: '20px',
+                gap: '10px',
+                marginBottom: '18px',
               }}
             >
-              <div style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '20px' }}>🔁</span>
-                <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--ink)' }}>{totalCount}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--ink2)', fontWeight: 600 }}>High-Frequency Entries</div>
-                </div>
+              <div style={{ background: 'var(--card-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--line)' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--ink)' }}>{pyqItems.length}</div>
+                <div style={{ fontSize: '12px', color: 'var(--ink2)', fontWeight: 600 }}>Official {examShort} Vocab PYQs</div>
               </div>
-
-              <div style={{ background: 'var(--blue-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '20px' }}>⚖️</span>
-                <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--blue)' }}>{config.antonyms.length + config.synonyms.length}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--blue)', fontWeight: 600 }}>Antonym &amp; Synonym Sets</div>
-                </div>
+              <div style={{ background: 'var(--blue-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--blue-border)' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--blue)' }}>{catCounts.synonym + catCounts.antonym}</div>
+                <div style={{ fontSize: '12px', color: 'var(--blue)', fontWeight: 600 }}>Synonyms &amp; Antonyms</div>
               </div>
-
-              <div style={{ background: 'var(--green-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--green-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '20px' }}>💬</span>
-                <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--green)' }}>{config.idioms.length + config.oneWords.length}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--green)', fontWeight: 600 }}>Idioms &amp; One-Word Sets</div>
-                </div>
+              <div style={{ background: 'var(--green-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--green-border)' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--green)' }}>{catCounts.idiom + catCounts['one-word']}</div>
+                <div style={{ fontSize: '12px', color: 'var(--green)', fontWeight: 600 }}>Idioms &amp; One-Word</div>
               </div>
-
-              <div style={{ background: 'var(--hl-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--hl-border)', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '20px' }}>🎯</span>
-                <div>
-                  <div style={{ fontSize: '17px', fontWeight: 800, color: 'var(--hl-dark)' }}>100%</div>
-                  <div style={{ fontSize: '11px', color: 'var(--hl-dark)', fontWeight: 600 }}>PYQ-Backed</div>
-                </div>
+              <div style={{ background: 'var(--hl-bg)', padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--hl-border)' }}>
+                <div style={{ fontSize: '20px', fontWeight: 800, color: 'var(--hl-dark)' }}>{repeatedTotal}</div>
+                <div style={{ fontSize: '12px', color: 'var(--hl-dark)', fontWeight: 600 }}>Highlighted Repeats</div>
               </div>
             </div>
           </header>
@@ -173,53 +179,46 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
             <p>{config.quickAnswer}</p>
           </section>
 
-          <nav className="river-guide-toc" aria-label="Contents">
-            <h2>In this guide</h2>
-            <ol>
-              <li><a href="#antonyms-section">{config.antonymsHeading.replace(/^\d+\.\s*/, '')}</a></li>
-              <li><a href="#synonyms-section">{config.synonymsHeading.replace(/^\d+\.\s*/, '')}</a></li>
-              <li><a href="#idioms-section">High-yield idioms &amp; phrases</a></li>
-              <li><a href="#one-word-section">Important one-word substitutions</a></li>
-              <li><a href="#confusion-pairs">{config.trapsHeading.replace(/^\d+\.\s*/, '')}</a></li>
-              <li><a href="#pyq-practice">Solve real vocabulary PYQs</a></li>
-              <li><a href="#vocab-faqs">Frequently asked questions</a></li>
-            </ol>
-          </nav>
-
-          <div
+          {/* Year-Wise Filter + Category Filter Bar at Top */}
+          <section
+            aria-label="Filter vocabulary PYQs by year and category"
             style={{
-              display: 'flex',
-              flexWrap: 'wrap',
-              gap: '10px',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              padding: '14px',
+              padding: '16px',
               borderRadius: '12px',
               background: 'var(--card-bg)',
               border: '1px solid var(--line)',
-              marginBottom: '24px',
+              marginBottom: '26px',
             }}
           >
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }} role="tablist" aria-label="Filter vocabulary sections">
-              {(
-                [
-                  ['all', `All (${totalCount})`],
-                  ['antonyms', `Antonyms (${filteredAntonyms.length})`],
-                  ['synonyms', `Synonyms (${filteredSynonyms.length})`],
-                  ['idioms', `Idioms (${filteredIdioms.length})`],
-                  ['one-word', `One-Word (${filteredOneWords.length})`],
-                ] as Array<[VocabTab, string]>
-              ).map(([tab, label]) => {
-                const active = activeTab === tab
+            <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--ink2)', marginBottom: '8px' }}>
+              Filter by Exam Year
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '14px' }}>
+              <button
+                type="button"
+                onClick={() => setSelectedYear('all')}
+                style={{
+                  padding: '6px 13px',
+                  borderRadius: '999px',
+                  border: selectedYear === 'all' ? '1px solid var(--brand)' : '1px solid var(--line)',
+                  background: selectedYear === 'all' ? 'var(--brand)' : 'transparent',
+                  color: selectedYear === 'all' ? '#fff' : 'var(--ink)',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                }}
+              >
+                All Years ({pyqItems.length})
+              </button>
+              {years.map(([yr, cnt]) => {
+                const active = selectedYear === yr
                 return (
                   <button
-                    key={tab}
+                    key={yr}
                     type="button"
-                    role="tab"
-                    aria-selected={active}
-                    onClick={() => setActiveTab(tab)}
+                    onClick={() => setSelectedYear(yr)}
                     style={{
-                      padding: '6px 12px',
+                      padding: '6px 13px',
                       borderRadius: '999px',
                       border: active ? '1px solid var(--brand)' : '1px solid var(--line)',
                       background: active ? 'var(--brand)' : 'transparent',
@@ -229,191 +228,242 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
                       cursor: 'pointer',
                     }}
                   >
-                    {label}
+                    {yr} ({cnt})
                   </button>
                 )
               })}
             </div>
 
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search word, meaning, or idiom..."
-              aria-label="Search vocabulary list"
-              style={{
-                minWidth: '220px',
-                flex: '1 1 220px',
-                maxWidth: '320px',
-                padding: '7px 12px',
-                borderRadius: '8px',
-                border: '1px solid var(--line)',
-                background: 'var(--bg)',
-                color: 'var(--ink)',
-                fontSize: '13px',
-              }}
-            />
-          </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '7px' }}>
+                {(
+                  [
+                    ['all', `All Types (${catCounts.all})`],
+                    ['synonym', `Synonyms (${catCounts.synonym})`],
+                    ['antonym', `Antonyms (${catCounts.antonym})`],
+                    ['idiom', `Idioms (${catCounts.idiom})`],
+                    ['one-word', `One-Word (${catCounts['one-word']})`],
+                  ] as Array<[VocabCat, string]>
+                ).map(([cat, label]) => {
+                  const active = selectedCat === cat
+                  return (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setSelectedCat(cat)}
+                      style={{
+                        padding: '5px 11px',
+                        borderRadius: '8px',
+                        border: active ? '1px solid var(--ink)' : '1px solid var(--line)',
+                        background: active ? 'var(--ink)' : 'transparent',
+                        color: active ? 'var(--bg)' : 'var(--ink2)',
+                        fontSize: '12.5px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                      }}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
 
-          {showAntonyms && (
-            <section id="antonyms-section" style={{ marginBottom: '36px' }}>
-              <h2>{config.antonymsHeading}</h2>
-              <div className="river-table-wrap">
-                <table className="river-table">
-                  <thead>
-                    <tr>
-                      <th>Word</th>
-                      <th>Meaning</th>
-                      <th>Top Antonyms</th>
-                      <th>Memory Hook &amp; Synonyms</th>
-                      <th>PYQ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredAntonyms.map((item) => (
-                      <tr key={item.word}>
-                        <td>
-                          <strong>{item.word}</strong>
-                          <div style={{ fontSize: '11px', color: 'var(--ink2)' }}>{item.pos}</div>
-                        </td>
-                        <td>{item.meaning}</td>
-                        <td><strong>{item.primaryAnswer}</strong></td>
-                        <td>
-                          <div>{item.hook}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--ink2)', marginTop: '4px' }}>{item.alsoPair}</div>
-                        </td>
-                        <td>
-                          {item.pyqHref ? (
-                            <Link to={item.pyqHref} style={{ fontWeight: 600, color: 'var(--brand)', whiteSpace: 'nowrap' }}>
-                              Solve PYQ →
-                            </Link>
-                          ) : (
-                            <span style={{ color: 'var(--ink2)', fontSize: '12px' }}>Core PYQ</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <button
+                  type="button"
+                  onClick={() => setOnlyRepeated((v) => !v)}
+                  style={{
+                    padding: '5px 11px',
+                    borderRadius: '8px',
+                    border: onlyRepeated ? '1px solid var(--hl-dark)' : '1px solid var(--hl-border)',
+                    background: onlyRepeated ? 'var(--hl-bg)' : 'transparent',
+                    color: 'var(--hl-dark)',
+                    fontSize: '12.5px',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                  }}
+                >
+                  🔥 Repeated Only ({repeatedTotal})
+                </button>
               </div>
-            </section>
-          )}
 
-          {showSynonyms && (
-            <section id="synonyms-section" style={{ marginBottom: '36px' }}>
-              <h2>{config.synonymsHeading}</h2>
-              <div className="river-table-wrap">
-                <table className="river-table">
-                  <thead>
-                    <tr>
-                      <th>Word</th>
-                      <th>Meaning</th>
-                      <th>Top Synonyms</th>
-                      <th>Memory Hook &amp; Antonyms</th>
-                      <th>PYQ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredSynonyms.map((item) => (
-                      <tr key={item.word}>
-                        <td>
-                          <strong>{item.word}</strong>
-                          <div style={{ fontSize: '11px', color: 'var(--ink2)' }}>{item.pos}</div>
-                        </td>
-                        <td>{item.meaning}</td>
-                        <td><strong>{item.primaryAnswer}</strong></td>
-                        <td>
-                          <div>{item.hook}</div>
-                          <div style={{ fontSize: '12px', color: 'var(--ink2)', marginTop: '4px' }}>{item.alsoPair}</div>
-                        </td>
-                        <td>
-                          {item.pyqHref ? (
-                            <Link to={item.pyqHref} style={{ fontWeight: 600, color: 'var(--brand)', whiteSpace: 'nowrap' }}>
-                              Solve PYQ →
-                            </Link>
-                          ) : (
-                            <span style={{ color: 'var(--ink2)', fontSize: '12px' }}>Core PYQ</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search word, answer, or paper..."
+                aria-label="Search vocabulary PYQs"
+                style={{
+                  minWidth: '210px',
+                  flex: '1 1 210px',
+                  maxWidth: '290px',
+                  padding: '7px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid var(--line)',
+                  background: 'var(--bg)',
+                  color: 'var(--ink)',
+                  fontSize: '13.5px',
+                }}
+              />
+            </div>
+          </section>
 
-          {showIdioms && (
-            <section id="idioms-section" style={{ marginBottom: '36px' }}>
-              <h2>3. High-Yield Idioms &amp; Phrases</h2>
-              <div className="river-table-wrap">
-                <table className="river-table">
-                  <thead>
-                    <tr>
-                      <th>Idiom / Phrase</th>
-                      <th>Exact Exam Meaning</th>
-                      <th>Usage Example</th>
-                      <th>PYQ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredIdioms.map((item) => (
-                      <tr key={item.idiom}>
-                        <td><strong>{item.idiom}</strong></td>
-                        <td>{item.meaning}</td>
-                        <td>{item.example}</td>
-                        <td>
-                          {item.pyqHref ? (
-                            <Link to={item.pyqHref} style={{ fontWeight: 600, color: 'var(--brand)', whiteSpace: 'nowrap' }}>
-                              Solve PYQ →
-                            </Link>
-                          ) : (
-                            <span style={{ color: 'var(--ink2)', fontSize: '12px' }}>Core PYQ</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+          {/* Year-by-Year Full List of Official PYQs */}
+          <section aria-label="Year-wise vocabulary PYQ list" style={{ marginBottom: '36px' }}>
+            {groupedByYear.length === 0 ? (
+              <p style={{ padding: '24px', borderRadius: '10px', border: '1px solid var(--line)', textAlign: 'center' }}>
+                No matching vocabulary questions found for this filter.
+              </p>
+            ) : (
+              groupedByYear.map(([yr, items]) => (
+                <div key={yr} id={`year-${yr}`} style={{ marginBottom: '34px' }}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'baseline',
+                      justifyContent: 'space-between',
+                      borderBottom: '2px solid var(--line)',
+                      paddingBottom: '8px',
+                      marginBottom: '14px',
+                    }}
+                  >
+                    <h2 style={{ margin: 0 }}>{examShort} {yr} Vocabulary PYQs</h2>
+                    <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--ink2)' }}>
+                      {items.length} Questions
+                    </span>
+                  </div>
 
-          {showOneWords && (
-            <section id="one-word-section" style={{ marginBottom: '36px' }}>
-              <h2>4. Important One-Word Substitutions</h2>
-              <div className="river-table-wrap">
-                <table className="river-table">
-                  <thead>
-                    <tr>
-                      <th>Definition / Phrase</th>
-                      <th>One-Word Substitute</th>
-                      <th>Root Clue</th>
-                      <th>PYQ</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredOneWords.map((item) => (
-                      <tr key={item.substitute}>
-                        <td>{item.phrase}</td>
-                        <td><strong>{item.substitute}</strong></td>
-                        <td>{item.rootNote}</td>
-                        <td>
-                          {item.pyqHref ? (
-                            <Link to={item.pyqHref} style={{ fontWeight: 600, color: 'var(--brand)', whiteSpace: 'nowrap' }}>
-                              Solve PYQ →
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    {items.map((item, idx) => {
+                      const cmeta = CAT_META[item.category]
+                      const isRepeated = item.repeatCount > 1
+                      const cardKey = `${yr}-${item.paperSlug}-${idx}`
+                      const tooltipText = isRepeated
+                        ? `Repeated ${item.repeatCount}× across: ${item.repeatSources.join(' | ')}`
+                        : ''
+
+                      return (
+                        <article
+                          key={cardKey}
+                          onMouseEnter={() => isRepeated && setHoveredKey(cardKey)}
+                          onMouseLeave={() => hoveredKey === cardKey && setHoveredKey(null)}
+                          style={{
+                            position: 'relative',
+                            padding: '15px 16px',
+                            borderRadius: '12px',
+                            border: isRepeated ? '1.5px solid var(--hl-border)' : '1px solid var(--line)',
+                            background: isRepeated ? 'var(--hl-bg)' : 'var(--card-bg)',
+                          }}
+                        >
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px' }}>
+                              <span
+                                style={{
+                                  fontSize: '11.5px',
+                                  fontWeight: 700,
+                                  padding: '2px 9px',
+                                  borderRadius: '999px',
+                                  background: cmeta.bg,
+                                  color: cmeta.fg,
+                                  border: `1px solid ${cmeta.border}`,
+                                }}
+                              >
+                                {cmeta.label}
+                              </span>
+
+                              {item.term && (
+                                <strong style={{ fontSize: '16px', color: 'var(--ink)' }}>
+                                  {item.term}
+                                </strong>
+                              )}
+
+                              {isRepeated && (
+                                <span
+                                  title={tooltipText}
+                                  style={{
+                                    position: 'relative',
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    fontSize: '11.5px',
+                                    fontWeight: 800,
+                                    padding: '2px 9px',
+                                    borderRadius: '999px',
+                                    background: '#fef3c7',
+                                    color: '#92400e',
+                                    border: '1px solid #f59e0b',
+                                    cursor: 'help',
+                                  }}
+                                >
+                                  🔥 Repeated {item.repeatCount}×
+                                  {hoveredKey === cardKey && (
+                                    <span
+                                      role="tooltip"
+                                      style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        top: 'calc(100% + 6px)',
+                                        zIndex: 20,
+                                        minWidth: '250px',
+                                        maxWidth: '340px',
+                                        padding: '8px 10px',
+                                        borderRadius: '8px',
+                                        background: '#111827',
+                                        color: '#f9fafb',
+                                        fontSize: '12px',
+                                        fontWeight: 500,
+                                        lineHeight: 1.45,
+                                        boxShadow: '0 8px 20px rgba(0,0,0,0.22)',
+                                        whiteSpace: 'normal',
+                                      }}
+                                    >
+                                      <strong>Repeated {item.repeatCount} times:</strong>
+                                      <br />
+                                      {item.repeatSources.join(' · ')}
+                                    </span>
+                                  )}
+                                </span>
+                              )}
+                            </div>
+
+                            <Link
+                              to={`/pyq/${item.paperSlug}`}
+                              style={{ fontSize: '12px', color: 'var(--ink2)', textDecoration: 'none', fontWeight: 600 }}
+                            >
+                              {item.paperTitle}
                             </Link>
-                          ) : (
-                            <span style={{ color: 'var(--ink2)', fontSize: '12px' }}>Core PYQ</span>
+                          </div>
+
+                          <p style={{ margin: '0 0 8px', fontSize: '15.5px', lineHeight: 1.6, color: 'var(--ink)' }}>
+                            {item.question}
+                          </p>
+
+                          <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                            <div style={{ fontSize: '14.5px', color: 'var(--green)', fontWeight: 700 }}>
+                              Answer: {item.answer}
+                            </div>
+
+                            {item.questionHref && (
+                              <Link
+                                to={item.questionHref}
+                                style={{ fontSize: '13px', fontWeight: 700, color: 'var(--brand)', textDecoration: 'none' }}
+                              >
+                                View Full Solution →
+                              </Link>
+                            )}
+                          </div>
+
+                          {item.explanation && (
+                            <p style={{ margin: '8px 0 0', fontSize: '13.5px', lineHeight: 1.55, color: 'var(--ink2)' }}>
+                              {item.explanation}
+                            </p>
                           )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+                        </article>
+                      )
+                    })}
+                  </div>
+                </div>
+              ))
+            )}
+          </section>
 
           <section id="confusion-pairs" style={{ marginBottom: '36px' }}>
             <h2>{config.trapsHeading}</h2>
@@ -428,25 +478,17 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
           </section>
 
           <section id="pyq-practice" style={{ marginBottom: '36px' }}>
-            <h2>6. Solve Real Vocabulary PYQs</h2>
+            <h2>Explore More {examShort} Resources</h2>
             <p>
-              Practice these words in official exam format, then explore our{' '}
-              <Link to={config.examHubHref}>{config.examHubLabel}</Link>,{' '}
-              <Link to={config.guideHref}>{config.guideLabel}</Link>, or{' '}
+              Practice full papers on our{' '}
+              <Link to={config.examHubHref}>{config.examHubLabel}</Link>, check official cutoffs in{' '}
+              <Link to={config.guideHref}>{config.guideLabel}</Link>, or read{' '}
               <Link to={siblingHref}>{siblingLabel}</Link>
             </p>
-            <ul className="river-pyq-list">
-              {config.directPyqs.map((qItem) => (
-                <li key={qItem.href}>
-                  <Link to={qItem.href}>{qItem.label}</Link>
-                  <span className="river-pyq-exam">{qItem.tag}</span>
-                </li>
-              ))}
-            </ul>
           </section>
 
           <section id="vocab-faqs" className="river-guide-faqs">
-            <h2>7. Frequently Asked Questions</h2>
+            <h2>Frequently Asked Questions</h2>
             <dl>
               {config.faqs.map(([question, answer]) => (
                 <div key={question} className="river-faq-item">
@@ -463,9 +505,9 @@ function VocabBlogArticle({ config }: { config: VocabArticleConfig }) {
 }
 
 export function JkssbVocabBlogPage() {
-  return <VocabBlogArticle config={JKSSB_VOCAB_CONFIG} />
+  return <VocabBlogArticle config={JKSSB_VOCAB_CONFIG} pyqItems={JKSSB_VOCAB_PYQS} />
 }
 
 export function SscCglVocabBlogPage() {
-  return <VocabBlogArticle config={SSC_CGL_VOCAB_CONFIG} />
+  return <VocabBlogArticle config={SSC_CGL_VOCAB_CONFIG} pyqItems={SSC_CGL_VOCAB_PYQS} />
 }
