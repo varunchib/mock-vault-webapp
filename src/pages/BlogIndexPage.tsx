@@ -5,6 +5,12 @@ import {
   INDIAN_RIVERS_ARTICLE_PATH,
   INDIAN_RIVERS_MODIFIED,
 } from './indianRiversArticleMeta'
+import {
+  VOCAB_BLOG_HEADLINE,
+  VOCAB_BLOG_META,
+  VOCAB_BLOG_MODIFIED,
+  VOCAB_BLOG_PATH,
+} from './vocabBlogArticleMeta'
 
 const BLOG_PATH = '/blog'
 
@@ -19,6 +25,14 @@ type BlogPost = {
 
 // Add a new entry here whenever a new blog post is published.
 const POSTS: BlogPost[] = [
+  {
+    href: VOCAB_BLOG_PATH,
+    category: 'English Vocabulary',
+    title: VOCAB_BLOG_HEADLINE,
+    excerpt: VOCAB_BLOG_META.description,
+    readTime: '14 min read',
+    updated: VOCAB_BLOG_MODIFIED,
+  },
   {
     href: INDIAN_RIVERS_ARTICLE_PATH,
     category: 'Indian geography',

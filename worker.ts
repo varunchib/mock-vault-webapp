@@ -25,6 +25,8 @@ import { RamsarWetlandsPage } from './src/pages/RamsarWetlandsPage'
 import { RAMSAR_FAQS } from './src/data/ramsarSitesIndia'
 import { IndianRiversBlogPage } from './src/pages/IndianRiversBlogPage'
 import { INDIAN_RIVERS_ARTICLE_META } from './src/pages/indianRiversArticleMeta'
+import { VocabBlogPage } from './src/pages/VocabBlogPage'
+import { VOCAB_BLOG_META, VOCAB_BLOG_PATH } from './src/pages/vocabBlogArticleMeta'
 import { BlogIndexPage } from './src/pages/BlogIndexPage'
 import { buildGuideFaqs } from './src/lib/guideFaqs'
 import { GUIDE_INTELLIGENCE } from './src/data/guideIntelligence'
@@ -457,6 +459,12 @@ const STATIC_META: Record<string, PageMeta> = {
     description: INDIAN_RIVERS_ARTICLE_META.description,
     contentHtml: renderStaticPage('/blog/indian-rivers-and-tributaries', createElement(IndianRiversBlogPage)),
     jsonLd: INDIAN_RIVERS_ARTICLE_META.jsonLd,
+  },
+  [VOCAB_BLOG_PATH]: {
+    title: VOCAB_BLOG_META.title,
+    description: VOCAB_BLOG_META.description,
+    contentHtml: renderStaticPage(VOCAB_BLOG_PATH, createElement(VocabBlogPage)),
+    jsonLd: VOCAB_BLOG_META.jsonLd,
   },
   '/about': {
     title: 'About Us — Ministry of Papers | Editorial Policy & Mission',
@@ -1999,7 +2007,11 @@ export default {
     // Only the blog index and current river guide are active. Unknown blog paths
     // must return a real 404 rather than an SPA shell that Google sees as a soft 404.
     const canonicalBlogPath = path.endsWith('/') ? path.slice(0, -1) : path
-    if (canonicalBlogPath.startsWith('/blog/') && canonicalBlogPath !== '/blog/indian-rivers-and-tributaries') {
+    if (
+      canonicalBlogPath.startsWith('/blog/') &&
+      canonicalBlogPath !== '/blog/indian-rivers-and-tributaries' &&
+      canonicalBlogPath !== VOCAB_BLOG_PATH
+    ) {
       return notFoundResponse('decided')
     }
 
@@ -2084,6 +2096,7 @@ export default {
         const studyLastMod = '2026-11-16'
         const extraUrls = [
           `${BASE}/blog/indian-rivers-and-tributaries`,
+          `${BASE}${VOCAB_BLOG_PATH}`,
           `${BASE}/blog`,
           `${BASE}/contact`,
           `${BASE}/disclaimer`,

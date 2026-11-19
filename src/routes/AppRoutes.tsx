@@ -24,6 +24,7 @@ const DisclaimerPage    = lazy(() => import('../pages/DisclaimerPage').then(m =>
 const PostGuidePage     = lazy(() => import('../pages/PostGuidePage').then(m => ({ default: m.PostGuidePage })))
 const RiversOfIndiaPage = lazy(() => import('../pages/RiversOfIndiaPage').then(m => ({ default: m.RiversOfIndiaPage })))
 const IndianRiversBlogPage = lazy(() => import('../pages/IndianRiversBlogPage').then(m => ({ default: m.IndianRiversBlogPage })))
+const VocabBlogPage        = lazy(() => import('../pages/VocabBlogPage').then(m => ({ default: m.VocabBlogPage })))
 const BlogIndexPage     = lazy(() => import('../pages/BlogIndexPage').then(m => ({ default: m.BlogIndexPage })))
 
 // Lazy — auth-gated or heavy pages not needed on initial load
@@ -140,6 +141,7 @@ export function AppRoutes() {
       <Route path="/ramsar-wetlands-and-national-parks" element={<Lazy><RamsarWetlandsPage /></Lazy>} />
       <Route path="/blog" element={<Lazy><BlogIndexPage /></Lazy>} />
       <Route path="/blog/indian-rivers-and-tributaries" element={<Lazy><IndianRiversBlogPage /></Lazy>} />
+      <Route path="/blog/jkssb-ssc-cgl-repeated-antonyms-synonyms-idioms" element={<Lazy><VocabBlogPage /></Lazy>} />
       <Route path="/rivers-of-india" element={<Navigate to="/india-physical-geography-map" replace />} />
       {/* Legacy redirects */}
       <Route path="/exam"        element={<Navigate to="/exams" replace />} />
