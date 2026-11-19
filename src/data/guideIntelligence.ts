@@ -8778,7 +8778,26 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
         ]
       }
     ],
-    "scoreDistributions": [],
+    "scoreDistributions": [
+      {
+        "label": "2024 Official Score Distribution (08.12.2024 · 55,729 Appeared)",
+        "appeared": 55729,
+        "registered": 167609,
+        "topScore": "91.25 / 100",
+        "meanScore": "22.35 / 100",
+        "medianScore": "20.25 / 100",
+        "sourceNote": "Derived from Official JKSSB Result Notification No. JKSSB-COE0EXAM(UT)/36/2024-03 (7593651) dated 20.01.2025 (Written + NCC Total Marks; 1,11,880 candidates were absent).",
+        "bars": [
+          { "range": "75 – 100", "candidates": 9, "pct": 0.02 },
+          { "range": "65 – 74.75", "candidates": 49, "pct": 0.09 },
+          { "range": "55 – 64.75", "candidates": 624, "pct": 1.1 },
+          { "range": "45 – 54.75", "candidates": 2910, "pct": 5.2 },
+          { "range": "35 – 44.75", "candidates": 6823, "pct": 12.2 },
+          { "range": "25 – 34.75", "candidates": 11004, "pct": 19.7 },
+          { "range": "Below 25", "candidates": 34310, "pct": 61.6 }
+        ]
+      }
+    ],
     "paperXrays": [
       {
         "paperSlug": "jkssb-constable-telecom-2024-set-a",
