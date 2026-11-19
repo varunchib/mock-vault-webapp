@@ -442,20 +442,24 @@ const JKSSB_BASE: Omit<VocabArticleConfig, 'jsonLd'> = {
   ],
   faqs: [
     [
-      'How many synonym and antonym questions are asked in JKSSB exams?',
-      'JKSSB General English sections (FAA, Patwari, Junior Assistant, VLW, Supervisor, Constable) usually carry 10 to 20 marks total, of which 3 to 6 questions come directly from synonyms, antonyms, idioms, spellings, and one-word substitutions.',
+      'Which JKSSB exams and years are covered in this vocabulary list?',
+      'This guide compiles 62 official General English vocabulary questions from JKSSB previous year papers between 2016 and 2026—including JKSSB Finance Accounts Assistant (FAA), Patwari, Junior Assistant, Inspector (Forest), Wildlife Guard, Lab Attendant, and J&K Police Constable.',
     ],
     [
-      'Does JKSSB repeat vocabulary from previous year question papers?',
-      'Yes. JKSSB regularly repeats core English vocabulary and idioms from its own earlier shifts (Junior Assistant, Patwari, FAA, Stock Assistant) as well as standard SSC-level word lists.',
+      'How many marks do synonyms, antonyms and idioms carry in JKSSB exams?',
+      'JKSSB General English sections typically carry 10 to 20 marks overall, with 3 to 6 direct questions coming from synonyms, antonyms, idioms & phrases, and one-word substitutions.',
     ],
     [
-      'What is the easiest way to avoid negative marking in JKSSB antonym questions?',
-      'Always re-read whether the question asks for "opposite in meaning" (antonym) or "closest in meaning" (synonym) before clicking, and watch out for negative-prefix traps like inflammable vs. flammable.',
+      'Do JKSSB vocabulary words repeat across different posts and years?',
+      'Yes. Idioms such as "Break the ice" and core vocabulary clusters (such as Benign/Pernicious, Obvious/Obscure, and Feeble) have repeated across JKSSB shifts as well as SSC-level exams. Repeated entries are highlighted in this list with exact exam appearances.',
     ],
     [
-      'Which JKSSB posts have the highest General English weightage?',
-      'Junior Assistant, Patwari, Supervisor, Finance Accounts Assistant (FAA), Sub-Inspector (SI), and VLW/Panchayat Secretary exams all feature dedicated General English sections where vocabulary gives fast, high-accuracy marks.',
+      'Should I revise JKSSB synonyms, antonyms and idioms together or separately?',
+      'Revising them together by exam year is faster and prevents confusion: learning a word alongside its opposite pair and real exam options builds recall for both synonym and antonym questions.',
+    ],
+    [
+      'How can I avoid negative marking in JKSSB vocabulary questions?',
+      'Always double-check whether the prompt asks for "nearest in meaning" (synonym) or "opposite in meaning" (antonym), and watch out for traps like "Flammable vs. Inflammable" where both words mean the same thing.',
     ],
   ],
 }
@@ -804,20 +808,24 @@ const SSC_CGL_BASE: Omit<VocabArticleConfig, 'jsonLd'> = {
   ],
   faqs: [
     [
-      'How many vocabulary questions appear in SSC CGL Tier-1 and Tier-2?',
-      'In SSC CGL Tier-1, vocabulary (synonyms, antonyms, idioms, one-word substitutions, and spelling) accounts for 8 to 12 out of 25 questions. In Tier-2 English (45 questions), vocabulary and comprehension-linked word meanings carry 12 to 18 questions.',
+      'Which SSC CGL years and shifts are included in this vocabulary bank?',
+      'This guide compiles 52 official English vocabulary questions from SSC CGL Tier-1 and Tier-2 papers from 2024 to 2026 (including 2026 September–October shifts and 2025 Tier-1/Tier-2 shifts), grouped year-by-year.',
     ],
     [
-      'Does SSC CGL repeat previous year synonyms and antonyms?',
-      'Yes. Roughly 60% to 70% of SSC CGL vocabulary questions repeat exact words from previous SSC CGL, CHSL, and CPO shifts or test close root-word relatives.',
+      'How many vocabulary questions are asked in SSC CGL Tier-1 and Tier-2?',
+      'In SSC CGL Tier-1 (25 English questions), 8 to 12 questions typically test synonyms, antonyms, idioms, one-word substitutions, and spellings. In Tier-2 (45 English questions), vocabulary and contextual word meaning account for 12 to 18 questions.',
     ],
     [
-      'How should I prepare SSC CGL vocabulary alongside sectional timing?',
-      'Revise 20 root-clustered words daily (with opposite pairs), solve PYQs under real exam timing, and track confusing pairs like disinterested vs. uninterested or inflammable vs. flammable.',
+      'Why are some words highlighted as repeated in this SSC CGL list?',
+      'SSC frequently reuses exact words and synonym/antonym clusters across shifts (for example, Obscure appearing across Abstruse, Esoteric, and Obvious, or Pernicious/Benign). Highlighted rows show how many times and in which shifts each word appeared.',
     ],
     [
-      'Which vocabulary topics give the fastest score boost in SSC CGL?',
-      'One-word substitutions and idioms & phrases offer the highest accuracy per second spent, followed by high-frequency antonym/synonym clusters.',
+      'Is it better to study SSC CGL synonyms, antonyms, idioms and one-word substitutions together?',
+      'Yes. Studying them together on one exam-focused page lets you spot shared roots (like -cide, -cracy, -loquy) and opposite pairs, while still letting you filter by question type before mock tests.',
+    ],
+    [
+      'What is the fastest way to revise this SSC CGL vocabulary list before the exam?',
+      'Start with the Repeated filter and the latest 2026–2025 shifts, read the verified answer alongside the 1-line explanation, and click View Solution on any unfamiliar word to practice its official 4-option distractors.',
     ],
   ],
 }
