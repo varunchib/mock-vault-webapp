@@ -8739,41 +8739,83 @@ export const GUIDE_INTELLIGENCE: Record<string, GuideIntelligence> = {
     "cutoffSets": [
       {
         "year": "2024",
-        "label": "2024 J&K Police Constable (Telecommunication) Cutoff (8 Dec 2024)",
+        "label": "2024 Official Final Selection Cutoffs (Notification No. 12-Selection of 2026 · 20.02.2026)",
         "maxMarks": 100,
-        "vacancies": "502 Posts (Advt. 01 of 2024)",
-        "appeared": "~42,000+ Appeared",
-        "topperScore": "88.50 / 100",
-        "meanScore": "39.40 / 100",
-        "sourceNote": "Based on 8 December 2024 Telecommunication Constable OMR examination (100 marks, 0.25 negative marking).",
+        "vacancies": "502 Posts (Advt. 01 of 2024 · Item No. 03)",
+        "appeared": "55,729 Appeared (1,67,609 Registered)",
+        "topperScore": "91.25 / 100",
+        "meanScore": "22.35 / 100",
+        "sourceNote": "Exact last-selected Total Marks (Written + NCC) from Official JKSSB Final Selection List Notification No. 12 - Selection of 2026 dated 20.02.2026 (Exam: 08.12.2024; PST/PET: Dec 2025).",
         "rows": [
           {
             "category": "OM (Open Merit)",
-            "marks": "66.50 – 70.00",
-            "pct": 68,
-            "safeTarget": "72+ Marks",
-            "note": "Open Merit technical wing cutoff"
+            "marks": "60.75",
+            "pct": 61,
+            "safeTarget": "63+ Marks",
+            "note": "201 total OM posts (103 non-horizontal seats: 60.75 – 91.25; 1 OM/Women post kept reserved)"
           },
           {
             "category": "RBA",
-            "marks": "62.00 – 65.00",
-            "pct": 63,
-            "safeTarget": "66+ Marks",
-            "note": "10% vertical reservation"
-          },
-          {
-            "category": "EWS / OBC",
-            "marks": "55.00 – 59.50",
-            "pct": 57,
+            "marks": "58.75",
+            "pct": 59,
             "safeTarget": "61+ Marks",
-            "note": "Reserved categories"
+            "note": "50 total RBA posts (20 non-horizontal: 58.75 – 60.25; Women: 48.25, SPO: 35.50, VHG: 32.50)"
           },
           {
-            "category": "SC / ST",
-            "marks": "50.00 – 55.50",
+            "category": "ST-2",
+            "marks": "52.50",
             "pct": 53,
-            "safeTarget": "57+ Marks",
-            "note": "SC & ST-1/ST-2 categories"
+            "safeTarget": "55+ Marks",
+            "note": "50 total ST-2 posts (30 non-horizontal: 52.50 – 60.25; Women: 49.25, SPO: 35.00, ESM: 16.00)"
+          },
+          {
+            "category": "ALC / IB",
+            "marks": "49.00",
+            "pct": 49,
+            "safeTarget": "52+ Marks",
+            "note": "20 total ALC/IB posts (16 non-horizontal: 49.00 – 59.75; Women: 48.00, SPO: 38.50)"
+          },
+          {
+            "category": "OBC",
+            "marks": "48.25",
+            "pct": 48,
+            "safeTarget": "51+ Marks",
+            "note": "40 total OBC posts (35 non-horizontal: 48.25 – 60.25; Women: 48.25, SPO: 33.75)"
+          },
+          {
+            "category": "ST-1",
+            "marks": "45.25",
+            "pct": 45,
+            "safeTarget": "48+ Marks",
+            "note": "50 total ST-1 posts (44 non-horizontal: 45.25 – 57.75; Women: 48.75, SPO: 34.00)"
+          },
+          {
+            "category": "SC",
+            "marks": "45.00",
+            "pct": 45,
+            "safeTarget": "48+ Marks",
+            "note": "41 total SC posts (29 non-horizontal: 45.00 – 59.25; Women: 45.25, SPO: 33.75, VHG: 21.50)"
+          },
+          {
+            "category": "EWS",
+            "marks": "40.50",
+            "pct": 41,
+            "safeTarget": "43+ Marks",
+            "note": "50 total EWS posts (37 non-horizontal: 40.50 – 60.50; Women: 39.75, SPO: 50.25)"
+          },
+          {
+            "category": "OM / Women (Horizontal)",
+            "marks": "48.25",
+            "pct": 48,
+            "safeTarget": "51+ Marks",
+            "note": "37 selected under OM/Women (incl. 2 OM/ST2/Women; 1 post kept reserved)"
+          },
+          {
+            "category": "OM / SPO · VHG · ESM",
+            "marks": "33.50 (SPO) · 15.00 (ESM)",
+            "pct": 34,
+            "safeTarget": "36+ Marks",
+            "note": "Horizontal quotas in OM: SPO (33 seats, min 33.50), VHG (7 seats, min 16.75), ESM (20 seats, min 15.00)"
           }
         ]
       }
