@@ -2,7 +2,6 @@ import {
   ArrowRight,
   BookOpen,
   Calendar,
-  Compass,
   Map,
   Scale,
   Sparkles,
@@ -14,15 +13,14 @@ import { usePageMeta } from '../lib/usePageMeta'
 
 export function StudyMaterialPage() {
   usePageMeta({
-    title: 'Study Material & Visual Learning Suite | Ministry of Papers',
+    title: 'Study Material & Interactive Visual Learning Suites | Ministry of Papers',
     description:
-      'Explore high-yield visual learning suites for UPSC CSE, State PSCs, and competitive exams: Constitution of India linewise articles, Modern History timeline (1757–1947), Ramsar wetlands registry (1981–2026), and interactive physical geography maps.',
+      'Explore 4 interactive visual learning suites for UPSC CSE, SSC, JKSSB, and State PSCs: Constitution of India Explorer (Articles 1–395), Modern History Timeline (1757–1947), Ramsar Wetlands Registry (1981–2026), and India Physical Geography Map.',
     canonicalPath: '/study-material',
   })
 
   return (
     <section className="study-material-page">
-      {/* Breadcrumb Navigation */}
       <nav className="rivers-breadcrumb" aria-label="Breadcrumb" style={{ marginBottom: '20px' }}>
         <Link to="/">Home</Link>
         <span aria-hidden="true">›</span>
@@ -31,13 +29,13 @@ export function StudyMaterialPage() {
 
       <header className="study-material-header">
         <div>
-          <p className="study-material-eyebrow">Your Learning Library</p>
+          <p className="study-material-eyebrow">Interactive Learning Tools</p>
           <h1>Study Material</h1>
           <p className="study-material-intro">
-            Curated, visual, and linewise learning suites engineered specifically for UPSC CSE, State PSC, and national competitive exams.
+            Curated, visual, and interactive learning suites engineered for UPSC CSE, SSC, JKSSB, and State PSC aspirants.
           </p>
         </div>
-        <span className="study-material-count">7 Learning Suites</span>
+        <span className="study-material-count">4 Interactive Suites</span>
       </header>
 
       {/* SECTION 1: Indian Polity & Constitution */}
@@ -110,79 +108,53 @@ export function StudyMaterialPage() {
       <section className="study-material-section" aria-labelledby="study-material-geography" style={{ marginBottom: '36px' }}>
         <h2 id="study-material-geography" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Map size={20} color="var(--blue, #2563eb)" />
-          <span>Physical Geography &amp; River Systems</span>
+          <span>Physical Geography &amp; Drainage Atlas</span>
         </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Link className="study-material-card" to="/india-physical-geography-map">
-            <span className="study-material-card-icon" style={{ background: 'var(--blue-bg, #eff6ff)', color: 'var(--blue, #1d4ed8)' }}>
-              <Map size={24} />
-              <Waves size={16} />
+        <Link className="study-material-card" to="/india-physical-geography-map">
+          <span className="study-material-card-icon" style={{ background: 'var(--blue-bg, #eff6ff)', color: 'var(--blue, #1d4ed8)' }}>
+            <Map size={24} />
+            <Waves size={16} />
+          </span>
+          <span className="study-material-card-copy">
+            <span className="study-material-card-label" style={{ color: 'var(--blue, #1d4ed8)' }}>Interactive Visual Map</span>
+            <strong>India Physical Geography &amp; Drainage Map</strong>
+            <span>
+              Interactive digital atlas: zoom and trace 13 major river courses, filter left and right bank tributaries, and locate major freshwater lakes and reservoirs across Indian states.
             </span>
-            <span className="study-material-card-copy">
-              <span className="study-material-card-label" style={{ color: 'var(--blue, #1d4ed8)' }}>Interactive Visual Map</span>
-              <strong>India Physical Geography &amp; Drainage Map</strong>
-              <span>
-                Interactive digital atlas: zoom and trace 13 major river courses, filter left and right bank tributaries, and locate major freshwater lakes and reservoirs across Indian states.
-              </span>
-            </span>
-            <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
-          </Link>
-
-          <Link className="study-material-card" to="/blog/indian-rivers-and-tributaries">
-            <span className="study-material-card-icon" style={{ background: 'var(--card-bg-subtle, #f8fafc)', color: 'var(--ink, #0f172a)' }}>
-              <Compass size={24} />
-              <BookOpen size={16} />
-            </span>
-            <span className="study-material-card-copy">
-              <span className="study-material-card-label">Comprehensive Exam Guide</span>
-              <strong>Indian Rivers &amp; Tributaries Study Guide</strong>
-              <span>
-                Detailed analytical text covering Himalayan vs Peninsular drainage systems, comparative tables, bank-by-bank tributary lists, examiner traps, and worked previous year exam questions.
-              </span>
-            </span>
-            <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
-          </Link>
-        </div>
+          </span>
+          <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
+        </Link>
       </section>
 
-      {/* SECTION 5: General English & Vocabulary */}
-      <section className="study-material-section" aria-labelledby="study-material-english" style={{ marginBottom: '36px' }}>
-        <h2 id="study-material-english" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <BookOpen size={20} color="#7c3aed" />
-          <span>General English &amp; PYQ Vocabulary</span>
-        </h2>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <Link className="study-material-card" to="/blog/jkssb-most-repeated-synonyms-antonyms">
-            <span className="study-material-card-icon" style={{ background: '#f5f3ff', color: '#6d28d9' }}>
-              <BookOpen size={24} />
-              <Sparkles size={16} />
-            </span>
-            <span className="study-material-card-copy">
-              <span className="study-material-card-label" style={{ color: '#6d28d9' }}>JKSSB PYQ Archive (2016–2026)</span>
-              <strong>JKSSB Most Repeated Synonyms, Antonyms &amp; Idioms</strong>
-              <span>
-                Year-wise tables of 62 official JKSSB vocabulary PYQs (FAA, Patwari, Junior Assistant, Inspector, Constable) with highlighted repeats, meanings, and direct solved question links.
-              </span>
-            </span>
-            <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
-          </Link>
-
-          <Link className="study-material-card" to="/blog/ssc-cgl-most-repeated-synonyms-antonyms">
-            <span className="study-material-card-icon" style={{ background: 'var(--blue-bg, #eff6ff)', color: 'var(--blue, #1d4ed8)' }}>
-              <BookOpen size={24} />
-              <Sparkles size={16} />
-            </span>
-            <span className="study-material-card-copy">
-              <span className="study-material-card-label" style={{ color: 'var(--blue, #1d4ed8)' }}>SSC CGL Tier-1 &amp; Tier-2 (2024–2026)</span>
-              <strong>SSC CGL Most Repeated Synonyms, Antonyms &amp; One-Word Substitutions</strong>
-              <span>
-                Year-wise tables of 52 official SSC CGL vocabulary PYQs separated into Synonyms, Antonyms, Idioms, and One-Word Substitutions with repeat tooltips and solved PYQs.
-              </span>
-            </span>
-            <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
-          </Link>
-        </div>
-      </section>
+      <div
+        style={{
+          padding: '16px 20px',
+          borderRadius: '12px',
+          border: '1px solid var(--line)',
+          background: 'var(--card-bg)',
+          display: 'flex',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: '12px',
+        }}
+      >
+        <span style={{ fontSize: '15px', color: 'var(--ink2)' }}>
+          Looking for written PYQ vocabulary lists (JKSSB &amp; SSC CGL) and river study articles?
+        </span>
+        <Link
+          to="/blog"
+          style={{
+            fontSize: '14.5px',
+            fontWeight: 700,
+            color: 'var(--brand)',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          Explore Written Guides in Blog →
+        </Link>
+      </div>
     </section>
   )
 }

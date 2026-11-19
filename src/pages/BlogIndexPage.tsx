@@ -14,7 +14,7 @@ import {
 
 const BLOG_PATH = '/blog'
 
-type BlogCategory = 'All' | 'English Vocabulary' | 'Polity & History' | 'Geography & Environment'
+type BlogCategory = 'All' | 'English Vocabulary' | 'Geography'
 
 type BlogPost = {
   href: string
@@ -47,61 +47,16 @@ const POSTS: BlogPost[] = [
   },
   {
     href: INDIAN_RIVERS_ARTICLE_PATH,
-    category: 'Geography & Environment',
-    tag: 'Study Guide · 13 River Basins',
+    category: 'Geography',
+    tag: '13 River Basins · Tributaries',
     title: 'Indian Rivers and Their Tributaries',
     excerpt: INDIAN_RIVERS_ARTICLE_META.description,
     readTime: '12 min read',
     updated: INDIAN_RIVERS_MODIFIED,
   },
-  {
-    href: '/constitution-of-india',
-    category: 'Polity & History',
-    tag: 'Interactive Explorer · Articles 1–395',
-    title: 'Constitution of India: Preamble, Articles 1–395 & Schedules',
-    excerpt:
-      'Read every constitutional article linewise with Preamble analysis, 25 Parts, all 12 Schedules, landmark Supreme Court doctrines, and exam frequency rankings.',
-    readTime: 'Interactive Suite',
-    updated: '2026-11-16',
-  },
-  {
-    href: '/modern-indian-history-timeline',
-    category: 'Polity & History',
-    tag: 'Chronology · 1757–1947',
-    title: 'Modern Indian History Chronological Timeline (1757–1947)',
-    excerpt:
-      '190 years from the Battle of Plassey to Independence in concise revision points, including 35 Governor-Generals & Viceroys, British Acts, and freedom movements.',
-    readTime: 'Interactive Suite',
-    updated: '2026-11-16',
-  },
-  {
-    href: '/ramsar-wetlands-and-national-parks',
-    category: 'Geography & Environment',
-    tag: 'Registry · 103 Sites (1981–2026)',
-    title: 'Ramsar Wetlands of India Complete Timeline',
-    excerpt:
-      'All 103 Ramsar wetland sites in chronological order through 2026 with river basin linkages, endemic fauna, Montreux Record status, and solved UPSC questions.',
-    readTime: 'Interactive Suite',
-    updated: '2026-11-16',
-  },
-  {
-    href: '/india-physical-geography-map',
-    category: 'Geography & Environment',
-    tag: 'Interactive Map · 13 Rivers',
-    title: 'India Physical Geography & Drainage Map',
-    excerpt:
-      'Interactive digital atlas to trace 13 major river courses, filter left- and right-bank tributaries, and locate major freshwater lakes and reservoirs.',
-    readTime: 'Interactive Map',
-    updated: '2026-11-16',
-  },
 ]
 
-const CATEGORIES: BlogCategory[] = [
-  'All',
-  'English Vocabulary',
-  'Polity & History',
-  'Geography & Environment',
-]
+const CATEGORIES: BlogCategory[] = ['All', 'English Vocabulary', 'Geography']
 
 const fmtDate = (iso: string) =>
   new Date(`${iso}T00:00:00+05:30`).toLocaleDateString('en-IN', {
@@ -110,9 +65,9 @@ const fmtDate = (iso: string) =>
 
 export function BlogIndexPage() {
   usePageMeta({
-    title: 'Blog & Study Guides | Ministry of Papers',
+    title: 'Blog: Written Study Guides & PYQ Articles | Ministry of Papers',
     description:
-      'Evergreen study guides, PYQ vocabulary banks, and interactive learning suites for JKSSB, SSC CGL, UPSC, and State PSC aspirants.',
+      'Evergreen written study guides and PYQ vocabulary archives for JKSSB, SSC CGL, UPSC, and State PSC aspirants.',
     canonicalPath: BLOG_PATH,
   })
 
@@ -133,15 +88,15 @@ export function BlogIndexPage() {
         </nav>
 
         <header className="blog-hub-hero" style={{ marginBottom: '20px' }}>
-          <h1>Study Guides &amp; Blog</h1>
+          <h1>Blog &amp; Written Guides</h1>
           <p className="blog-hub-sub">
-            Evergreen PYQ vocabulary lists, exam-ready study guides, and interactive visual learning suites for JKSSB, SSC CGL, UPSC, and State PSC aspirants.
+            Evergreen PYQ vocabulary banks and in-depth exam study articles from the Ministry of Papers editorial team.
           </p>
         </header>
 
         <div
           role="tablist"
-          aria-label="Filter blog guides by topic"
+          aria-label="Filter blog articles by topic"
           style={{
             display: 'flex',
             flexWrap: 'wrap',
@@ -178,7 +133,7 @@ export function BlogIndexPage() {
           })}
         </div>
 
-        <div className="blog-card-grid">
+        <div className="blog-card-grid" style={{ marginBottom: '28px' }}>
           {filteredPosts.map((post) => (
             <article key={post.href} className="blog-post-card">
               <p className="blog-post-meta">
@@ -195,11 +150,41 @@ export function BlogIndexPage() {
                   Updated <time dateTime={post.updated}>{fmtDate(post.updated)}</time> · {post.readTime}
                 </span>
                 <Link className="blog-post-link" to={post.href}>
-                  Open guide <span aria-hidden="true">→</span>
+                  Read article <span aria-hidden="true">→</span>
                 </Link>
               </p>
             </article>
           ))}
+        </div>
+
+        <div
+          style={{
+            padding: '16px 20px',
+            borderRadius: '12px',
+            border: '1px solid var(--line)',
+            background: 'var(--card-bg)',
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+          }}
+        >
+          <span style={{ fontSize: '15px', color: 'var(--ink2)' }}>
+            Want interactive maps, timelines, and the Constitution Article Explorer?
+          </span>
+          <Link
+            to="/study-material"
+            style={{
+              fontSize: '14.5px',
+              fontWeight: 700,
+              color: 'var(--brand)',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            Open Study Material Tools →
+          </Link>
         </div>
       </main>
     </section>
