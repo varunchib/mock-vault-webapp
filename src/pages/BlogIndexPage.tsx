@@ -6,10 +6,9 @@ import {
   INDIAN_RIVERS_MODIFIED,
 } from './indianRiversArticleMeta'
 import {
-  VOCAB_BLOG_HEADLINE,
-  VOCAB_BLOG_META,
+  JKSSB_VOCAB_CONFIG,
+  SSC_CGL_VOCAB_CONFIG,
   VOCAB_BLOG_MODIFIED,
-  VOCAB_BLOG_PATH,
 } from './vocabBlogArticleMeta'
 
 const BLOG_PATH = '/blog'
@@ -26,11 +25,19 @@ type BlogPost = {
 // Add a new entry here whenever a new blog post is published.
 const POSTS: BlogPost[] = [
   {
-    href: VOCAB_BLOG_PATH,
-    category: 'English Vocabulary',
-    title: VOCAB_BLOG_HEADLINE,
-    excerpt: VOCAB_BLOG_META.description,
-    readTime: '14 min read',
+    href: JKSSB_VOCAB_CONFIG.path,
+    category: 'JKSSB English',
+    title: JKSSB_VOCAB_CONFIG.headline,
+    excerpt: JKSSB_VOCAB_CONFIG.description,
+    readTime: '12 min read',
+    updated: VOCAB_BLOG_MODIFIED,
+  },
+  {
+    href: SSC_CGL_VOCAB_CONFIG.path,
+    category: 'SSC CGL English',
+    title: SSC_CGL_VOCAB_CONFIG.headline,
+    excerpt: SSC_CGL_VOCAB_CONFIG.description,
+    readTime: '12 min read',
     updated: VOCAB_BLOG_MODIFIED,
   },
   {
