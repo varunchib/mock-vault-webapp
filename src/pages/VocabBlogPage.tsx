@@ -27,24 +27,6 @@ const CAT_LABEL: Record<VocabPyqItem['category'], string> = {
   'one-word': 'One-Word',
 }
 
-const BOILERPLATE_PREFIX_RE =
-  /^(?:select|choose|pick\s+out|give|find|identify)\s+(?:the\s+)?(?:most\s+appropriate\s+|correct\s+|nearest\s+|closest\s+|opposite\s+)?(?:meaning\s+of\s+(?:the\s+)?(?:given\s+)?(?:idiom|phrase|word)\s*|one[- ]word\s+substitut(?:e|ion)\s+for\s*|synonym(?:s)?\s+(?:of|for)\s+(?:the\s+)?(?:given\s+)?(?:word|underlined\s+word|italicized\s+(?:word|part))?\s*|antonym(?:s)?\s*\(?(?:opposite\s+meaning)?\)?\s*(?:of|for)\s+(?:the\s+)?(?:given\s+)?(?:word|underlined\s+word|italicized\s+word)?\s*|word\s+which\s+is\s+(?:opposite|nearest|similar)\s+in\s+meaning\s+to\s+the\s+(?:italicized|underlined)\s+(?:word|part)\s*|sentence\s+(?:that\s+)?expresses\s+the\s+correct\s+meaning\s+of\s+the\s+given\s+idiom\s*|idiom\s+for\s+the\s+(?:word|phrase)\s+highlighted\s+in\s+bold\s*)(?:from\s+the\s+options\s+below\.?\s*)?[:\-–.]?\s*/i
-
-function cleanVocabPrompt(item: VocabPyqItem): { heading: string; context: string } {
-  const stripped = item.question.replace(BOILERPLATE_PREFIX_RE, '').trim()
-  const term = item.term.trim()
-  if (term && (!stripped || stripped.toLowerCase() === term.toLowerCase())) {
-    return { heading: term, context: '' }
-  }
-  if (term && stripped.length <= term.length + 12) {
-    return { heading: term, context: '' }
-  }
-  return {
-    heading: term || stripped,
-    context: term && stripped && stripped.toLowerCase() !== term.toLowerCase() ? stripped : '',
-  }
-}
-
 function VocabBlogArticle({
   config,
   pyqItems,
@@ -103,8 +85,8 @@ function VocabBlogArticle({
         if (onlyRepeated && item.repeatCount <= 1) return false
         if (!q) return true
         return (
-          item.term.toLowerCase().includes(q) ||
-          item.question.toLowerCase().includes(q) ||
+          item.word.toLowerCase().includes(q) ||
+          item.meaning.toLowerCase().includes(q) ||
           item.answer.toLowerCase().includes(q) ||
           item.paperTitle.toLowerCase().includes(q)
         )
@@ -276,27 +258,27 @@ function VocabBlogArticle({
             </div>
           </div>
 
-          {/* Year-by-Year Proper Styled Tables */}
-          <section aria-label="Year-wise vocabulary PYQ archive" style={{ marginBottom: '36px' }}>
+          {/* Clean Year-by-Year Word / Meaning / Answer Tables */}
+          <section aria-label="Year-wise vocabulary list" style={{ marginBottom: '36px' }}>
             {groupedByYear.length === 0 ? (
               <p style={{ padding: '20px 0', color: 'var(--ink2)' }}>
-                No matching vocabulary questions found for this filter.
+                No matching vocabulary entries found for this filter.
               </p>
             ) : (
               groupedByYear.map(([yr, items]) => (
                 <section key={yr} id={`year-${yr}`} style={{ marginBottom: '36px' }}>
                   <h2 style={{ marginBottom: '12px' }}>
-                    {examShort} {yr} Vocabulary PYQs ({items.length})
+                    {examShort} {yr} Synonyms, Antonyms &amp; Idioms ({items.length})
                   </h2>
 
                   <div className="river-guide-table-wrap" role="region" aria-label={`${examShort} ${yr} vocabulary table`} tabIndex={0}>
                     <table className="river-guide-table">
                       <thead>
                         <tr>
-                          <th>Word / Prompt</th>
+                          <th>Word / Idiom</th>
                           <th>Type</th>
-                          <th>Answer</th>
-                          <th>Exam Paper</th>
+                          <th>Answer (Synonym / Antonym)</th>
+                          <th>Meaning &amp; Exam</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -306,7 +288,6 @@ function VocabBlogArticle({
                           const tooltipText = isRepeated
                             ? `Repeated ${item.repeatCount}× across: ${item.repeatSources.join(' | ')}`
                             : ''
-                          const { heading, context } = cleanVocabPrompt(item)
 
                           return (
                             <tr
@@ -316,12 +297,7 @@ function VocabBlogArticle({
                               style={isRepeated ? { background: 'var(--hl-bg)' } : undefined}
                             >
                               <td>
-                                <strong>{heading}</strong>
-                                {context && (
-                                  <div style={{ fontSize: '13px', color: 'var(--ink2)', marginTop: '3px', lineHeight: 1.5 }}>
-                                    {context}
-                                  </div>
-                                )}
+                                <strong>{item.word}</strong>
                                 {isRepeated && (
                                   <div style={{ marginTop: '4px', position: 'relative' }}>
                                     <span
@@ -374,16 +350,19 @@ function VocabBlogArticle({
                                 {item.questionHref && (
                                   <div style={{ marginTop: '3px' }}>
                                     <Link to={item.questionHref} style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
-                                      Solution →
+                                      PYQ →
                                     </Link>
                                   </div>
                                 )}
                               </td>
 
-                              <td style={{ fontSize: '13px', color: 'var(--ink2)' }}>
-                                <Link to={`/pyq/${item.paperSlug}`} style={{ color: 'var(--ink2)', textDecoration: 'none' }}>
-                                  {item.paperTitle}
-                                </Link>
+                              <td>
+                                <div style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{item.meaning}</div>
+                                <div style={{ fontSize: '12px', color: 'var(--ink2)', marginTop: '4px' }}>
+                                  <Link to={`/pyq/${item.paperSlug}`} style={{ color: 'var(--ink2)', textDecoration: 'none' }}>
+                                    {item.paperTitle}
+                                  </Link>
+                                </div>
                               </td>
                             </tr>
                           )
