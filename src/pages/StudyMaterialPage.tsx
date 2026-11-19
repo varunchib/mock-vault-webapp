@@ -37,7 +37,7 @@ export function StudyMaterialPage() {
             Curated, visual, and linewise learning suites engineered specifically for UPSC CSE, State PSC, and national competitive exams.
           </p>
         </div>
-        <span className="study-material-count">5 Learning Suites</span>
+        <span className="study-material-count">7 Learning Suites</span>
       </header>
 
       {/* SECTION 1: Indian Polity & Constitution */}
@@ -138,6 +138,45 @@ export function StudyMaterialPage() {
               <strong>Indian Rivers &amp; Tributaries Study Guide</strong>
               <span>
                 Detailed analytical text covering Himalayan vs Peninsular drainage systems, comparative tables, bank-by-bank tributary lists, examiner traps, and worked previous year exam questions.
+              </span>
+            </span>
+            <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+
+      {/* SECTION 5: General English & Vocabulary */}
+      <section className="study-material-section" aria-labelledby="study-material-english" style={{ marginBottom: '36px' }}>
+        <h2 id="study-material-english" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <BookOpen size={20} color="#7c3aed" />
+          <span>General English &amp; PYQ Vocabulary</span>
+        </h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <Link className="study-material-card" to="/blog/jkssb-most-repeated-synonyms-antonyms">
+            <span className="study-material-card-icon" style={{ background: '#f5f3ff', color: '#6d28d9' }}>
+              <BookOpen size={24} />
+              <Sparkles size={16} />
+            </span>
+            <span className="study-material-card-copy">
+              <span className="study-material-card-label" style={{ color: '#6d28d9' }}>JKSSB PYQ Archive (2016–2026)</span>
+              <strong>JKSSB Most Repeated Synonyms, Antonyms &amp; Idioms</strong>
+              <span>
+                Year-wise tables of 62 official JKSSB vocabulary PYQs (FAA, Patwari, Junior Assistant, Inspector, Constable) with highlighted repeats, meanings, and direct solved question links.
+              </span>
+            </span>
+            <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />
+          </Link>
+
+          <Link className="study-material-card" to="/blog/ssc-cgl-most-repeated-synonyms-antonyms">
+            <span className="study-material-card-icon" style={{ background: 'var(--blue-bg, #eff6ff)', color: 'var(--blue, #1d4ed8)' }}>
+              <BookOpen size={24} />
+              <Sparkles size={16} />
+            </span>
+            <span className="study-material-card-copy">
+              <span className="study-material-card-label" style={{ color: 'var(--blue, #1d4ed8)' }}>SSC CGL Tier-1 &amp; Tier-2 (2024–2026)</span>
+              <strong>SSC CGL Most Repeated Synonyms, Antonyms &amp; One-Word Substitutions</strong>
+              <span>
+                Year-wise tables of 52 official SSC CGL vocabulary PYQs separated into Synonyms, Antonyms, Idioms, and One-Word Substitutions with repeat tooltips and solved PYQs.
               </span>
             </span>
             <ArrowRight className="study-material-card-arrow" size={20} aria-hidden="true" />

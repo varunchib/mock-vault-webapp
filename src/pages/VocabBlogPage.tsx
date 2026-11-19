@@ -148,6 +148,7 @@ function VocabBlogArticle({
 
           {/* Clean Editorial Year & Type Controls */}
           <div
+            id="vocab-filters"
             aria-label="Filter vocabulary PYQs by year and type"
             style={{
               borderTop: '1px solid var(--line)',
@@ -320,22 +321,28 @@ function VocabBlogArticle({
                                     style={isRepeated ? { background: 'var(--hl-bg)' } : undefined}
                                   >
                                     <td>
-                                      <strong>{item.word}</strong>
+                                      <strong style={{ wordBreak: 'break-word' }}>{item.word}</strong>
                                       {isRepeated && (
                                         <div style={{ marginTop: '4px', position: 'relative' }}>
-                                          <span
+                                          <button
+                                            type="button"
                                             title={tooltipText}
+                                            onClick={() => setHoveredKey(hoveredKey === rowKey ? null : rowKey)}
+                                            aria-expanded={hoveredKey === rowKey}
                                             style={{
+                                              background: 'none',
+                                              border: 'none',
+                                              borderBottom: '1px dashed #d97706',
+                                              padding: 0,
                                               display: 'inline-block',
                                               fontSize: '11.5px',
                                               fontWeight: 700,
                                               color: '#92400e',
-                                              borderBottom: '1px dashed #d97706',
-                                              cursor: 'help',
+                                              cursor: 'pointer',
                                             }}
                                           >
                                             Repeated {item.repeatCount}×
-                                          </span>
+                                          </button>
                                           {hoveredKey === rowKey && (
                                             <span
                                               role="tooltip"
@@ -344,7 +351,7 @@ function VocabBlogArticle({
                                                 left: 0,
                                                 top: 'calc(100% + 4px)',
                                                 zIndex: 20,
-                                                width: 'min(280px, 75vw)',
+                                                width: 'min(260px, 72vw)',
                                                 padding: '8px 10px',
                                                 borderRadius: '6px',
                                                 background: '#111827',
@@ -393,6 +400,19 @@ function VocabBlogArticle({
                       </div>
                     )
                   })}
+                  <div style={{ textAlign: 'right', marginTop: '-10px' }}>
+                    <a
+                      href="#vocab-filters"
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 600,
+                        color: 'var(--brand)',
+                        textDecoration: 'none',
+                      }}
+                    >
+                      ↑ Back to top
+                    </a>
+                  </div>
                 </section>
               ))
             )}
