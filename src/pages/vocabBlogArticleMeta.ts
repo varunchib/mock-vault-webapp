@@ -39,6 +39,7 @@ export type VocabArticleConfig = {
   badge: string
   deck: string
   quickAnswer: string
+  aboutPage: string
   examHubHref: string
   examHubLabel: string
   guideHref: string
@@ -120,7 +121,9 @@ const JKSSB_BASE: Omit<VocabArticleConfig, 'jsonLd'> = {
   deck:
     'Master the exact synonyms, antonyms, idioms, and one-word substitutions repeatedly tested in JKSSB General English sections—with memory hooks, negative-prefix traps, and direct solved PYQs.',
   quickAnswer:
-    'In JKSSB General English (FAA, Patwari, Junior Assistant, VLW, Supervisor, and Police Constable), 4 to 7 marks come directly from vocabulary—especially high-frequency antonyms/synonyms like Obvious, Prudent, Benign, Spend, Prodigal, Luminous, and classic idioms like Break the ice. Revising words in opposite pairs prevents the classic negative-marking flip.',
+    'JKSSB General English papers (FAA, Patwari, Junior Assistant, Inspector, Wildlife Guard, Lab Attendant, and Constable) award 3 to 6 direct marks from synonyms, antonyms, idioms, and one-word substitutions. Revising JKSSB PYQs year-by-year (2016–2026) and prioritizing repeated words like Benign, Obvious, Feeble, and Break the ice is the fastest way to score full marks without negative marking.',
+  aboutPage:
+    'This page is a complete, year-wise JKSSB General English vocabulary archive built from 62 official previous year questions (2016 to 2026). Every year is split into separate tables for JKSSB Synonyms, JKSSB Antonyms, JKSSB Idioms & Phrases, and JKSSB One-Word Substitutions—with concise meanings, verified official answers, highlighted repeat counts, and direct links to full solved PYQ pages.',
   examHubHref: '/exam/jkssb',
   examHubLabel: 'JKSSB PYQ Hub',
   guideHref: '/guide/jkssb-patwari',
@@ -479,7 +482,9 @@ const SSC_CGL_BASE: Omit<VocabArticleConfig, 'jsonLd'> = {
   deck:
     'High-frequency synonyms, antonyms, idioms, and one-word substitutions repeated across SSC CGL Tier-1 and Tier-2 shifts—mapped with root clues, memory hooks, and direct solved SSC PYQs.',
   quickAnswer:
-    'In SSC CGL Tier-1 (25 Qs) and Tier-2 (45 Qs), vocabulary—synonyms, antonyms, idioms, one-word substitutions, and spellings—accounts for 35% to 45% of the English section. Nearly 60%+ of SSC CGL words repeat directly or via root families (such as Encomium, Puissant, Lachrymose, Fecund, Exiguous, Persiflage, and Soliloquy).',
+    'In SSC CGL Tier-1 (25 English Qs) and Tier-2 (45 English Qs), vocabulary—synonyms, antonyms, idioms & phrases, and one-word substitutions—drives 35% to 45% of the section. Revising SSC CGL PYQs year-by-year (2024–2026) and targeting repeated clusters such as Abstruse/Esoteric (Obscure), Pernicious, and Feeble gives immediate accuracy gains under sectional timing.',
+  aboutPage:
+    'This page is a structured, year-wise SSC CGL English vocabulary archive compiled from 52 official Tier-1 and Tier-2 previous year questions (2024 to 2026). Each exam year is organized into separate tables for SSC CGL Synonyms, SSC CGL Antonyms, SSC CGL Idioms & Phrases, and SSC CGL One-Word Substitutions—complete with meanings, verified answers, repeat-frequency highlights, and direct links to full solved PYQs.',
   examHubHref: '/exam/ssc-cgl',
   examHubLabel: 'SSC CGL PYQ Hub',
   guideHref: '/guide/ssc-cgl',

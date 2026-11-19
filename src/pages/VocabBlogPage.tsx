@@ -20,12 +20,12 @@ const fmtDate = (iso: string) =>
     day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Kolkata',
   })
 
-const CAT_LABEL: Record<VocabPyqItem['category'], string> = {
-  synonym: 'Synonym',
-  antonym: 'Antonym',
-  idiom: 'Idiom',
-  'one-word': 'One-Word',
-}
+const CAT_ORDER: Array<{ key: VocabPyqItem['category']; heading: string; answerCol: string; termCol: string }> = [
+  { key: 'synonym', heading: 'Synonyms', answerCol: 'Synonym (Answer)', termCol: 'Word' },
+  { key: 'antonym', heading: 'Antonyms', answerCol: 'Antonym (Answer)', termCol: 'Word' },
+  { key: 'idiom', heading: 'Idioms & Phrases', answerCol: 'Meaning (Answer)', termCol: 'Idiom / Phrase' },
+  { key: 'one-word', heading: 'One-Word Substitutions', answerCol: 'Definition / Meaning', termCol: 'One-Word Substitute' },
+]
 
 function VocabBlogArticle({
   config,
@@ -114,7 +114,7 @@ function VocabBlogArticle({
 
   return (
     <section className="public-page river-article-page">
-      <main className="public-shell river-article-shell">
+      <main className="public-shell river-article-shell" style={{ overflowX: 'clip' }}>
         <nav className="rivers-breadcrumb" aria-label="Breadcrumb">
           <Link to="/">Home</Link>
           <span aria-hidden="true">›</span>
@@ -123,7 +123,7 @@ function VocabBlogArticle({
           <span>{config.breadcrumbLabel}</span>
         </nav>
 
-        <article className="river-guide-article">
+        <article className="river-guide-article" style={{ maxWidth: '100%', overflowX: 'clip' }}>
           <header className="river-guide-header" style={{ marginBottom: '22px' }}>
             <p className="public-kicker" style={{ marginBottom: '8px' }}>{config.kicker}</p>
             <h1>{config.headline}</h1>
@@ -136,9 +136,14 @@ function VocabBlogArticle({
             </p>
           </header>
 
-          <section className="river-guide-answer" aria-labelledby="vocab-quick-answer">
+          <section className="river-guide-answer" aria-labelledby="vocab-quick-answer" style={{ marginBottom: '20px' }}>
             <h2 id="vocab-quick-answer">Key takeaway</h2>
             <p style={{ marginBottom: 0 }}>{config.quickAnswer}</p>
+          </section>
+
+          <section aria-labelledby="about-this-guide" style={{ marginBottom: '22px' }}>
+            <h2 id="about-this-guide" style={{ fontSize: '19px', marginBottom: '8px' }}>What is in this {examShort} vocabulary guide</h2>
+            <p style={{ marginBottom: 0 }}>{config.aboutPage}</p>
           </section>
 
           {/* Clean Editorial Year & Type Controls */}
@@ -244,9 +249,9 @@ function VocabBlogArticle({
                 placeholder="Search word or meaning..."
                 aria-label="Search vocabulary PYQs"
                 style={{
-                  minWidth: '200px',
-                  flex: '1 1 200px',
-                  maxWidth: '260px',
+                  minWidth: '180px',
+                  flex: '1 1 180px',
+                  maxWidth: '250px',
                   padding: '6px 10px',
                   borderRadius: '6px',
                   border: '1px solid var(--line)',
@@ -258,118 +263,136 @@ function VocabBlogArticle({
             </div>
           </div>
 
-          {/* Clean Year-by-Year Word / Meaning / Answer Tables */}
-          <section aria-label="Year-wise vocabulary list" style={{ marginBottom: '36px' }}>
+          {/* Year-wise -> Separate Table per Category (Synonyms, Antonyms, Idioms, One-Word) */}
+          <section aria-label="Year-wise vocabulary tables" style={{ marginBottom: '36px' }}>
             {groupedByYear.length === 0 ? (
               <p style={{ padding: '20px 0', color: 'var(--ink2)' }}>
                 No matching vocabulary entries found for this filter.
               </p>
             ) : (
-              groupedByYear.map(([yr, items]) => (
-                <section key={yr} id={`year-${yr}`} style={{ marginBottom: '36px' }}>
-                  <h2 style={{ marginBottom: '12px' }}>
-                    {examShort} {yr} Synonyms, Antonyms &amp; Idioms ({items.length})
+              groupedByYear.map(([yr, yearItems]) => (
+                <section key={yr} id={`year-${yr}`} style={{ marginBottom: '42px' }}>
+                  <h2 style={{ marginBottom: '16px', paddingBottom: '6px', borderBottom: '2px solid var(--line)' }}>
+                    {examShort} {yr} Vocabulary Questions ({yearItems.length})
                   </h2>
 
-                  <div className="river-guide-table-wrap" role="region" aria-label={`${examShort} ${yr} vocabulary table`} tabIndex={0}>
-                    <table className="river-guide-table">
-                      <thead>
-                        <tr>
-                          <th>Word / Idiom</th>
-                          <th>Type</th>
-                          <th>Answer (Synonym / Antonym)</th>
-                          <th>Meaning &amp; Exam</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {items.map((item, idx) => {
-                          const isRepeated = item.repeatCount > 1
-                          const rowKey = `${yr}-${item.paperSlug}-${idx}`
-                          const tooltipText = isRepeated
-                            ? `Repeated ${item.repeatCount}× across: ${item.repeatSources.join(' | ')}`
-                            : ''
+                  {CAT_ORDER.map((catSpec) => {
+                    const catItems = yearItems.filter((it) => it.category === catSpec.key)
+                    if (catItems.length === 0) return null
 
-                          return (
-                            <tr
-                              key={rowKey}
-                              onMouseEnter={() => isRepeated && setHoveredKey(rowKey)}
-                              onMouseLeave={() => hoveredKey === rowKey && setHoveredKey(null)}
-                              style={isRepeated ? { background: 'var(--hl-bg)' } : undefined}
-                            >
-                              <td>
-                                <strong>{item.word}</strong>
-                                {isRepeated && (
-                                  <div style={{ marginTop: '4px', position: 'relative' }}>
-                                    <span
-                                      title={tooltipText}
-                                      style={{
-                                        display: 'inline-block',
-                                        fontSize: '11.5px',
-                                        fontWeight: 700,
-                                        color: '#92400e',
-                                        borderBottom: '1px dashed #d97706',
-                                        cursor: 'help',
-                                      }}
-                                    >
-                                      Repeated {item.repeatCount}×
-                                    </span>
-                                    {hoveredKey === rowKey && (
-                                      <span
-                                        role="tooltip"
-                                        style={{
-                                          position: 'absolute',
-                                          left: 0,
-                                          top: 'calc(100% + 4px)',
-                                          zIndex: 20,
-                                          minWidth: '240px',
-                                          maxWidth: '320px',
-                                          padding: '8px 10px',
-                                          borderRadius: '6px',
-                                          background: '#111827',
-                                          color: '#f9fafb',
-                                          fontSize: '12px',
-                                          fontWeight: 500,
-                                          lineHeight: 1.45,
-                                          boxShadow: '0 6px 18px rgba(0,0,0,0.2)',
-                                          whiteSpace: 'normal',
-                                        }}
-                                      >
-                                        <strong>Repeated {item.repeatCount} times:</strong>
-                                        <br />
-                                        {item.repeatSources.join(' · ')}
-                                      </span>
-                                    )}
-                                  </div>
-                                )}
-                              </td>
+                    return (
+                      <div key={`${yr}-${catSpec.key}`} id={`year-${yr}-${catSpec.key}`} style={{ marginBottom: '26px' }}>
+                        <h3 style={{ marginBottom: '10px', fontSize: '17px' }}>
+                          {examShort} {yr} {catSpec.heading} ({catItems.length})
+                        </h3>
 
-                              <td style={{ whiteSpace: 'nowrap' }}>{CAT_LABEL[item.category]}</td>
+                        <div
+                          className="river-guide-table-wrap"
+                          role="region"
+                          aria-label={`${examShort} ${yr} ${catSpec.heading}`}
+                          tabIndex={0}
+                          style={{ maxWidth: '100%', overflowX: 'auto' }}
+                        >
+                          <table
+                            className="river-guide-table"
+                            style={{ width: '100%', tableLayout: 'auto', overflowWrap: 'anywhere', wordBreak: 'break-word' }}
+                          >
+                            <thead>
+                              <tr>
+                                <th style={{ width: '24%' }}>{catSpec.termCol}</th>
+                                <th style={{ width: '24%' }}>{catSpec.answerCol}</th>
+                                <th style={{ width: '52%' }}>Meaning &amp; Exam Paper</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {catItems.map((item, idx) => {
+                                const isRepeated = item.repeatCount > 1
+                                const rowKey = `${yr}-${catSpec.key}-${item.paperSlug}-${idx}`
+                                const tooltipText = isRepeated
+                                  ? `Repeated ${item.repeatCount}× across: ${item.repeatSources.join(' | ')}`
+                                  : ''
 
-                              <td>
-                                <strong style={{ color: 'var(--green)' }}>{item.answer}</strong>
-                                {item.questionHref && (
-                                  <div style={{ marginTop: '3px' }}>
-                                    <Link to={item.questionHref} style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
-                                      PYQ →
-                                    </Link>
-                                  </div>
-                                )}
-                              </td>
+                                return (
+                                  <tr
+                                    key={rowKey}
+                                    onMouseEnter={() => isRepeated && setHoveredKey(rowKey)}
+                                    onMouseLeave={() => hoveredKey === rowKey && setHoveredKey(null)}
+                                    style={isRepeated ? { background: 'var(--hl-bg)' } : undefined}
+                                  >
+                                    <td>
+                                      <strong>{item.word}</strong>
+                                      {isRepeated && (
+                                        <div style={{ marginTop: '4px', position: 'relative' }}>
+                                          <span
+                                            title={tooltipText}
+                                            style={{
+                                              display: 'inline-block',
+                                              fontSize: '11.5px',
+                                              fontWeight: 700,
+                                              color: '#92400e',
+                                              borderBottom: '1px dashed #d97706',
+                                              cursor: 'help',
+                                            }}
+                                          >
+                                            Repeated {item.repeatCount}×
+                                          </span>
+                                          {hoveredKey === rowKey && (
+                                            <span
+                                              role="tooltip"
+                                              style={{
+                                                position: 'absolute',
+                                                left: 0,
+                                                top: 'calc(100% + 4px)',
+                                                zIndex: 20,
+                                                width: 'min(280px, 75vw)',
+                                                padding: '8px 10px',
+                                                borderRadius: '6px',
+                                                background: '#111827',
+                                                color: '#f9fafb',
+                                                fontSize: '12px',
+                                                fontWeight: 500,
+                                                lineHeight: 1.45,
+                                                boxShadow: '0 6px 18px rgba(0,0,0,0.2)',
+                                                whiteSpace: 'normal',
+                                              }}
+                                            >
+                                              <strong>Repeated {item.repeatCount} times:</strong>
+                                              <br />
+                                              {item.repeatSources.join(' · ')}
+                                            </span>
+                                          )}
+                                        </div>
+                                      )}
+                                    </td>
 
-                              <td>
-                                <div style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{item.meaning}</div>
-                                <div style={{ fontSize: '12px', color: 'var(--ink2)', marginTop: '4px' }}>
-                                  <Link to={`/pyq/${item.paperSlug}`} style={{ color: 'var(--ink2)', textDecoration: 'none' }}>
-                                    {item.paperTitle}
-                                  </Link>
-                                </div>
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
+                                    <td>
+                                      <strong style={{ color: 'var(--green)' }}>{item.answer}</strong>
+                                      {item.questionHref && (
+                                        <div style={{ marginTop: '3px' }}>
+                                          <Link to={item.questionHref} style={{ fontSize: '12.5px', fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
+                                            PYQ →
+                                          </Link>
+                                        </div>
+                                      )}
+                                    </td>
+
+                                    <td>
+                                      <div style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{item.meaning}</div>
+                                      <div style={{ fontSize: '12px', color: 'var(--ink2)', marginTop: '4px' }}>
+                                        <Link to={`/pyq/${item.paperSlug}`} style={{ color: 'var(--ink2)', textDecoration: 'none' }}>
+                                          {item.paperTitle}
+                                        </Link>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                )
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    )
+                  })}
                 </section>
               ))
             )}
