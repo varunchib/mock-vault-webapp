@@ -227,6 +227,7 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
                     <p>{group.subtitle}</p>
                   </div>
                 </div>
+                <div className="ec-cat-section-rule" aria-hidden="true" />
                 <span className="ec-cat-section-count">
                   {group.exams.length} {group.exams.length === 1 ? 'Exam' : 'Exams'}
                 </span>
@@ -245,9 +246,13 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
                         </div>
                         <p className="ec-card-full">{exam.name}</p>
                         <div className="ec-card-meta">
-                          {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
+                          {exam.papers > 0 ? (
+                            <span className="ec-meta-pyq">{exam.papers} {exam.papers === 1 ? 'Paper' : 'Papers'}</span>
+                          ) : (
+                            <span>Practice Hub</span>
+                          )}
                           {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
-                          {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
+                          {exam.totalQuestions > 0 && <span>{exam.totalQuestions.toLocaleString()} Qs</span>}
                         </div>
                       </div>
                       <ChevronRight size={15} className="ec-card-arrow" aria-hidden="true" />
