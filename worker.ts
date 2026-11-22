@@ -17,6 +17,7 @@ import { ContactPage } from './src/pages/ContactPage'
 import { DisclaimerPage } from './src/pages/DisclaimerPage'
 import { ExamCatalogPage } from './src/pages/ExamCatalogPage'
 import { PrivacyPolicyPage } from './src/pages/PrivacyPolicyPage'
+import { StudyMaterialPage } from './src/pages/StudyMaterialPage'
 import { TermsPage } from './src/pages/TermsPage'
 import { RiversOfIndiaPage, GEOGRAPHY_MAP_FAQS } from './src/pages/RiversOfIndiaPage'
 import { ConstitutionExplorerPage, CONSTITUTION_EXPLORER_FAQS } from './src/pages/ConstitutionExplorerPage'
@@ -234,13 +235,15 @@ const STATIC_META: Record<string, PageMeta> = {
     contentHtml: `<article class="seo-rendered">
       <h1>Ministry of Papers — Free Previous Year Question Papers, Solved &amp; Explained</h1>
       <p>Ministry of Papers is India's free platform for <strong>previous year question papers (PYQs)</strong> and <strong>mock tests</strong>. Every question is <strong>fully solved</strong> with the official answer key and a detailed explanation — no login, no paywall.</p>
-      <p>Practise solved papers for <strong>UPSC Civil Services, SSC CGL, State PSCs (BPSC, JKSSB, JKPSC, RSSB), Banking (IBPS PO)</strong> and 200+ competitive exams, in both <strong>English and Hindi</strong>.</p>
+      <p>Practise solved papers for <strong>UPSC Civil Services, SSC CGL, State PSCs (BPSC, JKSSB, JKPSC, RSSB), Railways (RRB NTPC), Banking (IBPS PO)</strong> and 200+ competitive exams, in both <strong>English and Hindi</strong>.</p>
       <nav aria-label="Browse exams">
         <a href="/exams">Browse all exams</a>
         <a href="/exam/upsc-cse">UPSC CSE</a>
         <a href="/exam/ssc-cgl">SSC CGL</a>
         <a href="/exam/bpsc">BPSC</a>
         <a href="/exam/jkssb">JKSSB</a>
+        <a href="/exam/rrb-ntpc">RRB NTPC</a>
+        <a href="/exam/ibps-po">IBPS PO</a>
         <a href="/exam/kashmir-university">Kashmir University</a>
         <a href="/pyq/upsc-cse-prelims-2026-gs1">UPSC CSE Prelims 2026 GS1</a>
         <a href="/pyq/kashmir-university-jaa-2026-set-a">Kashmir University JAA 2026</a>
@@ -248,6 +251,21 @@ const STATIC_META: Record<string, PageMeta> = {
         <a href="/pyq/jkssb-wildlife-guard-2026-may-10">JKSSB Wildlife Guard 2026</a>
         <a href="/pyq/jkssb-junior-assistant-pyq">JKSSB Junior Assistant 2026</a>
         <a href="/pyq/jkssb-field-assistant-2026-may-20">JKSSB Field Assistant 2026</a>
+        <a href="/pyq/ssc-cgl-2026-oct01-shift1">SSC CGL 2026 01 Oct Shift 1</a>
+        <a href="/pyq/ssc-cgl-2026-sep30-shift2">SSC CGL 2026 30 Sep Shift 2</a>
+        <a href="/guide/jkssb-constable-telecom">JKSSB Constable Telecommunication Guide &amp; Final Cutoffs</a>
+        <a href="/guide/jkssb-patwari">JKSSB Patwari Exam Guide</a>
+        <a href="/guide/jkssb-junior-assistant">JKSSB Junior Assistant Exam Guide</a>
+        <a href="/guide/ssc-cgl">SSC CGL Exam Guide</a>
+        <a href="/guide/upsc-cse">UPSC CSE Exam Guide</a>
+        <a href="/blog">Study Guides &amp; Blog</a>
+        <a href="/blog/jkssb-most-repeated-synonyms-antonyms">JKSSB Most Repeated Synonyms &amp; Antonyms</a>
+        <a href="/blog/ssc-cgl-most-repeated-synonyms-antonyms">SSC CGL Most Repeated Synonyms &amp; Antonyms</a>
+        <a href="/blog/indian-rivers-and-tributaries">Indian Rivers and Their Tributaries</a>
+        <a href="/study-material">Interactive Study Material Tools</a>
+        <a href="/constitution-of-india">Constitution of India Explorer (Articles 1–395)</a>
+        <a href="/modern-indian-history-timeline">Modern Indian History Timeline (1757–1947)</a>
+        <a href="/ramsar-wetlands-and-national-parks">Ramsar Wetlands of India Timeline</a>
         <a href="/india-physical-geography-map">Explore India’s physical geography map</a>
       </nav>
     </article>`,
@@ -447,8 +465,8 @@ const STATIC_META: Record<string, PageMeta> = {
     ],
   },
   '/blog': {
-    title: 'Blog: Study Guides and Articles | Ministry of Papers',
-    description: 'Study guides and articles for UPSC, SSC and State PSC aspirants, starting with a complete guide to Indian rivers and their tributaries.',
+    title: 'Blog: Written Study Guides & PYQ Articles | Ministry of Papers',
+    description: 'Evergreen written study guides and PYQ vocabulary archives for JKSSB, SSC CGL, UPSC, and State PSC aspirants.',
     contentHtml: renderStaticPage('/blog', createElement(BlogIndexPage)),
     jsonLd: {
       '@context': 'https://schema.org',
@@ -456,6 +474,22 @@ const STATIC_META: Record<string, PageMeta> = {
       name: 'Articles and study guides',
       description: 'Comprehensive study guides, physical geography resources, and exam syllabus breakdowns.',
       url: `${BASE}/blog`,
+      inLanguage: 'en-IN',
+      isPartOf: { '@type': 'WebSite', name: 'Ministry of Papers', url: BASE },
+    },
+  },
+  '/study-material': {
+    title: 'Study Material & Interactive Visual Learning Suites | Ministry of Papers',
+    description:
+      'Explore 4 interactive visual learning suites for UPSC CSE, SSC, JKSSB, and State PSCs: Constitution of India Explorer (Articles 1–395), Modern History Timeline (1757–1947), Ramsar Wetlands Registry (1981–2026), and India Physical Geography Map.',
+    contentHtml: renderStaticPage('/study-material', createElement(StudyMaterialPage)),
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: 'Study Material & Interactive Learning Suites — Ministry of Papers',
+      description:
+        'Interactive visual learning suites for UPSC CSE, SSC, JKSSB, and State PSCs: Constitution of India Explorer, Modern History Timeline, Ramsar Wetlands Registry, and India Physical Geography Map.',
+      url: `${BASE}/study-material`,
       inLanguage: 'en-IN',
       isPartOf: { '@type': 'WebSite', name: 'Ministry of Papers', url: BASE },
     },
