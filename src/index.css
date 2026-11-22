@@ -7460,6 +7460,16 @@ footer {
    body so plain-paragraph explanations elsewhere are untouched. */
 .pyq-solution-body > *:first-child { margin-top: 0; }
 .pyq-solution-body p { font-size: 15.5px; line-height: 1.75; color: var(--ink); margin: 0 0 10px; }
+.pyq-solution-body p.expl-lead {
+  font-size: 15.5px;
+  line-height: 1.72;
+  color: var(--ink);
+  background: color-mix(in srgb, var(--line2) 55%, transparent);
+  border-left: 3px solid var(--brand, #0f766e);
+  padding: 10px 14px;
+  border-radius: 0 8px 8px 0;
+  margin: 0 0 14px;
+}
 .pyq-solution-body p:last-child { margin-bottom: 0; }
 
 .pyq-solution-body .expl-heading {
@@ -14393,6 +14403,74 @@ html[data-theme="dark"] {
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+}
+
+/* Category-segregated exam sections (ExamSide style) */
+.ec-sections-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.ec-cat-section {
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--line, #e5e7eb);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.ec-cat-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--line, #e5e7eb);
+  flex-wrap: wrap;
+}
+
+.ec-cat-section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ec-cat-section-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--line2, #f3f4f6);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 19px;
+  flex-shrink: 0;
+}
+
+.ec-cat-section-title h2,
+.ec-cat-section-title h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.25;
+}
+
+.ec-cat-section-title p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--ink3, var(--ink2));
+}
+
+.ec-cat-section-count {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--line2, #f3f4f6);
+  color: var(--ink2);
+  white-space: nowrap;
 }
 
 /* Card grid */

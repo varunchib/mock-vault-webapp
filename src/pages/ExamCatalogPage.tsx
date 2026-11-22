@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { HaloLoader } from '../components/common/HaloLoader'
 import { searchExams } from '../lib/examSearch'
-import { topLevelBoards } from '../lib/examTree'
 import {
   fetchExamCatalog,
   fetchEnrolledSlugs,
@@ -13,8 +12,7 @@ import {
 import { usePageMeta } from '../lib/usePageMeta'
 import {
   categoryIcons,
-  categoryOrder,
-  normalizeExamCategory,
+  groupExamsBySection,
 } from '../lib/examCategories'
 
 const ALL = 'All'
@@ -27,7 +25,7 @@ function requestExamCatalog() {
     fetchEnrolledSlugs().catch(() => ({ slugs: [] as string[] })),
   ]).then(([catalog, enrolled]) => {
     const all = (catalog ?? []).filter((e) => !isHiddenExam(e))
-    return { all, boards: topLevelBoards(all), enrolled: new Set(enrolled.slugs) }
+    return { all, enrolled: new Set(enrolled.slugs) }
   })
 }
 
@@ -36,9 +34,6 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
   const searchKey = searchParams.toString()
   const searchQuery = searchParams.get('q') ?? ''
   const visibleInitial = initialExams ? initialExams.filter((e) => !isHiddenExam(e)) : undefined
-  const [exams, setExams] = useState<Exam[]>(() => visibleInitial ? topLevelBoards(visibleInitial) : [])
-  // Full catalog including sub-exams. The grid browses boards only, but search
-  // spans everything — otherwise sub-exams like JKSSB Patwari are unreachable.
   const [allExams, setAllExams] = useState<Exam[]>(visibleInitial ?? [])
   const [enrolledSlugs, setEnrolledSlugs] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(initialExams === undefined)
@@ -50,17 +45,23 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
   const query = queryState.searchKey === searchKey ? queryState.value : searchQuery
   const setQuery = (value: string) => setQueryState({ searchKey, value })
 
-  const catalogCountLabel = allExams.length > 0 ? `${allExams.length} ` : ''
+  const allGroups = useMemo(() => groupExamsBySection(allExams), [allExams])
+  const totalVisibleExams = useMemo(
+    () => allGroups.reduce((sum, g) => sum + g.exams.length, 0),
+    [allGroups],
+  )
+
+  const catalogCountLabel = totalVisibleExams > 0 ? `${totalVisibleExams} ` : ''
 
   usePageMeta({
     title: `Exam Catalog — Browse ${catalogCountLabel}Competitive Exams | Ministry of Papers`,
-    description: `Browse ${catalogCountLabel}competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.`,
+    description: `Browse ${catalogCountLabel}competitive exams segregated by category — SSC, State Exams (JKSSB, JKPSC, BPSC, UPPCS, RSSB, HP), UPSC, Railways (RRB), and Banking (IBPS).`,
     canonicalPath: '/exams',
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'CollectionPage',
       name: 'Exam Catalog — Ministry of Papers',
-      description: `Browse ${catalogCountLabel}competitive exams — UPSC, SSC, Banking, Railways, State PSCs and more. Access PYQs and mock tests for every exam.`,
+      description: `Browse ${catalogCountLabel}competitive exams — SSC, State PSCs, JKSSB, UPSC, Railways, Banking and more.`,
       url: 'https://ministryofpapers.com/exams',
       publisher: {
         '@type': 'Organization',
@@ -81,8 +82,7 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
     setLoading(true)
     setError(false)
     void requestExamCatalog()
-      .then(({ all, boards, enrolled }) => {
-        setExams(boards)
+      .then(({ all, enrolled }) => {
         setAllExams(all)
         setEnrolledSlugs(enrolled)
       })
@@ -94,9 +94,8 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
     if (initialExams !== undefined) return
     let cancelled = false
     void requestExamCatalog()
-      .then(({ all, boards, enrolled }) => {
+      .then(({ all, enrolled }) => {
         if (cancelled) return
-        setExams(boards)
         setAllExams(all)
         setEnrolledSlugs(enrolled)
       })
@@ -106,34 +105,29 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
       .finally(() => {
         if (!cancelled) setLoading(false)
       })
-      return () => { cancelled = true }
+    return () => { cancelled = true }
   }, [initialExams])
 
-  const categories = useMemo(() => {
-    const raw = [...new Set(exams.map((e) => normalizeExamCategory(e.category)))]
-    return [ALL, ...raw.sort((a, b) => {
-      const ai = categoryOrder.indexOf(a)
-      const bi = categoryOrder.indexOf(b)
-      if (ai === -1 && bi === -1) return a.localeCompare(b)
-      if (ai === -1) return 1
-      if (bi === -1) return -1
-      return ai - bi
-    })]
-  }, [exams])
+  const categories = useMemo(
+    () => [ALL, ...allGroups.map((g) => g.label)],
+    [allGroups],
+  )
 
   const q = query.trim()
-  // Browse the boards; search the whole catalog. Restricting search to boards
-  // made sub-exams (JKSSB Patwari, Junior Assistant, ...) unfindable here even
-  // though they have their own pages.
-  //
-  // The category filter is applied AFTER searching, not before: searchExams
-  // reads the board/sub-exam relationship out of the list it is given, so
-  // handing it a category slice would hide the children that identify a board
-  // and boards would leak back into the results. Both are independent
-  // predicates, so the final set is identical either way.
-  const hits = q ? searchExams(allExams, q) : exams
-  const filtered = hits.filter(
-    (e) => activeCategory === ALL || normalizeExamCategory(e.category) === activeCategory,
+  const baseList = useMemo(
+    () => (q ? searchExams(allExams, q) : allExams),
+    [allExams, q],
+  )
+
+  const filteredGroups = useMemo(() => {
+    const groups = groupExamsBySection(baseList)
+    if (activeCategory === ALL) return groups
+    return groups.filter((g) => g.label === activeCategory)
+  }, [baseList, activeCategory])
+
+  const filteredCount = useMemo(
+    () => filteredGroups.reduce((sum, g) => sum + g.exams.length, 0),
+    [filteredGroups],
   )
 
   if (loading) return React.createElement(HaloLoader, { label: 'Loading exams' })
@@ -154,9 +148,6 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
 
   return (
     <div className="ec-page">
-
-      {/* Backs the BreadcrumbList declared above: structured data must reflect
-          a trail the page actually shows. */}
       <nav className="ep-breadcrumb" aria-label="Breadcrumb">
         <Link to="/">Home</Link>
         <ChevronRight size={13} />
@@ -167,13 +158,13 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
       <header className="ec-header">
         <div className="ec-header-left">
           <small>Exam catalog</small>
-          <h1>Exams</h1>
-          <p>Browse all exams, enroll in yours, and access mocks &amp; PYQs from your dashboard.</p>
+          <h1>All Competitive Exams</h1>
+          <p>Browse exams segregated by category — SSC, State Exams, UPSC, Railways &amp; Banking.</p>
         </div>
         <div className="ec-header-stats">
           <div className="ec-stat">
-            <strong>{exams.length}</strong>
-            <span>Boards</span>
+            <strong>{totalVisibleExams}</strong>
+            <span>Exams</span>
           </div>
           <div className="ec-stat">
             <strong>{enrolledCount}</strong>
@@ -201,7 +192,7 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
           <input
             value={query}
             onChange={(ev) => setQuery(ev.target.value)}
-            placeholder="Search exams, subjects…"
+            placeholder="Search exams, posts, subjects…"
           />
           {query && (
             <button type="button" onClick={() => setQuery('')} aria-label="Clear">
@@ -213,7 +204,7 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
 
       {/* ── Results count ───────────────────────────── */}
       <div className="ec-results-bar">
-        <span>{filtered.length} board{filtered.length !== 1 ? 's' : ''}</span>
+        <span>{filteredCount} exam{filteredCount !== 1 ? 's' : ''} across {filteredGroups.length} categor{filteredGroups.length !== 1 ? 'ies' : 'y'}</span>
         {(activeCategory !== ALL || query) && (
           <button type="button" className="ec-clear-btn" onClick={() => { setActiveCategory(ALL); setQuery('') }}>
             Clear filters
@@ -221,30 +212,49 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
         )}
       </div>
 
-      {/* ── Grid ────────────────────────────────────── */}
-      {filtered.length === 0 ? (
-        <p className="ec-empty">No boards matched your filters.</p>
+      {/* ── Segregated Category Sections (ExamSide style) ── */}
+      {filteredGroups.length === 0 ? (
+        <p className="ec-empty">No exams matched your filters.</p>
       ) : (
-        <div className="ec-grid">
-          {filtered.map((exam) => {
-            const enrolled = enrolledSlugs.has(exam.slug)
-            return (
-              <Link className={`ec-card${enrolled ? ' enrolled' : ''}`} to={`/exam/${exam.slug}`} key={exam.slug}>
-                <div className="ec-card-top">
-                  <span className="ec-card-icon">{exam.icon}</span>
-                  {enrolled && <CheckCircle2 size={15} className="ec-enrolled-check" />}
+        <div className="ec-sections-stack">
+          {filteredGroups.map((group) => (
+            <section key={group.label} className="ec-cat-section">
+              <div className="ec-cat-section-head">
+                <div className="ec-cat-section-title">
+                  <span className="ec-cat-section-icon" aria-hidden="true">{group.icon}</span>
+                  <div>
+                    <h2>{group.label}</h2>
+                    <p>{group.subtitle}</p>
+                  </div>
                 </div>
-                <strong className="ec-card-name">{exam.shortName}</strong>
-                <p className="ec-card-full">{exam.name}</p>
-                <div className="ec-card-meta">
-                  {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
-                  {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
-                  {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
-                </div>
-                <span className="ec-card-cta">View exam →</span>
-              </Link>
-            )
-          })}
+                <span className="ec-cat-section-count">
+                  {group.exams.length} {group.exams.length === 1 ? 'Exam' : 'Exams'}
+                </span>
+              </div>
+
+              <div className="ec-grid">
+                {group.exams.map((exam) => {
+                  const enrolled = enrolledSlugs.has(exam.slug)
+                  return (
+                    <Link className={`ec-card${enrolled ? ' enrolled' : ''}`} to={`/exam/${exam.slug}`} key={exam.slug}>
+                      <div className="ec-card-top">
+                        <span className="ec-card-icon">{exam.icon}</span>
+                        {enrolled && <CheckCircle2 size={15} className="ec-enrolled-check" />}
+                      </div>
+                      <strong className="ec-card-name">{exam.shortName}</strong>
+                      <p className="ec-card-full">{exam.name}</p>
+                      <div className="ec-card-meta">
+                        {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
+                        {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
+                        {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
+                      </div>
+                      <span className="ec-card-cta">View exam →</span>
+                    </Link>
+                  )
+                })}
+              </div>
+            </section>
+          ))}
         </div>
       )}
     </div>
