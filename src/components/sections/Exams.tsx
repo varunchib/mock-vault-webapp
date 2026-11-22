@@ -43,16 +43,20 @@ export function Exams() {
                 </span>
               </div>
 
-              <div className="exam-grid">
+              <div className="ec-grid">
                 {group.exams.map((exam) => (
-                  <Link className="exam-card" to={`/exam/${exam.slug}`} key={exam.slug}>
-                    <div className="ec-icon">{exam.icon}</div>
-                    <h4 className="ec-name">{exam.shortName}</h4>
-                    <div className="ec-sub">
-                      {exam.papers > 0 ? `${exam.papers} PYQ Papers · ` : ''}
-                      {exam.totalQuestions} questions
+                  <Link className="ec-card" to={`/exam/${exam.slug}`} key={exam.slug}>
+                    <span className="ec-card-icon" aria-hidden="true">{exam.icon}</span>
+                    <div className="ec-card-body">
+                      <div className="ec-card-title-row">
+                        <strong className="ec-card-name">{exam.shortName}</strong>
+                      </div>
+                      <p className="ec-card-full">{exam.name}</p>
+                      <div className="ec-card-meta">
+                        {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
+                        {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
+                      </div>
                     </div>
-                    <div className="ec-badge">{group.label.replace(/\s*\(.*\)/, '')}</div>
                   </Link>
                 ))}
               </div>

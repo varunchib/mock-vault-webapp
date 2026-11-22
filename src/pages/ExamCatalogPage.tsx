@@ -237,18 +237,20 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
                   const enrolled = enrolledSlugs.has(exam.slug)
                   return (
                     <Link className={`ec-card${enrolled ? ' enrolled' : ''}`} to={`/exam/${exam.slug}`} key={exam.slug}>
-                      <div className="ec-card-top">
-                        <span className="ec-card-icon">{exam.icon}</span>
-                        {enrolled && <CheckCircle2 size={15} className="ec-enrolled-check" />}
+                      <span className="ec-card-icon" aria-hidden="true">{exam.icon}</span>
+                      <div className="ec-card-body">
+                        <div className="ec-card-title-row">
+                          <strong className="ec-card-name">{exam.shortName}</strong>
+                          {enrolled && <CheckCircle2 size={14} className="ec-enrolled-check" />}
+                        </div>
+                        <p className="ec-card-full">{exam.name}</p>
+                        <div className="ec-card-meta">
+                          {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
+                          {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
+                          {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
+                        </div>
                       </div>
-                      <strong className="ec-card-name">{exam.shortName}</strong>
-                      <p className="ec-card-full">{exam.name}</p>
-                      <div className="ec-card-meta">
-                        {exam.papers > 0 && <span>{exam.papers} PYQs</span>}
-                        {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
-                        {exam.totalQuestions > 0 && <span>{exam.totalQuestions} Qs</span>}
-                      </div>
-                      <span className="ec-card-cta">View exam →</span>
+                      <ChevronRight size={15} className="ec-card-arrow" aria-hidden="true" />
                     </Link>
                   )
                 })}
