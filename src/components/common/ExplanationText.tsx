@@ -20,7 +20,7 @@ type ListItem = { text: string; sub: string[] }
 type Block =
   | { t: 'p'; text: string }
   | { t: 'h'; text: string }
-  | { t: 'ul'; items: ListItem[] }
+  | { t: 'ul'; ordered: boolean; items: ListItem[] }
   | { t: 'table'; head: string[]; rows: string[][] }
 
 // A pipe-table row: | a | b | c |  (leading/trailing pipe optional)
@@ -49,17 +49,19 @@ function parseExplanation(raw: string): Block[] {
   const lines = raw.replace(/\r/g, '').split('\n')
   const blocks: Block[] = []
   let list: ListItem[] | null = null
+  let listOrdered = false
 
   const flush = () => {
-    if (list && list.length) blocks.push({ t: 'ul', items: list })
+    if (list && list.length) blocks.push({ t: 'ul', ordered: listOrdered, items: list })
     list = null
+    listOrdered = false
   }
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].replace(/\s+$/, '')
     if (!line.trim()) { flush(); continue }
 
-    const heading = line.match(/^\s*#{2,3}\s+(.*)$/)
+    const heading = line.match(/^\s*#{1,4}\s+(.*)$/)
     if (heading) { flush(); blocks.push({ t: 'h', text: heading[1].trim() }); continue }
 
     // Pipe table: a header row, a separator row, then one or more body rows.
@@ -79,7 +81,20 @@ function parseExplanation(raw: string): Block[] {
     if (nested && list && list.length) { list[list.length - 1].sub.push(nested[1].trim()); continue }
 
     const bullet = line.match(/^\s*[-*•]\s+(.*)$/)
-    if (bullet) { if (!list) list = []; list.push({ text: bullet[1].trim(), sub: [] }); continue }
+    if (bullet) {
+      if (list && listOrdered) flush()
+      if (!list) { list = []; listOrdered = false }
+      list.push({ text: bullet[1].trim(), sub: [] })
+      continue
+    }
+
+    const ordered = line.match(/^\s*\d+[.)]\s+(.*)$/)
+    if (ordered) {
+      if (list && !listOrdered) flush()
+      if (!list) { list = []; listOrdered = true }
+      list.push({ text: ordered[1].trim(), sub: [] })
+      continue
+    }
 
     flush()
     blocks.push({ t: 'p', text: line.trim() })
@@ -107,8 +122,9 @@ export function ExplanationText({ text }: { text: string }) {
           )
         }
         if (b.t === 'ul') {
+          const ListTag = b.ordered ? 'ol' : 'ul'
           return (
-            <ul key={i} className="expl-list">
+            <ListTag key={i} className={b.ordered ? 'expl-list expl-num-list' : 'expl-list'}>
               {b.items.map((it, j) => (
                 <li key={j}>
                   <MathText text={it.text} />
@@ -119,7 +135,7 @@ export function ExplanationText({ text }: { text: string }) {
                   )}
                 </li>
               ))}
-            </ul>
+            </ListTag>
           )
         }
         if (b.t === 'table') {

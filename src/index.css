@@ -12452,10 +12452,11 @@ footer {
   border-radius: 0 6px 6px 0;
   margin: 6px 0 0;
 }
-.sq-explanation.pyq-solution-body p { font-size: 14.5px; margin: 0 0 8px; }
-.sq-explanation.pyq-solution-body .expl-heading { font-size: 14.5px; margin: 14px 0 8px; }
-.sq-explanation.pyq-solution-body .expl-list > li { font-size: 14px; }
-.sq-explanation.pyq-solution-body .expl-sublist > li { font-size: 13.5px; }
+.sq-explanation.pyq-solution-body p { font-size: 15.5px; margin: 0 0 10px; }
+.sq-explanation.pyq-solution-body .expl-heading { font-size: 15px; margin: 14px 0 8px; }
+.sq-explanation.pyq-solution-body .expl-list > li { font-size: 15px; }
+.sq-explanation.pyq-solution-body .expl-sublist > li { font-size: 14.5px; }
+.pyq-solution-body .expl-num-list { list-style: decimal; padding-left: 20px; }
 
 /* Load more */
 .sq-load-more { display: flex; justify-content: center; padding: 20px 0 4px; }

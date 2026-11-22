@@ -37,7 +37,9 @@ import { recordExamView } from '../lib/examActivity'
 import { subExamsOf } from '../lib/examTree'
 import { normalizeExamCategory } from '../lib/examCategories'
 import { QuestionRenderer } from '../components/common/QuestionRenderer'
+import { MathText } from '../components/common/MathText'
 import { ExplanationText } from '../components/common/ExplanationText'
+import { cleanPassageText, questionPath } from '../lib/questionUrl'
 import { getExamFaqs } from '../data/examFaq'
 import { FaqAccordion } from '../components/common/FaqAccordion'
 
@@ -109,7 +111,19 @@ function SubjectMCQ({ q, idx, topics, onTagClick }: {
         )}
         <span className="sq-source">{q.paper}{q.year ? ` · ${q.year}` : ' · PYQ'}</span>
       </div>
+      {q.passage && (
+        <div className="pyq-passage">
+          <QuestionRenderer className="pyq-passage-text" text={cleanPassageText(q.passage)} />
+        </div>
+      )}
       <QuestionRenderer className="sq-question" text={q.question} />
+      {q.images && q.images.length > 0 && (
+        <div className="pyq-q-images">
+          {q.images.map((src, i) => (
+            <img key={i} src={src} alt={`Question ${idx + 1} figure ${i + 1}`} loading="lazy" />
+          ))}
+        </div>
+      )}
       <div className="sq-options">
         {q.options.map((opt) => {
           const isCorrect = opt.key === q.answerKey
@@ -128,14 +142,29 @@ function SubjectMCQ({ q, idx, topics, onTagClick }: {
               disabled={answered}
             >
               <span className="sq-opt-key">{opt.key}</span>
-              <span className="sq-opt-text">{opt.text}</span>
+              <span className="sq-opt-text"><MathText text={opt.text} /></span>
             </button>
           )
         })}
       </div>
+      {answered && (
+        <div className="sq-result-row" style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '8px', marginTop: '10px' }}>
+          <div className={`pyq-result ${selected === q.answerKey ? 'correct' : 'wrong'}`}>
+            {selected === q.answerKey ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
+          </div>
+          {q.slug && (
+            <Link to={questionPath(q)} className="sq-full-link" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
+              View Full Solution →
+            </Link>
+          )}
+        </div>
+      )}
       {answered && q.explanation && (
-        <div className="sq-explanation pyq-solution-body">
-          <ExplanationText text={q.explanation} />
+        <div className="pyq-explanation" style={{ marginTop: '10px' }}>
+          <strong>Explanation</strong>
+          <div className="pyq-solution-body">
+            <ExplanationText text={q.explanation} />
+          </div>
         </div>
       )}
     </div>
