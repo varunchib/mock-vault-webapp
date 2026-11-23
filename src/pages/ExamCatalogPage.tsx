@@ -10,12 +10,18 @@ import {
   type Exam,
 } from '../lib/api'
 import { usePageMeta } from '../lib/usePageMeta'
-import {
-  categoryIcons,
-  groupExamsBySection,
-} from '../lib/examCategories'
+import { groupExamsBySection } from '../lib/examCategories'
 
 const ALL = 'All'
+
+const SHORT_TAB_LABELS: Record<string, string> = {
+  'SSC Exams': 'SSC',
+  'State Exams (J&K — JKSSB & JKPSC)': 'J&K State',
+  'State PSC & State Exams': 'State PSCs',
+  'UPSC & Civil Services': 'UPSC',
+  'Railways (RRB)': 'Railways',
+  'Banking & Insurance': 'Banking',
+}
 
 const isHiddenExam = (e: Exam) => e.slug === 'neet-ug' || /\bneet\b/i.test(e.slug) || /\bnta\b/i.test(e.name)
 
@@ -27,6 +33,14 @@ function requestExamCatalog() {
     const all = (catalog ?? []).filter((e) => !isHiddenExam(e))
     return { all, enrolled: new Set(enrolled.slugs) }
   })
+}
+
+function formatCardMeta(exam: Exam): string {
+  const parts: string[] = []
+  if (exam.papers > 0) parts.push(`${exam.papers} ${exam.papers === 1 ? 'Paper' : 'Papers'}`)
+  if (exam.totalQuestions > 0) parts.push(`${exam.totalQuestions.toLocaleString()} Qs`)
+  if (exam.mocks > 0 && parts.length < 2) parts.push(`${exam.mocks} Mocks`)
+  return parts.length > 0 ? parts.join(' · ') : 'Practice Hub'
 }
 
 export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
@@ -125,11 +139,6 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
     return groups.filter((g) => g.label === activeCategory)
   }, [baseList, activeCategory])
 
-  const filteredCount = useMemo(
-    () => filteredGroups.reduce((sum, g) => sum + g.exams.length, 0),
-    [filteredGroups],
-  )
-
   if (loading) return React.createElement(HaloLoader, { label: 'Loading exams' })
 
   if (error) {
@@ -144,116 +153,79 @@ export function ExamCatalogPage({ initialExams }: { initialExams?: Exam[] }) {
     )
   }
 
-  const enrolledCount = enrolledSlugs.size
-
   return (
     <div className="ec-page">
-      <nav className="ep-breadcrumb" aria-label="Breadcrumb">
-        <Link to="/">Home</Link>
-        <ChevronRight size={13} />
-        <span aria-current="page">Exams</span>
-      </nav>
-
-      {/* ── Header ───────────────────────────────────── */}
+      {/* ── Minimal Editorial Header ───────────────────── */}
       <header className="ec-header">
         <div className="ec-header-left">
-          <small>Exam catalog</small>
-          <h1>All Competitive Exams</h1>
-          <p>Browse exams segregated by category — SSC, State Exams, UPSC, Railways &amp; Banking.</p>
+          <h1>All Exams</h1>
+          <p>Previous year papers with verified keys and structured explanations.</p>
         </div>
-        <div className="ec-header-stats">
-          <div className="ec-stat">
-            <strong>{totalVisibleExams}</strong>
-            <span>Exams</span>
-          </div>
-          <div className="ec-stat">
-            <strong>{enrolledCount}</strong>
-            <span>Enrolled</span>
-          </div>
-        </div>
-      </header>
-
-      {/* ── Filter bar ──────────────────────────────── */}
-      <div className="ec-filter-bar">
-        <div className="ec-category-tabs">
-          {categories.map((cat) => (
-            <button
-              key={cat}
-              type="button"
-              className={`ec-cat-tab${activeCategory === cat ? ' active' : ''}`}
-              onClick={() => { setActiveCategory(cat); setQuery('') }}
-            >
-              {cat !== ALL && (categoryIcons[cat.toLowerCase()] ?? '')} {cat}
-            </button>
-          ))}
-        </div>
-        <label className="ec-search">
-          <Search size={14} />
+        <label className="ec-search" aria-label="Search exams">
+          <Search size={15} />
           <input
             value={query}
             onChange={(ev) => setQuery(ev.target.value)}
-            placeholder="Search exams, posts, subjects…"
+            placeholder="Search exams (e.g. SSC CGL, JKSSB FAA, UPSC)…"
           />
           {query && (
-            <button type="button" onClick={() => setQuery('')} aria-label="Clear">
-              <X size={13} />
+            <button type="button" onClick={() => setQuery('')} aria-label="Clear search">
+              <X size={14} />
             </button>
           )}
         </label>
-      </div>
+      </header>
 
-      {/* ── Results count ───────────────────────────── */}
-      <div className="ec-results-bar">
-        <span>{filteredCount} exam{filteredCount !== 1 ? 's' : ''} across {filteredGroups.length} categor{filteredGroups.length !== 1 ? 'ies' : 'y'}</span>
-        {(activeCategory !== ALL || query) && (
-          <button type="button" className="ec-clear-btn" onClick={() => { setActiveCategory(ALL); setQuery('') }}>
-            Clear filters
+      {/* ── Clean Category Pills ───────────────────────── */}
+      <div className="ec-category-tabs" role="tablist" aria-label="Exam categories">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            role="tab"
+            aria-selected={activeCategory === cat}
+            className={`ec-cat-tab${activeCategory === cat ? ' active' : ''}`}
+            onClick={() => { setActiveCategory(cat); setQuery('') }}
+          >
+            {cat === ALL ? `All (${totalVisibleExams})` : (SHORT_TAB_LABELS[cat] ?? cat)}
           </button>
-        )}
+        ))}
       </div>
 
-      {/* ── Segregated Category Sections (ExamSide style) ── */}
+      {/* ── Clean Segregated Sections ──────────────────── */}
       {filteredGroups.length === 0 ? (
-        <p className="ec-empty">No exams matched your filters.</p>
+        <div className="ec-empty">
+          <p>No exams matched “{query}”.</p>
+          <button type="button" className="ec-clear-btn" onClick={() => { setActiveCategory(ALL); setQuery('') }}>
+            Reset filters
+          </button>
+        </div>
       ) : (
         <div className="ec-sections-stack">
           {filteredGroups.map((group) => (
             <section key={group.label} className="ec-cat-section">
               <div className="ec-cat-section-head">
-                <div className="ec-cat-section-title">
-                  <span className="ec-cat-section-icon" aria-hidden="true">{group.icon}</span>
-                  <div>
-                    <h2>{group.label}</h2>
-                    <p>{group.subtitle}</p>
-                  </div>
-                </div>
-                <div className="ec-cat-section-rule" aria-hidden="true" />
-                <span className="ec-cat-section-count">
-                  {group.exams.length} {group.exams.length === 1 ? 'Exam' : 'Exams'}
-                </span>
+                <h2>{group.label}</h2>
+                <span className="ec-cat-section-count">{group.exams.length}</span>
               </div>
 
               <div className="ec-grid">
                 {group.exams.map((exam) => {
                   const enrolled = enrolledSlugs.has(exam.slug)
                   return (
-                    <Link className={`ec-card${enrolled ? ' enrolled' : ''}`} to={`/exam/${exam.slug}`} key={exam.slug}>
+                    <Link
+                      className={`ec-card${enrolled ? ' enrolled' : ''}`}
+                      to={`/exam/${exam.slug}`}
+                      key={exam.slug}
+                      title={exam.name}
+                    >
                       <span className="ec-card-icon" aria-hidden="true">{exam.icon}</span>
                       <div className="ec-card-body">
                         <div className="ec-card-title-row">
                           <strong className="ec-card-name">{exam.shortName}</strong>
-                          {enrolled && <CheckCircle2 size={14} className="ec-enrolled-check" />}
+                          {enrolled && <CheckCircle2 size={13} className="ec-enrolled-check" />}
                         </div>
-                        <p className="ec-card-full">{exam.name}</p>
-                        <div className="ec-card-meta">
-                          {exam.papers > 0 ? (
-                            <span className="ec-meta-pyq">{exam.papers} {exam.papers === 1 ? 'Paper' : 'Papers'}</span>
-                          ) : (
-                            <span>Practice Hub</span>
-                          )}
-                          {exam.mocks > 0 && <span>{exam.mocks} Mocks</span>}
-                          {exam.totalQuestions > 0 && <span>{exam.totalQuestions.toLocaleString()} Qs</span>}
-                        </div>
+                        <span className="ec-card-sub">{formatCardMeta(exam)}</span>
                       </div>
                       <ChevronRight size={15} className="ec-card-arrow" aria-hidden="true" />
                     </Link>
