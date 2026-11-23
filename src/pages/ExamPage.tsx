@@ -371,16 +371,26 @@ export function ExamPage() {
         wholePaper.set(tag, wholePaper.has(tag) ? wholePaper.get(tag)! && covers : covers)
       }
     }
+    const examNames = new Set(
+      [exam?.shortName, exam?.name, exam?.slug?.replace(/-/g, ' ')]
+        .filter(Boolean)
+        .map((s) => s!.trim().toLowerCase()),
+    )
     return [...total.entries()]
-      .filter(([tag, n]) =>
-        n >= 2
-        && n < subjectQuestions.length
-        && !INTERNAL_TAGS.has(tag)
-        && !wholePaper.get(tag)
-        && tag.toLowerCase() !== (selectedSubject ?? '').toLowerCase())
+      .filter(([tag, n]) => {
+        const lower = tag.trim().toLowerCase()
+        return (
+          n >= 2
+          && n < subjectQuestions.length
+          && !INTERNAL_TAGS.has(tag)
+          && !wholePaper.get(tag)
+          && lower !== (selectedSubject ?? '').toLowerCase()
+          && !examNames.has(lower)
+        )
+      })
       .map(([tag]) => tag)
       .sort()
-  }, [subjectQuestions, selectedSubject])
+  }, [subjectQuestions, selectedSubject, exam])
 
   const filteredSubjectQuestions = useMemo(() => {
     setVisibleCount(PAGE_SIZE)
