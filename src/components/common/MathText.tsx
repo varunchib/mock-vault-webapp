@@ -276,11 +276,23 @@ function tokenize(text: string): Token[] {
             : <span key={i} className="math-inline">{tok.content}</span>
         }
         case 'bold':
-          return <strong key={i} className="qr-highlight">{tok.content}</strong>
+          return (
+            <strong key={i} className="qr-highlight">
+              {tok.content.includes('$') ? <MathText text={tok.content} /> : tok.content}
+            </strong>
+          )
         case 'italic':
-          return <em key={i}>{tok.content}</em>
+          return (
+            <em key={i}>
+              {tok.content.includes('$') ? <MathText text={tok.content} /> : tok.content}
+            </em>
+          )
         case 'bold-italic':
-          return <strong key={i} className="qr-highlight"><em>{tok.content}</em></strong>
+          return (
+            <strong key={i} className="qr-highlight">
+              <em>{tok.content.includes('$') ? <MathText text={tok.content} /> : tok.content}</em>
+            </strong>
+          )
         case 'code':
           return (
             <code
