@@ -85,15 +85,17 @@ const INTERNAL_TAGS = new Set(['Worked Solution', 'diagram-pending'])
 // has 7 sub-exams, so page 2 would hold a single chip.
 const SUBEXAM_COLLAPSE_AT = 8
 
-function SubjectMCQ({ q, idx, topics, onTagClick }: {
-  q: Question; idx: number; topics: string[]; onTagClick: (tag: string) => void
+function SubjectMCQ({ q, idx, topics, activeTopic, onTagClick }: {
+  q: Question; idx: number; topics: string[]; activeTopic?: string | null; onTagClick: (tag: string) => void
 }) {
   const [selected, setSelected] = useState<string | null>(null)
   const answered = selected !== null
   // q.tags[0] is whatever happens to come first, which is usually the board
-  // ("RSMSSB") rather than anything about the question. Show the first tag that
-  // survived the sub-topic filter, and no chip at all when none did.
-  const topicTag = q.tags.find((t) => topics.includes(t))
+  // ("RSMSSB") rather than anything about the question. Show the active topic
+  // when filtering, or the first tag that survived the sub-topic filter.
+  const topicTag = (activeTopic && q.tags.includes(activeTopic))
+    ? activeTopic
+    : q.tags.find((t) => topics.includes(t))
 
   function pick(key: string) {
     if (answered) return
@@ -153,7 +155,7 @@ function SubjectMCQ({ q, idx, topics, onTagClick }: {
             {selected === q.answerKey ? '✓ Correct' : `✗ Correct answer: ${q.answerKey}`}
           </div>
           {q.slug && (
-            <Link to={questionPath(q)} className="sq-full-link" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
+            <Link to={questionPath(q.urlCode ?? q.slug, q.question)} className="sq-full-link" style={{ fontSize: '13px', fontWeight: 600, color: 'var(--brand)', textDecoration: 'none' }}>
               View Full Solution →
             </Link>
           )}
@@ -884,7 +886,7 @@ export function ExamPage() {
             <>
               <div className="sq-list">
                 {visibleSubjectQuestions.map((q, i) => (
-                  <SubjectMCQ key={q.slug} q={q} idx={i} topics={availableTopics} onTagClick={setTopicFilter} />
+                  <SubjectMCQ key={q.slug} q={q} idx={i} topics={availableTopics} activeTopic={topicFilter} onTagClick={setTopicFilter} />
                 ))}
               </div>
 
