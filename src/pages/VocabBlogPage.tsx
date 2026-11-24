@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { usePageMeta } from '../lib/usePageMeta'
+import { paperPath } from '../lib/paperSeo'
 import {
   JKSSB_VOCAB_PYQS,
   SSC_CGL_VOCAB_PYQS,
@@ -386,7 +387,7 @@ function VocabBlogArticle({
                                     <td>
                                       <div style={{ color: 'var(--ink)', lineHeight: 1.5 }}>{item.meaning}</div>
                                       <div style={{ fontSize: '12px', color: 'var(--ink2)', marginTop: '4px' }}>
-                                        <Link to={`/pyq/${item.paperSlug}`} style={{ color: 'var(--ink2)', textDecoration: 'none' }}>
+                                        <Link to={paperPath(item.paperSlug)} style={{ color: 'var(--ink2)', textDecoration: 'none' }}>
                                           {item.paperTitle}
                                         </Link>
                                       </div>

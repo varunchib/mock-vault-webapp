@@ -19,9 +19,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Benign means gentle, kindly, or harmless (non-threatening).",
     "answer": "Pernicious",
     "year": "2026",
-    "paperSlug": "jkssb-wildlife-guard-2026-may-10",
+    "paperSlug": "jkssb-wildlife-guard-question-paper-2026",
     "paperTitle": "JKSSB Wildlife Guard Question Paper 2026",
-    "questionHref": "/question/jkssb-wildlife-guard-2026-may-10-q60",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-benign--23b21e2066",
     "repeatCount": 2,
     "repeatSources": [
       "2026 · JKSSB Wildlife Guard Question Paper 2026",
@@ -36,7 +36,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q71",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-word-taciturn--514b61305f",
     "repeatCount": 2,
     "repeatSources": [
       "2026 · JKSSB Social Forestry Worker Question Paper 2026",
@@ -51,7 +51,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-inspector-forest-2026-mar-15",
     "paperTitle": "JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
-    "questionHref": "/question/jkssb-inspector-forest-2026-mar-15-q1",
+    "questionHref": "/question/what-does-the-idiom-break-the-ice-mean--b74771b069",
     "repeatCount": 2,
     "repeatSources": [
       "2026 · JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
@@ -64,9 +64,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Using too many words; tediously long-winded",
     "answer": "Verbose",
     "year": "2026",
-    "paperSlug": "jkssb-junior-assistant-pyq",
+    "paperSlug": "jkssb-junior-assistant-question-paper-2026",
     "paperTitle": "JKSSB Junior Assistant Question Paper 2026",
-    "questionHref": "/question/jkssb-junior-assistant-pyq-44",
+    "questionHref": "/question/the-editor-criticized-the-article-for-its-prolix-treatment-of-an-otherwise--86a552c490",
     "repeatCount": 2,
     "repeatSources": [
       "2026 · JKSSB Junior Assistant Question Paper 2026",
@@ -79,9 +79,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Clear, logical, and convincing",
     "answer": "Specious",
     "year": "2026",
-    "paperSlug": "jkssb-junior-assistant-pyq",
+    "paperSlug": "jkssb-junior-assistant-question-paper-2026",
     "paperTitle": "JKSSB Junior Assistant Question Paper 2026",
-    "questionHref": "/question/jkssb-junior-assistant-pyq-45",
+    "questionHref": "/question/her-argument-was-praised-for-being-cogent-and-logically-compelling-which-option--c1a13fe63e",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -91,9 +91,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Calm, even-tempered, and composed under stress",
     "answer": "Volatile",
     "year": "2026",
-    "paperSlug": "jkssb-junior-assistant-pyq",
+    "paperSlug": "jkssb-junior-assistant-question-paper-2026",
     "paperTitle": "JKSSB Junior Assistant Question Paper 2026",
-    "questionHref": "/question/jkssb-junior-assistant-pyq-46",
+    "questionHref": "/question/the-professor-was-admired-for-his-equanimous-response-to-harsh-criticism-which--758d33be0a",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -105,7 +105,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q72",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-word-impulsive--d70919b171",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -117,7 +117,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q84",
+    "questionHref": "/question/her-laconic-reply-suggested-that-she-was-not-interested-in-continuing-the--406ffa551c",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -127,9 +127,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "is the exact antonym of perturbed (meaning anxious, agitated, troubled, or emotionally disturbed—from Latin perturbare, meaning to thro…",
     "answer": "Calm",
     "year": "2026",
-    "paperSlug": "jkssb-lab-attendant-2026-may-10",
+    "paperSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "paperTitle": "JKSSB Laboratory Attendant Question Paper 2026",
-    "questionHref": "/question/jkssb-lab-attendant-2026-may-10-q94",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-perturbed--4bc2ee1c17",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -139,9 +139,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Prudence means wise carefulness, sound judgment, and foresight in avoiding risk.",
     "answer": "Brashness",
     "year": "2026",
-    "paperSlug": "jkssb-wildlife-guard-2026-may-10",
+    "paperSlug": "jkssb-wildlife-guard-question-paper-2026",
     "paperTitle": "JKSSB Wildlife Guard Question Paper 2026",
-    "questionHref": "/question/jkssb-wildlife-guard-2026-may-10-q59",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-prudence--68f23dad74",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -153,7 +153,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q85",
+    "questionHref": "/question/while-most-of-the-team-was-exhausted-the-captain-remained-resilient-pushing--6523b12e1a",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -163,9 +163,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "is the direct antonym of succinct, which means briefly, clearly, and compactly expressed in very few words.",
     "answer": "Long-winded",
     "year": "2026",
-    "paperSlug": "jkssb-lab-attendant-2026-may-10",
+    "paperSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "paperTitle": "JKSSB Laboratory Attendant Question Paper 2026",
-    "questionHref": "/question/jkssb-lab-attendant-2026-may-10-q93",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-succinct--3540bf8efa",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -175,9 +175,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "is the established meaning of the idiom give someone a piece of one's mind—to scold, reprimand, or express anger frankly to someone who…",
     "answer": "To rebuke someone strongly",
     "year": "2026",
-    "paperSlug": "jkssb-lab-attendant-2026-may-10",
+    "paperSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "paperTitle": "JKSSB Laboratory Attendant Question Paper 2026",
-    "questionHref": "/question/jkssb-lab-attendant-2026-may-10-q98",
+    "questionHref": "/question/select-the-most-appropriate-meaning-of-the-given-idiom-give-a-piece--bdcdb80f7e",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -187,9 +187,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Action that is both insufficient and done too late",
     "answer": "Inadequate in both substance and timing",
     "year": "2026",
-    "paperSlug": "jkssb-junior-assistant-pyq",
+    "paperSlug": "jkssb-junior-assistant-question-paper-2026",
     "paperTitle": "JKSSB Junior Assistant Question Paper 2026",
-    "questionHref": "/question/jkssb-junior-assistant-pyq-41",
+    "questionHref": "/question/the-senator-s-apology-was-widely-viewed-as-too-little-too-late--303be423ea",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -201,7 +201,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-inspector-forest-2026-mar-15",
     "paperTitle": "JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
-    "questionHref": "/question/jkssb-inspector-forest-2026-mar-15-q2",
+    "questionHref": "/question/what-does-the-idiom-hit-the-nail-on-the-head-mean--77b17aeaf7",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -211,9 +211,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "One-word substitute for a wandering beggar",
     "answer": "One who wanders from place to place without a settled home",
     "year": "2026",
-    "paperSlug": "jkssb-lab-attendant-2026-may-10",
+    "paperSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "paperTitle": "JKSSB Laboratory Attendant Question Paper 2026",
-    "questionHref": "/question/jkssb-lab-attendant-2026-may-10-q99",
+    "questionHref": "/question/select-the-word-which-means-the-same-as-the-group-of-words--57c2ed07b1",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -225,7 +225,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-inspector-forest-2026-mar-15",
     "paperTitle": "JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
-    "questionHref": "/question/jkssb-inspector-forest-2026-mar-15-q4",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-underlined-word-his-explanation-was--243ae126d3",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -237,7 +237,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q70",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-word-chaste--148b71efd9",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -249,7 +249,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-inspector-forest-2026-mar-15",
     "paperTitle": "JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
-    "questionHref": "/question/jkssb-inspector-forest-2026-mar-15-q3",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-underlined-word-the-speaker-s--111c4d5afa",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -261,7 +261,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-accounts-assistant-finance-2026",
     "paperTitle": "JKSSB Finance Accounts Assistant Question Paper 2026",
-    "questionHref": "/question/jkssb-accounts-assistant-finance-2026-q10",
+    "questionHref": "/question/choose-the-synonym-of-ephemeral--9b1a65cde6",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -271,9 +271,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Fecund means fertile, fruitful, or capable of producing abundant offspring, vegetation, or creative ideas.",
     "answer": "Prolific",
     "year": "2026",
-    "paperSlug": "jkssb-wildlife-guard-2026-may-10",
+    "paperSlug": "jkssb-wildlife-guard-question-paper-2026",
     "paperTitle": "JKSSB Wildlife Guard Question Paper 2026",
-    "questionHref": "/question/jkssb-wildlife-guard-2026-may-10-q57",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-fecund--078b39bdd7",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -283,9 +283,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "is the closest synonym to persiflage, which means light, good-natured teasing, playful banter, or frivolous talk.",
     "answer": "Banter",
     "year": "2026",
-    "paperSlug": "jkssb-lab-attendant-2026-may-10",
+    "paperSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "paperTitle": "JKSSB Laboratory Attendant Question Paper 2026",
-    "questionHref": "/question/jkssb-lab-attendant-2026-may-10-q91",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-persiflage--10ae10bdec",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -295,9 +295,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Having keen insight and sharp discernment",
     "answer": "Astute",
     "year": "2026",
-    "paperSlug": "jkssb-junior-assistant-pyq",
+    "paperSlug": "jkssb-junior-assistant-question-paper-2026",
     "paperTitle": "JKSSB Junior Assistant Question Paper 2026",
-    "questionHref": "/question/jkssb-junior-assistant-pyq-43",
+    "questionHref": "/question/the-scholar-was-known-for-his-perspicacious-analysis-of-complex-philosophical-te--f302b56560",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -307,9 +307,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Prodigal describes someone who spends money or resources recklessly, lavishly, and wastefully.",
     "answer": "Extravagant",
     "year": "2026",
-    "paperSlug": "jkssb-wildlife-guard-2026-may-10",
+    "paperSlug": "jkssb-wildlife-guard-question-paper-2026",
     "paperTitle": "JKSSB Wildlife Guard Question Paper 2026",
-    "questionHref": "/question/jkssb-wildlife-guard-2026-may-10-q58",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-prodigal--046f2056b4",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -319,9 +319,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "is the synonym of recalcitrant (meaning stubbornly uncooperative, defiant of authority, or hard to control).",
     "answer": "Rebellious",
     "year": "2026",
-    "paperSlug": "jkssb-lab-attendant-2026-may-10",
+    "paperSlug": "jkssb-laboratory-attendant-question-paper-2026",
     "paperTitle": "JKSSB Laboratory Attendant Question Paper 2026",
-    "questionHref": "/question/jkssb-lab-attendant-2026-may-10-q92",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-recalcitrant--fae23ca398",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -331,9 +331,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Matched synonym pairs (JKSSB 2026)",
     "answer": "Carom · Dejected · Heart-rending · Ploy",
     "year": "2026",
-    "paperSlug": "jkssb-wildlife-guard-2026-may-10",
+    "paperSlug": "jkssb-wildlife-guard-question-paper-2026",
     "paperTitle": "JKSSB Wildlife Guard Question Paper 2026",
-    "questionHref": "/question/jkssb-wildlife-guard-2026-may-10-q72",
+    "questionHref": "/question/match-the-word-with-its-correct-synonym-i-ricochet-a-carom-ii--d9583f7ddd",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -345,7 +345,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q69",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-word-sagacious--645e49ccd9",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -357,7 +357,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "jkssb-social-forestry-worker-2026",
     "paperTitle": "JKSSB Social Forestry Worker Question Paper 2026",
-    "questionHref": "/question/jkssb-social-forestry-worker-2026-q83",
+    "questionHref": "/question/the-ceo-s-mercurial-temperament-made-it-difficult-for-the-staff-to--09382175d9",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -367,9 +367,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "is the direct antonym of ample (meaning plentiful, abundant, or more than enough).",
     "answer": "Meagre",
     "year": "2025",
-    "paperSlug": "jkssb-veterinary-pharmacist-2025",
+    "paperSlug": "jkssb-veterinary-pharmacist-question-paper-2025",
     "paperTitle": "JKSSB Veterinary Pharmacist Question Paper 2025",
-    "questionHref": "/question/jkssb-veterinary-pharmacist-2025-q8",
+    "questionHref": "/question/find-the-antonym-of-the-word-ample--f88d728cf6",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -379,9 +379,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Matched antonym pairs (JKSSB 2024)",
     "answer": "Stingy · Ugly · Weak · Defeat · Modern",
     "year": "2025",
-    "paperSlug": "jkssb-veterinary-pharmacist-2025",
+    "paperSlug": "jkssb-veterinary-pharmacist-question-paper-2025",
     "paperTitle": "JKSSB Veterinary Pharmacist Question Paper 2025",
-    "questionHref": "/question/jkssb-veterinary-pharmacist-2025-q14",
+    "questionHref": "/question/match-the-words-in-column-a-with-their-correct-antonyms-in-column--4d6d6c6fc9",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -391,9 +391,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "accurately defines the idiom a skeleton in the cupboard (also phrased as a skeleton in the closet).",
     "answer": "An embarrassing fact to be kept secret",
     "year": "2025",
-    "paperSlug": "jkssb-veterinary-pharmacist-2025",
+    "paperSlug": "jkssb-veterinary-pharmacist-question-paper-2025",
     "paperTitle": "JKSSB Veterinary Pharmacist Question Paper 2025",
-    "questionHref": "/question/jkssb-veterinary-pharmacist-2025-q1",
+    "questionHref": "/question/choose-the-correct-meaning-of-the-given-idiom-a-skeleton-in-the--3f7d667a80",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -403,9 +403,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "To break the ice means to say or do something warm, friendly, or humorous to relieve initial awkwardness or tension at a first meeting…",
     "answer": "To remove the tension at a first meeting",
     "year": "2024",
-    "paperSlug": "jkssb-patwari-2024-sep1-set-a",
+    "paperSlug": "jkssb-patwari-question-paper-2024",
     "paperTitle": "JKSSB Patwari Question Paper 2024",
-    "questionHref": "/question/jkssb-patwari-2024-sep1-set-a-q82",
+    "questionHref": "/question/pick-out-the-correct-meaning-of-the-idiom-break-the-ice--065af1dcd6",
     "repeatCount": 2,
     "repeatSources": [
       "2026 · JKSSB Inspector (Forest, Ecology & Environment) Question Paper 2026",
@@ -418,9 +418,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "AGONY means extreme suffering.",
     "answer": "Ecstasy",
     "year": "2024",
-    "paperSlug": "jkssb-finance-accounts-2024-paper",
+    "paperSlug": "jkssb-finance-accounts-assistant-question-paper-2024",
     "paperTitle": "JKSSB Finance Accounts Assistant Question Paper 2024",
-    "questionHref": "/question/jkssb-faa-2024-q63",
+    "questionHref": "/question/antonym-of-agony--d9b94677b5",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -432,7 +432,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-2024-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-2024-set-a-q17",
+    "questionHref": "/question/select-the-antonyms-of-the-word-guile--31111b728a",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -442,9 +442,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "Leniency means mercy, mildness, or tolerance when punishing someone.",
     "answer": "Vengeance",
     "year": "2024",
-    "paperSlug": "jkssb-patwari-2024-sep1-set-a",
+    "paperSlug": "jkssb-patwari-question-paper-2024",
     "paperTitle": "JKSSB Patwari Question Paper 2024",
-    "questionHref": "/question/jkssb-patwari-2024-sep1-set-a-q77",
+    "questionHref": "/question/select-the-antonym-of-the-bold-word-in-the-sentence-the-school--472ab7e298",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -456,7 +456,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-2024-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-2024-set-a-q16",
+    "questionHref": "/question/select-the-antonyms-of-the-word-occult--b1924f6400",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -468,7 +468,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-telecom-2024-set-a",
     "paperTitle": "JKSSB Constable (Telecommunication) Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-telecom-2024-set-a-q5",
+    "questionHref": "/question/choose-the-word-opposite-in-meaning-to-the-given-word-perspicuity--863d02099d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -480,7 +480,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-2024-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-2024-set-a-q21",
+    "questionHref": "/question/which-sentence-expresses-the-correct-meaning-of-the-given-idiom-days-of--4a91ec9b4d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -492,7 +492,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-telecom-2024-set-a",
     "paperTitle": "JKSSB Constable (Telecommunication) Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-telecom-2024-set-a-q11",
+    "questionHref": "/question/choose-the-alternative-which-best-expresses-the-meaning-of-the-idiom-phrase--4d7decb378",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -502,9 +502,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "The idiom to show the white feather means to behave in a cowardly manner or show fear under pressure (To act as a cowardice).",
     "answer": "To act as a cowardice",
     "year": "2024",
-    "paperSlug": "jkssb-patwari-2024-sep1-set-a",
+    "paperSlug": "jkssb-patwari-question-paper-2024",
     "paperTitle": "JKSSB Patwari Question Paper 2024",
-    "questionHref": "/question/jkssb-patwari-2024-sep1-set-a-q81",
+    "questionHref": "/question/pick-out-the-correct-meaning-of-the-idiom-to-show-the-white--b0ec9b147e",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -516,7 +516,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-telecom-2024-set-a",
     "paperTitle": "JKSSB Constable (Telecommunication) Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-telecom-2024-set-a-q10",
+    "questionHref": "/question/choose-the-alternative-which-best-expresses-the-meaning-of-the-idiom-phrase--8cf23d477a",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -528,7 +528,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-2024-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-2024-set-a-q20",
+    "questionHref": "/question/which-sentence-expresses-the-correct-meaning-of-the-given-idiom-will-o--5d83dc1fb9",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -540,7 +540,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-telecom-2024-set-a",
     "paperTitle": "JKSSB Constable (Telecommunication) Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-telecom-2024-set-a-q15",
+    "questionHref": "/question/select-the-most-appropriate-meaning-of-the-given-idiom-the-trouble-makers--d59f7c0d68",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -552,7 +552,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-telecom-2024-set-a",
     "paperTitle": "JKSSB Constable (Telecommunication) Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-telecom-2024-set-a-q13",
+    "questionHref": "/question/select-the-word-which-means-the-same-as-the-group-of-words--88afa76d80",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -562,9 +562,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "ADMONISH means to warn or reprimand firmly.",
     "answer": "Threaten",
     "year": "2024",
-    "paperSlug": "jkssb-finance-accounts-2024-paper",
+    "paperSlug": "jkssb-finance-accounts-assistant-question-paper-2024",
     "paperTitle": "JKSSB Finance Accounts Assistant Question Paper 2024",
-    "questionHref": "/question/jkssb-faa-2024-q62",
+    "questionHref": "/question/synonym-of-admonish--d7b706324e",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -576,7 +576,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-2024-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-2024-set-a-q14",
+    "questionHref": "/question/select-the-synonyms-of-the-word-quibble--67c917709d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -586,9 +586,9 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "meaning": "A soliloquy (from Latin solus 'alone' + loqui 'to speak') is a dramatic speech in which a character speaks their thoughts aloud while a…",
     "answer": "Monologue",
     "year": "2024",
-    "paperSlug": "jkssb-patwari-2024-sep1-set-a",
+    "paperSlug": "jkssb-patwari-question-paper-2024",
     "paperTitle": "JKSSB Patwari Question Paper 2024",
-    "questionHref": "/question/jkssb-patwari-2024-sep1-set-a-q78",
+    "questionHref": "/question/select-the-synonym-of-the-word-soliloquy--0ddfc4633c",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -600,7 +600,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "jkssb-constable-2024-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2024",
-    "questionHref": "/question/jkssb-constable-2024-set-a-q15",
+    "questionHref": "/question/select-the-synonyms-of-the-word-tenacious--f6d3dab5a2",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -612,7 +612,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkpsi-2022",
     "paperTitle": "JKSSB J&K Police Sub-Inspector (JKPSI) Question Paper 2022",
-    "questionHref": "/question/jkssb-jk-psi-2022-q53",
+    "questionHref": "/question/identify-the-antonym-for-the-word-disparity--cc008c9dfb",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -624,7 +624,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkpsi-2022",
     "paperTitle": "JKSSB J&K Police Sub-Inspector (JKPSI) Question Paper 2022",
-    "questionHref": "/question/jkssb-jk-psi-2022-q27",
+    "questionHref": "/question/identify-the-antonym-for-the-word-jeopardy--9436b870ff",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -636,7 +636,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkssb-accounts-assistant-finance-2022",
     "paperTitle": "JKSSB Finance Accounts Assistant Question Paper 2022",
-    "questionHref": "/question/jkssb-accounts-assistant-finance-2022-q67",
+    "questionHref": "/question/four-alternatives-are-given-for-idioms-phrases-choose-the-one-that-best--5f06db49d3",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -648,7 +648,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkpsi-2022",
     "paperTitle": "JKSSB J&K Police Sub-Inspector (JKPSI) Question Paper 2022",
-    "questionHref": "/question/jkssb-jk-psi-2022-q119",
+    "questionHref": "/question/choose-the-correct-word-substitute-for-the-following-sentence-the-branch-of--b5ef72e0b7",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -660,7 +660,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkpsi-2022",
     "paperTitle": "JKSSB J&K Police Sub-Inspector (JKPSI) Question Paper 2022",
-    "questionHref": "/question/jkssb-jk-psi-2022-q4",
+    "questionHref": "/question/choose-the-correct-word-substitute-for-the-following-sentence-one-who-engages--ab693616f2",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -672,7 +672,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkpsi-2022",
     "paperTitle": "JKSSB J&K Police Sub-Inspector (JKPSI) Question Paper 2022",
-    "questionHref": "/question/jkssb-jk-psi-2022-q66",
+    "questionHref": "/question/identify-the-synonym-of-the-word-acrimony--3c760c4645",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -684,7 +684,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkpsi-2022",
     "paperTitle": "JKSSB J&K Police Sub-Inspector (JKPSI) Question Paper 2022",
-    "questionHref": "/question/jkssb-jk-psi-2022-q14",
+    "questionHref": "/question/identify-the-synonym-for-the-word-imminent--b311bf25b1",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -696,7 +696,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2022",
     "paperSlug": "jkssb-accounts-assistant-finance-2022",
     "paperTitle": "JKSSB Finance Accounts Assistant Question Paper 2022",
-    "questionHref": "/question/jkssb-accounts-assistant-finance-2022-q70",
+    "questionHref": "/question/choose-an-appropriate-synonym-for-the-underlined-word-the-food-given-in--c608f6217f",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -708,7 +708,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2017",
     "paperSlug": "jkp-constable-2017-oct08",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2017",
-    "questionHref": "/question/jkp-constable-2017-oct08-q71",
+    "questionHref": "/question/give-the-antonyms-opposite-meaning-of-obvious--8c92d474ed",
     "repeatCount": 3,
     "repeatSources": [
       "2017 · JKSSB J&K Police Constable Question Paper 2017",
@@ -724,7 +724,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2017",
     "paperSlug": "jkp-constable-2017-oct08",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2017",
-    "questionHref": "/question/jkp-constable-2017-oct08-q69",
+    "questionHref": "/question/give-the-antonyms-opposite-meaning-of-bleak--f873862b9c",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -736,7 +736,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2017",
     "paperSlug": "jkp-constable-2017-oct08",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2017",
-    "questionHref": "/question/jkp-constable-2017-oct08-q70",
+    "questionHref": "/question/give-the-antonyms-opposite-meaning-of-concede--f0d05b5497",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -748,7 +748,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2017",
     "paperSlug": "jkp-constable-2017-oct08",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2017",
-    "questionHref": "/question/jkp-constable-2017-oct08-q72",
+    "questionHref": "/question/give-the-antonyms-opposite-meaning-of-spend--09fb2537e7",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -760,7 +760,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2016",
     "paperSlug": "jkp-constable-2016-mar20-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2016",
-    "questionHref": "/question/jkp-constable-2016-mar20-set-a-q92",
+    "questionHref": "/question/choose-the-word-nearest-in-meaning-to-the-italicized-part-grandmother-has--b86d2bfa60",
     "repeatCount": 2,
     "repeatSources": [
       "2016 · JKSSB J&K Police Constable Question Paper 2016",
@@ -775,7 +775,7 @@ export const JKSSB_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2016",
     "paperSlug": "jkp-constable-2016-mar20-set-a",
     "paperTitle": "JKSSB J&K Police Constable Question Paper 2016",
-    "questionHref": "/question/jkp-constable-2016-mar20-set-a-q81",
+    "questionHref": "/question/choose-the-word-which-is-opposite-in-meaning-to-the-italicized-word--99be5654c9",
     "repeatCount": 1,
     "repeatSources": []
   }
@@ -790,7 +790,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q91",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-abstruse--40bc43eb41",
     "repeatCount": 3,
     "repeatSources": [
       "2026 · SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
@@ -806,7 +806,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-sep30-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2026-sep30-shift2-q93",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-esoteric--f2c1af0417",
     "repeatCount": 3,
     "repeatSources": [
       "2026 · SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
@@ -822,7 +822,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q100",
+    "questionHref": "/question/choose-the-most-appropriate-antonym-of-the-underlined-word-the-new-law--a3b8542eed",
     "repeatCount": 2,
     "repeatSources": [
       "2026 · JKSSB Wildlife Guard Question Paper 2026",
@@ -837,7 +837,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-sep30-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2026-sep30-shift2-q96",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-crepuscular--d91f4d7f69",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -849,7 +849,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-sep30-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2026-sep30-shift2-q94",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-excoriate--6af8ee89fa",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -861,7 +861,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q90",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-prudent--1437363025",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -873,7 +873,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-sep30-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2026-sep30-shift2-q95",
+    "questionHref": "/question/choose-the-correct-meaning-of-idiom-beard-the-lion-in-his-den--173c288fd6",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -885,7 +885,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q88",
+    "questionHref": "/question/choose-the-correct-idiom-for-the-word-highlighted-in-bold-i-don--85f4bbdea3",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -897,7 +897,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q85",
+    "questionHref": "/question/choose-the-correct-idiom-for-the-word-highlighted-in-bold-the-parents--92493e3b78",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -909,7 +909,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-sep30-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2026-sep30-shift2-q87",
+    "questionHref": "/question/choose-the-correct-idiom-for-the-phrase-highlighted-in-bold-mrs-robinson--c37420ee66",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -921,7 +921,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-sep30-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 30 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2026-sep30-shift2-q79",
+    "questionHref": "/question/the-indian-government-has-appointed-a-new-diplomat-to-head-the-official--f2165fbcb8",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -933,7 +933,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q79",
+    "questionHref": "/question/choose-the-synonym-of-exacerbate-from-the-options-below--4cd608701d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -945,7 +945,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2026",
     "paperSlug": "ssc-cgl-2026-oct01-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2026 — 01 Oct (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2026-oct01-shift1-q89",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-malediction--ce726e2988",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -957,7 +957,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift2-q78",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-puissant--1a8620f144",
     "repeatCount": 2,
     "repeatSources": [
       "2025 · SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 2)",
@@ -972,7 +972,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep17-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 17 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep17-shift1-q78",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-abrogate--a057db9a5f",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -984,7 +984,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift3",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 3)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift3-q79",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-encomium--11a562ed7b",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -996,7 +996,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift3",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 3)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift3-q77",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-erudite--a09608c8d3",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1008,7 +1008,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift1-q78",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-evanescent--2ed29104a2",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1020,7 +1020,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-tier2",
     "paperTitle": "SSC CGL Tier-II Question Paper 2025 — Paper I (19 Jan 2026)",
-    "questionHref": "/question/ssc-cgl-2025-tier2-q65",
+    "questionHref": "/question/choose-the-appropriate-antonym-of-the-given-word-gullibility--2bc3d52d20",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1032,7 +1032,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift2-q78",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-lachrymose--27f22816ef",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1044,7 +1044,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift1-q78",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-perfidious--e52d5dcaba",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1056,7 +1056,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-tier2",
     "paperTitle": "SSC CGL Tier-II Question Paper 2025 — Paper I (19 Jan 2026)",
-    "questionHref": "/question/ssc-cgl-2025-tier2-q66",
+    "questionHref": "/question/in-the-following-question-out-of-the-four-alternatives-choose-the-one--188ad47912",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1068,7 +1068,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift3",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 3)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift3-q78",
+    "questionHref": "/question/choose-the-correct-meaning-of-the-idiom-fly-off-the-handle--814d8131c0",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1080,7 +1080,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift2-q77",
+    "questionHref": "/question/choose-the-correct-meaning-of-the-idiom-has-two-strings-to-his--260c08459f",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1092,7 +1092,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift1-q77",
+    "questionHref": "/question/choose-the-correct-meaning-of-idiom-hobson-s-choice--613b4d7bb9",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1104,7 +1104,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift1-q77",
+    "questionHref": "/question/choose-the-correct-meaning-of-the-idiom-make-no-bones-about-it--41f6b8b25f",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1116,7 +1116,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift2-q77",
+    "questionHref": "/question/choose-the-correct-meaning-of-idiom-move-heaven-and-earth--0976bc6871",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1128,7 +1128,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep17-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 17 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep17-shift1-q79",
+    "questionHref": "/question/choose-the-correct-meaning-of-idiom-t-o-chew-the-cud-of--46ba00c22c",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1140,7 +1140,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-tier2",
     "paperTitle": "SSC CGL Tier-II Question Paper 2025 — Paper I (19 Jan 2026)",
-    "questionHref": "/question/ssc-cgl-2025-tier2-q77",
+    "questionHref": "/question/in-the-following-question-out-of-the-four-alternatives-choose-the-one--51cbc6c9ab",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1152,7 +1152,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift2-q81",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-a-state-of-temporary-disuse--9dfe3cd301",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1164,7 +1164,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep17-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 17 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep17-shift1-q83",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-extremely-old-fashioned-belonging-to--1d7573d7e8",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1176,7 +1176,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift2-q81",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-a-person-who-abstains-from--15bf7b0323",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1188,7 +1188,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift1-q81",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-an-official-reprimand-or-strong--0f3e3f5e66",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1200,7 +1200,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift3",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 3)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift3-q81",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-a-state-of-disuse-or--52e93b16bd",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1212,7 +1212,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift1-q81",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-a-political-system-based-on--232650b629",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1224,7 +1224,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep17-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 17 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep17-shift1-q82",
+    "questionHref": "/question/choose-the-correct-one-word-substitute-for-a-person-who-supports-change--ee203a0c3c",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1236,7 +1236,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift2-q76",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-abnegate--71e211d511",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1248,7 +1248,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift2-q76",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-bibliophile--232b0a023b",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1260,7 +1260,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep13-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 13 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep13-shift1-q76",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-caustic--a7a840864a",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1272,7 +1272,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-tier2",
     "paperTitle": "SSC CGL Tier-II Question Paper 2025 — Paper I (19 Jan 2026)",
-    "questionHref": "/question/ssc-cgl-2025-tier2-q68",
+    "questionHref": "/question/choose-the-appropriate-synonym-of-the-given-word-erroneous--c531f3b06d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1284,7 +1284,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep17-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 17 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep17-shift1-q77",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-exiguous--123d6b56d4",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1296,7 +1296,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep17-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 17 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep17-shift1-q76",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-luminous--0e8af9345c",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1308,7 +1308,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift3",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 3)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift3-q76",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-nebulous--f67466ac62",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1320,7 +1320,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2025",
     "paperSlug": "ssc-cgl-2025-sep12-shift1",
     "paperTitle": "SSC CGL Tier-I Question Paper 2025 — 12 Sep (Shift 1)",
-    "questionHref": "/question/ssc-cgl-2025-sep12-shift1-q76",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-perfidious--f28bd83d43",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1332,7 +1332,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q86",
+    "questionHref": "/question/select-the-correct-antonym-of-the-underlined-word-to-fill-in-the--e3f8ad9016",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1344,7 +1344,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q94",
+    "questionHref": "/question/select-the-most-appropriate-antonym-of-the-given-word-insert--b4a0c41b4d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1356,7 +1356,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q82",
+    "questionHref": "/question/select-the-option-that-expresses-the-opposite-meaning-of-the-underlined-word--fef4e7468d",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1368,7 +1368,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q89",
+    "questionHref": "/question/select-the-most-appropriate-meaning-of-the-underlined-idiom-bincy-s-mother--c5dcb92057",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1380,7 +1380,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q78",
+    "questionHref": "/question/select-the-option-that-can-be-used-as-a-one-word-substitute--3faa4f3e53",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1392,7 +1392,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q88",
+    "questionHref": "/question/select-the-option-that-can-be-used-as-a-one-word-substitute--b77234c506",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1404,7 +1404,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q95",
+    "questionHref": "/question/select-the-most-appropriate-synonym-of-the-given-word-carcass--59b7759589",
     "repeatCount": 1,
     "repeatSources": []
   },
@@ -1416,7 +1416,7 @@ export const SSC_CGL_VOCAB_PYQS: VocabPyqItem[] = [
     "year": "2024",
     "paperSlug": "ssc-cgl-2024-sep26-shift2",
     "paperTitle": "SSC CGL Tier-I Question Paper 2024 — 26 Sep (Shift 2)",
-    "questionHref": "/question/ssc-cgl-2024-sep26-shift2-q79",
+    "questionHref": "/question/identify-the-word-which-is-similar-in-meaning-to-the-following-word--0dd5a75313",
     "repeatCount": 1,
     "repeatSources": []
   }

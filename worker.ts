@@ -248,8 +248,8 @@ const STATIC_META: Record<string, PageMeta> = {
         <a href="/pyq/upsc-cse-prelims-2026-gs1">UPSC CSE Prelims 2026 GS1</a>
         <a href="/pyq/kashmir-university-jaa-2026-set-a">Kashmir University JAA 2026</a>
         <a href="/pyq/jkssb-accounts-assistant-finance-2026">JKSSB FAA 2026</a>
-        <a href="/pyq/jkssb-wildlife-guard-2026-may-10">JKSSB Wildlife Guard 2026</a>
-        <a href="/pyq/jkssb-junior-assistant-pyq">JKSSB Junior Assistant 2026</a>
+        <a href="/pyq/jkssb-wildlife-guard-question-paper-2026">JKSSB Wildlife Guard 2026</a>
+        <a href="/pyq/jkssb-junior-assistant-question-paper-2026">JKSSB Junior Assistant 2026</a>
         <a href="/pyq/jkssb-field-assistant-2026-may-20">JKSSB Field Assistant 2026</a>
         <a href="/pyq/ssc-cgl-2026-oct01-shift1">SSC CGL 2026 01 Oct Shift 1</a>
         <a href="/pyq/ssc-cgl-2026-sep30-shift2">SSC CGL 2026 30 Sep Shift 2</a>
@@ -1419,12 +1419,21 @@ function renderExamContent(e: ExamData, papers: PaperData[], mocks: MockData[], 
     .map(m => `<li><a href="/mock-test/${encodeURIComponent(m.slug)}">${htmlText(m.title)}</a> <small>${htmlText(m.difficulty)} - ${m.questions} questions</small></li>`)
     .join('')
   const subjects = (e.subjects ?? []).filter(Boolean).join(', ')
-  // Guide cross-link — hands crawlers off to the editorial reference for this
-  // exam, mirroring the card the React page shows.
+  // Guide & blog cross-links — hands crawlers off to the editorial reference
+  // and relevant blog articles for this exam, building strong internal link equity.
   const guideHref = guidePathForExam(e.slug)
-  const resourceLinks = guideHref
-    ? `<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`
-    : ''
+  const resourceItems: string[] = []
+  if (guideHref) {
+    resourceItems.push(`<li><a href="${guideHref}">${htmlText(e.shortName)} exam guide — syllabus, pattern &amp; weightage analysis</a></li>`)
+  }
+  if (/^(?:jkssb|jkpsi|jkcce|kashmir-university)/i.test(e.slug)) {
+    resourceItems.push(`<li><a href="/blog/jkssb-most-repeated-synonyms-antonyms">JKSSB Most Repeated Synonyms, Antonyms &amp; Idioms (PYQ List)</a></li>`)
+  } else if (/^ssc/i.test(e.slug)) {
+    resourceItems.push(`<li><a href="/blog/ssc-cgl-most-repeated-synonyms-antonyms">SSC CGL Most Repeated Synonyms, Antonyms &amp; Idioms (PYQ List)</a></li>`)
+  }
+  resourceItems.push(`<li><a href="/blog/indian-rivers-and-tributaries">Indian Rivers and Their Tributaries — Complete PYQ Study Guide</a></li>`)
+  resourceItems.push(`<li><a href="/study-material">Interactive Study Material (Constitution, History Timeline &amp; Ramsar Wetlands)</a></li>`)
+  const resourceLinks = resourceItems.join('')
   const faqs = getExamFaqs({ ...e, papers: e.papers ?? papers.length })
   const faqSection = faqs.length > 0
     ? `<section><h2>Frequently Asked Questions — ${htmlText(e.shortName)} PYQ</h2><dl>${faqs.map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl></section>`
@@ -1566,6 +1575,20 @@ function renderGuideContent(slug: string, guide: (typeof postGuides)[string], cr
       <p>Check the conducting body’s official website for corrigenda or a newer notification before relying on dates or eligibility details:
         <a href="${esc(guide.officialWebsite)}" rel="noopener noreferrer">${htmlText(guide.conductingBody)}</a>.
       </p>
+    </section>
+    <section><h2>Related Study Guides &amp; Articles</h2>
+      <ul>
+        ${/^(?:jkssb|jkpsi|jkcce|kashmir-university)/i.test(guide.examSlug)
+          ? '<li><a href="/blog/jkssb-most-repeated-synonyms-antonyms">JKSSB Most Repeated Synonyms &amp; Antonyms (PYQ List)</a></li>'
+          : /^ssc/i.test(guide.examSlug)
+            ? '<li><a href="/blog/ssc-cgl-most-repeated-synonyms-antonyms">SSC CGL Most Repeated Synonyms &amp; Antonyms (PYQ List)</a></li>'
+            : ''}
+        <li><a href="/blog/indian-rivers-and-tributaries">Indian Rivers and Their Tributaries — Complete PYQ Study Guide</a></li>
+        <li><a href="/constitution-of-india">Constitution of India Explorer (Articles 1–395)</a></li>
+        <li><a href="/modern-indian-history-timeline">Modern Indian History Timeline (1757–1947)</a></li>
+        <li><a href="/ramsar-wetlands-and-national-parks">Ramsar Wetlands &amp; National Parks of India</a></li>
+        <li><a href="/blog">All Study Guides &amp; Blog Articles</a></li>
+      </ul>
     </section>
     <section><h2>Frequently asked questions</h2>
       <dl>${buildGuideFaqs(guide).map(f => `<dt><strong>${htmlText(f.q)}</strong></dt><dd>${htmlText(f.a)}</dd>`).join('')}</dl>
